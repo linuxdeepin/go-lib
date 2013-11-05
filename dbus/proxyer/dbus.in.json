@@ -1,0 +1,23 @@
+{
+    "Config": {
+	"NotExportBus": true,
+	"OutputPath": "dde.dbus.go"
+    },
+    "Interfaces": [
+	{
+	    "Type": "introspect",
+	    "File": "dock.xml",
+	    "Dest": "com.deepin.dde.dock",
+	    "Path": "/com/deepin/dde/dock",
+	    "Name":"com.deepin.dde.dock",
+	    "ObJName": "DockDBusObj"
+	},
+	{
+	    "Type": "introspect",
+	    "Dest": "com.deepin.dde.desktop",
+	    "Path": "/com/deepin/dde/desktop",
+	    "Name":"com.deepin.dde.desktop",
+	    "ObjName": "DesktopDBusObj"
+	}
+    ]
+}
