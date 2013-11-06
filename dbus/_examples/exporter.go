@@ -59,6 +59,6 @@ func main() {
 	m := DesktopManager{}
 	m.Name = "snyh"
 	dbus.InstallOnSession(&m)
-	m.Changed(3) //emit an signal
+	/*m.Changed(3) //emit an signal*/
 	select {}
 }

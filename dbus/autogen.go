@@ -113,13 +113,13 @@ func InstallOnSession(obj DBusObject) error {
 	info := obj.GetDBusInfo()
 	path := ObjectPath(info.ObjectPath)
 	if path.IsValid() {
-		return installOnSessionAny(obj, info.Dest, path, info.Interface)
+		return InstallOnSessionAny(obj, info.Dest, path, info.Interface)
 	}
 	return errors.New("ObjectPath " + info.ObjectPath + " is invalid")
 }
 
 //TODO: Need exported?
-func installOnSessionAny(v interface{}, dest_name string, path ObjectPath, iface string) error {
+func InstallOnSessionAny(v interface{}, dest_name string, path ObjectPath, iface string) error {
 	conn, err := SessionBus()
 	if err != nil {
 		return err
