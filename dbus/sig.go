@@ -47,10 +47,10 @@ func SignatureOfType(t reflect.Type) Signature {
 
 // getSignature returns the signature of the given type and panics on unknown types.
 func getSignature(t reflect.Type) string {
-	// handle simple types first
 	if t.Implements(dbusObjectInterface) {
 		return "o"
 	}
+	// handle simple types first
 	switch t.Kind() {
 	case reflect.Uint8:
 		return "y"
@@ -83,6 +83,8 @@ func getSignature(t reflect.Type) string {
 			return "o"
 		}
 		return "s"
+	case dbusObjectInterface.Kind():
+		return "o"
 	case reflect.Struct:
 		if t == variantType {
 			return "v"
