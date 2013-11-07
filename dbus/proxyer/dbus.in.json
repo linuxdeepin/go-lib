@@ -1,23 +1,171 @@
 {
     "Config": {
 	"NotExportBus": true,
-	"OutputPath": "dde.dbus.go"
+	"OutputDir": "nm-go",
+	"InputDir": "example-xml",
+	"PkgName": "nm",
+	"BusType": "System",
+	"DestName": "org.freedesktop.NetworkManager"
     },
     "Interfaces": [
-	{
-	    "Type": "introspect",
-	    "File": "dock.xml",
-	    "Dest": "com.deepin.dde.dock",
-	    "Path": "/com/deepin/dde/dock",
-	    "Name":"com.deepin.dde.dock",
-	    "ObJName": "DockDBusObj"
-	},
-	{
-	    "Type": "introspect",
-	    "Dest": "com.deepin.dde.desktop",
-	    "Path": "/com/deepin/dde/desktop",
-	    "Name":"com.deepin.dde.desktop",
-	    "ObjName": "DesktopDBusObj"
-	}
+    {
+	"Interface": "org.freedesktop.NetworkManager",
+	"GoFile": "nm-manager.go",
+	"XMLFile": "nm-manager.xml",
+	"ObjectName": "Manager",
+	"TestPath": "/org/freedesktop/NetworkManager"
+    },
+    {
+	"Interface": "org.freedesktop.NetworkManager.AccessPoint",
+	"GoFile": "nm-access-point.go",
+	"XMLFile": "nm-access-point.xml",
+	"ObjectName": "AccessPoint"
+    },
+    {
+	"Interface": "org.freedesktop.NetworkManager.Device",
+	"GoFile": "nm-device.go",
+	"XMLFile": "nm-device.xml",
+	"ObjectName": "Device"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Wired",
+	"GoFile": "nm-device-ethernet.go",
+	"XMLFile": "nm-device-ethernet.xml",
+	"ObjectName": "DeviceWired"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Wireless",
+	"GoFile": "nm-device-wifi.go",
+	"XMLFile": "nm-device-wifi.xml",
+	"ObjectName": "DeviceWireless"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Modem",
+	"GoFile": "nm-device-modem.go",
+	"XMLFile": "nm-device-modem.xml",
+	"ObjectName": "DeviceModem"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Bluetooth",
+	"GoFile": "nm-device-bt.go",
+	"XMLFile": "nm-device-bt.xml",
+	"ObjectName": "DeviceBluetooth"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.OlpcMesh",
+	"GoFile": "nm-device-olpc-mesh.go",
+	"XMLFile": "nm-device-olpc-mesh.xml",
+	"ObjectName": "DeviceOlpcMesh"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.WiMax",
+	"GoFile": "nm-device-wimax.go",
+	"XMLFile": "nm-device-wimax.xml",
+	"ObjectName": "DeviceWiMax"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.WiMax.Nsp",
+	"GoFile": "nm-device-bond.go",
+	"XMLFile": "nm-wimax-nsp.xml",
+	"ObjectName": "DeviceWiMaxNsp"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Infiniband",
+	"GoFile": "nm-device-infiniband.go",
+	"XMLFile": "nm-device-infiniband.xml",
+	"ObjectName": "DeviceInfiniband"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Bond",
+	"GoFile": "nm-device-bond.go",
+	"XMLFile": "nm-device-bond.xml",
+	"ObjectName": "DeviceBond"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Bridge",
+	"GoFile": "nm-device-bridge.go",
+	"XMLFile": "nm-device-bridge.xml",
+	"ObjectName": "DeviceBridge"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Vlan",
+	"GoFile": "nm-device-vlan.go",
+	"XMLFile": "nm-device-vlan.xml",
+	"ObjectName": "DeviceVlan"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Device.Adsl",
+	"GoFile": "nm-device-adsl.go",
+	"XMLFile": "nm-device-adsl.xml",
+	"ObjectName": "DeviceAdsl"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.IP4Config",
+	"GoFile": "nm-ip4-config.go",
+	"XMLFile": "nm-ip4-config.xml",
+	"ObjectName": "IP4Config"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.IP6Config",
+	"GoFile": "nm-ip6-config.go",
+	"XMLFile": "nm-ip6-config.xml",
+	"ObjectName": "IP6Config"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.DHCP4Config",
+	"GoFile": "nm-dhcp4-config.go",
+	"XMLFile": "nm-dhcp4-config.xml",
+	"ObjectName": "DHCP4Config"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.DHCP6Config",
+	"GoFile": "nm-dhcp6-config.go",
+	"XMLFile": "nm-dhcp6-config.xml",
+	"ObjectName": "DHCP6Config"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Settings",
+	"GoFile": "nm-settings.go",
+	"XMLFile": "nm-settings.xml",
+	"ObjectName": "Settings",
+	"TestPath": "/org/freedesktop/NetworkManager/Settings"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Settings.Connection",
+	"GoFile": "nm-settings-connection.go",
+	"XMLFile": "nm-settings-connection.xml",
+	"ObjectName": "SettingsConnection"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.Connection.Active",
+	"GoFile": "nm-active-connection.go",
+	"XMLFile": "nm-active-connection.xml",
+	"ObjectName": "ActiveConnection"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.AgentManager",
+	"GoFile": "nm-agent-manager.go",
+	"XMLFile": "nm-agent-manager.xml",
+	"ObjectName": "AgentManager",
+	"TestPath": "/org/freedesktop/NetworkManager/AgentManager"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.SecretAgent",
+	"GoFile": "nm-secret-agent.go",
+	"XMLFile": "nm-secret-agent.xml",
+	"ObjectName": "SecretAgent"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.VPN.Connection",
+	"GoFile": "nm-vpn-connection.go",
+	"XMLFile": "nm-vpn-connection.xml",
+	"ObjectName": "VPNConnection"
+    },
+    {
+	"Interface":"org.freedesktop.NetworkManager.VPN.Plugin",
+	"GoFile": "nm-vpn-plugin.go",
+	"XMLFile": "nm-vpn-plugin.xml",
+	"ObjectName": "VPNPlugin"
+    }
     ]
 }
