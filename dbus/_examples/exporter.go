@@ -24,8 +24,11 @@ func (m *DesktopManager) GetDBusInfo() dbus.DBusInfo {
 }
 
 //auto return an sub object to dbus
-func (m *DesktopManager) GetDesktopEntryById(id string) *DesktopEntry {
-	return NewDesktopEntry(id)
+func (m *DesktopManager) GetDesktopEntryById() []*DesktopEntry {
+	return []*DesktopEntry{NewDesktopEntry("b"), NewDesktopEntry("c")}
+}
+func (m *DesktopManager) GetOne() *DesktopEntry {
+	return NewDesktopEntry("a")
 }
 
 type DesktopEntry struct {

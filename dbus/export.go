@@ -150,12 +150,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		ret = ret[:out_n-1]
 	}
 	for i, r := range ret {
-		if r.Type().Implements(dbusObjectInterface) {
-			ret[i] = reflect.ValueOf(r.Interface().(DBusObject).GetDBusInfo().ObjectPath)
-			//TODO: which session to install
-			InstallOnSession(r.Interface().(DBusObject))
-		}
-
+		ret[i] = tryTranslateDBusObjectToObjectPath(r)
 	}
 	if msg.Flags&FlagNoReplyExpected == 0 {
 		reply := new(Message)
@@ -328,3 +323,30 @@ const (
 	RequestNameReplyExists
 	RequestNameReplyAlreadyOwner
 )
+
+func tryTranslateDBusObjectToObjectPath(value reflect.Value) reflect.Value {
+	if value.Type().Implements(dbusObjectInterface) {
+		obj := value.Interface().(DBusObject)
+		//TODO: which session to install
+		InstallOnSession(obj)
+		return reflect.ValueOf(ObjectPath(obj.GetDBusInfo().ObjectPath))
+	}
+	switch value.Type().Kind() {
+	case reflect.Array, reflect.Slice:
+		n := value.Len()
+		if n == 0 {
+			return value
+		}
+		t := value.Index(0).Type()
+		if t.Implements(dbusObjectInterface) {
+			t = objectPathType
+		}
+		new_value := reflect.MakeSlice(reflect.SliceOf(t), n, n)
+		for i := 0; i < n; i++ {
+			new_value.Index(i).Set(tryTranslateDBusObjectToObjectPath(value.Index(i)))
+		}
+		return new_value
+	}
+	// Is possible dynamic create an struct or change one struct's some field's type by some trick?
+	return value
+}
