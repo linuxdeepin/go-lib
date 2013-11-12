@@ -98,11 +98,23 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 			if access != "read" {
 				access = "readwrite"
 			}
-			ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
-				Name:   field.Name,
-				Type:   SignatureOfType(field.Type).String(),
-				Access: access,
-			})
+			if field.Type.Implements(propertyType) {
+				field_v := getValueOf(ifc).Field(i)
+				t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
+				if t != nil {
+					ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
+						Name:   field.Name,
+						Type:   SignatureOfType(t).String(),
+						Access: access,
+					})
+				}
+			} else {
+				ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
+					Name:   field.Name,
+					Type:   SignatureOfType(field.Type).String(),
+					Access: access,
+				})
+			}
 		}
 	}
 
