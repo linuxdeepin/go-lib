@@ -3,6 +3,7 @@ package property
 import "dlib"
 import "reflect"
 import "dlib/dbus"
+import "log"
 
 type GSettingsProperty struct {
 	core      *dlib.Settings
@@ -33,6 +34,10 @@ func NewGSettingsPropertyFull(s *dlib.Settings, key string, t interface{}, con *
 	prop.core.Connect("changed::"+key, func(s *dlib.Settings, key string) {
 		inputs := make(map[string]dbus.Variant)
 		inputs[propName] = dbus.MakeVariant(prop.Get())
+		e := con.Emit(dbus.ObjectPath(path), "org.freedesktop.DBus.Properties.PropertiesChanged", ifc, inputs, make([]string, 0))
+		if e != nil {
+			log.Print(e)
+		}
 	})
 	return prop
 }
