@@ -178,32 +178,6 @@ func main() {
 	}
 }
 
-var __TEST_TEMPLATE = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
-package {{PkgName}}
-import "testing"
-{{range .Methods}}
-func Test{{ObjName}}Method{{.Name}} (t *testing.T) {
-	{{/*
-	rnd := rand.New(rand.NewSource(99))
-	r := Get{{ObjName}}("{{TestPath}}").{{.Name}}({{.Args}})
---*/}}
-
-}
-{{end}}
-
-{{range .Properties}}
-func Test{{ObjName}}Property{{.Name}} (t *testing.T) {
-	t.Log("Get the property {{.Name}} of object {{ObjName}} ===> ",
-		Get{{ObjName}}("{{TestPath}}").Get{{.Name}}())
-}
-{{end}}
-
-{{range .Signals}}
-func Test{{ObjName}}Signal{{.Name}} (t *testing.T) {
-}
-{{end}}
-`
-
 func genTest(testPath, pkgName string, objName string, writer io.Writer, info dbus.InterfaceInfo) {
 	funcs := template.FuncMap{
 		"TestPath": func() string { return testPath },
