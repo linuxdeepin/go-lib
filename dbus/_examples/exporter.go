@@ -14,7 +14,7 @@ const (
 type DesktopManager struct {
 	Changed  func(int32)
 	Name     string
-	DockMode *property.GSettingsProperty
+	DockMode dbus.Property
 }
 
 func (m *DesktopManager) ListAutoStart() []string {
