@@ -76,7 +76,7 @@ func (p GSettingsProperty) Get() interface{} {
 	case reflect.String:
 		return p.core.GetString(p.key)
 	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
-		return p.core.GetInt(p.key)
+		return int32(p.core.GetInt(p.key))
 	case reflect.Slice:
 		return p.core.GetStrv(p.key)
 	}
