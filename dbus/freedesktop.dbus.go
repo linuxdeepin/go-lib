@@ -45,7 +45,8 @@ func (i IntrospectProxy) Introspect() (string, *Error) {
 }
 
 type PropertiesProxy struct {
-	infos map[string]interface{}
+	infos             map[string]interface{}
+	PropertiesChanged func(string, map[string]Variant, []string)
 }
 type Property interface {
 	Get() interface{}
