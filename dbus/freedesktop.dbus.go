@@ -47,6 +47,11 @@ func (i IntrospectProxy) Introspect() (string, *Error) {
 type PropertiesProxy struct {
 	infos map[string]interface{}
 }
+type Property interface {
+	Get() interface{}
+	Set(interface{})
+	GetType() reflect.Type
+}
 
 var errUnknownProperty = Error{
 	"org.freedesktop.DBus.Error.UnknownProperty",
@@ -81,8 +86,20 @@ func (i PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *
 		ifc_t := getTypeOf(ifc)
 		t, ok := ifc_t.FieldByName(prop_name)
 		v := getValueOf(ifc).FieldByName(prop_name)
-		if ok && v.IsValid() {
-			if v.CanAddr() && "read" != t.Tag.Get("access") && v.Type() == reflect.TypeOf(value.Value()) {
+		if ok && v.IsValid() && "read" != t.Tag.Get("access") {
+			if v.Type().Implements(propertyType) {
+				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
+					v.MethodByName("Set").Interface().(func(interface{}))(value.Value())
+					fn := getValueOf(ifc).MethodByName("OnPropertiesChanged")
+					if fn.IsValid() && !fn.IsNil() {
+						fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.Zero(reflect.TypeOf(value.Value()))})
+					}
+					return nil
+				} else {
+					return &errPropertyNotWritable
+				}
+			}
+			if v.CanAddr() && v.Type() == reflect.TypeOf(value.Value()) {
 				prop_val := reflect.ValueOf(value.Value())
 				prop_old_val := v.Interface()
 				v.Set(prop_val)
@@ -103,6 +120,10 @@ func (i PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *
 func (i PropertiesProxy) Get(ifc_name string, prop_name string) (Variant, *Error) {
 	if ifc, ok := i.infos[ifc_name]; ok {
 		value := getValueOf(ifc).FieldByName(prop_name)
+		if value.Type().Implements(propertyType) {
+			t := value.MethodByName("Get").Interface().(func() interface{})()
+			return MakeVariant(t), nil
+		}
 		if value.IsValid() {
 			return MakeVariant(value.Interface()), nil
 		} else {

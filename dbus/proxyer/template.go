@@ -20,6 +20,7 @@ var __IFC_TEMPLATE = `/*This file is auto generate by dlib/dbus/proxyer. Don't e
 
 package {{PkgName}}
 import "dlib/dbus"
+{{with .Signals}}import "reflect"{{end}}
 
 type {{ExportName}} struct {
 	core *dbus.Object
@@ -36,12 +37,20 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{range .Signals}}
 func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterInsProto .Args}})) {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
-		"type='signal',path='"+{{OBJ_NAME}}.core.Path()+"', interface='{{IfcName}}',sender='{{DestName}}'")
+		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
 	__conn.Signal({{OBJ_NAME}}.signal_chan)
 	go func() {
 		for v := range({{OBJ_NAME}}.signal_chan) {
-			v = v
-			/*callback(v.Body...)*/
+			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
+				continue
+			}
+			{{ if eq 0 (len .Args)}}_ = reflect.TypeOf /*prevent compile error*/{{end}}
+			{{range $index, $arg := .Args}}if reflect.TypeOf(v.Body[0]) != reflect.TypeOf((*{{TypeFor $arg.Type}})(nil)).Elem() {
+				continue
+			}
+			{{end}}
+
+			callback({{range $index, $arg := .Args}}{{if $index}},{{end}}v.Body[{{$index}}].({{TypeFor $arg.Type}}){{end}})
 		}
 	}()
 
@@ -68,4 +77,30 @@ func Get{{ExportName}}(path string) *{{ExportName}} {
 	return  &{{ExportName}}{getBus().Object("{{DestName}}", dbus.ObjectPath(path)){{if .Signals}},make(chan *dbus.Signal){{end}}}
 }
 
+`
+
+var __TEST_TEMPLATE = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
+package {{PkgName}}
+import "testing"
+{{range .Methods}}
+func Test{{ObjName}}Method{{.Name}} (t *testing.T) {
+	{{/*
+	rnd := rand.New(rand.NewSource(99))
+	r := Get{{ObjName}}("{{TestPath}}").{{.Name}}({{.Args}})
+--*/}}
+
+}
+{{end}}
+
+{{range .Properties}}
+func Test{{ObjName}}Property{{.Name}} (t *testing.T) {
+	t.Log("Get the property {{.Name}} of object {{ObjName}} ===> ",
+		Get{{ObjName}}("{{TestPath}}").Get{{.Name}}())
+}
+{{end}}
+
+{{range .Signals}}
+func Test{{ObjName}}Signal{{.Name}} (t *testing.T) {
+}
+{{end}}
 `
