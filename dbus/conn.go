@@ -96,7 +96,7 @@ func SessionBusPrivate() (*Conn, error) {
 		return Dial(address)
 	}
 
-	return SessionBusPlatform()
+	return sessionBusPlatform()
 }
 
 // SystemBus returns a shared connection to the system bus, connecting to it if
