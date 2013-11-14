@@ -73,4 +73,34 @@ func filterGoKeyWord(info *dbus.InterfaceInfo) {
 	for i, _ := range info.Properties {
 		propKeyword = keywordFilter(propKeyword, &info.Properties[i].Name)
 	}
+	solveNameConfilict(info)
+}
+
+func solveNameConfilict(info *dbus.InterfaceInfo) {
+	usedName := make(map[string]bool)
+	for _, m := range info.Methods {
+		usedName[m.Name] = true
+	}
+	for i, s := range info.Signals {
+		sigName := "Connect" + s.Name
+		if usedName[sigName] {
+			newName := sigName + "_"
+			info.Signals[i].Name = newName
+			usedName[newName] = true
+		}
+	}
+	for i, p := range info.Properties {
+		propName := "Set" + p.Name
+		if usedName[propName] {
+			newName := propName + "_"
+			info.Properties[i].Name = newName
+			usedName[newName] = true
+		}
+		propName = "Get" + p.Name
+		if usedName[propName] {
+			newName := propName + "_"
+			info.Properties[i].Name = newName
+			usedName[newName] = true
+		}
+	}
 }
