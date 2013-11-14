@@ -1,9 +1,10 @@
 package main
 
 import "dlib/dbus"
+import "strings"
 
-func _filter(old *string) {
-	v := map[string]bool{
+func getGoKeyword() map[string]bool {
+	return map[string]bool{
 		"break":       true,
 		"default":     true,
 		"func":        true,
@@ -30,26 +31,46 @@ func _filter(old *string) {
 		"return":      true,
 		"var":         true,
 	}
+}
+
+func keywordFilter(v map[string]bool, old *string) map[string]bool {
+	*old = strings.Replace(*old, "-", "_", -1)
 	if v[*old] {
 		*old = *old + "_"
+		v[*old] = true
 	}
+	return v
 }
 
 func filterGoKeyWord(info *dbus.InterfaceInfo) {
-	_filter(&info.Name)
+	keywordFilter(getGoKeyword(), &info.Name)
+
+	methodKeyword := getGoKeyword()
 	for i, _ := range info.Methods {
-		_filter(&info.Methods[i].Name)
-		for j, _ := range info.Methods[i].Args {
-			_filter(&info.Methods[i].Args[j].Name)
+		methodKeyword = keywordFilter(methodKeyword, &info.Methods[i].Name)
+
+		argKeyword := getGoKeyword()
+		/*for j, _ := range info.Methods[i].Args {*/
+		/*argKeyword = keywordFilter(argKeyword, &info.Methods[i].Args[j].Name)*/
+		/*}*/
+
+		for j := 0; j < len(info.Methods[i].Args); j++ {
+			argKeyword = keywordFilter(argKeyword, &info.Methods[i].Args[j].Name)
 		}
 	}
+
+	sigKeyword := getGoKeyword()
 	for i, _ := range info.Signals {
-		_filter(&info.Signals[i].Name)
+		sigKeyword = keywordFilter(sigKeyword, &info.Signals[i].Name)
+
+		argKeyword := getGoKeyword()
 		for j, _ := range info.Signals[i].Args {
-			_filter(&info.Signals[i].Args[j].Name)
+			argKeyword = keywordFilter(argKeyword, &info.Signals[i].Args[j].Name)
 		}
 	}
+
+	propKeyword := getGoKeyword()
 	for i, _ := range info.Properties {
-		_filter(&info.Properties[i].Name)
+		propKeyword = keywordFilter(propKeyword, &info.Properties[i].Name)
 	}
 }
