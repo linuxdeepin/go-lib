@@ -23,6 +23,7 @@ import "dlib/dbus"
 {{with .Signals}}import "reflect"{{end}}
 
 type {{ExportName}} struct {
+	Path dbus.ObjectPath
 	core *dbus.Object
 	{{if .Signals}}signal_chan chan *dbus.Signal{{end}}
 }
@@ -74,7 +75,7 @@ func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{TypeFor .Type}}) {
 {{end}}
 
 func Get{{ExportName}}(path string) *{{ExportName}} {
-	return  &{{ExportName}}{getBus().Object("{{DestName}}", dbus.ObjectPath(path)){{if .Signals}},make(chan *dbus.Signal){{end}}}
+	return  &{{ExportName}}{dbus.ObjectPath(path), getBus().Object("{{DestName}}", dbus.ObjectPath(path)){{if .Signals}},make(chan *dbus.Signal){{end}}}
 }
 
 `
