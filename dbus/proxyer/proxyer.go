@@ -14,6 +14,7 @@ import "bytes"
 import "dlib/dbus"
 
 func GenInterfaceCode(pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
+	filterGoKeyWord(&info)
 	fmt.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{
 		"PkgName":    func() string { return pkgName },

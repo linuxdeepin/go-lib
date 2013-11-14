@@ -1,10 +1,11 @@
 package dbus
 
 import (
+	"errors"
 	"os/exec"
 )
 
-func SessionBusPlatform() (*Conn, error) {
+func sessionBusPlatform() (*Conn, error) {
 	cmd := exec.Command("launchctl", "getenv", "DBUS_LAUNCHD_SESSION_BUS_SOCKET")
 	b, err := cmd.CombinedOutput()
 

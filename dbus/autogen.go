@@ -192,7 +192,7 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 		infos["org.freedesktop.DBus.Introspectable"] = IntrospectProxy{infos, make(map[string]bool)}
 	}
 	if _, ok := infos["org.freedesktop.DBus.Properties"]; !ok {
-		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos}
+		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos, nil}
 	}
 	return nil
 }

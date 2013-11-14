@@ -45,7 +45,8 @@ func (i IntrospectProxy) Introspect() (string, *Error) {
 }
 
 type PropertiesProxy struct {
-	infos map[string]interface{}
+	infos             map[string]interface{}
+	PropertiesChanged func(string, map[string]Variant, []string)
 }
 type Property interface {
 	Get() interface{}
@@ -73,8 +74,14 @@ func (i PropertiesProxy) GetAll(ifc_name string) map[string]Variant {
 		n := o_type.NumField()
 		for i := 0; i < n; i++ {
 			field := o_type.Field(i)
+			value := getValueOf(ifc).Field(i)
 			if field.Type.Kind() != reflect.Func && field.PkgPath == "" {
-				props[field.Name] = MakeVariant(getValueOf(ifc).Field(i).Interface())
+				if value.Type().Implements(propertyType) {
+					t := value.MethodByName("Get").Interface().(func() interface{})()
+					props[field.Name] = MakeVariant(t)
+				} else {
+					props[field.Name] = MakeVariant(value.Interface())
+				}
 			}
 		}
 	}
