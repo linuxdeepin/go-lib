@@ -5,7 +5,7 @@ import "errors"
 import "strings"
 
 var (
-	dbusErrorType = reflect.TypeOf(Error{})
+	dbusErrorType = reflect.TypeOf((*Error)(nil))
 )
 
 func splitObjectPath(path ObjectPath) (parent, base string) {
@@ -59,7 +59,7 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 		}
 		for i := 0; i < n_out; i++ {
 			t := m.Out(i)
-			if t == reflect.TypeOf(dbusErrorType) {
+			if t == dbusErrorType {
 				continue
 			}
 			args = append(args, ArgInfo{

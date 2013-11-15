@@ -154,7 +154,7 @@ func (conn *Conn) handleCall(msg *Message) {
 	}
 	ret := m.Call(params)
 	out_n := t.NumOut()
-	if out_n > 0 && ret[out_n-1].Type() == reflect.TypeOf(&errmsgInvalidArg) {
+	if out_n > 0 && ret[out_n-1].Type() == dbusErrorType {
 		if em := ret[out_n-1].Interface().(*Error); em != nil {
 			conn.sendError(*em, sender, serial)
 			return
