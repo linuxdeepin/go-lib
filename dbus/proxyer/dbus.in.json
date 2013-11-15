@@ -1,12 +1,12 @@
 {
     "Config": {
+	"OutputDir": "nmpy",
+	"InputDir": "example-xml",
+	"BusType": "System",
+	"DestName": "org.freedesktop.NetworkManager",
 	"Language": "PyQt",
 	"NotExportBus": true,
-	"OutputDir": "nm-py",
-	"InputDir": "example-xml",
-	"PkgName": "nm",
-	"BusType": "System",
-	"DestName": "org.freedesktop.NetworkManager"
+	"PkgName": "nm"
     },
     "Interfaces": [
     {
@@ -18,153 +18,153 @@
     },
     {
 	"Interface": "org.freedesktop.NetworkManager.AccessPoint",
-	"OutFile": "nm-access-point",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-access-point.xml",
 	"ObjectName": "AccessPoint"
     },
     {
 	"Interface": "org.freedesktop.NetworkManager.Device",
-	"OutFile": "nm-device",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device.xml",
 	"ObjectName": "Device"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Wired",
-	"OutFile": "nm-device-ethernet",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-ethernet.xml",
 	"ObjectName": "DeviceWired"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Wireless",
-	"OutFile": "nm-device-wifi",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-wifi.xml",
 	"ObjectName": "DeviceWireless"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Modem",
-	"OutFile": "nm-device-modem",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-modem.xml",
 	"ObjectName": "DeviceModem"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Bluetooth",
-	"OutFile": "nm-device-bt",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-bt.xml",
 	"ObjectName": "DeviceBluetooth"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.OlpcMesh",
-	"OutFile": "nm-device-olpc-mesh",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-olpc-mesh.xml",
 	"ObjectName": "DeviceOlpcMesh"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.WiMax",
-	"OutFile": "nm-device-wimax",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-wimax.xml",
 	"ObjectName": "DeviceWiMax"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.WiMax.Nsp",
-	"OutFile": "nm-device-bond",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-wimax-nsp.xml",
 	"ObjectName": "DeviceWiMaxNsp"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Infiniband",
-	"OutFile": "nm-device-infiniband",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-infiniband.xml",
 	"ObjectName": "DeviceInfiniband"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Bond",
-	"OutFile": "nm-device-bond",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-bond.xml",
 	"ObjectName": "DeviceBond"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Bridge",
-	"OutFile": "nm-device-bridge",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-bridge.xml",
 	"ObjectName": "DeviceBridge"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Vlan",
-	"OutFile": "nm-device-vlan",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-vlan.xml",
 	"ObjectName": "DeviceVlan"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Device.Adsl",
-	"OutFile": "nm-device-adsl",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-device-adsl.xml",
 	"ObjectName": "DeviceAdsl"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.IP4Config",
-	"OutFile": "nm-ip4-config",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-ip4-config.xml",
 	"ObjectName": "IP4Config"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.IP6Config",
-	"OutFile": "nm-ip6-config",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-ip6-config.xml",
 	"ObjectName": "IP6Config"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.DHCP4Config",
-	"OutFile": "nm-dhcp4-config",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-dhcp4-config.xml",
 	"ObjectName": "DHCP4Config"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.DHCP6Config",
-	"OutFile": "nm-dhcp6-config",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-dhcp6-config.xml",
 	"ObjectName": "DHCP6Config"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Settings",
-	"OutFile": "nm-settings",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-settings.xml",
 	"ObjectName": "Settings",
 	"TestPath": "/org/freedesktop/NetworkManager/Settings"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Settings.Connection",
-	"OutFile": "nm-settings-connection",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-settings-connection.xml",
 	"ObjectName": "SettingsConnection"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.Connection.Active",
-	"OutFile": "nm-active-connection",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-active-connection.xml",
 	"ObjectName": "ActiveConnection"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.AgentManager",
-	"OutFile": "nm-agent-manager",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-agent-manager.xml",
 	"ObjectName": "AgentManager",
 	"TestPath": "/org/freedesktop/NetworkManager/AgentManager"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.SecretAgent",
-	"OutFile": "nm-secret-agent",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-secret-agent.xml",
 	"ObjectName": "SecretAgent"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.VPN.Connection",
-	"OutFile": "nm-vpn-connection",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-vpn-connection.xml",
 	"ObjectName": "VPNConnection"
     },
     {
 	"Interface":"org.freedesktop.NetworkManager.VPN.Plugin",
-	"OutFile": "nm-vpn-plugin",
+	"OutFile": "nm-manager",
 	"XMLFile": "nm-vpn-plugin.xml",
 	"ObjectName": "VPNPlugin"
     }

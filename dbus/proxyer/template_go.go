@@ -16,12 +16,14 @@ func getBus() *dbus.Conn {
 }
 `
 
-var __IFC_TEMPLATE = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
-
+var __IFC_TEMPLATE_INIT = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
 package {{PkgName}}
 import "dlib/dbus"
-{{with .Signals}}import "reflect"{{end}}
+import "reflect"
+var _ = reflect.TypeOf /*prevent compile error*/
+`
 
+var __IFC_TEMPLATE = `
 type {{ExportName}} struct {
 	Path dbus.ObjectPath
 	core *dbus.Object
@@ -45,7 +47,6 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterI
 			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
 				continue
 			}
-			{{ if eq 0 (len .Args)}}_ = reflect.TypeOf /*prevent compile error*/{{end}}
 			{{range $index, $arg := .Args}}if reflect.TypeOf(v.Body[0]) != reflect.TypeOf((*{{TypeFor $arg.Type}})(nil)).Elem() {
 				continue
 			}

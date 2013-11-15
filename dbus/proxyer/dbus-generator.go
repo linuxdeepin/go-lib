@@ -40,6 +40,7 @@ type _Config struct {
 type Infos struct {
 	Interfaces []_Interface
 	Config     _Config
+	outputs    map[string]io.Writer
 }
 
 var INFOS *Infos
@@ -68,13 +69,25 @@ func parseInfo() {
 	} else if len(INFOS.Config.OutputDir) == 0 {
 		INFOS.Config.OutputDir = outputPath
 	}
+	INFOS.outputs = make(map[string]io.Writer)
+	os.MkdirAll(INFOS.Config.OutputDir, 0755)
 	if INFOS.Config.Language == "GoLang" {
 		for i, ifc := range INFOS.Interfaces {
-			INFOS.Interfaces[i].OutFile = ifc.OutFile + ".go"
+			name := ifc.OutFile + ".go"
+			INFOS.Interfaces[i].OutFile = name
+			if INFOS.outputs[name], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+				panic(err)
+			}
+			renderInterfaceInit(INFOS.outputs[name])
 		}
 	} else if INFOS.Config.Language == "PyQt" {
 		for i, ifc := range INFOS.Interfaces {
-			INFOS.Interfaces[i].OutFile = ifc.OutFile + ".py"
+			name := ifc.OutFile + ".py"
+			INFOS.Interfaces[i].OutFile = name
+			if INFOS.outputs[name], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+				panic(err)
+			}
+			renderInterfaceInit(INFOS.outputs[name])
 		}
 	} else {
 		log.Fatal(`Didn't no generate target language, please set Language to "Golang" or "PyQt"`)
@@ -83,39 +96,42 @@ func parseInfo() {
 
 func main() {
 	parseInfo()
-	os.MkdirAll(INFOS.Config.OutputDir, 0755)
 	var writer io.Writer
 	var err error
 	if INFOS.Config.Language == "GoLang" {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "init.go")); err != nil {
-		panic(err)
+			panic(err)
 		}
 	} else if INFOS.Config.Language == "PyQt" {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "__init__.py")); err != nil {
-		panic(err)
+			panic(err)
 		}
 	}
-	getMainTemplate().Execute(writer, nil)
-
+	renderMain(writer)
 	writer.(*os.File).Close()
+
 	defer func() {
 		exec.Command("gofmt", "-w", INFOS.Config.OutputDir).Start()
+		for _, w := range INFOS.outputs {
+			w.(*os.File).Close()
+		}
 	}()
 	for _, ifc := range INFOS.Interfaces {
-		file := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
+		writer = INFOS.outputs[ifc.OutFile]
+
+		inFile := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
 		var reader io.Reader
-		writer, err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile))
-		if _, err := os.Stat(file); err == nil {
-			reader, err = os.Open(file)
+		if _, err := os.Stat(inFile); err == nil {
+			reader, err = os.Open(inFile)
 			if err != nil {
-				panic(err.Error() + "(File:" + file + ")")
+				panic(err.Error() + "(File:" + inFile + ")")
 			}
 			info := GetInterfaceInfo(reader, ifc.Interface)
-			GenInterfaceCode(INFOS.Config.Language, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(INFOS.Config.Language, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 			/*if ifc.TestPath != "" {*/
 			/*var test_writer io.Writer*/
 			/*test_writer, err = os.Create(path.Join(INFOS.Config.OutputDir, path.Base(ifc.OutFile)+"_test.go"))*/
-			/*genTest(ifc.TestPath, INFOS.Config.PkgName, ifc.ObjectName, test_writer, info)*/
+			/*render(ifc.TestPath, INFOS.Config.PkgName, ifc.ObjectName, test_writer, info)*/
 			/*}*/
 			reader.(*os.File).Close()
 		} else {
@@ -124,20 +140,8 @@ func main() {
 			if err := conn.Object(ifc.Dest, dbus.ObjectPath(ifc.ObjectPath)).Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&xml); err != nil {
 				panic(err.Error() + "Interface " + ifc.Interface + " is can't dynamic introspect")
 			}
-			GenInterfaceCode(INFOS.Config.Language, INFOS.Config.PkgName, GetInterfaceInfo(bytes.NewBufferString(xml), ifc.Interface), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(INFOS.Config.Language, INFOS.Config.PkgName, GetInterfaceInfo(bytes.NewBufferString(xml), ifc.Interface), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 
 		}
-		writer.(*os.File).Close()
 	}
 }
-
-/*func genTest(testPath, pkgName string, objName string, writer io.Writer, info dbus.InterfaceInfo) {*/
-/*funcs := template.FuncMap{*/
-/*"TestPath": func() string { return testPath },*/
-/*"PkgName":  func() string { return pkgName },*/
-/*"ObjName":  func() string { return objName },*/
-/*[>"GetTestValue": func(args []dbus.ArgInfo) string {<]*/
-/*[>},<]*/
-/*}*/
-/*template.Must(template.New("testing").Funcs(funcs).Parse(__TEST_TEMPLATE)).Execute(writer, info)*/
-/*}*/

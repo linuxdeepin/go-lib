@@ -17,15 +17,29 @@ func getInterfaceTemplate() string {
 	}
 	return __IFC_TEMPLATE
 }
-
-func getMainTemplate() *template.Template {
-	return template.Must(template.New("main").Funcs(template.FuncMap{
-		"GetBusType": func() string { return INFOS.Config.BusType },
-		"PkgName":    func() string { return INFOS.Config.PkgName },
-	}).Parse(getGlobalTemplate()))
+func getInterfaceInitTemplate() string {
+	if INFOS.Config.Language == "PyQt" {
+		return __IFC_TEMPLATE_INIT_PyQt
+	}
+	return __IFC_TEMPLATE_INIT
 }
 
-func GenInterfaceCode(lang string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
+func renderMain(writer io.Writer) {
+	template.Must(template.New("main").Funcs(template.FuncMap{
+		"GetBusType": func() string { return INFOS.Config.BusType },
+		"PkgName":    func() string { return INFOS.Config.PkgName },
+	}).Parse(getGlobalTemplate())).Execute(writer, nil)
+}
+
+func renderInterfaceInit(writer io.Writer) {
+	template.Must(template.New("IfcInit").Funcs(template.FuncMap{
+		"GetBusType": func() string { return INFOS.Config.BusType },
+		"PkgName":    func() string { return INFOS.Config.PkgName },
+		"HasSignals": func() bool { return true },
+	}).Parse(getInterfaceInitTemplate())).Execute(writer, nil)
+}
+
+func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
 	if lang == "Golang" {
 		filterKeyWord(getGoKeyword, &info)
 	}
@@ -88,4 +102,15 @@ func GenInterfaceCode(lang string, pkgName string, info dbus.InterfaceInfo, writ
 	}
 	templ := template.Must(template.New(exportName).Funcs(funcs).Parse(getInterfaceTemplate()))
 	templ.Execute(writer, info)
+}
+
+func renderTest(testPath, pkgName string, objName string, writer io.Writer, info dbus.InterfaceInfo) {
+	funcs := template.FuncMap{
+		"TestPath": func() string { return testPath },
+		"PkgName":  func() string { return pkgName },
+		"ObjName":  func() string { return objName },
+		/*"GetTestValue": func(args []dbus.ArgInfo) string {*/
+		/*},*/
+	}
+	template.Must(template.New("testing").Funcs(funcs).Parse(__TEST_TEMPLATE)).Execute(writer, info)
 }
