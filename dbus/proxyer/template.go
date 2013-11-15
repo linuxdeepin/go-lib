@@ -36,7 +36,7 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{end}}
 
 {{range .Signals}}
-func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterInsProto .Args}})) {
+func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
 		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
 	__conn.Signal({{OBJ_NAME}}.signal_chan)
