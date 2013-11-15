@@ -28,7 +28,7 @@ type _Interface struct {
 	OutFile, XMLFile, Dest, ObjectPath, Interface, ObjectName, TestPath string
 }
 type _Config struct {
-	Language     string
+	Target       string
 	NotExportBus bool
 	OutputDir    string
 	InputDir     string
@@ -72,7 +72,7 @@ func parseInfo() {
 	}
 	INFOS.outputs = make(map[string]io.Writer)
 	os.MkdirAll(INFOS.Config.OutputDir, 0755)
-	if INFOS.Config.Language == "GoLang" {
+	if INFOS.Config.Target == "GoLang" {
 		for i, ifc := range INFOS.Interfaces {
 			name := ifc.OutFile + ".go"
 			INFOS.Interfaces[i].OutFile = name
@@ -81,7 +81,7 @@ func parseInfo() {
 			}
 			renderInterfaceInit(INFOS.outputs[name])
 		}
-	} else if INFOS.Config.Language == "PyQt" {
+	} else if INFOS.Config.Target == "PyQt" {
 		for i, ifc := range INFOS.Interfaces {
 			name := ifc.OutFile + ".py"
 			INFOS.Interfaces[i].OutFile = name
@@ -91,7 +91,7 @@ func parseInfo() {
 			renderInterfaceInit(INFOS.outputs[name])
 		}
 	} else {
-		log.Fatal(`Didn't no generate target language, please set Language to "Golang" or "PyQt"`)
+		log.Fatal(`Didn't supported target , please set Target to "Golang" or "PyQt"`)
 	}
 }
 
@@ -99,11 +99,11 @@ func main() {
 	parseInfo()
 	var writer io.Writer
 	var err error
-	if INFOS.Config.Language == "GoLang" {
+	if INFOS.Config.Target == "GoLang" {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "init.go")); err != nil {
 			panic(err)
 		}
-	} else if INFOS.Config.Language == "PyQt" {
+	} else if INFOS.Config.Target == "PyQt" {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "__init__.py")); err != nil {
 			panic(err)
 		}
@@ -128,7 +128,7 @@ func main() {
 				panic(err.Error() + "(File:" + inFile + ")")
 			}
 			info := GetInterfaceInfo(reader, ifc.Interface)
-			renderInterface(INFOS.Config.Language, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 			/*if ifc.TestPath != "" {*/
 			/*var test_writer io.Writer*/
 			/*test_writer, err = os.Create(path.Join(INFOS.Config.OutputDir, path.Base(ifc.OutFile)+"_test.go"))*/
@@ -141,7 +141,7 @@ func main() {
 			if err := conn.Object(ifc.Dest, dbus.ObjectPath(ifc.ObjectPath)).Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&xml); err != nil {
 				panic(err.Error() + "Interface " + ifc.Interface + " is can't dynamic introspect")
 			}
-			renderInterface(INFOS.Config.Language, INFOS.Config.PkgName, GetInterfaceInfo(bytes.NewBufferString(xml), ifc.Interface), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, GetInterfaceInfo(bytes.NewBufferString(xml), ifc.Interface), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 
 		}
 	}

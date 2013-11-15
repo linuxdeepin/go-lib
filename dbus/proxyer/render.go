@@ -6,19 +6,19 @@ import "io"
 import "log"
 
 func getGlobalTemplate() string {
-	if INFOS.Config.Language == "PyQt" {
+	if INFOS.Config.Target == "PyQt" {
 		return __GLOBAL_TEMPLATE_PyQT
 	}
 	return __GLOBAL_TEMPLATE
 }
 func getInterfaceTemplate() string {
-	if INFOS.Config.Language == "PyQt" {
+	if INFOS.Config.Target == "PyQt" {
 		return __IFC_TEMPLATE_PyQt
 	}
 	return __IFC_TEMPLATE
 }
 func getInterfaceInitTemplate() string {
-	if INFOS.Config.Language == "PyQt" {
+	if INFOS.Config.Target == "PyQt" {
 		return __IFC_TEMPLATE_INIT_PyQt
 	}
 	return __IFC_TEMPLATE_INIT
@@ -40,8 +40,10 @@ func renderInterfaceInit(writer io.Writer) {
 }
 
 func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
-	if lang == "Golang" {
+	if lang == "GoLang" {
 		filterKeyWord(getGoKeyword, &info)
+	} else if lang == "PyQt" {
+		filterKeyWord(getPyQtKeyword, &info)
 	}
 	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{

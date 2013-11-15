@@ -52,7 +52,7 @@ func getGoKeyword() map[string]bool {
 	}
 }
 
-func getPyKeyword() map[string]bool {
+func getPyQtKeyword() map[string]bool {
 	return map[string]bool{}
 }
 
