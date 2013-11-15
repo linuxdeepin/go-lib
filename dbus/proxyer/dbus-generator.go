@@ -51,8 +51,9 @@ func parseInfo() {
 	}
 	INFOS = new(Infos)
 	var outputPath, inputFile string
-	flag.StringVar(&outputPath, "out", "out", "the file to save the generated code")
+	flag.StringVar(&outputPath, "out", "out", "the directory to save the generated code")
 	flag.StringVar(&inputFile, "in", "dbus.in.json", "the config file path")
+	flag.Parse()
 
 	f, err := os.Open(inputFile)
 	if err != nil {
