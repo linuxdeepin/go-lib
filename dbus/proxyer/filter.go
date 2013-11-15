@@ -52,6 +52,10 @@ func getGoKeyword() map[string]bool {
 	}
 }
 
+func getPyKeyword() map[string]bool {
+	return map[string]bool{}
+}
+
 func keywordFilter(v map[string]bool, old *string) map[string]bool {
 	*old = strings.Replace(*old, "-", "_", -1)
 	if v[*old] {
@@ -61,14 +65,14 @@ func keywordFilter(v map[string]bool, old *string) map[string]bool {
 	return v
 }
 
-func filterGoKeyWord(info *dbus.InterfaceInfo) {
-	keywordFilter(getGoKeyword(), &info.Name)
+func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
+	keywordFilter(keyword(), &info.Name)
 
-	methodKeyword := getGoKeyword()
+	methodKeyword := keyword()
 	for i, _ := range info.Methods {
 		methodKeyword = keywordFilter(methodKeyword, &info.Methods[i].Name)
 
-		argKeyword := getGoKeyword()
+		argKeyword := keyword()
 		/*for j, _ := range info.Methods[i].Args {*/
 		/*argKeyword = keywordFilter(argKeyword, &info.Methods[i].Args[j].Name)*/
 		/*}*/
@@ -78,48 +82,47 @@ func filterGoKeyWord(info *dbus.InterfaceInfo) {
 		}
 	}
 
-	sigKeyword := getGoKeyword()
+	sigKeyword := keyword()
 	for i, _ := range info.Signals {
 		sigKeyword = keywordFilter(sigKeyword, &info.Signals[i].Name)
 
-		argKeyword := getGoKeyword()
+		argKeyword := keyword()
 		for j, _ := range info.Signals[i].Args {
 			argKeyword = keywordFilter(argKeyword, &info.Signals[i].Args[j].Name)
 		}
 	}
 
-	propKeyword := getGoKeyword()
+	propKeyword := keyword()
 	for i, _ := range info.Properties {
 		propKeyword = keywordFilter(propKeyword, &info.Properties[i].Name)
 	}
-	solveNameConfilict(info)
-}
 
-func solveNameConfilict(info *dbus.InterfaceInfo) {
-	usedName := make(map[string]bool)
-	for _, m := range info.Methods {
-		usedName[m.Name] = true
-	}
-	for i, s := range info.Signals {
-		sigName := "Connect" + s.Name
-		if usedName[sigName] {
-			newName := sigName + "_"
-			info.Signals[i].Name = newName
-			usedName[newName] = true
+	func(info *dbus.InterfaceInfo) {
+		usedName := make(map[string]bool)
+		for _, m := range info.Methods {
+			usedName[m.Name] = true
 		}
-	}
-	for i, p := range info.Properties {
-		propName := "Set" + p.Name
-		if usedName[propName] {
-			newName := propName + "_"
-			info.Properties[i].Name = newName
-			usedName[newName] = true
+		for i, s := range info.Signals {
+			sigName := "Connect" + s.Name
+			if usedName[sigName] {
+				newName := sigName + "_"
+				info.Signals[i].Name = newName
+				usedName[newName] = true
+			}
 		}
-		propName = "Get" + p.Name
-		if usedName[propName] {
-			newName := propName + "_"
-			info.Properties[i].Name = newName
-			usedName[newName] = true
+		for i, p := range info.Properties {
+			propName := "Set" + p.Name
+			if usedName[propName] {
+				newName := propName + "_"
+				info.Properties[i].Name = newName
+				usedName[newName] = true
+			}
+			propName = "Get" + p.Name
+			if usedName[propName] {
+				newName := propName + "_"
+				info.Properties[i].Name = newName
+				usedName[newName] = true
+			}
 		}
-	}
+	}(info) //solve name conflict
 }
