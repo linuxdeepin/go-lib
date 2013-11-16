@@ -2,6 +2,9 @@ package main
 
 import "dlib/dbus"
 import "strings"
+import "strconv"
+import "log"
+
 
 func getGoKeyword() map[string]bool {
 	return map[string]bool{
@@ -59,9 +62,10 @@ func getPyQtKeyword() map[string]bool {
 func keywordFilter(v map[string]bool, old *string) map[string]bool {
 	*old = strings.Replace(*old, "-", "_", -1)
 	if v[*old] {
+		log.Println("Name conflict:", *old, " convent to:", *old+"_")
 		*old = *old + "_"
-		v[*old] = true
 	}
+	v[*old] = true
 	return v
 }
 
@@ -73,12 +77,12 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 		methodKeyword = keywordFilter(methodKeyword, &info.Methods[i].Name)
 
 		argKeyword := keyword()
-		/*for j, _ := range info.Methods[i].Args {*/
-		/*argKeyword = keywordFilter(argKeyword, &info.Methods[i].Args[j].Name)*/
-		/*}*/
-
 		for j := 0; j < len(info.Methods[i].Args); j++ {
-			argKeyword = keywordFilter(argKeyword, &info.Methods[i].Args[j].Name)
+			name := &info.Methods[i].Args[j].Name
+			if len(*name) == 0 {
+				*name = "arg" + strconv.Itoa(j)
+			}
+			argKeyword = keywordFilter(argKeyword, name)
 		}
 	}
 

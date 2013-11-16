@@ -6,8 +6,8 @@ var __GLOBAL_TEMPLATE_PyQT = `#! /usr/bin/env python
 
 var __IFC_TEMPLATE_INIT_PyQt = `#! /usr/bin/env python
 # This file is auto generate by dlib/dbus/proxyer @linuxdeepin.com . Don't edit it
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
-from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusInterface
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty, QVariant
+from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusInterface, QDBusError
 `
 
 var __IFC_TEMPLATE_PyQt = `
@@ -25,27 +25,30 @@ class {{ExportName}}(QObject):
     def __init__(self, path, parent=None):
         self.path = path
         super({{ExportName}}, self).__init__(parent)
-        bus = QDBusConnection.systemBus()
+        bus = QDBusConnection.{{GetBusType}}Bus()
         self._proxyer = {{ExportName}}.Proxyer(bus, path, self)
 {{with .Properties}}
         self._propIfc = QDBusInterface("{{DestName}}", self.path, "org.freedesktop.DBus.Properties", bus, parent)
 {{end}}
 {{range .Properties}}
-    @pyqtProperty('QDBusArgument')
+    @pyqtProperty(QVariant)
     def {{.Name}}(self):
         return QDBusReply(self._propIfc.call("Get", "{{IfcName}}", "{{.Name}}")).value()
     @{{.Name}}.setter
     def {{.Name}}(self, value):
         self._propIfc.asynCall("Set", "{{IfcName}}", "{{.Name}}", value)
 {{end}}
-{{range .Methods }}
-    @pyqtSlot(result=bool) #TODO
+{{range .Methods }}{{$outNum := CalcArgNum .Args "out"}}{{$inNum := (CalcArgNum .Args "in")}}
+    @pyqtSlot({{Repeat "QVariant" ", " $inNum}}{{if gt $outNum 0}}{{if gt $inNum 0}}, {{end}}result=QVariant{{end}})
     def {{.Name}} (self{{range .Args}}{{if eq .Direction "in"}}, {{.Name}}{{end}}{{end}}):
-        reply = QDBusReply(self._proxyer.call("{{.Name}}" {{GetParamterNames .Args}}))
-        if reply.isValid():
-                return reply.value()
+        msg = self._proxyer.call("{{.Name}}" {{GetParamterNames .Args}})
+        reply = QDBusReply(msg)
+        if reply.isValid():{{if gt $outNum 1}}
+                return list(msg.arguments()){{else}}{{if eq $outNum 0}}
+                pass{{else}}
+                return reply.value(){{end}}{{end}}
         else:
-                print(reply.error().message())
+                raise(Exception(reply.error().message()))
 {{end}}
 `
 var m = `

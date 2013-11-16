@@ -47,12 +47,30 @@ func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, write
 	}
 	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{
+		"GetBusType": func() string { return INFOS.Config.BusType },
 		"PkgName":    func() string { return pkgName },
 		"OBJ_NAME":   func() string { return "obj" },
 		"TypeFor":    func(s string) string { return dbus.TypeFor(s) },
 		"DestName":   func() string { return dest },
 		"IfcName":    func() string { return ifc_name },
 		"ExportName": func() string { return exportName },
+		"CalcArgNum": func(args []dbus.ArgInfo, direction string) (r int) {
+			for _, arg := range args {
+				if arg.Direction == direction {
+					r++
+				}
+			}
+			return
+		},
+		"Repeat": func(str string, sep string, times int) (r string) {
+			for i := 0; i < times; i++ {
+				if i != 0 {
+					r += sep
+				}
+				r += str
+			}
+			return
+		},
 		"GetParamterNames": func(args []dbus.ArgInfo) (ret string) {
 			for _, arg := range args {
 				if arg.Direction != "out" {
