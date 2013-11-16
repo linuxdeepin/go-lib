@@ -28,7 +28,14 @@ func renderMain(writer io.Writer) {
 	template.Must(template.New("main").Funcs(template.FuncMap{
 		"GetBusType": func() string { return INFOS.Config.BusType },
 		"PkgName":    func() string { return INFOS.Config.PkgName },
-	}).Parse(getGlobalTemplate())).Execute(writer, nil)
+		"GetModules": func() map[string]string {
+			r := make(map[string]string)
+			for _, ifc := range INFOS.Interfaces {
+				r[ifc.OutFile] = ifc.OutFile
+			}
+			return r
+		},
+	}).Parse(getGlobalTemplate())).Execute(writer, INFOS)
 }
 
 func renderInterfaceInit(writer io.Writer) {

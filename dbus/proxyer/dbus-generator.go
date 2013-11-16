@@ -79,22 +79,22 @@ func parseInfo() {
 		log.Fatal("Didn't support bus type", busType)
 	}
 	if INFOS.Config.Target == "GoLang" {
-		for i, ifc := range INFOS.Interfaces {
+		for _, ifc := range INFOS.Interfaces {
 			name := ifc.OutFile + ".go"
-			INFOS.Interfaces[i].OutFile = name
-			if INFOS.outputs[name], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+			/*INFOS.Interfaces[i].OutFile = name*/
+			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
 				panic(err)
 			}
-			renderInterfaceInit(INFOS.outputs[name])
+			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
 	} else if INFOS.Config.Target == "PyQt" {
-		for i, ifc := range INFOS.Interfaces {
+		for _, ifc := range INFOS.Interfaces {
 			name := ifc.OutFile + ".py"
-			INFOS.Interfaces[i].OutFile = name
-			if INFOS.outputs[name], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+			/*INFOS.Interfaces[i].OutFile = name*/
+			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
 				panic(err)
 			}
-			renderInterfaceInit(INFOS.outputs[name])
+			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
 	} else {
 		log.Fatal(`Didn't supported target , please set Target to "Golang" or "PyQt"`)

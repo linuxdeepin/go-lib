@@ -2,6 +2,24 @@ package main
 
 var __GLOBAL_TEMPLATE_PyQT = `#! /usr/bin/env python
 # This file is auto generate by dlib/dbus/proxyer @linuxdeepin.com . Don't edit it
+
+from PyQt5.QtCore import QObject, pyqtSlot{{range GetModules}}
+from {{.}} import *{{end}}
+
+class DBusFactory(QObject):
+    def __init__(self, parent=None):
+        super(DBusFactory, self).__init__(parent)
+        self.__objects = {}
+{{range .Interfaces}}
+    @pyqtSlot(str, result=QObject)
+    def get{{.ObjectName}}(self, path):
+        if hasattr(self.__objects, path):
+            return self.__objects[path]
+        else:
+            obj = {{.ObjectName}}(path)
+            self.__objects[path]=obj
+            return obj
+{{end}}
 `
 
 var __IFC_TEMPLATE_INIT_PyQt = `#! /usr/bin/env python
