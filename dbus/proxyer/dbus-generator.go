@@ -3,6 +3,7 @@ package main
 import "path"
 import "encoding/xml"
 import "encoding/json"
+import "strings"
 import "log"
 import "os"
 import "os/exec"
@@ -72,6 +73,11 @@ func parseInfo() {
 	}
 	INFOS.outputs = make(map[string]io.Writer)
 	os.MkdirAll(INFOS.Config.OutputDir, 0755)
+	busType := strings.ToLower(INFOS.Config.BusType)
+	INFOS.Config.BusType = busType
+	if busType != "sesssion" && busType != "system" {
+		log.Fatal("Didn't support bus type", busType)
+	}
 	if INFOS.Config.Target == "GoLang" {
 		for i, ifc := range INFOS.Interfaces {
 			name := ifc.OutFile + ".go"
