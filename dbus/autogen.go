@@ -3,6 +3,7 @@ package dbus
 import "reflect"
 import "errors"
 import "strings"
+import "log"
 
 var (
 	dbusErrorType = reflect.TypeOf((*Error)(nil))
@@ -100,13 +101,17 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 			}
 			if field.Type.Implements(propertyType) {
 				field_v := getValueOf(ifc).Field(i)
-				t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
-				if t != nil {
-					ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
-						Name:   field.Name,
-						Type:   SignatureOfType(t).String(),
-						Access: access,
-					})
+				if field_v.IsNil() {
+					log.Println("UnInit dbus property", field.Name)
+				} else {
+					t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
+					if t != nil {
+						ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
+							Name:   field.Name,
+							Type:   SignatureOfType(t).String(),
+							Access: access,
+						})
+					}
 				}
 			} else {
 				ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
