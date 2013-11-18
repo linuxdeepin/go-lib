@@ -80,24 +80,28 @@ func parseInfo() {
 	}
 	if INFOS.Config.Target == "GoLang" {
 		for _, ifc := range INFOS.Interfaces {
-			name := ifc.OutFile + ".go"
-			/*INFOS.Interfaces[i].OutFile = name*/
-			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".go")); err != nil {
 				panic(err)
 			}
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
 	} else if INFOS.Config.Target == "PyQt" {
 		for _, ifc := range INFOS.Interfaces {
-			name := ifc.OutFile + ".py"
-			/*INFOS.Interfaces[i].OutFile = name*/
-			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, name)); err != nil {
+			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".py")); err != nil {
 				panic(err)
 			}
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
+	} else if INFOS.Config.Target == "QML" {
+		for _, ifc := range INFOS.Interfaces {
+			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".h")); err != nil {
+				panic(err)
+			}
+			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
+		}
+		renderQMLProject()
 	} else {
-		log.Fatal(`Didn't supported target , please set Target to "Golang" or "PyQt"`)
+		log.Fatal(`Didn't supported target , please set Target to "Golang" or "PyQt" or "QML"`)
 	}
 }
 
@@ -111,6 +115,10 @@ func main() {
 		}
 	} else if INFOS.Config.Target == "PyQt" {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "__init__.py")); err != nil {
+			panic(err)
+		}
+	} else if INFOS.Config.Target == "QML" {
+		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "plugin.h")); err != nil {
 			panic(err)
 		}
 	}

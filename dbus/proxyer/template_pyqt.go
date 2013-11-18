@@ -1,6 +1,6 @@
 package main
 
-var __GLOBAL_TEMPLATE_PyQT = `#! /usr/bin/env python
+var __GLOBAL_TEMPLATE_PyQt = `#! /usr/bin/env python
 # This file is auto generate by dlib/dbus/proxyer @linuxdeepin.com . Don't edit it
 
 from PyQt5.QtCore import QObject, pyqtSlot{{range GetModules}}
@@ -43,7 +43,7 @@ class {{ExportName}}(QObject):
     def __init__(self, path, parent=None):
         self.path = path
         super({{ExportName}}, self).__init__(parent)
-        bus = QDBusConnection.{{GetBusType}}Bus()
+        bus = QDBusConnection.{{BusType}}Bus()
         self._proxyer = {{ExportName}}.Proxyer(bus, path, self)
 {{with .Properties}}
         self._propIfc = QDBusInterface("{{DestName}}", self.path, "org.freedesktop.DBus.Properties", bus, parent)

@@ -1,13 +1,13 @@
 package main
 
-var __GLOBAL_TEMPLATE = `
+var __GLOBAL_TEMPLATE_GoLang = `
 package {{PkgName}}
 import "dlib/dbus"
 var __conn *dbus.Conn = nil
 func getBus() *dbus.Conn {
 	if __conn  == nil {
 		var err error
-		__conn, err = dbus.{{GetBusType}}Bus()
+		__conn, err = dbus.{{BusType}}Bus()
 		if err != nil {
 			panic(err)
 		}
@@ -16,14 +16,14 @@ func getBus() *dbus.Conn {
 }
 `
 
-var __IFC_TEMPLATE_INIT = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
+var __IFC_TEMPLATE_INIT_GoLang = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
 package {{PkgName}}
 import "dlib/dbus"
 import "reflect"
 var _ = reflect.TypeOf /*prevent compile error*/
 `
 
-var __IFC_TEMPLATE = `
+var __IFC_TEMPLATE_GoLang = `
 type {{ExportName}} struct {
 	Path dbus.ObjectPath
 	core *dbus.Object

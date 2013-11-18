@@ -1,33 +1,34 @@
 package main
 
+import "strings"
 import "text/template"
 import "dlib/dbus"
 import "io"
 import "log"
 
-func getGlobalTemplate() string {
-	if INFOS.Config.Target == "PyQt" {
-		return __GLOBAL_TEMPLATE_PyQT
-	}
-	return __GLOBAL_TEMPLATE
-}
-func getInterfaceTemplate() string {
-	if INFOS.Config.Target == "PyQt" {
-		return __IFC_TEMPLATE_PyQt
-	}
-	return __IFC_TEMPLATE
-}
-func getInterfaceInitTemplate() string {
-	if INFOS.Config.Target == "PyQt" {
-		return __IFC_TEMPLATE_INIT_PyQt
-	}
-	return __IFC_TEMPLATE_INIT
+func lower(str string) string { return strings.ToLower(str[:1]) + str[1:] }
+func upper(str string) string { return strings.ToUpper(str[:1]) + str[1:] }
+
+var TEMPLs = map[string]string{
+	"GLOBAL_PyQt":   __GLOBAL_TEMPLATE_PyQt,
+	"GLOBAL_GoLang": __GLOBAL_TEMPLATE_GoLang,
+	"GLOBAL_QML":    __GLOBAL_TEMPLATE_QML,
+
+	"IFC_PyQt":   __IFC_TEMPLATE_PyQt,
+	"IFC_GoLang": __IFC_TEMPLATE_GoLang,
+	"IFC_QML":    __IFC_TEMPLATE_QML,
+
+	"IFC_INIT_PyQt":   __IFC_TEMPLATE_INIT_PyQt,
+	"IFC_INIT_GoLang": __IFC_TEMPLATE_INIT_GoLang,
+	"IFC_INIT_QML":    __IFC_TEMPLATE_INIT_QML,
 }
 
 func renderMain(writer io.Writer) {
 	template.Must(template.New("main").Funcs(template.FuncMap{
-		"GetBusType": func() string { return INFOS.Config.BusType },
-		"PkgName":    func() string { return INFOS.Config.PkgName },
+		"Lower":   lower,
+		"Upper":   upper,
+		"BusType": func() string { return INFOS.Config.BusType },
+		"PkgName": func() string { return INFOS.Config.PkgName },
 		"GetModules": func() map[string]string {
 			r := make(map[string]string)
 			for _, ifc := range INFOS.Interfaces {
@@ -35,15 +36,15 @@ func renderMain(writer io.Writer) {
 			}
 			return r
 		},
-	}).Parse(getGlobalTemplate())).Execute(writer, INFOS)
+	}).Parse(TEMPLs["GLOBAL_"+INFOS.Config.Target])).Execute(writer, INFOS)
 }
 
 func renderInterfaceInit(writer io.Writer) {
 	template.Must(template.New("IfcInit").Funcs(template.FuncMap{
-		"GetBusType": func() string { return INFOS.Config.BusType },
+		"BusType":    func() string { return INFOS.Config.BusType },
 		"PkgName":    func() string { return INFOS.Config.PkgName },
 		"HasSignals": func() bool { return true },
-	}).Parse(getInterfaceInitTemplate())).Execute(writer, nil)
+	}).Parse(TEMPLs["IFC_INIT_"+INFOS.Config.Target])).Execute(writer, nil)
 }
 
 func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
@@ -54,13 +55,26 @@ func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, write
 	}
 	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{
-		"GetBusType": func() string { return INFOS.Config.BusType },
+		"Lower":      lower,
+		"Upper":      upper,
+		"BusType":    func() string { return INFOS.Config.BusType },
 		"PkgName":    func() string { return pkgName },
 		"OBJ_NAME":   func() string { return "obj" },
 		"TypeFor":    func(s string) string { return dbus.TypeFor(s) },
+		"getQType":   getQType,
 		"DestName":   func() string { return dest },
 		"IfcName":    func() string { return ifc_name },
 		"ExportName": func() string { return exportName },
+		"NormaliseQDBus": normaliseQDBus,
+		"GetOuts": func(args []dbus.ArgInfo) []dbus.ArgInfo {
+			ret := make([]dbus.ArgInfo, 0)
+			for _, a := range args {
+				if a.Direction != "out" {
+					ret = append(ret, a)
+				}
+			}
+			return ret
+		},
 		"CalcArgNum": func(args []dbus.ArgInfo, direction string) (r int) {
 			for _, arg := range args {
 				if arg.Direction == direction {
@@ -127,7 +141,7 @@ func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, write
 			return
 		},
 	}
-	templ := template.Must(template.New(exportName).Funcs(funcs).Parse(getInterfaceTemplate()))
+	templ := template.Must(template.New(exportName).Funcs(funcs).Parse(TEMPLs["IFC_"+INFOS.Config.Target]))
 	templ.Execute(writer, info)
 }
 
