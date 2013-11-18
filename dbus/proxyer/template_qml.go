@@ -4,6 +4,7 @@ import "fmt"
 import "os"
 import "os/exec"
 import "path"
+import "strings"
 import "text/template"
 
 var __IFC_TEMPLATE_INIT_QML = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
@@ -28,8 +29,10 @@ public:
     {
     };
 {{range .Properties}}
-    Q_PROPERTY({{getQType .Type}} {{.Name}} NOTIFY {{.Name}}Changed)
-    Q_SIGNAL void {{.Name}}Changed({{getQType .Type}} {{.Name}});{{end}}
+    Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} WRITE set{{.Name}})
+    QVariant {{.Name}}() { return tryConvert(property("{{.Name}}")); }
+    void set{{.Name}}(const QVariant &v) { setProperty("{{.Name}}", v); }
+    {{end}}
 
 Q_SIGNALS:{{range .Signals}}
     void {{.Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}} {{$e.Name}}{{end}});{{end}}
@@ -40,14 +43,28 @@ class {{ExportName}} : public QObject
     Q_OBJECT
 private:
     QString m_path;
-    void rebuild() 
+    Q_SLOT void _propertiesChanged(const QDBusMessage &msg) {
+	    QList<QVariant> arguments = msg.arguments();
+	    if (3 != arguments.count())
+	    	return;
+	    QString interfaceName = msg.arguments().at(0).toString();
+	    if (interfaceName != "{{IfcName}}")
+		    return;
+
+	    QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
+	    foreach(const QString &prop, changedProps.keys()) {
+		    if (0) { {{range .Properties}}
+		    } else if (prop == "{{.Name}}") {
+			    Q_EMIT {{Lower .Name}}Changed(changedProps.value(prop));{{end}}
+		    }
+	    }
+    }
+    void _rebuild() 
     { 
 	  delete m_ifc;
           m_ifc = new {{ExportName}}Proxyer(m_path);{{range .Signals}}
 	  QObject::connect(m_ifc, SIGNAL({{.Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})), 
 	  		this, SIGNAL({{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})));{{end}}
-          //TODO: Signal arguments convert{{range .Properties}}
-	  QObject::connect(m_ifc, SIGNAL({{.Name}}Changed({{getQType .Type}})), this, SIGNAL({{Lower .Name}}Changed({{getQType .Type}})));{{end}}
     }
 public:
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
@@ -55,21 +72,27 @@ public:
 	    return m_path;
     }
     void setPath(const QString& path) {
+	    QDBusConnection::{{BusType}}Bus().disconnect("{{DestName}}", m_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
+	    				 this, SLOT(_propertiesChanged(QDBusMessage)));
 	    m_path = path;
-	    rebuild();
+	    QDBusConnection::{{BusType}}Bus().connect("{{DestName}}", m_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
+	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
+	    _rebuild();
     }
     Q_SIGNAL void pathChanged(QString);
 
     {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{Ifc2Obj IfcName}}"))
     {
+	    QDBusConnection::{{BusType}}Bus().connect("{{DestName}}", m_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
+	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
     }
     {{range .Properties}}
-    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} NOTIFY {{Lower .Name}}Changed){{end}}
+    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} WRITE set{{.Name}} NOTIFY {{Lower .Name}}Changed){{end}}
 
     //Property read methods{{range .Properties}}
-    const QVariant {{.Name}}() {
-	    return tryConvert(m_ifc->property("{{.Name}}"));
-    }{{end}}
+    const QVariant {{.Name}}() { return tryConvert(m_ifc->property("{{.Name}}")); }{{end}}
+    //Property set methods :TODO check access{{range .Properties}}
+    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); }{{end}}
 
 public Q_SLOTS:{{range .Methods}}
     QVariant {{.Name}}({{range $i, $e := GetOuts .Args}}{{if ne $i 0}}, {{end}}const QVariant &{{.Name}}{{end}}) {
@@ -103,7 +126,7 @@ public Q_SLOTS:{{range .Methods}}
 
 Q_SIGNALS:
 //Property changed notify signal{{range .Properties}}
-    void {{Lower .Name}}Changed();{{end}}
+    void {{Lower .Name}}Changed(QVariant);{{end}}
 
 //DBus Interface's signal{{range .Signals}}
     void {{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}} {{$e.Name}}{{end}});{{end}}
@@ -203,6 +226,8 @@ QVariant tryConvert(const QVariant& v) {
 		return QVariant::fromValue(v.value<QDBusObjectPath>().path());
 	} else if (v.userType() == qMetaTypeId<QDBusArgument>()) {
 		return tryConvert(parse(v.value<QDBusArgument>()));
+	} else if (v.userType() == qMetaTypeId<QByteArray>()) {
+		return QString(v.value<QByteArray>());
 	}
 	return v;
 }
@@ -313,4 +338,15 @@ func testQML() {
 		},
 	}).Parse(__TEST_QML)).Execute(writer, INFOS)
 
+}
+func qtPropertyFilter(s string) string {
+	s = strings.TrimSpace(s)
+	if strings.HasPrefix(s, "QMap") {
+		return "QVariantMap"
+	} else if strings.HasPrefix(s, "QList") {
+		return "QVariantList"
+	} else if strings.HasPrefix(s, "QValueList") {
+		return "QVariantValueList"
+	}
+	return s
 }

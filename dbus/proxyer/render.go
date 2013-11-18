@@ -67,7 +67,7 @@ func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, write
 		"IfcName":        func() string { return ifc_name },
 		"ExportName":     func() string { return exportName },
 		"NormaliseQDBus": normaliseQDBus,
-		"Ifc2Obj": ifc2obj, 
+		"Ifc2Obj":        ifc2obj,
 		"GetOuts": func(args []dbus.ArgInfo) []dbus.ArgInfo {
 			ret := make([]dbus.ArgInfo, 0)
 			for _, a := range args {
