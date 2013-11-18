@@ -79,6 +79,7 @@ func parseInfo() {
 		log.Fatal("Didn't support bus type", busType)
 	}
 	if INFOS.Config.Target == "GoLang" {
+		INFOS.Config.BusType = upper(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".go")); err != nil {
 				panic(err)
@@ -86,6 +87,7 @@ func parseInfo() {
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
 	} else if INFOS.Config.Target == "PyQt" {
+		INFOS.Config.BusType = lower(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".py")); err != nil {
 				panic(err)
@@ -93,6 +95,7 @@ func parseInfo() {
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
 	} else if INFOS.Config.Target == "QML" {
+		INFOS.Config.BusType = lower(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".h")); err != nil {
 				panic(err)
