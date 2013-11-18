@@ -9,20 +9,29 @@ import "os"
 import "os/exec"
 import "io"
 import "flag"
-import "bytes"
+
+/*import "bytes"*/
 
 import "dlib/dbus"
 
-func GetInterfaceInfo(reader io.Reader, ifc_name string) dbus.InterfaceInfo {
-	decoder := xml.NewDecoder(reader)
-	obj := dbus.NodeInfo{}
-	decoder.Decode(&obj)
-	for _, ifc := range obj.Interfaces {
-		if ifc.Name == ifc_name {
-			return ifc
+func GetInterfaceInfo(ifc _Interface) dbus.InterfaceInfo {
+	inFile := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
+	if _, err := os.Stat(inFile); err == nil {
+		reader, err := os.Open(inFile)
+		if err != nil {
+			panic(err.Error() + "(File:" + inFile + ")")
 		}
+		decoder := xml.NewDecoder(reader)
+		obj := dbus.NodeInfo{}
+		decoder.Decode(&obj)
+		for _, ifcInfo := range obj.Interfaces {
+			if ifcInfo.Name == ifc.Interface {
+				return ifcInfo
+			}
+		}
+		reader.Close()
 	}
-	panic("No " + ifc_name + " interface")
+	panic("Not Found Interface " + ifc.Interface)
 }
 
 type _Interface struct {
@@ -75,7 +84,7 @@ func parseInfo() {
 	os.MkdirAll(INFOS.Config.OutputDir, 0755)
 	busType := strings.ToLower(INFOS.Config.BusType)
 	INFOS.Config.BusType = busType
-	if busType != "sesssion" && busType != "system" {
+	if busType != "session" && busType != "system" {
 		log.Fatal("Didn't support bus type", busType)
 	}
 	if INFOS.Config.Target == "GoLang" {
@@ -133,32 +142,29 @@ func main() {
 		for _, w := range INFOS.outputs {
 			w.(*os.File).Close()
 		}
+		if INFOS.Config.Target == "QML" {
+			testQML()
+		}
 	}()
 	for _, ifc := range INFOS.Interfaces {
 		writer = INFOS.outputs[ifc.OutFile]
 
 		inFile := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
-		var reader io.Reader
 		if _, err := os.Stat(inFile); err == nil {
-			reader, err = os.Open(inFile)
-			if err != nil {
-				panic(err.Error() + "(File:" + inFile + ")")
-			}
-			info := GetInterfaceInfo(reader, ifc.Interface)
+			info := GetInterfaceInfo(ifc)
 			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 			/*if ifc.TestPath != "" {*/
 			/*var test_writer io.Writer*/
 			/*test_writer, err = os.Create(path.Join(INFOS.Config.OutputDir, path.Base(ifc.OutFile)+"_test.go"))*/
 			/*render(ifc.TestPath, INFOS.Config.PkgName, ifc.ObjectName, test_writer, info)*/
 			/*}*/
-			reader.(*os.File).Close()
 		} else {
 			conn, _ := dbus.SystemBus()
 			var xml string
 			if err := conn.Object(ifc.Dest, dbus.ObjectPath(ifc.ObjectPath)).Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&xml); err != nil {
 				panic(err.Error() + "Interface " + ifc.Interface + " is can't dynamic introspect")
 			}
-			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, GetInterfaceInfo(bytes.NewBufferString(xml), ifc.Interface), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, GetInterfaceInfo(ifc), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
 
 		}
 	}

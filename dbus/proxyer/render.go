@@ -6,8 +6,9 @@ import "dlib/dbus"
 import "io"
 import "log"
 
-func lower(str string) string { return strings.ToLower(str[:1]) + str[1:] }
-func upper(str string) string { return strings.ToUpper(str[:1]) + str[1:] }
+func lower(str string) string   { return strings.ToLower(str[:1]) + str[1:] }
+func upper(str string) string   { return strings.ToUpper(str[:1]) + str[1:] }
+func ifc2obj(ifc string) string { return "/" + strings.Replace(ifc, ".", "/", -1) }
 
 var TEMPLs = map[string]string{
 	"GLOBAL_PyQt":   __GLOBAL_TEMPLATE_PyQt,
@@ -55,17 +56,18 @@ func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, write
 	}
 	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{
-		"Lower":      lower,
-		"Upper":      upper,
-		"BusType":    func() string { return INFOS.Config.BusType },
-		"PkgName":    func() string { return pkgName },
-		"OBJ_NAME":   func() string { return "obj" },
-		"TypeFor":    func(s string) string { return dbus.TypeFor(s) },
-		"getQType":   getQType,
-		"DestName":   func() string { return dest },
-		"IfcName":    func() string { return ifc_name },
-		"ExportName": func() string { return exportName },
+		"Lower":          lower,
+		"Upper":          upper,
+		"BusType":        func() string { return INFOS.Config.BusType },
+		"PkgName":        func() string { return pkgName },
+		"OBJ_NAME":       func() string { return "obj" },
+		"TypeFor":        func(s string) string { return dbus.TypeFor(s) },
+		"getQType":       getQType,
+		"DestName":       func() string { return dest },
+		"IfcName":        func() string { return ifc_name },
+		"ExportName":     func() string { return exportName },
 		"NormaliseQDBus": normaliseQDBus,
+		"Ifc2Obj": ifc2obj, 
 		"GetOuts": func(args []dbus.ArgInfo) []dbus.ArgInfo {
 			ret := make([]dbus.ArgInfo, 0)
 			for _, a := range args {

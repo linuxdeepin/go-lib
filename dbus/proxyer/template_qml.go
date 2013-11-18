@@ -1,6 +1,8 @@
 package main
 
+import "fmt"
 import "os"
+import "os/exec"
 import "path"
 import "text/template"
 
@@ -45,7 +47,7 @@ private:
 	  QObject::connect(m_ifc, SIGNAL({{.Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})), 
 	  		this, SIGNAL({{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})));{{end}}
           //TODO: Signal arguments convert{{range .Properties}}
-	  QObject::connect(m_ifc, SIGNAL({{.Name}}({{getQType .Type}})), this, SIGNAL({{Lower .Name}}({{getQType .Type}})));{{end}}
+	  QObject::connect(m_ifc, SIGNAL({{.Name}}Changed({{getQType .Type}})), this, SIGNAL({{Lower .Name}}Changed({{getQType .Type}})));{{end}}
     }
 public:
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
@@ -58,7 +60,7 @@ public:
     }
     Q_SIGNAL void pathChanged(QString);
 
-    {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{IfcName}}"))
+    {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{Ifc2Obj IfcName}}"))
     {
     }
     {{range .Properties}}
@@ -128,9 +130,8 @@ class DBusPlugin: public QQmlExtensionPlugin
 
     public:
 	void registerTypes(const char* uri) {
-		qDebug() << "D:" << uri;
-		{{range GetModules}}
-	    qmlRegisterType<{{Upper .}}>(uri, 1, 0, "{{Upper .}}");{{end}}
+		qDebug() << "D:" << uri;{{range .Interfaces}}
+	    qmlRegisterType<{{.ObjectName}}>(uri, 1, 0, "{{.ObjectName}}");{{end}}
     }
 };
 #endif
@@ -192,11 +193,9 @@ QVariant parse(const QDBusArgument &argument)
 }
 
 QVariant tryConvert(const QVariant& v) {
-	return v;
 	if (QString(v.typeName()).startsWith("QList")) {
 		QVariantList list;
 		foreach(const QDBusObjectPath &p, v.value<QList<QDBusObjectPath> >()) {
-			/*qDebug() << "Prop :" << p.path();*/
 			list.append(tryConvert(QVariant::fromValue(p)));
 		}
 		return list;
@@ -217,12 +216,50 @@ QMAKE_CC=clang
 QMAKE_CXX=clang++
 
 TARGET = {{PkgName}}
-DESTDIR = lib
+DESTDIR = {{PkgName}}
 
 OBJECTS_DIRS = tmp
 MOC_DIR = tmp
 
 HEADERS += plugin.h {{range GetModules}}{{.}}.h {{end}}
+
+
+test.depends = {{PkgName}}/$(TARGET)
+test.commands = (qmlscene -I . test.qml)
+QMAKE_EXTRA_TARGETS += test
+`
+
+var __TEST_QML = `
+import {{PkgName}} 1.0
+import QtQuick 2.0
+import QtQuick.Controls 1.0
+
+Item { {{range .Interfaces}}
+    {{.ObjectName}} {
+       id: "{{Lower .ObjectName}}ID"
+       // path: "{{Ifc2Obj .Interface}}"
+    } {{end}}
+    width: 400; height: 400
+    TabView {
+	    anchors.fill  : parent
+	    {{range .Interfaces}}
+	    Tab {   {{$ifc := GetInterfaceInfo .}} {{$objName := Lower .ObjectName }}
+		    title: "{{.ObjectName}}"
+		    Column {
+			    {{range $ifc.Properties}}
+			    Row {
+				    Label {
+					    text: "{{.Name}}:"
+				    }
+				    Text {
+					    text: JSON.stringify({{$objName}}ID.{{Lower .Name}})
+				    }
+			    }{{end}}
+		    }
+	    }
+	    {{end}}
+    }
+}
 `
 
 func renderQMLProject() {
@@ -242,4 +279,38 @@ func renderQMLProject() {
 		},
 	}).Parse(__PROJECT_TEMPL_QML)).Execute(writer, INFOS)
 	writer.Close()
+}
+func testQML() {
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && qmake", INFOS.Config.OutputDir))
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+	qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, INFOS.Config.PkgName, "qmldir"))
+	if err != nil {
+		panic(err)
+	}
+	qmldir.WriteString("module " + INFOS.Config.PkgName + "\n")
+	qmldir.WriteString("plugin " + INFOS.Config.PkgName)
+	qmldir.Close()
+
+	writer, err := os.Create(path.Join(INFOS.Config.OutputDir, "test.qml"))
+	if err != nil {
+		panic(err)
+	}
+	template.Must(template.New("qmltest").Funcs(template.FuncMap{
+		"Lower":            lower,
+		"GetInterfaceInfo": GetInterfaceInfo,
+		"BusType":          func() string { return INFOS.Config.BusType },
+		"PkgName":          func() string { return INFOS.Config.PkgName },
+		"Ifc2Obj":          ifc2obj,
+		"GetModules": func() map[string]string {
+			r := make(map[string]string)
+			for _, ifc := range INFOS.Interfaces {
+				r[ifc.OutFile] = ifc.OutFile
+			}
+			return r
+		},
+	}).Parse(__TEST_QML)).Execute(writer, INFOS)
+
 }
