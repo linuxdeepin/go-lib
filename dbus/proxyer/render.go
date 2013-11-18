@@ -48,11 +48,13 @@ func renderInterfaceInit(writer io.Writer) {
 	}).Parse(TEMPLs["IFC_INIT_"+INFOS.Config.Target])).Execute(writer, nil)
 }
 
-func renderInterface(lang string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
-	if lang == "GoLang" {
+func renderInterface(target string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
+	if target == "GoLang" {
 		filterKeyWord(getGoKeyword, &info)
-	} else if lang == "PyQt" {
+	} else if target == "PyQt" {
 		filterKeyWord(getPyQtKeyword, &info)
+	} else if target == "QML" {
+		filterKeyWord(getGoKeyword, &info)
 	}
 	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
 	funcs := template.FuncMap{
