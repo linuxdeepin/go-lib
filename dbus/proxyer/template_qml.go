@@ -237,11 +237,8 @@ TEMPLATE=lib
 CONFIC += plugin
 QT += qml dbus
 
-QMAKE_CC=clang
-QMAKE_CXX=clang++
-
 TARGET = {{PkgName}}
-DESTDIR = {{PkgName}}
+DESTDIR = lib
 
 OBJECTS_DIRS = tmp
 MOC_DIR = tmp
@@ -311,7 +308,8 @@ func testQML() {
 	if err != nil {
 		panic(err)
 	}
-	qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, INFOS.Config.PkgName, "qmldir"))
+	/*qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, INFOS.Config.PkgName, "qmldir"))*/
+	qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, "lib", "qmldir"))
 	if err != nil {
 		panic(err)
 	}
