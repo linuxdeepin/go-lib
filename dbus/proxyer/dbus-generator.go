@@ -60,9 +60,10 @@ func parseInfo() {
 		panic("Don't call multime the function of parseInfo")
 	}
 	INFOS = new(Infos)
-	var outputPath, inputFile string
+	var outputPath, inputFile, target string
 	flag.StringVar(&outputPath, "out", "out", "the directory to save the generated code")
 	flag.StringVar(&inputFile, "in", "dbus.in.json", "the config file path")
+	flag.StringVar(&target, "target", "", "now support QML/PyQt/GoLang target")
 	flag.Parse()
 
 	f, err := os.Open(inputFile)
@@ -80,6 +81,10 @@ func parseInfo() {
 	} else if len(INFOS.Config.OutputDir) == 0 {
 		INFOS.Config.OutputDir = outputPath
 	}
+	if target != "" {
+		INFOS.Config.Target = target
+	}
+
 	INFOS.outputs = make(map[string]io.Writer)
 	os.MkdirAll(INFOS.Config.OutputDir, 0755)
 	busType := strings.ToLower(INFOS.Config.BusType)
