@@ -1,6 +1,5 @@
 package property
 
-import "dlib"
 import "reflect"
 import "dlib/dbus"
 import "log"
@@ -12,7 +11,7 @@ type NormalProperty struct {
 }
 
 func NewNormalProperty(con *dbus.Conn, path, ifc string, propName string, v interface{}) *NormalProperty {
-	prop := NormalProperty(v, reflect.TypeOf(v), nil)
+	prop := NormalProperty{v, reflect.TypeOf(v), nil}
 	prop.notify = func() {
 		inputs := make(map[string]dbus.Variant)
 		inputs[propName] = dbus.MakeVariant(prop.value)
@@ -21,7 +20,7 @@ func NewNormalProperty(con *dbus.Conn, path, ifc string, propName string, v inte
 			log.Print(e)
 		}
 	}
-	return prop
+	return &prop
 }
 
 func (p NormalProperty) Set(v interface{}) {
