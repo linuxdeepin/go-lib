@@ -164,6 +164,7 @@ func main() {
 			/*render(ifc.TestPath, INFOS.Config.PkgName, ifc.ObjectName, test_writer, info)*/
 			/*}*/
 		} else {
+			panic(inFile + " dind't exists")
 			conn, _ := dbus.SystemBus()
 			var xml string
 			if err := conn.Object(ifc.Dest, dbus.ObjectPath(ifc.ObjectPath)).Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&xml); err != nil {
