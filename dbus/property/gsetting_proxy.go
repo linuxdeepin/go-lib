@@ -17,6 +17,7 @@ func NewGSettingsProperty(s *dlib.Settings, key string, t interface{}) *GSetting
 	case reflect.Float32, reflect.Float64:
 	case reflect.String:
 	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
+
 	case reflect.Array:
 		panic("Don't support array of string use v[:] to pass an slice of string!")
 	case reflect.Slice:
@@ -56,8 +57,11 @@ func (p GSettingsProperty) Set(v interface{}) {
 	case reflect.String:
 		p.core.SetString(p.key, v.(string))
 		return
-	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
+	case reflect.Int, reflect.Int32, reflect.Int64:
 		p.core.SetInt(p.key, int(reflect.ValueOf(v).Int()))
+		return
+	case reflect.Uint, reflect.Uint32, reflect.Uint64:
+		p.core.SetUint(p.key, int(reflect.ValueOf(v).Int()))
 		return
 	case reflect.Slice:
 		p.core.SetStrv(p.key, v.([]string))
@@ -75,8 +79,10 @@ func (p GSettingsProperty) Get() interface{} {
 		return p.core.GetDouble(p.key)
 	case reflect.String:
 		return p.core.GetString(p.key)
-	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
+	case reflect.Int, reflect.Int32, reflect.Int64:
 		return int32(p.core.GetInt(p.key))
+	case reflect.Uint, reflect.Uint32, reflect.Uint64:
+		return uint32(p.core.GetUint(p.key))
 	case reflect.Slice:
 		return p.core.GetStrv(p.key)
 	}
