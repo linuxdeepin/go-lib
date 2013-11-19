@@ -1,4 +1,5 @@
 package dbus
+
 import "log"
 
 import "reflect"
@@ -16,7 +17,7 @@ var introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
 var propertyType = reflect.TypeOf((*Property)(nil)).Elem()
 
 func NotifyChange(con *Conn, obj DBusObject, propName string) {
-	value := reflect.ValueOf(obj).FieldByName(propName)
+	value := getValueOf(obj).FieldByName(propName)
 	if value.IsValid() {
 		inputs := make(map[string]Variant)
 		inputs[propName] = MakeVariant(value.Interface())
