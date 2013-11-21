@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 import "os"
+import "log"
 import "os/exec"
 import "path"
 import "strings"
@@ -303,10 +304,11 @@ func renderQMLProject() {
 	writer.Close()
 }
 func testQML() {
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %s && qmake", INFOS.Config.OutputDir))
+	cmd_str := fmt.Sprintf("cd %s && qmake", INFOS.Config.OutputDir)
+	cmd := exec.Command("bash", "-c", cmd_str)
 	err := cmd.Run()
 	if err != nil {
-		panic(err)
+		log.Fatal("Run: " + cmd_str + " failed(Did you have an valid qmake?) testQML code will not generated!")
 	}
 	/*qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, INFOS.Config.PkgName, "qmldir"))*/
 	qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, "lib", "qmldir"))
