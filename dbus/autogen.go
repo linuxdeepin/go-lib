@@ -127,21 +127,29 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 }
 
 func InstallOnSession(obj DBusObject) error {
-	info := obj.GetDBusInfo()
-	path := ObjectPath(info.ObjectPath)
-	if path.IsValid() {
-		return InstallOnSessionAny(obj, info.Dest, path, info.Interface)
-	}
-	return errors.New("ObjectPath " + info.ObjectPath + " is invalid")
-}
-
-//TODO: Need exported?
-func InstallOnSessionAny(v interface{}, dest_name string, path ObjectPath, iface string) error {
 	conn, err := SessionBus()
 	if err != nil {
 		return err
 	}
-	return export(conn, v, dest_name, path, iface)
+	return InstallOnAny(conn, obj)
+}
+
+func InstallOnSystem(obj DBusObject) error {
+	conn, err := SystemBus()
+	if err != nil {
+		return err
+	}
+	return InstallOnAny(conn, obj)
+}
+
+func InstallOnAny(conn *Conn, obj DBusObject) error {
+	info := obj.GetDBusInfo()
+	path := ObjectPath(info.ObjectPath)
+	if path.IsValid() {
+		return export(conn, obj, info.Dest, path, info.Interface)
+	} else {
+		return errors.New("ObjectPath " + info.ObjectPath + " is invalid")
+	}
 }
 
 func setupSignalHandler(c *Conn, v interface{}, path ObjectPath, iface string) {
