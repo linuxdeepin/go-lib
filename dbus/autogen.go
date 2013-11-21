@@ -182,7 +182,10 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 
 	}
 	if not_registered {
-		reply, _ := c.RequestName(name, NameFlagDoNotQueue)
+		reply, err := c.RequestName(name, NameFlagDoNotQueue)
+		if err != nil {
+			return err
+		}
 		if reply != RequestNameReplyPrimaryOwner {
 			return errors.New("name " + name + " already taken")
 		}
