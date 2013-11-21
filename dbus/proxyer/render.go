@@ -56,7 +56,7 @@ func renderInterface(target string, pkgName string, info dbus.InterfaceInfo, wri
 	} else if target == "QML" {
 		filterKeyWord(getGoKeyword, &info)
 	}
-	log.Println("d:", dest, "i:", ifc_name, "e:", exportName)
+	log.Printf("Generate %q code for service:%q interface:%q ObjectName:%q", INFOS.Config.Target, dest, ifc_name, exportName)
 	funcs := template.FuncMap{
 		"Lower":          lower,
 		"Upper":          upper,

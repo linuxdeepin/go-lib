@@ -5,7 +5,6 @@ import "strings"
 import "strconv"
 import "log"
 
-
 func getGoKeyword() map[string]bool {
 	return map[string]bool{
 		"break":       true,
@@ -59,22 +58,27 @@ func getPyQtKeyword() map[string]bool {
 	return map[string]bool{}
 }
 
-func keywordFilter(v map[string]bool, old *string) map[string]bool {
+func keywordFilter(v map[string]bool, old *string) (ret map[string]bool, hasHit bool) {
 	*old = strings.Replace(*old, "-", "_", -1)
 	if v[*old] {
-		log.Println("Name conflict:", *old, " convent to:", *old+"_")
 		*old = *old + "_"
+		hasHit = true
 	}
 	v[*old] = true
-	return v
+	ret = v
+	return
 }
 
 func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
+	var hit bool
 	keywordFilter(keyword(), &info.Name)
 
 	methodKeyword := keyword()
 	for i, _ := range info.Methods {
-		methodKeyword = keywordFilter(methodKeyword, &info.Methods[i].Name)
+		method_name := &info.Methods[i].Name
+		if methodKeyword, hit = keywordFilter(methodKeyword, method_name); hit {
+			log.Printf("Method name(%s.%s) conflict: convert", info.Name, *method_name)
+		}
 
 		argKeyword := keyword()
 		for j := 0; j < len(info.Methods[i].Args); j++ {
@@ -82,23 +86,38 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 			if len(*name) == 0 {
 				*name = "arg" + strconv.Itoa(j)
 			}
-			argKeyword = keywordFilter(argKeyword, name)
+			if argKeyword, hit = keywordFilter(argKeyword, name); hit {
+				log.Printf("The %d arg of (%s.%s:%s) conflict", j, info.Name, *method_name, *name)
+			}
 		}
 	}
 
 	sigKeyword := keyword()
 	for i, _ := range info.Signals {
-		sigKeyword = keywordFilter(sigKeyword, &info.Signals[i].Name)
+		sig_name := &info.Signals[i].Name
+
+		if sigKeyword, hit = keywordFilter(sigKeyword, sig_name); hit {
+			log.Printf("Signal name(%s.%s) conflict", info.Name, *sig_name)
+		}
 
 		argKeyword := keyword()
 		for j, _ := range info.Signals[i].Args {
-			argKeyword = keywordFilter(argKeyword, &info.Signals[i].Args[j].Name)
+			name := &info.Signals[i].Args[j].Name
+			if len(*name) == 0 {
+				*name = "arg" + strconv.Itoa(j)
+			}
+			if argKeyword, hit = keywordFilter(argKeyword, name); hit {
+				log.Printf("The %d arg of (%s.%s:%s) conflict", j, info.Name, *sig_name, *name)
+			}
 		}
 	}
 
 	propKeyword := keyword()
 	for i, _ := range info.Properties {
-		propKeyword = keywordFilter(propKeyword, &info.Properties[i].Name)
+		prop_name := &info.Properties[i].Name
+		if propKeyword, hit = keywordFilter(propKeyword, prop_name); hit {
+			log.Printf("Property name(%s.%s) conflict: convert", info.Name, *prop_name)
+		}
 	}
 
 	func(info *dbus.InterfaceInfo) {
