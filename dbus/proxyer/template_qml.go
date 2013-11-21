@@ -24,6 +24,9 @@ public:
     {{ExportName}}Proxyer(const QString &path)
           :QDBusAbstractInterface("{{DestName}}", path, "{{IfcName}}", QDBusConnection::{{BusType}}Bus(), 0)
     {
+	    if (!isValid()) {
+		    qDebug() << "Create {{ExportName}} remote object failed : " << lastError().message();
+	    }
     }
 
     ~{{ExportName}}Proxyer()
@@ -153,8 +156,7 @@ class DBusPlugin: public QQmlExtensionPlugin
 	Q_PLUGIN_METADATA(IID "com.deepin.dde.daemon.DBus")
 
     public:
-	void registerTypes(const char* uri) {
-		qDebug() << "D:" << uri;{{range .Interfaces}}
+	void registerTypes(const char* uri) { {{range .Interfaces}}
 	    qmlRegisterType<{{.ObjectName}}>(uri, 1, 0, "{{.ObjectName}}");{{end}}
     }
 };
