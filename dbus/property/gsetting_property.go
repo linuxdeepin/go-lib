@@ -1,17 +1,17 @@
 package property
 
-import "dlib"
+import "dlib/gio-2.0"
 import "reflect"
 import "dlib/dbus"
 import "log"
 
 type GSettingsProperty struct {
-	core      *dlib.Settings
+	core      *gio.Settings
 	key       string
 	valueType reflect.Type
 }
 
-func NewGSettingsProperty(s *dlib.Settings, key string, t interface{}) *GSettingsProperty {
+func NewGSettingsProperty(s *gio.Settings, key string, t interface{}) *GSettingsProperty {
 	switch reflect.TypeOf(t).Kind() {
 	case reflect.Bool:
 	case reflect.Float32, reflect.Float64:
@@ -30,9 +30,9 @@ func NewGSettingsProperty(s *dlib.Settings, key string, t interface{}) *GSetting
 	return &GSettingsProperty{s, key, reflect.TypeOf(t)}
 }
 
-func NewGSettingsPropertyFull(s *dlib.Settings, key string, t interface{}, con *dbus.Conn, path, ifc, propName string) *GSettingsProperty {
+func NewGSettingsPropertyFull(s *gio.Settings, key string, t interface{}, con *dbus.Conn, path, ifc, propName string) *GSettingsProperty {
 	prop := NewGSettingsProperty(s, key, t)
-	prop.core.Connect("changed::"+key, func(s *dlib.Settings, key string) {
+	prop.core.Connect("changed::"+key, func(s *gio.Settings, key string) {
 		inputs := make(map[string]dbus.Variant)
 		inputs[propName] = dbus.MakeVariant(prop.Get())
 		e := con.Emit(dbus.ObjectPath(path), "org.freedesktop.DBus.Properties.PropertiesChanged", ifc, inputs, make([]string, 0))
