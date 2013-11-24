@@ -10,6 +10,6 @@ func nothing() {
 	_ = gio.DBusConnectionFlagsAuthenticationClient
 	_ = glib.CanInline
 	_ = gobject.NilString
-	_ = dlib.NewSettings
+	_ = dlib.StartLoop
 	_ = dbus.NewConn
 }
