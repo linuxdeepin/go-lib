@@ -849,13 +849,13 @@ const (
 	SignalFlagsDeprecated SignalFlags = 256
 )
 type SignalInvocationHint struct {
-	SignalID uint32
+	SignalId uint32
 	Detail uint32
 	RunType SignalFlags
 }
 type SignalMatchType C.uint32_t
 const (
-	SignalMatchTypeID SignalMatchType = 1
+	SignalMatchTypeId SignalMatchType = 1
 	SignalMatchTypeDetail SignalMatchType = 2
 	SignalMatchTypeClosure SignalMatchType = 4
 	SignalMatchTypeFunc SignalMatchType = 8
@@ -863,7 +863,7 @@ const (
 	SignalMatchTypeUnblocked SignalMatchType = 32
 )
 type SignalQuery struct {
-	SignalID uint32
+	SignalId uint32
 	_ [4]byte
 	signal_name0 *C.char
 	Itype Type
@@ -879,7 +879,7 @@ func (this0 *SignalQuery) SignalName() string {
 	signal_name1 = C.GoString(this0.signal_name0)
 	return signal_name1
 }
-const TypeFlagReservedIDBit = 0x1
+const TypeFlagReservedIdBit = 0x1
 const TypeFundamentalMax = 255
 const TypeFundamentalShift = 2
 const TypeReservedBseFirst = 32

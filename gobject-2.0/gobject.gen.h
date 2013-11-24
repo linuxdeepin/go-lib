@@ -4,6 +4,7 @@
 
 typedef size_t GType;
 typedef void *GVaClosureMarshal;
+unsigned int _array_length(void* _array);
 
 typedef struct _GArray GArray;
 struct _GArray { uint8_t _data[16]; };

@@ -1,16 +1,8 @@
-#include "gobject.gen.h"
+#include "glib.gen.h"
 
 static void _c_callback_cleanup(void *userdata)
 {
-	_GObject_go_callback_cleanup(userdata);
-}
-
-unsigned int _array_length(void* _array)
-{
-	void** array = (void**)_array;
-	unsigned int i=0;
-	while (array && array[i] != 0) i++;
-	return i;
+	_GLib_go_callback_cleanup(userdata);
 }
 
 extern void _GChildWatchFunc_c_wrapper();
@@ -95,55 +87,3 @@ extern void _GUnixFDSourceFunc_c_wrapper();
 extern void _GUnixFDSourceFunc_c_wrapper_once();
 extern void _GVoidFunc_c_wrapper();
 extern void _GVoidFunc_c_wrapper_once();
-extern void _GBaseFinalizeFunc_c_wrapper();
-extern void _GBaseFinalizeFunc_c_wrapper_once();
-extern void _GBaseInitFunc_c_wrapper();
-extern void _GBaseInitFunc_c_wrapper_once();
-extern void _GBindingTransformFunc_c_wrapper();
-extern void _GBindingTransformFunc_c_wrapper_once();
-extern void _GBoxedFreeFunc_c_wrapper();
-extern void _GBoxedFreeFunc_c_wrapper_once();
-extern void _GCallback_c_wrapper();
-extern void _GCallback_c_wrapper_once();
-extern void _GClassFinalizeFunc_c_wrapper();
-extern void _GClassFinalizeFunc_c_wrapper_once();
-extern void _GClassInitFunc_c_wrapper();
-extern void _GClassInitFunc_c_wrapper_once();
-extern void _GClosureMarshal_c_wrapper();
-extern void _GClosureMarshal_c_wrapper_once();
-extern void _GClosureNotify_c_wrapper();
-extern void _GClosureNotify_c_wrapper_once();
-extern void _GInstanceInitFunc_c_wrapper();
-extern void _GInstanceInitFunc_c_wrapper_once();
-extern void _GInterfaceFinalizeFunc_c_wrapper();
-extern void _GInterfaceFinalizeFunc_c_wrapper_once();
-extern void _GInterfaceInitFunc_c_wrapper();
-extern void _GInterfaceInitFunc_c_wrapper_once();
-extern void _GObjectFinalizeFunc_c_wrapper();
-extern void _GObjectFinalizeFunc_c_wrapper_once();
-extern void _GObjectGetPropertyFunc_c_wrapper();
-extern void _GObjectGetPropertyFunc_c_wrapper_once();
-extern void _GObjectSetPropertyFunc_c_wrapper();
-extern void _GObjectSetPropertyFunc_c_wrapper_once();
-extern void _GSignalAccumulator_c_wrapper();
-extern void _GSignalAccumulator_c_wrapper_once();
-extern void _GSignalEmissionHook_c_wrapper();
-extern void _GSignalEmissionHook_c_wrapper_once();
-extern void _GToggleNotify_c_wrapper();
-extern void _GToggleNotify_c_wrapper_once();
-extern void _GTypeClassCacheFunc_c_wrapper();
-extern void _GTypeClassCacheFunc_c_wrapper_once();
-extern void _GTypeInterfaceCheckFunc_c_wrapper();
-extern void _GTypeInterfaceCheckFunc_c_wrapper_once();
-extern void _GTypePluginCompleteInterfaceInfo_c_wrapper();
-extern void _GTypePluginCompleteInterfaceInfo_c_wrapper_once();
-extern void _GTypePluginCompleteTypeInfo_c_wrapper();
-extern void _GTypePluginCompleteTypeInfo_c_wrapper_once();
-extern void _GTypePluginUnuse_c_wrapper();
-extern void _GTypePluginUnuse_c_wrapper_once();
-extern void _GTypePluginUse_c_wrapper();
-extern void _GTypePluginUse_c_wrapper_once();
-extern void _GValueTransform_c_wrapper();
-extern void _GValueTransform_c_wrapper_once();
-extern void _GWeakNotify_c_wrapper();
-extern void _GWeakNotify_c_wrapper_once();

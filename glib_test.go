@@ -6,7 +6,7 @@ import "testing"
 func TestGSettings(t *testing.T) {
 	go StartLoop() //gtk_main()
 
-	s := NewSettings("com.deepin.dde.dock")
+	s := gio.NewSettings("com.deepin.dde.dock")
 	if len(s.ListKeys()) != 4 {
 		t.Error("ListKeys Error")
 	}
