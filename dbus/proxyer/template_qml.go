@@ -305,19 +305,21 @@ func renderQMLProject() {
 	}).Parse(__PROJECT_TEMPL_QML)).Execute(writer, INFOS)
 	writer.Close()
 }
+
 func testQML() {
-	cmd_str := fmt.Sprintf("cd %s && qmake", INFOS.Config.OutputDir)
+	pkgName := getQMLPkgName("DBus." + INFOS.Config.DestName)
+	os.MkdirAll(INFOS.Config.OutputDir+"/"+strings.Replace(pkgName, ".", "/", -1), 0755)
+	cmd_str := fmt.Sprintf("cd %s && ln -sv %s lib && qmake", INFOS.Config.OutputDir, strings.Replace(pkgName, ".", "/", -1))
 	cmd := exec.Command("bash", "-c", cmd_str)
 	err := cmd.Run()
 	if err != nil {
 		log.Fatal("Run: " + cmd_str + " failed(Did you have an valid qmake?) testQML code will not generated!")
 	}
-	/*qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, INFOS.Config.PkgName, "qmldir"))*/
 	qmldir, err := os.Create(path.Join(INFOS.Config.OutputDir, "lib", "qmldir"))
 	if err != nil {
 		panic(err)
 	}
-	qmldir.WriteString("module " + INFOS.Config.PkgName + "\n")
+	qmldir.WriteString("module " + pkgName + "\n")
 	qmldir.WriteString("plugin " + INFOS.Config.PkgName)
 	qmldir.Close()
 
@@ -329,7 +331,7 @@ func testQML() {
 		"Lower":            lower,
 		"GetInterfaceInfo": GetInterfaceInfo,
 		"BusType":          func() string { return INFOS.Config.BusType },
-		"PkgName":          func() string { return INFOS.Config.PkgName },
+		"PkgName":          func() string { return pkgName },
 		"Ifc2Obj":          ifc2obj,
 		"GetModules": func() map[string]string {
 			r := make(map[string]string)

@@ -14,6 +14,13 @@ import "flag"
 
 import "dlib/dbus"
 
+//Supports target now
+const (
+	QML    string = "qml"
+	GoLang        = "golang"
+	PyQt          = "pyqt"
+)
+
 func GetInterfaceInfo(ifc _Interface) dbus.InterfaceInfo {
 	inFile := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
 	if _, err := os.Stat(inFile); err == nil {
@@ -92,7 +99,16 @@ func parseInfo() {
 	if busType != "session" && busType != "system" {
 		log.Fatal("Didn't support bus type", busType)
 	}
-	if INFOS.Config.Target == "GoLang" {
+
+	// convert target
+	INFOS.Config.Target = strings.ToLower(INFOS.Config.Target)
+	if INFOS.Config.PkgName == "" {
+		INFOS.Config.PkgName = getMember(INFOS.Config.DestName)
+		if INFOS.Config.PkgName == "" {
+			log.Fatal("Didn't specify an PkgName and can't calclus an valid PkgName by DestName:" + INFOS.Config.DestName)
+		}
+	}
+	if INFOS.Config.Target == GoLang {
 		INFOS.Config.BusType = upper(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".go")); err != nil {
@@ -100,7 +116,7 @@ func parseInfo() {
 			}
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
-	} else if INFOS.Config.Target == "PyQt" {
+	} else if INFOS.Config.Target == PyQt {
 		INFOS.Config.BusType = lower(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".py")); err != nil {
@@ -108,7 +124,7 @@ func parseInfo() {
 			}
 			renderInterfaceInit(INFOS.outputs[ifc.OutFile])
 		}
-	} else if INFOS.Config.Target == "QML" {
+	} else if INFOS.Config.Target == QML {
 		INFOS.Config.BusType = lower(INFOS.Config.BusType)
 		for _, ifc := range INFOS.Interfaces {
 			if INFOS.outputs[ifc.OutFile], err = os.Create(path.Join(INFOS.Config.OutputDir, ifc.OutFile+".h")); err != nil {
@@ -126,15 +142,15 @@ func main() {
 	parseInfo()
 	var writer io.Writer
 	var err error
-	if INFOS.Config.Target == "GoLang" {
+	if INFOS.Config.Target == GoLang {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "init.go")); err != nil {
 			panic(err)
 		}
-	} else if INFOS.Config.Target == "PyQt" {
+	} else if INFOS.Config.Target == PyQt {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "__init__.py")); err != nil {
 			panic(err)
 		}
-	} else if INFOS.Config.Target == "QML" {
+	} else if INFOS.Config.Target == QML {
 		if writer, err = os.Create(path.Join(INFOS.Config.OutputDir, "plugin.h")); err != nil {
 			panic(err)
 		}
@@ -147,7 +163,7 @@ func main() {
 		for _, w := range INFOS.outputs {
 			w.(*os.File).Close()
 		}
-		if INFOS.Config.Target == "QML" {
+		if INFOS.Config.Target == QML {
 			testQML()
 		}
 	}()
@@ -157,7 +173,7 @@ func main() {
 		inFile := path.Join(INFOS.Config.InputDir, ifc.XMLFile)
 		if _, err := os.Stat(inFile); err == nil {
 			info := GetInterfaceInfo(ifc)
-			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, info, writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(info, writer, ifc.Interface, ifc.ObjectName)
 			/*if ifc.TestPath != "" {*/
 			/*var test_writer io.Writer*/
 			/*test_writer, err = os.Create(path.Join(INFOS.Config.OutputDir, path.Base(ifc.OutFile)+"_test.go"))*/
@@ -170,7 +186,7 @@ func main() {
 			if err := conn.Object(ifc.Dest, dbus.ObjectPath(ifc.ObjectPath)).Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&xml); err != nil {
 				panic(err.Error() + "Interface " + ifc.Interface + " is can't dynamic introspect")
 			}
-			renderInterface(INFOS.Config.Target, INFOS.Config.PkgName, GetInterfaceInfo(ifc), writer, INFOS.Config.DestName, ifc.Interface, ifc.ObjectName)
+			renderInterface(GetInterfaceInfo(ifc), writer, ifc.Interface, ifc.ObjectName)
 
 		}
 	}

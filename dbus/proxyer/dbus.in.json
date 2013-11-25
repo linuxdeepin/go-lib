@@ -1,12 +1,10 @@
 {
     "Config": {
-	"OutputDir": "nmpy",
+	"OutputDir": "NM",
 	"InputDir": "example-xml",
 	"BusType": "System",
 	"DestName": "org.freedesktop.NetworkManager",
-	"Target": "PyQt",
-	"NotExportBus": true,
-	"PkgName": "nm"
+	"Target": "QML"
     },
     "Interfaces": [
     {

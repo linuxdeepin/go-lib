@@ -1,27 +1,22 @@
 package main
 
-import "strings"
 import "text/template"
 import "dlib/dbus"
 import "io"
 import "log"
 
-func lower(str string) string   { return strings.ToLower(str[:1]) + str[1:] }
-func upper(str string) string   { return strings.ToUpper(str[:1]) + str[1:] }
-func ifc2obj(ifc string) string { return "/" + strings.Replace(ifc, ".", "/", -1) }
-
 var TEMPLs = map[string]string{
-	"GLOBAL_PyQt":   __GLOBAL_TEMPLATE_PyQt,
-	"GLOBAL_GoLang": __GLOBAL_TEMPLATE_GoLang,
-	"GLOBAL_QML":    __GLOBAL_TEMPLATE_QML,
+	"GLOBAL_pyqt":   __GLOBAL_TEMPLATE_PyQt,
+	"GLOBAL_golang": __GLOBAL_TEMPLATE_GoLang,
+	"GLOBAL_qml":    __GLOBAL_TEMPLATE_QML,
 
-	"IFC_PyQt":   __IFC_TEMPLATE_PyQt,
-	"IFC_GoLang": __IFC_TEMPLATE_GoLang,
-	"IFC_QML":    __IFC_TEMPLATE_QML,
+	"IFC_pyqt":   __IFC_TEMPLATE_PyQt,
+	"IFC_golang": __IFC_TEMPLATE_GoLang,
+	"IFC_qml":    __IFC_TEMPLATE_QML,
 
-	"IFC_INIT_PyQt":   __IFC_TEMPLATE_INIT_PyQt,
-	"IFC_INIT_GoLang": __IFC_TEMPLATE_INIT_GoLang,
-	"IFC_INIT_QML":    __IFC_TEMPLATE_INIT_QML,
+	"IFC_INIT_pyqt":   __IFC_TEMPLATE_INIT_PyQt,
+	"IFC_INIT_golang": __IFC_TEMPLATE_INIT_GoLang,
+	"IFC_INIT_qml":    __IFC_TEMPLATE_INIT_QML,
 }
 
 func renderMain(writer io.Writer) {
@@ -48,24 +43,24 @@ func renderInterfaceInit(writer io.Writer) {
 	}).Parse(TEMPLs["IFC_INIT_"+INFOS.Config.Target])).Execute(writer, nil)
 }
 
-func renderInterface(target string, pkgName string, info dbus.InterfaceInfo, writer io.Writer, dest, ifc_name, exportName string) {
-	if target == "GoLang" {
+func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, exportName string) {
+	if INFOS.Config.Target == GoLang {
 		filterKeyWord(getGoKeyword, &info)
-	} else if target == "PyQt" {
+	} else if INFOS.Config.Target == PyQt {
 		filterKeyWord(getPyQtKeyword, &info)
-	} else if target == "QML" {
+	} else if INFOS.Config.Target == QML {
 		filterKeyWord(getGoKeyword, &info)
 	}
-	log.Printf("Generate %q code for service:%q interface:%q ObjectName:%q", INFOS.Config.Target, dest, ifc_name, exportName)
+	log.Printf("Generate %q code for service:%q interface:%q ObjectName:%q", INFOS.Config.Target, INFOS.Config.DestName, ifc_name, exportName)
 	funcs := template.FuncMap{
 		"Lower":          lower,
 		"Upper":          upper,
 		"BusType":        func() string { return INFOS.Config.BusType },
-		"PkgName":        func() string { return pkgName },
+		"PkgName":        func() string { return INFOS.Config.PkgName },
 		"OBJ_NAME":       func() string { return "obj" },
 		"TypeFor":        func(s string) string { return dbus.TypeFor(s) },
 		"getQType":       getQType,
-		"DestName":       func() string { return dest },
+		"DestName":       func() string { return INFOS.Config.DestName },
 		"IfcName":        func() string { return ifc_name },
 		"ExportName":     func() string { return exportName },
 		"NormaliseQDBus": normaliseQDBus,
@@ -149,10 +144,10 @@ func renderInterface(target string, pkgName string, info dbus.InterfaceInfo, wri
 	templ.Execute(writer, info)
 }
 
-func renderTest(testPath, pkgName string, objName string, writer io.Writer, info dbus.InterfaceInfo) {
+func renderTest(testPath, objName string, writer io.Writer, info dbus.InterfaceInfo) {
 	funcs := template.FuncMap{
 		"TestPath": func() string { return testPath },
-		"PkgName":  func() string { return pkgName },
+		"PkgName":  func() string { return INFOS.Config.PkgName },
 		"ObjName":  func() string { return objName },
 		/*"GetTestValue": func(args []dbus.ArgInfo) string {*/
 		/*},*/
