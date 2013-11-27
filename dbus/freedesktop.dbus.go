@@ -9,11 +9,11 @@ type IntrospectProxy struct {
 	child map[string]bool
 }
 
-func (i IntrospectProxy) String() string {
-	// i.infos reference i so can't use default String()
+func (ifc IntrospectProxy) String() string {
+	// ifc.infos reference ifc so can't use default String()
 	ret := "IntrospectProxy ["
 	comma := false
-	for k, _ := range i.infos {
+	for k, _ := range ifc.infos {
 		if comma {
 			ret += ","
 		}
@@ -24,14 +24,14 @@ func (i IntrospectProxy) String() string {
 	return ret
 }
 
-func (i IntrospectProxy) Introspect() (string, *Error) {
+func (ifc IntrospectProxy) Introspect() (string, *Error) {
 	var node = new(NodeInfo)
-	for k, _ := range i.child {
+	for k, _ := range ifc.child {
 		node.Children = append(node.Children, NodeInfo{
 			Name: k,
 		})
 	}
-	for name, ifc := range i.infos {
+	for name, ifc := range ifc.infos {
 		info := genInterfaceInfo(ifc)
 		info.Name = name
 		node.Interfaces = append(node.Interfaces, *info)
@@ -67,29 +67,26 @@ var errPropertyNotWritable = Error{
 	[]interface{}{"Can't write this property."},
 }
 
-func (i PropertiesProxy) GetAll(ifc_name string) map[string]Variant {
-	props := make(map[string]Variant)
-	if ifc, ok := i.infos[ifc_name]; ok {
+func (propProxy PropertiesProxy) GetAll(ifc_name string) (props map[string]Variant, err *Error) {
+	props = make(map[string]Variant)
+	if ifc, ok := propProxy.infos[ifc_name]; ok {
 		o_type := getTypeOf(ifc)
 		n := o_type.NumField()
 		for i := 0; i < n; i++ {
 			field := o_type.Field(i)
-			value := getValueOf(ifc).Field(i)
 			if field.Type.Kind() != reflect.Func && field.PkgPath == "" {
-				if value.Type().Implements(propertyType) {
-					t := value.MethodByName("Get").Interface().(func() interface{})()
-					props[field.Name] = MakeVariant(t)
-				} else {
-					props[field.Name] = MakeVariant(value.Interface())
+				props[field.Name], err = propProxy.Get(ifc_name, field.Name)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
 	}
-	return props
+	return
 }
 
-func (i PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *Error {
-	if ifc, ok := i.infos[ifc_name]; ok {
+func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *Error {
+	if ifc, ok := propProxy.infos[ifc_name]; ok {
 		ifc_t := getTypeOf(ifc)
 		t, ok := ifc_t.FieldByName(prop_name)
 		v := getValueOf(ifc).FieldByName(prop_name)
@@ -124,17 +121,17 @@ func (i PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *
 	}
 	return &errUnKnowInterface
 }
-func (i PropertiesProxy) Get(ifc_name string, prop_name string) (Variant, *Error) {
-	if ifc, ok := i.infos[ifc_name]; ok {
+func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant, *Error) {
+	if ifc, ok := propProxy.infos[ifc_name]; ok {
 		value := getValueOf(ifc).FieldByName(prop_name)
-		if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
-			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)),  value)
-			//TODO: if ifc is not an DBusObject then we need try get the Conn object by other way
-		}
 		if value.Type().Implements(propertyType) {
 			t := value.MethodByName("Get").Interface().(func() interface{})()
 			return MakeVariant(t), nil
+		} else if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
+			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)), value)
+			//TODO: if ifc is not an DBusObject then we need try get the Conn object by other way
 		}
+
 		if value.IsValid() {
 			return MakeVariant(value.Interface()), nil
 		} else {
