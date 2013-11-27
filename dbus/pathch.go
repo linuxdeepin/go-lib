@@ -26,30 +26,34 @@ func isExitsInBus(con *Conn, obj DBusObject) bool {
 	return false
 }
 
-func NotifyChange(obj DBusObject, propName string) {
-	value := getValueOf(obj).FieldByName(propName)
-	if value.IsValid() {
-		systemBusLck.Lock()
-		defer systemBusLck.Unlock()
-		sessionBusLck.Lock()
-		defer sessionBusLck.Unlock()
+func detectConnByDBusObject(obj DBusObject) *Conn {
+	systemBusLck.Lock()
+	defer systemBusLck.Unlock()
+	sessionBusLck.Lock()
+	defer sessionBusLck.Unlock()
 
-		var err error
-		if systemBus != nil && isExitsInBus(systemBus, obj) {
+	if systemBus != nil && isExitsInBus(systemBus, obj) {
+		return systemBus
+	} else if sessionBus != nil && isExitsInBus(sessionBus, obj) {
+		return sessionBus
+	}
+	return nil
+}
+
+func NotifyChange(obj DBusObject, propName string) {
+	con := detectConnByDBusObject(obj)
+	if con != nil {
+		value := getValueOf(obj).FieldByName(propName)
+		if value.IsValid() {
 			inputs := make(map[string]Variant)
 			inputs[propName] = MakeVariant(value.Interface())
 			info := obj.GetDBusInfo()
-			err = systemBus.Emit(ObjectPath(info.ObjectPath), "org.freedesktop.DBus.Properties.PropertiesChanged", info.Interface, inputs, make([]string, 0))
-		} else if sessionBus != nil && isExitsInBus(sessionBus, obj) {
-			inputs := make(map[string]Variant)
-			inputs[propName] = MakeVariant(value.Interface())
-			info := obj.GetDBusInfo()
-			err = sessionBus.Emit(ObjectPath(info.ObjectPath), "org.freedesktop.DBus.Properties.PropertiesChanged", info.Interface, inputs, make([]string, 0))
+			err := con.Emit(ObjectPath(info.ObjectPath), "org.freedesktop.DBus.Properties.PropertiesChanged", info.Interface, inputs, make([]string, 0))
+			if err != nil {
+				log.Print(err)
+			}
+		} else {
+			log.Printf(reflect.TypeOf(obj).String(), "hasn't the ", propName, "property")
 		}
-		if err != nil {
-			log.Print(err)
-		}
-	} else {
-		log.Printf(reflect.TypeOf(obj).String(), "hasn't the ", propName, "property")
 	}
 }

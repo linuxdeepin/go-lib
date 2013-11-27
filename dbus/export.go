@@ -162,7 +162,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		ret = ret[:out_n-1]
 	}
 	for i, r := range ret {
-		ret[i] = tryTranslateDBusObjectToObjectPath(r)
+		ret[i] = tryTranslateDBusObjectToObjectPath(conn, r)
 	}
 	if msg.Flags&FlagNoReplyExpected == 0 {
 		reply := new(Message)
@@ -336,12 +336,16 @@ const (
 	RequestNameReplyAlreadyOwner
 )
 
-func tryTranslateDBusObjectToObjectPath(value reflect.Value) reflect.Value {
+func tryTranslateDBusObjectToObjectPath(con *Conn, value reflect.Value) reflect.Value {
 	if value.Type().Implements(dbusObjectInterface) {
-		obj := value.Interface().(DBusObject)
-		//TODO: which session to install
-		InstallOnSession(obj)
-		return reflect.ValueOf(ObjectPath(obj.GetDBusInfo().ObjectPath))
+		if !value.IsNil() {
+			obj := value.Interface().(DBusObject)
+			//TODO: which session to install
+			InstallOnAny(con, obj)
+			return reflect.ValueOf(ObjectPath(obj.GetDBusInfo().ObjectPath))
+		} else {
+			return reflect.ValueOf(ObjectPath("/"))
+		}
 	}
 	switch value.Type().Kind() {
 	case reflect.Array, reflect.Slice:
@@ -355,7 +359,21 @@ func tryTranslateDBusObjectToObjectPath(value reflect.Value) reflect.Value {
 		}
 		new_value := reflect.MakeSlice(reflect.SliceOf(t), n, n)
 		for i := 0; i < n; i++ {
-			new_value.Index(i).Set(tryTranslateDBusObjectToObjectPath(value.Index(i)))
+			new_value.Index(i).Set(tryTranslateDBusObjectToObjectPath(con, value.Index(i)))
+		}
+		return new_value
+	case reflect.Map:
+		keys := value.MapKeys()
+		if len(keys) == 0 {
+			return value
+		}
+		t := tryTranslateDBusObjectToObjectPath(con, reflect.Zero(value.Type().Elem())).Type()
+		if t == value.Type().Elem() {
+			return value
+		}
+		new_value := reflect.MakeMap(reflect.MapOf(value.Type().Key(), t))
+		for i := 0; i <len(keys); i++ {
+			new_value.SetMapIndex(keys[i], tryTranslateDBusObjectToObjectPath(con, value.MapIndex(keys[i])))
 		}
 		return new_value
 	}

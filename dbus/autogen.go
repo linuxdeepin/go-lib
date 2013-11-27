@@ -143,6 +143,9 @@ func InstallOnSystem(obj DBusObject) error {
 }
 
 func InstallOnAny(conn *Conn, obj DBusObject) error {
+	if obj == nil {
+		panic("Can't install an nil DBusObject to dbus")
+	}
 	info := obj.GetDBusInfo()
 	path := ObjectPath(info.ObjectPath)
 	if path.IsValid() {

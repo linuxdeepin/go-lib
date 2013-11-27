@@ -127,6 +127,10 @@ func (i PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *
 func (i PropertiesProxy) Get(ifc_name string, prop_name string) (Variant, *Error) {
 	if ifc, ok := i.infos[ifc_name]; ok {
 		value := getValueOf(ifc).FieldByName(prop_name)
+		if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
+			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)),  value)
+			//TODO: if ifc is not an DBusObject then we need try get the Conn object by other way
+		}
 		if value.Type().Implements(propertyType) {
 			t := value.MethodByName("Get").Interface().(func() interface{})()
 			return MakeVariant(t), nil
