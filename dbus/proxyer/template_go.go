@@ -63,11 +63,15 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 func ({{OBJ_NAME}} *{{ExportName}}) Set{{.Name}}({{.Name}} {{TypeFor .Type}}) {
 	{{OBJ_NAME}}.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", {{.Name}})
 }
-func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{TypeFor .Type}}) {
+{{ $convert := TryConvertObjectPathGo . }}
+func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{GetObjectPathTypeGo .}}) {
 	var r dbus.Variant
 	err := {{OBJ_NAME}}.core.Call("org.freedesktop.DBus.Properties.Get", 0, "{{IfcName}}", "{{.Name}}").Store(&r)
-	if err == nil && r.Signature().String() == "{{.Type}}" {
-		return r.Value().({{TypeFor .Type}})
+	if err == nil && r.Signature().String() == "{{.Type}}" { {{ if $convert }}
+		before := r.Value().({{TypeFor .Type}})
+		{{$convert}}
+		return after{{else}}
+		return r.Value().({{TypeFor .Type}}){{end}}
 	}  else {
 		panic(err)
 	}

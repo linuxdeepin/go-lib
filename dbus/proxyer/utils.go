@@ -1,6 +1,7 @@
 package main
 
 import "strings"
+import "dlib/dbus"
 
 func lower(str string) string   { return strings.ToLower(str[:1]) + str[1:] }
 func upper(str string) string   { return strings.ToUpper(str[:1]) + str[1:] }
@@ -77,4 +78,25 @@ func getQMLPkgName(str string) (r string) {
 		r += upper(field)
 	}
 	return
+}
+
+func interfaceToObjectName(ifc_name string) string {
+	for _, ifc := range INFOS.Interfaces {
+		if ifc.Interface == ifc_name {
+			return ifc.ObjectName
+		}
+	}
+	return ""
+}
+
+// com.deepin.DBus.ObjectPathConvert.Property for properties
+// com.deepin.DBus.ObjectPathConvert.Out1..  for methods and signals
+// com.deepin.DBus.ObjectPathConvert.Arg1.. for methods input
+func getObjectPathConvert(suffix string, annotations []dbus.AnnotationInfo) string {
+	for _, v := range annotations {
+		if v.Name == "com.deepin.DBus.ObjectPathConvert."+suffix {
+			return v.Value
+		}
+	}
+	return ""
 }

@@ -139,6 +139,29 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 			}
 			return
 		},
+		"TryConvertObjectPath": func(prop dbus.PropertyInfo) string {
+			if v := getObjectPathConvert("Property", prop.Annotations); v != "" {
+				switch INFOS.Config.Target {
+				case GoLang:
+					return tryConvertObjectPathGo(prop.Type, v)
+				case QML:
+					return tryConvertObjectPathQML(prop.Type, v)
+				}
+			}
+			return ""
+		},
+		"GetObjectPathType": func(prop dbus.PropertyInfo) (ret string) {
+			if v := getObjectPathConvert("Property", prop.Annotations); v != "" {
+				switch INFOS.Config.Target {
+				case GoLang:
+					ret, _ = guessTypeGo(prop.Type, v)
+				case QML:
+					ret, _ = guessTypeQML(prop.Type, v)
+				}
+				return
+			}
+			return dbus.TypeFor(prop.Type)
+		},
 	}
 	templ := template.Must(template.New(exportName).Funcs(funcs).Parse(TEMPLs["IFC_"+INFOS.Config.Target]))
 	templ.Execute(writer, info)
