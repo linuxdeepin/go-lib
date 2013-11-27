@@ -39,14 +39,18 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 	n := o_type.NumMethod()
 
 	for i := 0; i < n; i++ {
-		name := o_type.Method(i).Name
+		method := o_type.Method(i)
+		if method.PkgPath != "" {
+			continue
+		}
+		name := method.Name
 		if (name == "GetDBusInfo" && o_type.Implements(dbusObjectInterface)) || name == "OnPropertiesChanged" {
 			continue
 		}
-		method := MethodInfo{}
-		method.Name = name
+		method_info := MethodInfo{}
+		method_info.Name = name
 
-		m := o_type.Method(i).Type
+		m := method.Type
 		n_in := m.NumIn()
 		n_out := m.NumOut()
 		args := make([]ArgInfo, 0)
@@ -68,8 +72,8 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 				Direction: "out",
 			})
 		}
-		method.Args = args
-		ifc_info.Methods = append(ifc_info.Methods, method)
+		method_info.Args = args
+		ifc_info.Methods = append(ifc_info.Methods, method_info)
 	}
 
 	// generate properties if any
