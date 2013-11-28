@@ -21,17 +21,14 @@ class {{ExportName}}Proxyer: public QDBusAbstractInterface
 {
     Q_OBJECT
 public:
-    {{ExportName}}Proxyer(const QString &path)
-          :QDBusAbstractInterface("{{DestName}}", path, "{{IfcName}}", QDBusConnection::{{BusType}}Bus(), 0)
+    {{ExportName}}Proxyer(const QString &path, QObject* parent)
+          :QDBusAbstractInterface("{{DestName}}", path, "{{IfcName}}", QDBusConnection::{{BusType}}Bus(), parent)
     {
 	    if (!isValid()) {
 		    qDebug() << "Create {{ExportName}} remote object failed : " << lastError().message();
 	    }
     }
 
-    ~{{ExportName}}Proxyer()
-    {
-    };
 {{range .Properties}}
     Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} WRITE set{{.Name}})
     QVariant {{.Name}}() { return tryConvert(property("{{.Name}}")); }
@@ -66,7 +63,7 @@ private:
     void _rebuild() 
     { 
 	  delete m_ifc;
-          m_ifc = new {{ExportName}}Proxyer(m_path);{{range .Signals}}
+          m_ifc = new {{ExportName}}Proxyer(m_path, this);{{range .Signals}}
 	  QObject::connect(m_ifc, SIGNAL({{.Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})), 
 	  		this, SIGNAL({{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})));{{end}}
     }
@@ -85,7 +82,7 @@ public:
     }
     Q_SIGNAL void pathChanged(QString);
 
-    {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{Ifc2Obj IfcName}}"))
+    {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{Ifc2Obj IfcName}}", this))
     {
 	    QDBusConnection::{{BusType}}Bus().connect("{{DestName}}", m_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
 	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
