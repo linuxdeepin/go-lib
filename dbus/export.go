@@ -304,6 +304,14 @@ func (conn *Conn) RequestName(name string, flags RequestNameFlags) (RequestNameR
 		conn.namesLck.Lock()
 		conn.names = append(conn.names, name)
 		conn.namesLck.Unlock()
+		if IS_LAUNCHED_BY_BUS_DAEMON {
+			if msgs, ok := conn.unhandledMsgs[name]; ok {
+				for _, msg := range msgs {
+					conn.handleCall(msg)
+				}
+				delete(conn.unhandledMsgs, name)
+			}
+		}
 	}
 	return RequestNameReply(r), nil
 }
@@ -372,7 +380,7 @@ func tryTranslateDBusObjectToObjectPath(con *Conn, value reflect.Value) reflect.
 			return value
 		}
 		new_value := reflect.MakeMap(reflect.MapOf(value.Type().Key(), t))
-		for i := 0; i <len(keys); i++ {
+		for i := 0; i < len(keys); i++ {
 			new_value.SetMapIndex(keys[i], tryTranslateDBusObjectToObjectPath(con, value.MapIndex(keys[i])))
 		}
 		return new_value

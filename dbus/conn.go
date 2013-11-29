@@ -58,6 +58,8 @@ type Conn struct {
 
 	eavesdropped    chan<- *Message
 	eavesdroppedLck sync.Mutex
+
+	unhandledMsgs map[string][]*Message
 }
 
 // SessionBus returns a shared connection to the session bus, connecting to it
@@ -161,6 +163,9 @@ func newConn(tr transport) (*Conn, error) {
 	conn.nextSerial = 1
 	conn.serialUsed = map[uint32]bool{0: true}
 	conn.busObj = conn.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+	if IS_LAUNCHED_BY_BUS_DAEMON {
+		conn.unhandledMsgs = make(map[string][]*Message)
+	}
 	return conn, nil
 }
 
@@ -266,6 +271,9 @@ func (conn *Conn) inWorker() {
 					}
 				}
 				conn.namesLck.RUnlock()
+			}
+			if IS_LAUNCHED_BY_BUS_DAEMON && !found && msg.Type == TypeMethodCall && !strings.Contains(dest, ":") {
+				conn.unhandledMsgs[dest] = append(conn.unhandledMsgs[dest], msg)
 			}
 			if !found {
 				// Eavesdropped a message, but no channel for it is registered.
@@ -594,4 +602,13 @@ func getKey(s, key string) string {
 		j = len(s)
 	}
 	return s[i+len(key)+1 : j]
+}
+
+var IS_LAUNCHED_BY_BUS_DAEMON bool = false
+
+func init() {
+	bus := os.Getenv("DBUS_STARTER_BUS_TYPE")
+	if bus == "session" || bus == "system" {
+		IS_LAUNCHED_BY_BUS_DAEMON = true
+	}
 }
