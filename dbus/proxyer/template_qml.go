@@ -30,9 +30,9 @@ public:
     }
 
 {{range .Properties}}
-    Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} WRITE set{{.Name}})
+    Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}})
     QVariant {{.Name}}() { return tryConvert(property("{{.Name}}")); }
-    void set{{.Name}}(const QVariant &v) { setProperty("{{.Name}}", v); }
+    {{if PropWritable .}}void set{{.Name}}(const QVariant &v) { setProperty("{{.Name}}", v); }{{end}}
     {{end}}
 
 Q_SIGNALS:{{range .Signals}}
@@ -88,12 +88,12 @@ public:
 	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
     }
     {{range .Properties}}
-    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} WRITE set{{.Name}} NOTIFY {{Lower .Name}}Changed){{end}}
+    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}} NOTIFY {{Lower .Name}}Changed){{end}}
 
     //Property read methods{{range .Properties}}
     const QVariant {{.Name}}() { return tryConvert(m_ifc->property("{{.Name}}")); }{{end}}
-    //Property set methods :TODO check access{{range .Properties}}
-    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); }{{end}}
+    //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}}
+    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
     QVariant {{.Name}}({{range $i, $e := GetOuts .Args}}{{if ne $i 0}}, {{end}}const QVariant &{{.Name}}{{end}}) {

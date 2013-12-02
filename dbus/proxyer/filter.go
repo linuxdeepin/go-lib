@@ -134,13 +134,15 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 			}
 		}
 		for i, p := range info.Properties {
-			propName := "Set" + p.Name
-			if usedName[propName] {
-				newName := propName + "_"
-				info.Properties[i].Name = newName
-				usedName[newName] = true
+			if p.Access == "readwrite" {
+				propName := "Set" + p.Name
+				if usedName[propName] {
+					newName := propName + "_"
+					info.Properties[i].Name = newName
+					usedName[newName] = true
+				}
 			}
-			propName = "Get" + p.Name
+			propName := "Get" + p.Name
 			if usedName[propName] {
 				newName := propName + "_"
 				info.Properties[i].Name = newName

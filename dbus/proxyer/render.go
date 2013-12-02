@@ -65,6 +65,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"ExportName":     func() string { return exportName },
 		"NormaliseQDBus": normaliseQDBus,
 		"Ifc2Obj":        ifc2obj,
+		"PropWritable":   func(prop dbus.PropertyInfo) bool { return prop.Access == "readwrite" },
 		"GetOuts": func(args []dbus.ArgInfo) []dbus.ArgInfo {
 			ret := make([]dbus.ArgInfo, 0)
 			for _, a := range args {
