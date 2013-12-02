@@ -60,9 +60,9 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 {{end}}
 
 {{range .Properties}}
-func ({{OBJ_NAME}} *{{ExportName}}) Set{{.Name}}({{.Name}} {{TypeFor .Type}}) {
+{{if PropWritable .}}func ({{OBJ_NAME}} *{{ExportName}}) Set{{.Name}}({{.Name}} {{TypeFor .Type}}) {
 	{{OBJ_NAME}}.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", {{.Name}})
-}
+}{{end}}
 {{ $convert := TryConvertObjectPath . }}
 func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{GetObjectPathType .}}) {
 	var r dbus.Variant
