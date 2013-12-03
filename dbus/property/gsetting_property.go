@@ -32,10 +32,14 @@ func NewGSettingsProperty(s *gio.Settings, key string, t interface{}) *GSettings
 
 func NewGSettingsPropertyFull(s *gio.Settings, key string, t interface{}, con *dbus.Conn, path, ifc, propName string) *GSettingsProperty {
 	prop := NewGSettingsProperty(s, key, t)
+	objPath := dbus.ObjectPath(path)
+	if !objPath.IsValid() {
+		panic(path + " Is not an valid ObjectPath")
+	}
 	prop.core.Connect("changed::"+key, func(s *gio.Settings, key string) {
 		inputs := make(map[string]dbus.Variant)
 		inputs[propName] = dbus.MakeVariant(prop.Get())
-		e := con.Emit(dbus.ObjectPath(path), "org.freedesktop.DBus.Properties.PropertiesChanged", ifc, inputs, make([]string, 0))
+		e := con.Emit(objPath, "org.freedesktop.DBus.Properties.PropertiesChanged", ifc, inputs, make([]string, 0))
 		if e != nil {
 			log.Print(e)
 		}
