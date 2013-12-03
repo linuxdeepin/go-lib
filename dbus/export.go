@@ -304,14 +304,6 @@ func (conn *Conn) RequestName(name string, flags RequestNameFlags) (RequestNameR
 		conn.namesLck.Lock()
 		conn.names = append(conn.names, name)
 		conn.namesLck.Unlock()
-		if IS_LAUNCHED_BY_BUS_DAEMON {
-			if msgs, ok := conn.unhandledMsgs[name]; ok {
-				for _, msg := range msgs {
-					conn.handleCall(msg)
-				}
-				delete(conn.unhandledMsgs, name)
-			}
-		}
 	}
 	return RequestNameReply(r), nil
 }
