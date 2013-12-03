@@ -100,8 +100,8 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 			})
 		} else if field.PkgPath == "" {
 			access := field.Tag.Get("access")
-			if access != "read" {
-				access = "readwrite"
+			if access != "readwrite" {
+				access = "read"
 			}
 			if field.Type.Implements(propertyType) {
 				field_v := getValueOf(ifc).Field(i)
