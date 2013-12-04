@@ -65,7 +65,7 @@ func (p GSettingsProperty) Set(v interface{}) {
 		p.core.SetInt(p.key, int(reflect.ValueOf(v).Int()))
 		return
 	case reflect.Uint, reflect.Uint32, reflect.Uint64:
-		p.core.SetUint(p.key, int(reflect.ValueOf(v).Int()))
+		p.core.SetUint(p.key, int(reflect.ValueOf(v).Uint()))
 		return
 	case reflect.Slice:
 		p.core.SetStrv(p.key, v.([]string))
