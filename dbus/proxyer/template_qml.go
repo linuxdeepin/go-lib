@@ -92,8 +92,12 @@ public:
 
     //Property read methods{{range .Properties}}
     const QVariant {{.Name}}() { return tryConvert(m_ifc->property("{{.Name}}")); }{{end}}
-    //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}}
-    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); Q_EMIT {{Lower .Name}}Changed(v); }{{end}}{{end}}
+    //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}} {{$type := TypeForQt .Type}}
+    void set{{.Name}}(const QVariant &v) { {{if $type}}
+	    m_ifc->setProperty("{{.Name}}", QVariant::fromValue(qvariant_cast<{{$type}}>(v)));{{else}}
+	    m_ifc->setProperty("{{.Name}}", v);{{end}}
+	    Q_EMIT {{Lower .Name}}Changed(v);
+    }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
     QVariant {{.Name}}({{range $i, $e := GetOuts .Args}}{{if ne $i 0}}, {{end}}const QVariant &{{.Name}}{{end}}) {
@@ -159,6 +163,19 @@ class DBusPlugin: public QQmlExtensionPlugin
 };
 #endif
 
+template<>
+inline QDBusObjectPath qvariant_cast(const QVariant& v) {
+    return QDBusObjectPath(qvariant_cast<QString>(v));
+}
+
+template<>
+inline QDBusSignature qvariant_cast(const QVariant& v) {
+    return QDBusSignature(qvariant_cast<QString>(v));
+}
+
+inline QDBusVariant qvariant_cast(const QVariant& v) {
+    return QDBusVariant(v);
+}
 
 inline 
 QVariant parse(const QDBusArgument &argument)
@@ -350,4 +367,24 @@ func qtPropertyFilter(s string) string {
 		return "QVariantValueList"
 	}
 	return s
+}
+
+var sigToQtType = map[byte]string{
+	'y': "uchar",
+	'b': "bool",
+	'n': "short",
+	'q': "ushort",
+	'i': "int",
+	'u': "uint",
+	'x': "qlonglong",
+	't': "qulonglong",
+	'd': "double",
+	's': "QString",
+	'g': "QDBusVariant",
+	'o': "QDBusObjectPath",
+	'v': "QDBusSignature",
+}
+
+func typeForQt(sig string) string {
+	return sigToQtType[sig[0]]
 }
