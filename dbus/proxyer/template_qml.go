@@ -93,7 +93,7 @@ public:
     //Property read methods{{range .Properties}}
     const QVariant {{.Name}}() { return tryConvert(m_ifc->property("{{.Name}}")); }{{end}}
     //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}}
-    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); }{{end}}{{end}}
+    void set{{.Name}}(const QVariant &v) { m_ifc->setProperty("{{.Name}}", v); Q_EMIT {{Lower .Name}}Changed(v); }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
     QVariant {{.Name}}({{range $i, $e := GetOuts .Args}}{{if ne $i 0}}, {{end}}const QVariant &{{.Name}}{{end}}) {
