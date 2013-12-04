@@ -20,7 +20,7 @@ func isExitsInBus(con *Conn, obj DBusObject) bool {
 	con.handlersLck.Lock()
 	defer con.handlersLck.Unlock()
 	info := obj.GetDBusInfo()
-	if ifcs , ok := con.handlers[ObjectPath(info.ObjectPath)]; ok {
+	if ifcs, ok := con.handlers[ObjectPath(info.ObjectPath)]; ok {
 		return ifcs[info.Interface] == obj
 	}
 	return false
@@ -44,16 +44,17 @@ func NotifyChange(obj DBusObject, propName string) {
 	con := detectConnByDBusObject(obj)
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
+		value = tryTranslateDBusObjectToObjectPath(con, value)
 		if value.IsValid() {
 			inputs := make(map[string]Variant)
 			inputs[propName] = MakeVariant(value.Interface())
 			info := obj.GetDBusInfo()
 			err := con.Emit(ObjectPath(info.ObjectPath), "org.freedesktop.DBus.Properties.PropertiesChanged", info.Interface, inputs, make([]string, 0))
 			if err != nil {
-				log.Print(err)
+				log.Println("NotifyChange send message error:", err)
 			}
 		} else {
-			log.Printf(reflect.TypeOf(obj).String(), "hasn't the ", propName, "property")
+			log.Println(reflect.TypeOf(obj).String(), "hasn't the ", propName, "property")
 		}
 	}
 }
