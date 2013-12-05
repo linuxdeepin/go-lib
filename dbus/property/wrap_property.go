@@ -25,7 +25,11 @@ type WrapProperty struct {
 }
 
 func NewWrapProperty(obj dbus.DBusObject, propName string, core dbus.Property) *WrapProperty {
-	return &WrapProperty{BaseObserver{}, obj, propName, core}
+	p := &WrapProperty{BaseObserver{}, obj, propName, core}
+	core.ConnectChanged(func() {
+		dbus.NotifyChange(p.obj, p.name)
+	})
+	return p
 }
 
 func (p WrapProperty) Set(v interface{}) {

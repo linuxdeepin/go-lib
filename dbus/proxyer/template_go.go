@@ -71,8 +71,8 @@ type dbusProperty{{ExportName}}{{.Name}} struct{
 	core *dbus.Object
 }
 {{if PropWritable .}}func (this *dbusProperty{{ExportName}}{{.Name}}) Set(v interface{}/*{{TypeFor .Type}}*/) {
-	if reflect.TypeOf(v) == reflect.TypeOf(*(*{{TypeFor .Type}})(nil)) {
-		this.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", v)
+	if reflect.TypeOf(v) == reflect.TypeOf((*{{TypeFor .Type}})(nil)).Elem() {
+		this.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", dbus.MakeVariant(v))
 	} else {
 		log.Println("The property {{.Name}} of {{IfcName}} is an {{TypeFor .Type}} but Set with an ", reflect.TypeOf(v))
 	}
@@ -94,7 +94,7 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) Get() interface{} /*{{GetObject
 	}
 }
 func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
-	return reflect.TypeOf(*(*{{TypeFor .Type}})(nil))
+	return reflect.TypeOf((*{{TypeFor .Type}})(nil)).Elem()
 }
 {{end}}
 
