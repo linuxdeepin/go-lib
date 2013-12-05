@@ -28,7 +28,7 @@ func NewGSettingsProperty(obj dbus.DBusObject, propName string, s *gio.Settings,
 	case "i":
 		prop.valueType = reflect.TypeOf(int32(0))
 		prop.getFn = func() interface{} {
-			return s.GetInt(keyName)
+			return int32(s.GetInt(keyName))
 		}
 		prop.setFn = func(v interface{}) {
 			s.SetInt(keyName, int(reflect.ValueOf(v).Int()))
@@ -36,7 +36,7 @@ func NewGSettingsProperty(obj dbus.DBusObject, propName string, s *gio.Settings,
 	case "u":
 		prop.valueType = reflect.TypeOf(uint32(0))
 		prop.getFn = func() interface{} {
-			return s.GetUint(keyName)
+			return uint32(s.GetUint(keyName))
 		}
 		prop.setFn = func(v interface{}) {
 			s.SetUint(keyName, int(reflect.ValueOf(v).Uint()))
