@@ -7,11 +7,11 @@ type BaseObserver struct {
 	cbs []func()
 }
 
-func (o BaseObserver) ConnectChanged(cb func()) {
+func (o *BaseObserver) ConnectChanged(cb func()) {
 	o.cbs = append(o.cbs, cb)
 }
 
-func (o BaseObserver) Notify() {
+func (o *BaseObserver) Notify() {
 	for _, c := range o.cbs {
 		c()
 	}

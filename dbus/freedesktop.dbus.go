@@ -51,6 +51,7 @@ type PropertiesProxy struct {
 type Property interface {
 	Get() interface{}
 	Set(interface{})
+	ConnectChanged(func())
 	GetType() reflect.Type
 }
 

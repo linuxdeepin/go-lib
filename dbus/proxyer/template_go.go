@@ -19,15 +19,22 @@ func getBus() *dbus.Conn {
 var __IFC_TEMPLATE_INIT_GoLang = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
 package {{PkgName}}
 import "dlib/dbus"
+import "dlib/dbus/property"
 import "reflect"
-var _ = reflect.TypeOf /*prevent compile error*/
+import "log"
+/*prevent compile error*/
+var _ = log.Printf
+var _ = reflect.TypeOf
+var _ = property.BaseObserver{}
 `
 
 var __IFC_TEMPLATE_GoLang = `
 type {{ExportName}} struct {
 	Path dbus.ObjectPath
 	core *dbus.Object
-	{{if .Signals}}signal_chan chan *dbus.Signal{{end}}
+	{{if or .Properties .Signals}}signal_chan chan *dbus.Signal{{end}}
+	{{range .Properties}}
+	{{.Name}} dbus.Property{{end}}
 }
 {{$obj_name := .Name}}
 {{range .Methods }}
@@ -41,7 +48,6 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
 		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
-	__conn.Signal({{OBJ_NAME}}.signal_chan)
 	go func() {
 		for v := range({{OBJ_NAME}}.signal_chan) {
 			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
@@ -60,13 +66,24 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 {{end}}
 
 {{range .Properties}}
-{{if PropWritable .}}func ({{OBJ_NAME}} *{{ExportName}}) Set{{.Name}}({{.Name}} {{TypeFor .Type}}) {
-	{{OBJ_NAME}}.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", {{.Name}})
+type dbusProperty{{ExportName}}{{.Name}} struct{
+	*property.BaseObserver
+	core *dbus.Object
+}
+{{if PropWritable .}}func (this *dbusProperty{{ExportName}}{{.Name}}) Set(v interface{}/*{{TypeFor .Type}}*/) {
+	if reflect.TypeOf(v) == reflect.TypeOf(*(*{{TypeFor .Type}})(nil)) {
+		this.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", v)
+	} else {
+		log.Println("The property {{.Name}} of {{IfcName}} is an {{TypeFor .Type}} but Set with an ", reflect.TypeOf(v))
+	}
+}{{else}}
+func (this *dbusProperty{{ExportName}}{{.Name}}) Set(notwritable interface{}) {
+	log.Printf("{{IfcName}}.{{.Name}} is not writable")
 }{{end}}
 {{ $convert := TryConvertObjectPath . }}
-func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{GetObjectPathType .}}) {
+func (this *dbusProperty{{ExportName}}{{.Name}}) Get() interface{} /*{{GetObjectPathType .}}*/ {
 	var r dbus.Variant
-	err := {{OBJ_NAME}}.core.Call("org.freedesktop.DBus.Properties.Get", 0, "{{IfcName}}", "{{.Name}}").Store(&r)
+	err := this.core.Call("org.freedesktop.DBus.Properties.Get", 0, "{{IfcName}}", "{{.Name}}").Store(&r)
 	if err == nil && r.Signature().String() == "{{.Type}}" { {{ if $convert }}
 		before := r.Value().({{TypeFor .Type}})
 		{{$convert}}
@@ -75,12 +92,51 @@ func ({{OBJ_NAME}} {{ExportName}}) Get{{.Name}}() (ret {{GetObjectPathType .}}) 
 	}  else {
 		panic(err)
 	}
-	return
+}
+func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
+	return reflect.TypeOf(*(*{{TypeFor .Type}})(nil))
 }
 {{end}}
 
 func Get{{ExportName}}(path string) *{{ExportName}} {
-	return  &{{ExportName}}{dbus.ObjectPath(path), getBus().Object("{{DestName}}", dbus.ObjectPath(path)){{if .Signals}},make(chan *dbus.Signal){{end}}}
+	core := getBus().Object("{{DestName}}", dbus.ObjectPath(path))
+	obj := &{{ExportName}}{Path:dbus.ObjectPath(path), core:core{{if .Signals}},signal_chan:make(chan *dbus.Signal){{end}}}
+	{{range .Properties}}
+	obj.{{.Name}} = &dbusProperty{{ExportName}}{{.Name}}{&property.BaseObserver{}, core}{{end}}
+	{{with .Properties}}
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='org.freedesktop.DBus.Properties',sender='{{DestName}}',member='PropertiesChanged'")
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='{{IfcName}}',sender='{{DestName}}',member='PropertiesChanged'")
+	go func() {
+		typeString := reflect.TypeOf("")
+		typeKeyValues := reflect.TypeOf(map[string]dbus.Variant{})
+		typeArrayValues := reflect.TypeOf([]string{})
+		for v := range(obj.signal_chan) {
+			if v.Name == "org.freedesktop.DBus.Properties.PropertiesChanged" &&
+				len(v.Body) == 3 &&
+				reflect.TypeOf(v.Body[0]) == typeString &&
+				reflect.TypeOf(v.Body[1]) == typeKeyValues &&
+				reflect.TypeOf(v.Body[2]) == typeArrayValues &&
+				v.Body[0].(string) != "{{IfcName}}" {
+				props := v.Body[1].(map[string]dbus.Variant)
+				for key, _ := range props {
+					if false { {{range .}}
+					} else if key == "{{.Name}}" {
+						obj.{{.Name}}.(*dbusProperty{{ExportName}}{{.Name}}).Notify()
+					{{end}} }
+				}
+			} else if v.Name == "{{IfcName}}.PropertiesChanged" && len(v.Body) == 1 && reflect.TypeOf(v.Body[0]) == typeKeyValues {
+				for key, _ := range v.Body[0].(map[string]dbus.Variant) {
+					if false { {{range .}}
+					} else if key == "{{.Name}}" {
+						obj.{{.Name}}.(*dbusProperty{{ExportName}}{{.Name}}).Notify()
+					{{end}} }
+				}
+			}
+		}
+	}()
+	{{end}}
+	{{if or .Properties .Signals }}getBus().Signal(obj.signal_chan){{end}}
+	return obj
 }
 
 `
