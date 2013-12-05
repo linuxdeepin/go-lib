@@ -5,6 +5,7 @@ import "reflect"
 import "dlib/dbus"
 
 type GSettingsProperty struct {
+	*BaseObserver
 	valueType reflect.Type
 	getFn     func() interface{}
 	setFn     func(interface{})
@@ -14,7 +15,7 @@ type GSettingsProperty struct {
 
 func NewGSettingsProperty(obj dbus.DBusObject, propName string, s *gio.Settings, keyName string) *GSettingsProperty {
 	prop := &GSettingsProperty{}
-	prop.core = obj
+	prop.BaseObserver = &BaseObserver{}
 	prop.propName = propName
 	switch s.GetValue(keyName).GetTypeString() {
 	case "b":
