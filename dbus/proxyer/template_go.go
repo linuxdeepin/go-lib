@@ -49,7 +49,9 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
 		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
 	go func() {
-		for v := range({{OBJ_NAME}}.signal_chan) {
+		signals := make(chan *dbus.Signal)
+		__conn.Signal(signals)
+		for v := range(signals) {
 			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
 				continue
 			}
