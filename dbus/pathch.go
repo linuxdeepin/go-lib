@@ -27,6 +27,9 @@ func isExitsInBus(con *Conn, obj DBusObject) bool {
 }
 
 func detectConnByDBusObject(obj DBusObject) *Conn {
+	if obj == nil {
+		panic("detecConnByDBusObject must not feed nil")
+	}
 	systemBusLck.Lock()
 	defer systemBusLck.Unlock()
 	sessionBusLck.Lock()
@@ -41,6 +44,9 @@ func detectConnByDBusObject(obj DBusObject) *Conn {
 }
 
 func NotifyChange(obj DBusObject, propName string) {
+	if obj == nil {
+		return
+	}
 	con := detectConnByDBusObject(obj)
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
