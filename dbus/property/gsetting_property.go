@@ -76,14 +76,14 @@ func NewGSettingsProperty(obj dbus.DBusObject, propName string, s *gio.Settings,
 	return prop
 }
 
-func (p GSettingsProperty) Set(v interface{}) {
+func (p GSettingsProperty) SetValue(v interface{}) {
 	if v != p.getFn() {
 		p.setFn(v)
 		dbus.NotifyChange(p.core, p.propName)
 	}
 }
 
-func (p GSettingsProperty) Get() interface{} {
+func (p GSettingsProperty) GetValue() interface{} {
 	return p.getFn()
 }
 

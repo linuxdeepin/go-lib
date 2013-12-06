@@ -32,14 +32,14 @@ func NewWrapProperty(obj dbus.DBusObject, propName string, core dbus.Property) *
 	return p
 }
 
-func (p WrapProperty) Set(v interface{}) {
-	p.core.Set(v)
+func (p WrapProperty) SetValue(v interface{}) {
+	p.core.SetValue(v)
 	dbus.NotifyChange(p.obj, p.name)
 	p.Notify()
 }
 
-func (p WrapProperty) Get() interface{} {
-	return p.core.Get()
+func (p WrapProperty) GetValue() interface{} {
+	return p.core.GetValue()
 }
 
 func (p WrapProperty) GetType() reflect.Type {

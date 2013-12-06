@@ -49,8 +49,8 @@ type PropertiesProxy struct {
 	PropertiesChanged func(string, map[string]Variant, []string)
 }
 type Property interface {
-	Get() interface{}
-	Set(interface{})
+	GetValue() interface{}
+	SetValue(interface{})
 	ConnectChanged(func())
 	GetType() reflect.Type
 }

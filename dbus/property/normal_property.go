@@ -23,7 +23,7 @@ func NewNormalProperty(con *dbus.Conn, path, ifc string, propName string, v inte
 	return &prop
 }
 
-func (p NormalProperty) Set(v interface{}) {
+func (p NormalProperty) SetValue(v interface{}) {
 	if reflect.TypeOf(v) != p.valueType {
 		panic("This property need type of " + p.valueType.String())
 	}
@@ -31,7 +31,7 @@ func (p NormalProperty) Set(v interface{}) {
 	p.notify()
 }
 
-func (p NormalProperty) Get() interface{} {
+func (p NormalProperty) GetValue() interface{} {
 	return p.value
 }
 
