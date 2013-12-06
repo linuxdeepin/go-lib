@@ -34,7 +34,7 @@ type {{ExportName}} struct {
 	core *dbus.Object
 	{{if or .Properties .Signals}}signal_chan chan *dbus.Signal{{end}}
 	{{range .Properties}}
-	{{.Name}} dbus.Property{{end}}
+	{{.Name}} *dbusProperty{{ExportName}}{{.Name}}{{end}}
 }
 {{$obj_name := .Name}}
 {{range .Methods }}
@@ -129,14 +129,14 @@ func Get{{ExportName}}(path string) *{{ExportName}} {
 				for key, _ := range props {
 					if false { {{range .}}
 					} else if key == "{{.Name}}" {
-						obj.{{.Name}}.(*dbusProperty{{ExportName}}{{.Name}}).Notify()
+						obj.{{.Name}}.Notify()
 					{{end}} }
 				}
 			} else if v.Name == "{{IfcName}}.PropertiesChanged" && len(v.Body) == 1 && reflect.TypeOf(v.Body[0]) == typeKeyValues {
 				for key, _ := range v.Body[0].(map[string]dbus.Variant) {
 					if false { {{range .}}
 					} else if key == "{{.Name}}" {
-						obj.{{.Name}}.(*dbusProperty{{ExportName}}{{.Name}}).Notify()
+						obj.{{.Name}}.Notify()
 					{{end}} }
 				}
 			}
