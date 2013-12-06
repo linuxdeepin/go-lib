@@ -72,18 +72,24 @@ type dbusProperty{{ExportName}}{{.Name}} struct{
 	*property.BaseObserver
 	core *dbus.Object
 }
-{{if PropWritable .}}func (this *dbusProperty{{ExportName}}{{.Name}}) Set(v interface{}/*{{TypeFor .Type}}*/) {
+{{if PropWritable .}}func (this *dbusProperty{{ExportName}}{{.Name}}) SetValue(v interface{}/*{{TypeFor .Type}}*/) {
 	if reflect.TypeOf(v) == reflect.TypeOf((*{{TypeFor .Type}})(nil)).Elem() {
 		this.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", dbus.MakeVariant(v))
 	} else {
 		log.Println("The property {{.Name}} of {{IfcName}} is an {{TypeFor .Type}} but Set with an ", reflect.TypeOf(v))
 	}
+}
+func (this *dbusProperty{{ExportName}}{{.Name}}) Set(v {{TypeFor .Type}}) {
+	this.SetValue(v)
 }{{else}}
-func (this *dbusProperty{{ExportName}}{{.Name}}) Set(notwritable interface{}) {
+func (this *dbusProperty{{ExportName}}{{.Name}}) SetValue(notwritable interface{}) {
 	log.Printf("{{IfcName}}.{{.Name}} is not writable")
 }{{end}}
 {{ $convert := TryConvertObjectPath . }}
-func (this *dbusProperty{{ExportName}}{{.Name}}) Get() interface{} /*{{GetObjectPathType .}}*/ {
+func (this *dbusProperty{{ExportName}}{{.Name}}) Get() {{GetObjectPathType .}} {
+	return this.GetValue().({{GetObjectPathType .}})
+}
+func (this *dbusProperty{{ExportName}}{{.Name}}) GetValue() interface{} /*{{GetObjectPathType .}}*/ {
 	var r dbus.Variant
 	err := this.core.Call("org.freedesktop.DBus.Properties.Get", 0, "{{IfcName}}", "{{.Name}}").Store(&r)
 	if err == nil && r.Signature().String() == "{{.Type}}" { {{ if $convert }}
