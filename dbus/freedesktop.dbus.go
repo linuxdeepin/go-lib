@@ -94,7 +94,7 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 		if ok && v.IsValid() && "read" != t.Tag.Get("access") {
 			if v.Type().Implements(propertyType) {
 				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
-					v.MethodByName("Set").Interface().(func(interface{}))(value.Value())
+					v.MethodByName("SetValue").Interface().(func(interface{}))(value.Value())
 					fn := getValueOf(ifc).MethodByName("OnPropertiesChanged")
 					if fn.IsValid() && !fn.IsNil() {
 						fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.Zero(reflect.TypeOf(value.Value()))})
@@ -126,7 +126,7 @@ func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant
 	if ifc, ok := propProxy.infos[ifc_name]; ok {
 		value := getValueOf(ifc).FieldByName(prop_name)
 		if value.Type().Implements(propertyType) {
-			t := value.MethodByName("Get").Interface().(func() interface{})()
+			t := value.MethodByName("GetValue").Interface().(func() interface{})()
 			return MakeVariant(t), nil
 		} else if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
 			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)), value)

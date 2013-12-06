@@ -51,7 +51,7 @@ func NotifyChange(obj DBusObject, propName string) {
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
 		if value.Type().Implements(propertyType) {
-			value = reflect.ValueOf(value.MethodByName("Get").Interface().(func() interface{})())
+			value = reflect.ValueOf(value.MethodByName("GetValue").Interface().(func() interface{})())
 		}
 		value = tryTranslateDBusObjectToObjectPath(con, value)
 		if value.IsValid() {
