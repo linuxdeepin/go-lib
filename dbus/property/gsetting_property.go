@@ -84,7 +84,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 	real_type := s.GetValue(keyName).GetTypeString()
 	if real_type != sig {
 		var correct_method string
-		switch sig {
+		switch real_type {
 		case "b":
 			correct_method = "NewGSettingsBoolProperty"
 		case "i":
@@ -100,7 +100,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 		default:
 			panic("GSettingsProperty didn't type " + sig)
 		}
-		panic("Type signal " + sig + " didn't match " + keyName + "'s type(" + real_type + ")" + ",please use the method " + correct_method)
+		panic("Type signal " + sig + " didn't match " + keyName + "'s type(" + real_type + ")" + ", please use the method " + correct_method)
 	}
 
 	prop := &_GSettingsProperty{}
