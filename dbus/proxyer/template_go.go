@@ -98,7 +98,8 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetValue() interface{} /*{{GetO
 		return after{{else}}
 		return r.Value().({{TypeFor .Type}}){{end}}
 	}  else {
-		panic(err)
+		log.Println(err, "at {{IfcName}}")
+		return *new({{TypeFor .Type}})
 	}
 }
 func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
