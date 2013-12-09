@@ -23,7 +23,6 @@ import "dlib/dbus/property"
 import "reflect"
 import "log"
 /*prevent compile error*/
-var _ = log.Printf
 var _ = reflect.TypeOf
 var _ = property.BaseObserver{}
 `
@@ -39,7 +38,10 @@ type {{ExportName}} struct {
 {{$obj_name := .Name}}
 {{range .Methods }}
 func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}}) {
-	{{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
+	err := {{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
+	if err != nil {
+		log.Println(err)
+	}
 	return
 }
 {{end}}
