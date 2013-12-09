@@ -8,7 +8,7 @@ import "dlib/gio-2.0"
 import "dlib/glib-2.0"
 
 func nothing() {
-	_ = property.NewGSettingsProperty
+	_ = property.NewGSettingsBoolProperty
 	_ = gio.DBusConnectionFlagsAuthenticationClient
 	_ = glib.CanInline
 	_ = gobject.NilString
