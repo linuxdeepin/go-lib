@@ -516,7 +516,7 @@ func (e Error) Error() string {
 	if len(e.Body) >= 1 {
 		s, ok := e.Body[0].(string)
 		if ok {
-			return s
+			return e.Name + ":" + s
 		}
 	}
 	return e.Name
