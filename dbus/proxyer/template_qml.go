@@ -10,7 +10,8 @@ import "text/template"
 
 var __IFC_TEMPLATE_INIT_QML = `/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
 #include <QtDBus>
-QVariant tryConvert(const QVariant&);
+QVariant unmarsh(const QVariant&);
+QVariant marsh(QDBusArgument target, const QVariant& arg, const QString& sig);
 `
 
 var __IFC_TEMPLATE_QML = `
@@ -31,7 +32,7 @@ public:
 
 {{range .Properties}}
     Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}})
-    QVariant {{.Name}}() { return tryConvert(property("{{.Name}}")); }
+    QVariant {{.Name}}() { return unmarsh(property("{{.Name}}")); }
     {{if PropWritable .}}void set{{.Name}}(const QVariant &v) { setProperty("{{.Name}}", v); }{{end}}
     {{end}}
 
@@ -56,7 +57,7 @@ private:
 	    foreach(const QString &prop, changedProps.keys()) {
 		    if (0) { {{range .Properties}}
 		    } else if (prop == "{{.Name}}") {
-			    Q_EMIT {{Lower .Name}}Changed(changedProps.value(prop));{{end}}
+			    Q_EMIT {{Lower .Name}}Changed(unmarsh(changedProps.value(prop)));{{end}}
 		    }
 	    }
     }
@@ -91,19 +92,18 @@ public:
     Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}} NOTIFY {{Lower .Name}}Changed){{end}}
 
     //Property read methods{{range .Properties}}
-    const QVariant {{.Name}}() { return tryConvert(m_ifc->property("{{.Name}}")); }{{end}}
-    //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}} {{$type := TypeForQt .Type}}
-    void set{{.Name}}(const QVariant &v) { {{if $type}}
-	    m_ifc->setProperty("{{.Name}}", QVariant::fromValue(qvariant_cast<{{$type}}>(v)));{{else}}
-	    m_ifc->setProperty("{{.Name}}", v);{{end}}
-	    Q_EMIT {{Lower .Name}}Changed(v);
+    const QVariant {{.Name}}() { return unmarsh(m_ifc->property("{{.Name}}")); }{{end}}
+    //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}}
+    void set{{.Name}}(const QVariant &v) {
+	    QVariant marshedValue = marsh(QDBusArgument(), v, "{{.Type}}");
+	    m_ifc->setProperty("{{.Name}}", marshedValue);
+	    Q_EMIT {{Lower .Name}}Changed(marshedValue);
     }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
     QVariant {{.Name}}({{range $i, $e := GetOuts .Args}}{{if ne $i 0}}, {{end}}const QVariant &{{.Name}}{{end}}) {
-	    QList<QVariant> argumentList;{{range GetOuts .Args}}{{if NormaliseQDBus .Type}}
-	    {{.Name}} = {{NormaliseQDBus .Type}}{{end}}{{end}}
-	    argumentList{{range GetOuts .Args}} << {{.Name}}{{end}};
+	    QList<QVariant> argumentList;
+	    argumentList{{range GetOuts .Args}} << marsh(QDBusArgument(), {{.Name}}, "{{.Type}}"){{end}};
 
 	    QDBusPendingReply<> call = m_ifc->asyncCallWithArgumentList(QLatin1String("{{.Name}}"), argumentList);
 	    call.waitForFinished();
@@ -112,12 +112,12 @@ public Q_SLOTS:{{range .Methods}}
 		    switch (args.size()) {
 			    case 0: return QVariant();
 			    case 1: {
-				    return tryConvert(args[0]);
+				    return unmarsh(args[0]);
 			    }
 		    default:
 			    {
 				    for (int i=0; i<args.size(); i++) {
-					    args[i] = tryConvert(args[i]);
+					    args[i] = unmarsh(args[i]);
 				    }
 				    return args;
 			    }
@@ -161,94 +161,10 @@ class DBusPlugin: public QQmlExtensionPlugin
 	    qmlRegisterType<{{.ObjectName}}>(uri, 1, 0, "{{.ObjectName}}");{{end}}
     }
 };
+` + _templateMarshUnMarsh + `
 #endif
-
-template<>
-inline QDBusObjectPath qvariant_cast(const QVariant& v) {
-    return QDBusObjectPath(qvariant_cast<QString>(v));
-}
-
-template<>
-inline QDBusSignature qvariant_cast(const QVariant& v) {
-    return QDBusSignature(qvariant_cast<QString>(v));
-}
-
-inline QDBusVariant qvariant_cast(const QVariant& v) {
-    return QDBusVariant(v);
-}
-
-inline 
-QVariant parse(const QDBusArgument &argument)
-{
-    switch (argument.currentType()) {
-    case QDBusArgument::BasicType: {
-        QVariant v = argument.asVariant();
-        if (v.userType() == qMetaTypeId<QDBusObjectPath>())
-            return v.value<QDBusObjectPath>().path();
-        else if (v.userType() == qMetaTypeId<QDBusSignature>())
-            return v.value<QDBusSignature>().signature();
-        else
-            return v;
-    }
-    case QDBusArgument::VariantType: {
-        QVariant v = argument.asVariant().value<QDBusVariant>().variant();
-        if (v.userType() == qMetaTypeId<QDBusArgument>())
-            return parse(v.value<QDBusArgument>());
-        else
-            return v;
-    }
-    case QDBusArgument::ArrayType: {
-        QVariantList list;
-        argument.beginArray();
-        while (!argument.atEnd())
-            list.append(parse(argument));
-        argument.endArray();
-        return list;
-    }
-    case QDBusArgument::StructureType: {
-        QVariantList list;
-        argument.beginStructure();
-        while (!argument.atEnd())
-            list.append(parse(argument));
-        argument.endStructure();
-        return QVariant::fromValue(list);
-    }
-    case QDBusArgument::MapType: {
-        QVariantMap map;
-        argument.beginMap();
-        while (!argument.atEnd()) {
-            argument.beginMapEntry();
-            QVariant key = parse(argument);
-            QVariant value = parse(argument);
-            map.insert(key.toString(), value);
-            argument.endMapEntry();
-        }
-        argument.endMap();
-        return map;
-    }
-    default:
-        return QVariant();
-        break;
-    }
-}
-
-QVariant tryConvert(const QVariant& v) {
-	if (QString(v.typeName()).startsWith("QList")) {
-		QVariantList list;
-		foreach(const QDBusObjectPath &p, v.value<QList<QDBusObjectPath> >()) {
-			list.append(tryConvert(QVariant::fromValue(p)));
-		}
-		return list;
-	} else if (v.userType() == qMetaTypeId<QDBusObjectPath>()) {
-		return QVariant::fromValue(v.value<QDBusObjectPath>().path());
-	} else if (v.userType() == qMetaTypeId<QDBusArgument>()) {
-		return tryConvert(parse(v.value<QDBusArgument>()));
-	} else if (v.userType() == qMetaTypeId<QByteArray>()) {
-		return QString(v.value<QByteArray>());
-	}
-	return v;
-}
 `
+
 var __PROJECT_TEMPL_QML = `
 TEMPLATE=lib
 CONFIC += plugin
@@ -266,6 +182,7 @@ HEADERS += plugin.h {{range GetModules}}{{.}}.h {{end}}
 test.depends = {{PkgName}}/$(TARGET)
 test.commands = (qmlscene -I . test.qml)
 QMAKE_EXTRA_TARGETS += test
+QMAKE_CXX=clang++
 `
 
 var __TEST_QML = `
@@ -388,3 +305,165 @@ var sigToQtType = map[byte]string{
 func typeForQt(sig string) string {
 	return sigToQtType[sig[0]]
 }
+
+var _templateMarshUnMarsh = `
+int getTypeId(const QString& sig) {
+    //TODO: this should staticly generate by xml info
+    if (sig == "o") {
+        return qMetaTypeId<QDBusObjectPath>();
+    } else if (sig == "s") {
+        return qMetaTypeId<QString>();
+    } else if (sig == "ao") {
+        return qMetaTypeId<QList<QDBusObjectPath> >();
+    } else if (sig == "as") {
+        return qMetaTypeId<QList<QString> >();
+    } else {
+        qDebug() << "Panic not suppport getTypeID" << sig;
+    }
+}
+
+inline
+QVariant qstring2dbus(QString value, char sig) {
+    switch (sig) {
+        case 'y':
+            return QVariant::fromValue(uchar(value[0].toLatin1()));
+        case 'n':
+            return QVariant::fromValue(value.toShort());
+        case 'q':
+            return QVariant::fromValue(value.toUShort());
+        case 'i':
+            return QVariant::fromValue(value.toInt());
+        case 'u':
+            return QVariant::fromValue(value.toUInt());
+        case 'x':
+            return QVariant::fromValue(value.toLongLong());
+        case 't':
+            return QVariant::fromValue(value.toULongLong());
+        case 'd':
+            return QVariant::fromValue(value.toDouble());
+        case 's':
+            return QVariant::fromValue(value);
+        case 'o':
+            return QVariant::fromValue(QDBusObjectPath(value));
+        case 'v':
+            return QVariant::fromValue(QDBusSignature(value));
+        default:
+            qDebug() << "Dict entry key should be an basic dbus type not an " << sig;
+            return QVariant();
+    }
+}
+
+QVariant marsh(QDBusArgument target, const QVariant& arg, const QString& sig) {
+    if (sig.size() == 0) {
+        return QVariant::fromValue(target);
+    }
+    switch (sig[0].toLatin1()) {
+        case 'o':
+            target << QDBusObjectPath(arg.value<QString>());
+            return QVariant::fromValue(target);
+        case 's':
+            target << arg.value<QString>();
+            return QVariant::fromValue(target);
+        case 'a':
+            {
+                if (sig.size() < 2) { return QVariant(); }
+                char s = sig[1].toLatin1();
+                if (s == '{') {
+                    char key_sig = sig[2].toLatin1();
+                    QString value_sig = sig.mid(3, sig.lastIndexOf('}') - 3);
+                    target.beginMap(getTypeId(QString(key_sig)), getTypeId(value_sig));
+                    qDebug() << "BeginMap:" << key_sig << value_sig;
+                    foreach(const QString& key, arg.value<QVariantMap>().keys()) {
+                        qDebug() << "KEY:" << key;
+                        target.beginMapEntry();
+                        qDebug() <<"beginMapEntry";
+                        marsh(target, qstring2dbus(key, key_sig), QString(key_sig));
+                        marsh(target, arg.value<QVariantMap>()[key], value_sig);
+                        qDebug() <<"EndMapEntry";
+                        target.endMapEntry();
+                    }
+                    qDebug() << "EndMap";
+                    target.endMap();
+                    return QVariant::fromValue(target);
+                } else {
+                    QString next = sig.right(sig.size() - 1);
+                    target.beginArray(getTypeId(next));
+                    foreach(const QVariant& v, arg.value<QVariantList>()) {
+                        marsh(target, v, next);
+                    }
+                    target.endArray();
+                    return QVariant::fromValue(target);
+                }
+            }
+        default:
+            qDebug() << "Panic didn't support omarsh" << sig;
+    }
+    return QVariant::fromValue(target);
+}
+
+inline
+QVariant unmarshDBus(const QDBusArgument &argument)
+{
+    switch (argument.currentType()) {
+    case QDBusArgument::BasicType: {
+        QVariant v = argument.asVariant();
+        if (v.userType() == qMetaTypeId<QDBusObjectPath>())
+            return v.value<QDBusObjectPath>().path();
+        else if (v.userType() == qMetaTypeId<QDBusSignature>())
+            return v.value<QDBusSignature>().signature();
+        else
+            return v;
+    }
+    case QDBusArgument::VariantType: {
+        QVariant v = argument.asVariant().value<QDBusVariant>().variant();
+        if (v.userType() == qMetaTypeId<QDBusArgument>())
+            return unmarshDBus(v.value<QDBusArgument>());
+        else
+            return v;
+    }
+    case QDBusArgument::ArrayType: {
+        QVariantList list;
+        argument.beginArray();
+        while (!argument.atEnd())
+            list.append(unmarshDBus(argument));
+        argument.endArray();
+        return list;
+    }
+    case QDBusArgument::StructureType: {
+        QVariantList list;
+        argument.beginStructure();
+        while (!argument.atEnd())
+            list.append(unmarshDBus(argument));
+        argument.endStructure();
+        return QVariant::fromValue(list);
+    }
+    case QDBusArgument::MapType: {
+        QVariantMap map;
+        argument.beginMap();
+        while (!argument.atEnd()) {
+            argument.beginMapEntry();
+            QVariant key = unmarshDBus(argument);
+            QVariant value = unmarshDBus(argument);
+            map.insert(key.toString(), value);
+            argument.endMapEntry();
+        }
+        argument.endMap();
+        return map;
+    }
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+QVariant unmarsh(const QVariant& v) {
+	if (v.userType() == qMetaTypeId<QDBusObjectPath>()) {
+		return QVariant::fromValue(v.value<QDBusObjectPath>().path());
+	} else if (v.userType() == qMetaTypeId<QDBusArgument>()) {
+		return unmarsh(unmarshDBus(v.value<QDBusArgument>()));
+	} else if (v.userType() == qMetaTypeId<QByteArray>()) {
+		return QString(v.value<QByteArray>());
+	}
+	return v;
+}
+`
