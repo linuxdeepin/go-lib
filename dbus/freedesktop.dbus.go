@@ -151,6 +151,18 @@ func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant
 		}
 
 		if value.IsValid() {
+			if path, ok := value.Interface().(*ObjectPath); ok {
+				if path == nil || !path.IsValid() {
+					return MakeVariant(""), &errUnknownProperty
+				}
+			} else if path, ok := value.Interface().(ObjectPath); ok {
+				if !path.IsValid() {
+					return MakeVariant(""), &errUnknownProperty
+				}
+			} else if str, ok := value.Interface().(*string); ok && str == nil {
+				//TODO: Why only an nil ptr string will cause we lost dbus connection?
+				return MakeVariant(""), nil
+			}
 			return MakeVariant(value.Interface()), nil
 		} else {
 			return MakeVariant(""), &errUnknownProperty
