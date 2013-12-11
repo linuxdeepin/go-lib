@@ -154,12 +154,12 @@ var __GLOBAL_TEMPLATE_QML = `
 class DBusPlugin: public QQmlExtensionPlugin
 {
     Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.deepin.dde.daemon.DBus")
+        Q_PLUGIN_METADATA(IID "com.deepin.dde.daemon.DBus")
 
     public:
-	void registerTypes(const char* uri) { {{range .Interfaces}}
-	    qmlRegisterType<{{.ObjectName}}>(uri, 1, 0, "{{.ObjectName}}");{{end}}
-    }
+        void registerTypes(const char* uri) { {{range .Interfaces}}
+             qmlRegisterType<{{.ObjectName}}>(uri, 1, 0, "{{.ObjectName}}");{{end}}
+        }
 };
 ` + _templateMarshUnMarsh + `
 #endif
@@ -353,17 +353,100 @@ QVariant qstring2dbus(QString value, char sig) {
     }
 }
 
+QList<QString> splitStructureSignature(const QString& sig) {
+    if (sig.size() < 3 || sig[0] != '(' || sig[sig.size()-1] != ')') {
+        return QList<QString>();
+    }
+
+    QList<QString> sigs;
+
+    QString tmp = sig.mid(1, sig.size()-2);
+    while (tmp.size() != 0) {
+        switch (tmp[0].toLatin1()) {
+            case 'a':
+                if (tmp.size() < 2) {
+                    return QList<QString>();
+                }
+                if (tmp[1] == '{') {
+                    int lastIndex = tmp.lastIndexOf('}') + 1;
+                    if (lastIndex == 0) return QList<QString>();
+                    sigs.append(tmp.mid(0, lastIndex));
+                    tmp = tmp.mid(lastIndex);
+                    break;
+                } else if (tmp[1] == '(') {
+                    int lastIndex = tmp.lastIndexOf(')') + 1;
+                    if (lastIndex == 0) return QList<QString>();
+                    sigs.append(tmp.mid(0, lastIndex));
+                    tmp = tmp.mid(lastIndex);
+                    break;
+                } else {
+                    sigs.append(tmp.mid(0, 2));
+                    tmp = tmp.mid(2);
+                    break;
+                }
+            case '(': {
+                          int lastIndex = tmp.lastIndexOf(')') + 1;
+                          if (lastIndex == 0) return QList<QString>();
+                          sigs.append(tmp.mid(0, lastIndex));
+                          tmp = tmp.mid(lastIndex);
+                          break;
+                      }
+            case 'y': case 'b': case 'n': case 'q':
+            case 'i': case 'u': case 'x': case 't':
+            case 'd': case 's': case 'o': case 'g':
+            case 'h': case 'v':
+                sigs.append(QString(tmp[0]));
+                tmp = tmp.mid(1, tmp.size() - 1);
+                break;
+            default:
+                return QList<QString>();
+        }
+    }
+    return sigs;
+}
+
 QVariant marsh(QDBusArgument target, const QVariant& arg, const QString& sig) {
     if (sig.size() == 0) {
         return QVariant::fromValue(target);
     }
     switch (sig[0].toLatin1()) {
-        case 'o':
-            target << QDBusObjectPath(arg.value<QString>());
+        case 'y':
+            target << qstring2dbus(arg.value<QString>(), 'y').value<uchar>();
+            return QVariant::fromValue(target);
+        case 'b':
+            target << arg.value<bool>();
+            return QVariant::fromValue(target);
+        case 'n':
+            target << arg.value<short>();
+            return QVariant::fromValue(target);
+        case 'q':
+            target << arg.value<ushort>();
+            return QVariant::fromValue(target);
+        case 'i':
+            target << arg.value<qint32>();
+            return QVariant::fromValue(target);
+        case 'u':
+            target << arg.value<quint32>();
+            return QVariant::fromValue(target);
+        case 'x':
+            target << arg.value<qlonglong>();
+            return QVariant::fromValue(target);
+        case 't':
+            target << arg.value<qulonglong>();
+            return QVariant::fromValue(target);
+        case 'd':
+            target << arg.value<double>();
             return QVariant::fromValue(target);
         case 's':
             target << arg.value<QString>();
             return QVariant::fromValue(target);
+        case 'o':
+            target << QDBusObjectPath(arg.value<QString>());
+            return QVariant::fromValue(target);
+        case 'g':
+            target << QDBusSignature(arg.value<QString>());
+            return QVariant::fromValue(target);
+
         case 'a':
             {
                 if (sig.size() < 2) { return QVariant(); }
@@ -372,17 +455,17 @@ QVariant marsh(QDBusArgument target, const QVariant& arg, const QString& sig) {
                     char key_sig = sig[2].toLatin1();
                     QString value_sig = sig.mid(3, sig.lastIndexOf('}') - 3);
                     target.beginMap(getTypeId(QString(key_sig)), getTypeId(value_sig));
-                    qDebug() << "BeginMap:" << key_sig << value_sig;
+                    //qDebug() << "BeginMap:" << key_sig << value_sig;
                     foreach(const QString& key, arg.value<QVariantMap>().keys()) {
-                        qDebug() << "KEY:" << key;
+                        //qDebug() << "KEY:" << key;
                         target.beginMapEntry();
-                        qDebug() <<"beginMapEntry";
+                        //qDebug() <<"beginMapEntry";
                         marsh(target, qstring2dbus(key, key_sig), QString(key_sig));
                         marsh(target, arg.value<QVariantMap>()[key], value_sig);
-                        qDebug() <<"EndMapEntry";
+                        //qDebug() <<"EndMapEntry";
                         target.endMapEntry();
                     }
-                    qDebug() << "EndMap";
+                    //qDebug() << "EndMap";
                     target.endMap();
                     return QVariant::fromValue(target);
                 } else {
@@ -395,8 +478,23 @@ QVariant marsh(QDBusArgument target, const QVariant& arg, const QString& sig) {
                     return QVariant::fromValue(target);
                 }
             }
+        case '(':
+            {
+                QList<QString> sigs = splitStructureSignature(sig);
+                QVariantList values = arg.value<QVariantList>();
+                if (values.size() != sigs.size()) {
+                    qDebug() << "structure (" << arg << ") didn't match signature :" << sigs;
+                    return QVariant();
+                }
+                target.beginStructure();
+                for (int i=0; i < sigs.size(); i++) {
+                    marsh(target, values[i], sigs[i]);
+                }
+                target.endStructure();
+                return QVariant::fromValue(target);
+            }
         default:
-            qDebug() << "Panic didn't support omarsh" << sig;
+            qDebug() << "Panic didn't support marsh" << sig;
     }
     return QVariant::fromValue(target);
 }
@@ -457,13 +555,13 @@ QVariant unmarshDBus(const QDBusArgument &argument)
 }
 
 QVariant unmarsh(const QVariant& v) {
-	if (v.userType() == qMetaTypeId<QDBusObjectPath>()) {
-		return QVariant::fromValue(v.value<QDBusObjectPath>().path());
-	} else if (v.userType() == qMetaTypeId<QDBusArgument>()) {
-		return unmarsh(unmarshDBus(v.value<QDBusArgument>()));
-	} else if (v.userType() == qMetaTypeId<QByteArray>()) {
-		return QString(v.value<QByteArray>());
-	}
-	return v;
+    if (v.userType() == qMetaTypeId<QDBusObjectPath>()) {
+        return QVariant::fromValue(v.value<QDBusObjectPath>().path());
+    } else if (v.userType() == qMetaTypeId<QDBusArgument>()) {
+        return unmarsh(unmarshDBus(v.value<QDBusArgument>()));
+    } else if (v.userType() == qMetaTypeId<QByteArray>()) {
+        return QString(v.value<QByteArray>());
+    }
+    return v;
 }
 `
