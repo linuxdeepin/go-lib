@@ -32,6 +32,7 @@ func renderMain(writer io.Writer) {
 			}
 			return r
 		},
+		"GetQtSignaturesType": getQtSignaturesType,
 	}).Parse(TEMPLs["GLOBAL_"+INFOS.Config.Target])).Execute(writer, INFOS)
 }
 
@@ -59,7 +60,6 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"PkgName":        func() string { return INFOS.Config.PkgName },
 		"OBJ_NAME":       func() string { return "obj" },
 		"TypeFor":        dbus.TypeFor,
-		"TypeForQt":      typeForQt,
 		"getQType":       getQType,
 		"DestName":       func() string { return INFOS.Config.DestName },
 		"IfcName":        func() string { return ifc_name },

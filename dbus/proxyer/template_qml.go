@@ -286,39 +286,78 @@ func qtPropertyFilter(s string) string {
 	return s
 }
 
-var sigToQtType = map[byte]string{
-	'y': "uchar",
-	'b': "bool",
-	'n': "short",
-	'q': "ushort",
-	'i': "int",
-	'u': "uint",
-	'x': "qlonglong",
-	't': "qulonglong",
-	'd': "double",
-	's': "QString",
-	'g': "QDBusVariant",
-	'o': "QDBusObjectPath",
-	'v': "QDBusSignature",
+var sigToQtType = map[string]string{
+	"y": "uchar",
+	"b": "bool",
+	"n": "short",
+	"q": "ushort",
+	"i": "int",
+	"u": "uint",
+	"x": "qlonglong",
+	"t": "qulonglong",
+	"d": "double",
+	"s": "QString",
+	"g": "QDBusVariant",
+	"o": "QDBusObjectPath",
+	"v": "QDBusSignature",
 }
 
-func typeForQt(sig string) string {
-	return sigToQtType[sig[0]]
+func getQtSignaturesType() (sigs map[string]string) {
+	sigs = make(map[string]string)
+	var store func(string)
+	store = func(sig string) {
+		if v, ok := sigToQtType[sig]; ok {
+			sigs[sig] = v
+		} else if sig == "as" {
+			sigs[sig] = "QStringList"
+		} else if sig[0] == 'a' {
+			if sig[1] == '(' {
+				sigs[sig] = "QVariantList"
+			} else if sig[1] == '{' {
+				if len(sig) < 5 { // a{xx} has at least five characters
+					return
+				}
+				store(sig[2:3])
+				store(sig[3:strings.LastIndex(sig, "}")])
+				sigs[sig] = "QVariantMap"
+			} else {
+				store(sig[1:])
+				sigs[sig] = "QList< " + sigs[sig[1:]] + " >"
+			}
+		} else if sig[0] == '(' {
+			sigs[sig] = "QVariantList"
+		} else {
+			panic("parse signature failed:" + sig)
+		}
+	}
+	for _, ifc := range INFOS.Interfaces {
+		info := GetInterfaceInfo(ifc)
+		for _, m := range info.Methods {
+			for _, a := range m.Args {
+				store(a.Type)
+			}
+		}
+		for _, p := range info.Properties {
+			store(p.Type)
+		}
+		for _, s := range info.Signals {
+			for _, ss := range s.Args {
+				store(ss.Type)
+			}
+		}
+	}
+	return sigs
 }
 
 var _templateMarshUnMarsh = `
+inline
 int getTypeId(const QString& sig) {
     //TODO: this should staticly generate by xml info
-    if (sig == "o") {
-        return qMetaTypeId<QDBusObjectPath>();
-    } else if (sig == "s") {
-        return qMetaTypeId<QString>();
-    } else if (sig == "ao") {
-        return qMetaTypeId<QList<QDBusObjectPath> >();
-    } else if (sig == "as") {
-        return qMetaTypeId<QList<QString> >();
+    if (0) { {{ range $key, $value := GetQtSignaturesType }}
+    } else if (sig == "{{$key}}") {
+	    return qDBusRegisterMetaType<{{$value}} >();{{end}}
     } else {
-        qDebug() << "Panic not suppport getTypeID" << sig;
+	    qDebug() << "Didn't support getTypeId" << sig << " please report it to snyh@snyh.org";
     }
 }
 
