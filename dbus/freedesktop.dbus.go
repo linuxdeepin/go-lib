@@ -92,6 +92,9 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 		t, ok := ifc_t.FieldByName(prop_name)
 		v := getValueOf(ifc).FieldByName(prop_name)
 		if ok && v.IsValid() && "read" != t.Tag.Get("access") {
+			if !v.CanAddr() {
+				return &errPropertyNotWritable
+			}
 			if v.Type().Implements(propertyType) {
 				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
 					v.MethodByName("SetValue").Interface().(func(interface{}))(value.Value())
@@ -103,8 +106,7 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 				} else {
 					return &errPropertyNotWritable
 				}
-			}
-			if v.CanAddr() && v.Type() == reflect.TypeOf(value.Value()) {
+			} else if v.Type() == reflect.TypeOf(value.Value()) {
 				prop_val := reflect.ValueOf(value.Value())
 				prop_old_val := v.Interface()
 				v.Set(prop_val)
@@ -113,8 +115,23 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 					fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.ValueOf(prop_old_val)})
 				}
 				return nil
-			} else {
-				return &errPropertyNotWritable
+			} else if isStructureMatched(v.Interface(), value.Value()) {
+				t := reflect.TypeOf(v.Interface())
+				if t.Kind() == reflect.Ptr {
+					t = t.Elem()
+					v = v.Elem()
+				}
+				dValues := value.Value().([]interface{})
+				for i := 0; i < t.NumField(); i++ {
+					if isExportedStructField(t.Field(i)) {
+						field := v.Field(i)
+						if t.Field(i).Type.Kind() == reflect.Ptr {
+							field = field.Elem()
+						}
+						field.Set(reflect.ValueOf(dValues[i]))
+					}
+				}
+				return nil
 			}
 		} else {
 			return &errUnknownProperty
