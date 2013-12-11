@@ -182,7 +182,6 @@ HEADERS += plugin.h {{range GetModules}}{{.}}.h {{end}}
 test.depends = {{PkgName}}/$(TARGET)
 test.commands = (qmlscene -I . test.qml)
 QMAKE_EXTRA_TARGETS += test
-QMAKE_CXX=clang++
 `
 
 var __TEST_QML = `
