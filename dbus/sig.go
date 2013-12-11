@@ -94,7 +94,7 @@ func getSignature(t reflect.Type) string {
 		var s string
 		for i := 0; i < t.NumField(); i++ {
 			field := t.Field(i)
-			if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
+			if isExportedStructField(field) {
 				s += getSignature(t.Field(i).Type)
 			}
 		}

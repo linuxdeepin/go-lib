@@ -1,5 +1,6 @@
 package dbus
 
+import "fmt"
 import "log"
 
 import "reflect"
@@ -15,6 +16,60 @@ var dbusObject DBusObject
 var dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
 var introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
 var propertyType = reflect.TypeOf((*Property)(nil)).Elem()
+var dbusStructType = reflect.TypeOf((*[]interface{})(nil)).Elem()
+
+func isStructureMatched(structValue interface{}, dbusValue interface{}) bool {
+	dValues, ok := dbusValue.([]interface{})
+	if !ok {
+		fmt.Println(dbusValue, "is Not an []interface{}")
+		return false
+	}
+
+	t1 := reflect.TypeOf(structValue)
+	if t1.Kind() == reflect.Ptr {
+		t1 = t1.Elem()
+	}
+
+	if t1.Kind() != reflect.Struct {
+		fmt.Println(t1.Kind(), "!=", reflect.Struct)
+		return false
+	}
+
+	j := -1
+	for i := 0; i < t1.NumField(); i++ {
+		field := t1.Field(i)
+		if isExportedStructField(field) {
+			j++
+			if j >= len(dValues) {
+				fmt.Println("J:", j, "values:", len(dValues))
+				return false
+			}
+
+			t := field.Type
+			if t.Kind() == reflect.Ptr {
+				t = t.Elem()
+			}
+			if reflect.TypeOf(dValues[j]).Kind() != t.Kind() {
+				fmt.Println(reflect.TypeOf(dValues[j]).Kind(), "!=", t.Kind())
+				return false
+			}
+		}
+	}
+	j++
+	if j != len(dValues) {
+		fmt.Println("exported Num:", j, "But dValues has NUm:", len(dValues))
+		return false
+	}
+	return true
+}
+
+func isExportedStructField(field reflect.StructField) bool {
+	if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
+		return true
+	} else {
+		return false
+	}
+}
 
 func isExitsInBus(con *Conn, obj DBusObject) bool {
 	con.handlersLck.Lock()

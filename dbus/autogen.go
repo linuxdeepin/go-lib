@@ -150,6 +150,9 @@ func InstallOnAny(conn *Conn, obj DBusObject) error {
 	if obj == nil {
 		panic("Can't install an nil DBusObject to dbus")
 	}
+	if reflect.TypeOf(obj).Kind() != reflect.Ptr {
+		panic("DBusObject must be an ptr at this moment")
+	}
 	info := obj.GetDBusInfo()
 	path := ObjectPath(info.ObjectPath)
 	if path.IsValid() {

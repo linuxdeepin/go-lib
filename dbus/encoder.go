@@ -144,7 +144,7 @@ func (enc *encoder) encode(v reflect.Value, depth int) {
 		default:
 			for i := 0; i < v.Type().NumField(); i++ {
 				field := t.Field(i)
-				if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
+				if isExportedStructField(field) {
 					enc.encode(v.Field(i), depth+1)
 				}
 			}
