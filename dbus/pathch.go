@@ -105,11 +105,15 @@ func NotifyChange(obj DBusObject, propName string) {
 	con := detectConnByDBusObject(obj)
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
-		if value.Type().Implements(propertyType) {
-			value = reflect.ValueOf(value.MethodByName("GetValue").Interface().(func() interface{})())
-		}
-		value = tryTranslateDBusObjectToObjectPath(con, value)
 		if value.IsValid() {
+			if value.Type().Implements(propertyType) {
+				v := value.MethodByName("GetValue").Interface().(func() interface{})()
+				if v == nil {
+					log.Println("dbus.NotifyChange", propName, "is an nil value! This shouldn't happen.")
+				}
+				value = reflect.ValueOf(v)
+			}
+			value = tryTranslateDBusObjectToObjectPath(con, value)
 			inputs := make(map[string]Variant)
 			inputs[propName] = MakeVariant(value.Interface())
 			info := obj.GetDBusInfo()
