@@ -498,6 +498,18 @@ func (conn *Conn) Signal(ch chan<- *Signal) {
 	conn.signalsLck.Unlock()
 }
 
+func (conn *Conn) DetachSignal(removingChan chan<- *Signal) {
+	conn.signalsLck.Lock()
+	newSignals := make([]chan<- *Signal, 0)
+	for _, ch := range conn.signals {
+		if ch != removingChan {
+			newSignals = append(newSignals, ch)
+		}
+	}
+	conn.signals = newSignals
+	conn.signalsLck.Unlock()
+}
+
 // SupportsUnixFDs returns whether the underlying transport supports passing of
 // unix file descriptors. If this is false, method calls containing unix file
 // descriptors will return an error and emitted signals containing them will

@@ -21,8 +21,12 @@ package {{PkgName}}
 import "dlib/dbus"
 import "dlib/dbus/property"
 import "reflect"
+import "sync"
+import "runtime"
 import "log"
 /*prevent compile error*/
+var _ = runtime.SetFinalizer
+var _ = sync.NewCond
 var _ = reflect.TypeOf
 var _ = property.BaseObserver{}
 `
@@ -31,10 +35,41 @@ var __IFC_TEMPLATE_GoLang = `
 type {{ExportName}} struct {
 	Path dbus.ObjectPath
 	core *dbus.Object
-	{{if or .Properties .Signals}}signal_chan chan *dbus.Signal{{end}}
+{{if or .Properties .Signals}}
+	signals map[chan *dbus.Signal]bool
+	signalsLocker sync.Mutex
+{{end}}
 	{{range .Properties}}
 	{{.Name}} *dbusProperty{{ExportName}}{{.Name}}{{end}}
 }
+{{if or .Properties .Signals}}
+func ({{OBJ_NAME}} {{ExportName}}) _createSignalChan() chan *dbus.Signal {
+	{{OBJ_NAME}}.signalsLocker.Lock()
+	ch := make(chan *dbus.Signal)
+	getBus().Signal(ch)
+	{{OBJ_NAME}}.signals[ch] = false
+	{{OBJ_NAME}}.signalsLocker.Unlock()
+	return ch
+}
+func ({{OBJ_NAME}} {{ExportName}}) _deleteSignalChan(ch chan *dbus.Signal) {
+	{{OBJ_NAME}}.signalsLocker.Lock()
+	delete({{OBJ_NAME}}.signals, ch)
+	getBus().DetachSignal(ch)
+	close(ch)
+	{{OBJ_NAME}}.signalsLocker.Unlock()
+}
+func destroy{{ExportName}}(obj *{{ExportName}}) {
+	obj.signalsLocker.Lock()
+	for ch, _ := range obj.signals {
+		delete({{OBJ_NAME}}.signals, ch)
+		getBus().DetachSignal(ch)
+		close(ch)
+	}
+	log.Printf("Debug: run destroy{{ExportName}}", obj)
+	obj.signalsLocker.Unlock()
+}
+{{end}}
+
 {{$obj_name := .Name}}
 {{range .Methods }}
 func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}}) {
@@ -47,13 +82,12 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{end}}
 
 {{range .Signals}}
-func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) {
+func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) func() {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
 		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
+	sigChan := {{OBJ_NAME}}._createSignalChan()
 	go func() {
-		signals := make(chan *dbus.Signal)
-		__conn.Signal(signals)
-		for v := range(signals) {
+		for v := range(sigChan) {
 			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
 				continue
 			}
@@ -65,7 +99,9 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 			callback({{range $index, $arg := .Args}}{{if $index}},{{end}}v.Body[{{$index}}].({{TypeFor $arg.Type}}){{end}})
 		}
 	}()
-
+	return func() {
+		{{OBJ_NAME}}._deleteSignalChan(sigChan)
+	}
 }
 {{end}}
 
@@ -100,7 +136,7 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetValue() interface{} /*{{GetO
 		return after{{else}}
 		return r.Value().({{TypeFor .Type}}){{end}}
 	}  else {
-		log.Println(err, "at {{IfcName}}")
+		log.Println("dbusProperty:{{.Name}} error:", err, "at {{IfcName}}")
 		return *new({{TypeFor .Type}})
 	}
 }
@@ -111,17 +147,18 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
 
 func Get{{ExportName}}(path string) *{{ExportName}} {
 	core := getBus().Object("{{DestName}}", dbus.ObjectPath(path))
-	obj := &{{ExportName}}{Path:dbus.ObjectPath(path), core:core{{if .Signals}},signal_chan:make(chan *dbus.Signal){{end}}}
+	obj := &{{ExportName}}{Path:dbus.ObjectPath(path), core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
 	{{range .Properties}}
 	obj.{{.Name}} = &dbusProperty{{ExportName}}{{.Name}}{&property.BaseObserver{}, core}{{end}}
-	{{with .Properties}}
+{{with .Properties}}
 	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='org.freedesktop.DBus.Properties',sender='{{DestName}}',member='PropertiesChanged'")
 	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='{{IfcName}}',sender='{{DestName}}',member='PropertiesChanged'")
+	sigChan := obj._createSignalChan()
 	go func() {
 		typeString := reflect.TypeOf("")
 		typeKeyValues := reflect.TypeOf(map[string]dbus.Variant{})
 		typeArrayValues := reflect.TypeOf([]string{})
-		for v := range(obj.signal_chan) {
+		for v := range(sigChan) {
 			if v.Name == "org.freedesktop.DBus.Properties.PropertiesChanged" &&
 				len(v.Body) == 3 &&
 				reflect.TypeOf(v.Body[0]) == typeString &&
@@ -145,8 +182,8 @@ func Get{{ExportName}}(path string) *{{ExportName}} {
 			}
 		}
 	}()
-	{{end}}
-	{{if or .Properties .Signals }}getBus().Signal(obj.signal_chan){{end}}
+{{end}}
+{{if or .Properties .Signals}}runtime.SetFinalizer(obj, func(_obj *{{ExportName}}) { destroy{{ExportName}}(_obj) }){{end}}
 	return obj
 }
 
