@@ -45,7 +45,7 @@ type {{ExportName}} struct {
 {{if or .Properties .Signals}}
 func ({{OBJ_NAME}} {{ExportName}}) _createSignalChan() chan *dbus.Signal {
 	{{OBJ_NAME}}.signalsLocker.Lock()
-	ch := make(chan *dbus.Signal)
+	ch := make(chan *dbus.Signal, 30)
 	getBus().Signal(ch)
 	{{OBJ_NAME}}.signals[ch] = false
 	{{OBJ_NAME}}.signalsLocker.Unlock()
