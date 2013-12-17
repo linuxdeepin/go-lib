@@ -350,14 +350,11 @@ func tryTranslateDBusObjectToObjectPath(con *Conn, value reflect.Value) reflect.
 	switch value.Type().Kind() {
 	case reflect.Array, reflect.Slice:
 		n := value.Len()
-		if n == 0 {
-			return value
+		elemType := value.Type().Elem()
+		if elemType.Implements(dbusObjectInterface) {
+			elemType = objectPathType
 		}
-		t := value.Index(0).Type()
-		if t.Implements(dbusObjectInterface) {
-			t = objectPathType
-		}
-		new_value := reflect.MakeSlice(reflect.SliceOf(t), n, n)
+		new_value := reflect.MakeSlice(reflect.SliceOf(elemType), n, n)
 		for i := 0; i < n; i++ {
 			new_value.Index(i).Set(tryTranslateDBusObjectToObjectPath(con, value.Index(i)))
 		}
