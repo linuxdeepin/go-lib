@@ -84,11 +84,11 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{range .Signals}}
 func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) func() {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
-		"type='signal',path='"+string({{OBJ_NAME}}.core.Path())+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
+		"type='signal',path='"+string({{OBJ_NAME}}.Path)+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
 	sigChan := {{OBJ_NAME}}._createSignalChan()
 	go func() {
 		for v := range(sigChan) {
-			if v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
+			if v.Path != {{OBJ_NAME}}.Path || v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
 				continue
 			}
 			{{range $index, $arg := .Args}}if reflect.TypeOf(v.Body[0]) != reflect.TypeOf((*{{TypeFor $arg.Type}})(nil)).Elem() {
