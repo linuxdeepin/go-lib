@@ -58,7 +58,7 @@ func ({{OBJ_NAME}} {{ExportName}}) _deleteSignalChan(ch chan *dbus.Signal) {
 	close(ch)
 	{{OBJ_NAME}}.signalsLocker.Unlock()
 }
-func destroy{{ExportName}}(obj *{{ExportName}}) {
+func Destroy{{ExportName}}(obj *{{ExportName}}) {
 	obj.signalsLocker.Lock()
 	for ch, _ := range obj.signals {
 		delete({{OBJ_NAME}}.signals, ch)
@@ -183,7 +183,7 @@ func Get{{ExportName}}(path string) *{{ExportName}} {
 		}
 	}()
 {{end}}
-{{if or .Properties .Signals}}runtime.SetFinalizer(obj, func(_obj *{{ExportName}}) { destroy{{ExportName}}(_obj) }){{end}}
+{{if or .Properties .Signals}}runtime.SetFinalizer(obj, func(_obj *{{ExportName}}) { Destroy{{ExportName}}(_obj) }){{end}}
 	return obj
 }
 
