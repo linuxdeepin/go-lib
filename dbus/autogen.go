@@ -162,6 +162,14 @@ func InstallOnAny(conn *Conn, obj DBusObject) error {
 	}
 }
 
+func UnInstallObject(obj DBusObject) {
+	if c := detectConnByDBusObject(obj); c != nil {
+		c.handlersLck.Lock()
+		delete(c.handlers, ObjectPath(obj.GetDBusInfo().ObjectPath))
+		c.handlersLck.Unlock()
+	}
+}
+
 func setupSignalHandler(c *Conn, v interface{}, path ObjectPath, iface string) {
 	value := reflect.ValueOf(v).Elem()
 	n := value.NumField()
@@ -206,6 +214,8 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 	if err != nil {
 		return err
 	}
+
+	c.handlersLck.RLock()
 	infos := c.handlers[path]
 	parentpath, basepath := splitObjectPath(path)
 	if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
@@ -214,6 +224,8 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 			intro.(IntrospectProxy).child[basepath] = true
 		}
 	}
+	c.handlersLck.RUnlock()
+
 	if _, ok := infos["org.freedesktop.DBus.Introspectable"]; !ok {
 		infos["org.freedesktop.DBus.Introspectable"] = IntrospectProxy{infos, make(map[string]bool)}
 	}
