@@ -98,7 +98,7 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 			if v.Type().Implements(propertyType) {
 				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
 					v.MethodByName("SetValue").Interface().(func(interface{}))(value.Value())
-					fn := getValueOf(ifc).MethodByName("OnPropertiesChanged")
+					fn := reflect.ValueOf(ifc).MethodByName("OnPropertiesChanged")
 					if fn.IsValid() && !fn.IsNil() {
 						fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.Zero(reflect.TypeOf(value.Value()))})
 					}
@@ -110,7 +110,7 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 				prop_val := reflect.ValueOf(value.Value())
 				prop_old_val := v.Interface()
 				v.Set(prop_val)
-				fn := getValueOf(ifc).MethodByName("OnPropertiesChanged")
+				fn := reflect.ValueOf(ifc).MethodByName("OnPropertiesChanged")
 				if fn.IsValid() && !fn.IsNil() {
 					fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.ValueOf(prop_old_val)})
 				}
