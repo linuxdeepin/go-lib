@@ -191,21 +191,23 @@ func setupSignalHandler(c *Conn, v interface{}, path ObjectPath, iface string) {
 
 //TODO: Need exported?
 func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) error {
-	not_registered := true
-	for _, _name := range c.Names() {
-		if _name == name {
-			not_registered = false
-			break
-		}
+	if name != "." {
+		not_registered := true
+		for _, _name := range c.Names() {
+			if _name == name {
+				not_registered = false
+				break
+			}
 
-	}
-	if not_registered {
-		reply, err := c.RequestName(name, NameFlagDoNotQueue)
-		if err != nil {
-			return err
 		}
-		if reply != RequestNameReplyPrimaryOwner {
-			return errors.New("name " + name + " already taken")
+		if not_registered {
+			reply, err := c.RequestName(name, NameFlagDoNotQueue)
+			if err != nil {
+				return err
+			}
+			if reply != RequestNameReplyPrimaryOwner {
+				return errors.New("name " + name + " already taken")
+			}
 		}
 	}
 	setupSignalHandler(c, v, path, iface)
