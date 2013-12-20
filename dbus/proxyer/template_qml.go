@@ -64,9 +64,14 @@ private:
     void _rebuild() 
     { 
 	  delete m_ifc;
-          m_ifc = new {{ExportName}}Proxyer(m_path, this);{{range .Signals}}
+          m_ifc = new {{ExportName}}Proxyer(m_path, this);
+	  _setupSignalHandle();
+    }
+    void _setupSignalHandle() {
+{{range .Signals}}
 	  QObject::connect(m_ifc, SIGNAL({{.Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})), 
-	  		this, SIGNAL({{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})));{{end}}
+	  		this, SIGNAL({{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}}{{end}})));
+{{end}}
     }
 public:
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
@@ -85,6 +90,7 @@ public:
 
     {{ExportName}}(QObject *parent=0) : QObject(parent), m_ifc(new {{ExportName}}Proxyer("{{Ifc2Obj IfcName}}", this))
     {
+	    _setupSignalHandle();
 	    QDBusConnection::{{BusType}}Bus().connect("{{DestName}}", m_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
 	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
     }
