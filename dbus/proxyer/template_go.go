@@ -61,10 +61,10 @@ func ({{OBJ_NAME}} {{ExportName}}) _deleteSignalChan(ch chan *dbus.Signal) {
 func Destroy{{ExportName}}(obj *{{ExportName}}) {
 	obj.signalsLocker.Lock()
 	for ch, _ := range obj.signals {
-		delete({{OBJ_NAME}}.signals, ch)
 		getBus().DetachSignal(ch)
 		close(ch)
 	}
+	obj.signals = make(map[chan *dbus.Signal]bool)
 	log.Printf("Debug: run destroy{{ExportName}}", obj)
 	obj.signalsLocker.Unlock()
 }
