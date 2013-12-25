@@ -24,6 +24,8 @@ import "reflect"
 import "sync"
 import "runtime"
 import "log"
+import "errors"
+import "strings"
 /*prevent compile error*/
 var _ = runtime.SetFinalizer
 var _ = sync.NewCond
@@ -144,9 +146,19 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
 }
 {{end}}
 
-func Get{{ExportName}}(path string) *{{ExportName}} {
-	core := getBus().Object("{{DestName}}", dbus.ObjectPath(path))
-	obj := &{{ExportName}}{Path:dbus.ObjectPath(path), core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
+func New{{ExportName}}(path dbus.ObjectPath) (*{{ExportName}}, error) {
+	if !path.IsValid() {
+		return nil, errors.New("The path of '" + string(path) + "' is invalid.")
+	}
+
+	core := getBus().Object("{{DestName}}", path)
+	var v string
+	core.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&v)
+	if strings.Index(v, "{{IfcName}}") == -1 {
+		return nil, errors.New("'" + string(path) + "' hasn't interface '{{IfcName}}'.")
+	}
+
+	obj := &{{ExportName}}{Path:path, core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
 	{{range .Properties}}
 	obj.{{.Name}} = &dbusProperty{{ExportName}}{{.Name}}{&property.BaseObserver{}, core}{{end}}
 {{with .Properties}}
@@ -183,7 +195,7 @@ func Get{{ExportName}}(path string) *{{ExportName}} {
 	}()
 {{end}}
 {{if or .Properties .Signals}}runtime.SetFinalizer(obj, func(_obj *{{ExportName}}) { Destroy{{ExportName}}(_obj) }){{end}}
-	return obj
+	return obj, nil
 }
 
 `
