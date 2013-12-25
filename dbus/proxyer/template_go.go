@@ -162,8 +162,8 @@ func New{{ExportName}}(path dbus.ObjectPath) (*{{ExportName}}, error) {
 	{{range .Properties}}
 	obj.{{.Name}} = &dbusProperty{{ExportName}}{{.Name}}{&property.BaseObserver{}, core}{{end}}
 {{with .Properties}}
-	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='org.freedesktop.DBus.Properties',sender='{{DestName}}',member='PropertiesChanged'")
-	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+path+"',interface='{{IfcName}}',sender='{{DestName}}',member='PropertiesChanged'")
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='org.freedesktop.DBus.Properties',sender='{{DestName}}',member='PropertiesChanged'")
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='{{IfcName}}',sender='{{DestName}}',member='PropertiesChanged'")
 	sigChan := obj._createSignalChan()
 	go func() {
 		typeString := reflect.TypeOf("")
