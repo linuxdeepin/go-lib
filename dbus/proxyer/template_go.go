@@ -65,7 +65,6 @@ func Destroy{{ExportName}}(obj *{{ExportName}}) {
 		close(ch)
 	}
 	obj.signals = make(map[chan *dbus.Signal]bool)
-	log.Printf("Debug: run destroy{{ExportName}}", obj)
 	obj.signalsLocker.Unlock()
 }
 {{end}}
