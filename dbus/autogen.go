@@ -235,13 +235,5 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos, nil}
 	}
 
-	if IS_LAUNCHED_BY_BUS_DAEMON {
-		if msgs, ok := c.unhandledMsgs[name]; ok {
-			for _, msg := range msgs {
-				c.handleCall(msg)
-			}
-			delete(c.unhandledMsgs, name)
-		}
-	}
 	return nil
 }

@@ -59,7 +59,7 @@ type Conn struct {
 	eavesdropped    chan<- *Message
 	eavesdroppedLck sync.Mutex
 
-	unhandledMsgs map[string][]*Message
+	unhandledMsgs []*Message
 }
 
 // SessionBus returns a shared connection to the session bus, connecting to it
@@ -163,9 +163,6 @@ func newConn(tr transport) (*Conn, error) {
 	conn.nextSerial = 1
 	conn.serialUsed = map[uint32]bool{0: true}
 	conn.busObj = conn.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
-	if IS_LAUNCHED_BY_BUS_DAEMON {
-		conn.unhandledMsgs = make(map[string][]*Message)
-	}
 	return conn, nil
 }
 
@@ -273,7 +270,7 @@ func (conn *Conn) inWorker() {
 				conn.namesLck.RUnlock()
 			}
 			if IS_LAUNCHED_BY_BUS_DAEMON && !found && msg.Type == TypeMethodCall && !strings.Contains(dest, ":") {
-				conn.unhandledMsgs[dest] = append(conn.unhandledMsgs[dest], msg)
+				conn.unhandledMsgs = append(conn.unhandledMsgs, msg)
 			}
 			if !found {
 				// Eavesdropped a message, but no channel for it is registered.
@@ -622,5 +619,20 @@ func init() {
 	bus := os.Getenv("DBUS_STARTER_BUS_TYPE")
 	if bus == "session" || bus == "system" {
 		IS_LAUNCHED_BY_BUS_DAEMON = true
+	}
+}
+
+func DealWithUnhandledMessage() {
+	if conn, err := SessionBus(); err == nil {
+		for _, msg := range conn.unhandledMsgs {
+			conn.handleCall(msg)
+		}
+		conn.unhandledMsgs = nil
+	}
+	if conn, err := SystemBus(); err == nil {
+		for _, msg := range conn.unhandledMsgs {
+			conn.handleCall(msg)
+		}
+		conn.unhandledMsgs = nil
 	}
 }
