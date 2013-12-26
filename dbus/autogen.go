@@ -5,10 +5,6 @@ import "errors"
 import "strings"
 import "log"
 
-var (
-	dbusErrorType = reflect.TypeOf((*Error)(nil))
-)
-
 func splitObjectPath(path ObjectPath) (parent, base string) {
 	i := strings.LastIndex(string(path), "/")
 	if i != -1 && i < len(string(path))-2 {

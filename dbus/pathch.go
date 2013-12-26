@@ -12,11 +12,13 @@ type DBusObject interface {
 	GetDBusInfo() DBusInfo
 }
 
-var dbusObject DBusObject
-var dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
-var introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
-var propertyType = reflect.TypeOf((*Property)(nil)).Elem()
-var dbusStructType = reflect.TypeOf((*[]interface{})(nil)).Elem()
+var (
+	dbusObject          DBusObject
+	dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
+	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
+	propertyType        = reflect.TypeOf((*Property)(nil)).Elem()
+	dbusStructType      = reflect.TypeOf((*[]interface{})(nil)).Elem()
+)
 
 func isStructureMatched(structValue interface{}, dbusValue interface{}) bool {
 	dValues, ok := dbusValue.([]interface{})

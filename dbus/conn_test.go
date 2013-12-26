@@ -41,7 +41,7 @@ func TestSend(t *testing.T) {
 
 type server struct{}
 
-func (server) Double(i int64) (int64, *Error) {
+func (server) Double(i int64) (int64, error) {
 	return 2 * i, nil
 }
 

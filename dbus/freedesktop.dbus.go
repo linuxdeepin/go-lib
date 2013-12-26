@@ -24,7 +24,7 @@ func (ifc IntrospectProxy) String() string {
 	return ret
 }
 
-func (ifc IntrospectProxy) Introspect() (string, *Error) {
+func (ifc IntrospectProxy) Introspect() (string, error) {
 	var node = new(NodeInfo)
 	for k, _ := range ifc.child {
 		node.Children = append(node.Children, NodeInfo{
@@ -55,28 +55,15 @@ type Property interface {
 	GetType() reflect.Type
 }
 
-var errUnknownProperty = Error{
-	"org.freedesktop.DBus.Error.UnknownProperty",
-	[]interface{}{"Unknown / invalid Property"},
-}
-var errUnKnowInterface = Error{
-	"org.freedesktop.DBus.Error.NoSuchInterface",
-	[]interface{}{"No such interface"},
-}
-var errPropertyNotWritable = Error{
-	"org.freedesktop.DBus.Error.NoWritable",
-	[]interface{}{"Can't write this property."},
-}
-
-func (propProxy PropertiesProxy) GetAll(ifc_name string) (props map[string]Variant, err *Error) {
+func (propProxy PropertiesProxy) GetAll(ifcName string) (props map[string]Variant, err error) {
 	props = make(map[string]Variant)
-	if ifc, ok := propProxy.infos[ifc_name]; ok {
+	if ifc, ok := propProxy.infos[ifcName]; ok {
 		o_type := getTypeOf(ifc)
 		n := o_type.NumField()
 		for i := 0; i < n; i++ {
 			field := o_type.Field(i)
 			if field.Type.Kind() != reflect.Func && field.PkgPath == "" {
-				props[field.Name], err = propProxy.Get(ifc_name, field.Name)
+				props[field.Name], err = propProxy.Get(ifcName, field.Name)
 				if err != nil {
 					return nil, err
 				}
@@ -86,25 +73,25 @@ func (propProxy PropertiesProxy) GetAll(ifc_name string) (props map[string]Varia
 	return
 }
 
-func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Variant) *Error {
-	if ifc, ok := propProxy.infos[ifc_name]; ok {
+func (propProxy PropertiesProxy) Set(ifcName string, propName string, value Variant) error {
+	if ifc, ok := propProxy.infos[ifcName]; ok {
 		ifc_t := getTypeOf(ifc)
-		t, ok := ifc_t.FieldByName(prop_name)
-		v := getValueOf(ifc).FieldByName(prop_name)
+		t, ok := ifc_t.FieldByName(propName)
+		v := getValueOf(ifc).FieldByName(propName)
 		if ok && v.IsValid() && "read" != t.Tag.Get("access") {
 			if !v.CanAddr() {
-				return &errPropertyNotWritable
+				return NewPropertyNotWritableError(propName)
 			}
 			if v.Type().Implements(propertyType) {
 				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
 					v.MethodByName("SetValue").Interface().(func(interface{}))(value.Value())
 					fn := reflect.ValueOf(ifc).MethodByName("OnPropertiesChanged")
 					if fn.IsValid() && !fn.IsNil() {
-						fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.Zero(reflect.TypeOf(value.Value()))})
+						fn.Call([]reflect.Value{reflect.ValueOf(propName), reflect.Zero(reflect.TypeOf(value.Value()))})
 					}
 					return nil
 				} else {
-					return &errPropertyNotWritable
+					return NewPropertyNotWritableError(propName)
 				}
 			} else if v.Type() == reflect.TypeOf(value.Value()) {
 				prop_val := reflect.ValueOf(value.Value())
@@ -112,7 +99,7 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 				v.Set(prop_val)
 				fn := reflect.ValueOf(ifc).MethodByName("OnPropertiesChanged")
 				if fn.IsValid() && !fn.IsNil() {
-					fn.Call([]reflect.Value{reflect.ValueOf(prop_name), reflect.ValueOf(prop_old_val)})
+					fn.Call([]reflect.Value{reflect.ValueOf(propName), reflect.ValueOf(prop_old_val)})
 				}
 				return nil
 			} else if isStructureMatched(v.Interface(), value.Value()) {
@@ -134,14 +121,14 @@ func (propProxy PropertiesProxy) Set(ifc_name string, prop_name string, value Va
 				return nil
 			}
 		} else {
-			return &errUnknownProperty
+			return NewUnknowPropertyError(propName)
 		}
 	}
-	return &errUnKnowInterface
+	return NewUnknowInterfaceError(ifcName)
 }
-func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant, *Error) {
-	if ifc, ok := propProxy.infos[ifc_name]; ok {
-		value := getValueOf(ifc).FieldByName(prop_name)
+func (propProxy PropertiesProxy) Get(ifcName string, propName string) (Variant, error) {
+	if ifc, ok := propProxy.infos[ifcName]; ok {
+		value := getValueOf(ifc).FieldByName(propName)
 		if value.Type().Implements(propertyType) {
 			t := value.MethodByName("GetValue").Interface().(func() interface{})()
 			return MakeVariant(t), nil
@@ -153,11 +140,11 @@ func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant
 		if value.IsValid() {
 			if path, ok := value.Interface().(*ObjectPath); ok {
 				if path == nil || !path.IsValid() {
-					return MakeVariant(""), &errUnknownProperty
+					return MakeVariant(""), NewUnknowPropertyError(propName)
 				}
 			} else if path, ok := value.Interface().(ObjectPath); ok {
 				if !path.IsValid() {
-					return MakeVariant(""), &errUnknownProperty
+					return MakeVariant(""), NewUnknowPropertyError(propName)
 				}
 			} else if str, ok := value.Interface().(*string); ok && str == nil {
 				//TODO: Why only an nil ptr string will cause we lost dbus connection?
@@ -165,9 +152,9 @@ func (propProxy PropertiesProxy) Get(ifc_name string, prop_name string) (Variant
 			}
 			return MakeVariant(value.Interface()), nil
 		} else {
-			return MakeVariant(""), &errUnknownProperty
+			return MakeVariant(""), NewUnknowPropertyError(propName)
 		}
 	} else {
-		return MakeVariant(""), &errUnKnowInterface
+		return MakeVariant(""), NewUnknowInterfaceError(ifcName)
 	}
 }

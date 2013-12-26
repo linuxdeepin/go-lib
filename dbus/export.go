@@ -2,24 +2,10 @@ package dbus
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"unicode"
-)
-
-var (
-	errmsgInvalidArg = Error{
-		"org.freedesktop.DBus.Error.InvalidArgs",
-		[]interface{}{"Invalid type / number of args"},
-	}
-	errmsgNoObject = Error{
-		"org.freedesktop.DBus.Error.NoSuchObject",
-		[]interface{}{"No such object"},
-	}
-	errmsgUnknownMethod = Error{
-		"org.freedesktop.DBus.Error.UnknownMethod",
-		[]interface{}{"Unknown / invalid method"},
-	}
 )
 
 // Sender is a type which can be used in exported methods to receive the message
@@ -79,7 +65,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		case "GetMachineId":
 			conn.sendReply(sender, serial, conn.uuid)
 		default:
-			conn.sendError(errmsgUnknownMethod, sender, serial)
+			conn.sendError(NewUnknowMethod(path, ifaceName, name), sender, serial)
 		}
 		return
 	} else if _, ok := conn.handlers[path]; !ok && ifaceName == "org.freedesktop.DBus.Introspectable" && name == "Introspect" {
@@ -91,7 +77,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		return
 	}
 	if len(name) == 0 || unicode.IsLower([]rune(name)[0]) {
-		conn.sendError(errmsgUnknownMethod, sender, serial)
+		conn.sendError(NewUnknowMethod(path, ifaceName, name), sender, serial)
 		return
 	}
 
@@ -100,7 +86,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		conn.handlersLck.RLock()
 		obj, ok := conn.handlers[path]
 		if !ok {
-			conn.sendError(errmsgNoObject, sender, serial)
+			conn.sendError(NewNoObjectError(path), sender, serial)
 			conn.handlersLck.RUnlock()
 			return
 		}
@@ -110,7 +96,7 @@ func (conn *Conn) handleCall(msg *Message) {
 	} else {
 		conn.handlersLck.RLock()
 		if _, ok := conn.handlers[path]; !ok {
-			conn.sendError(errmsgNoObject, sender, serial)
+			conn.sendError(NewNoObjectError(path), sender, serial)
 			conn.handlersLck.RUnlock()
 			return
 		}
@@ -123,7 +109,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		conn.handlersLck.RUnlock()
 	}
 	if !m.IsValid() {
-		conn.sendError(errmsgUnknownMethod, sender, serial)
+		conn.sendError(NewUnknowMethod(path, ifaceName, name), sender, serial)
 		return
 	}
 	t := m.Type()
@@ -141,11 +127,11 @@ func (conn *Conn) handleCall(msg *Message) {
 		}
 	}
 	if len(decode) != len(vs) {
-		conn.sendError(errmsgInvalidArg, sender, serial)
+		conn.sendError(NewInvalidArg(fmt.Sprintf("Need %d paramters but get %d", len(decode), len(vs))), sender, serial)
 		return
 	}
 	if err := Store(vs, decode...); err != nil {
-		conn.sendError(errmsgInvalidArg, sender, serial)
+		conn.sendError(NewInvalidArg(err.Error()), sender, serial)
 		return
 	}
 	params := make([]reflect.Value, len(pointers))
@@ -154,10 +140,16 @@ func (conn *Conn) handleCall(msg *Message) {
 	}
 	ret := m.Call(params)
 	out_n := t.NumOut()
-	if out_n > 0 && ret[out_n-1].Type() == dbusErrorType {
-		if em := ret[out_n-1].Interface().(*Error); em != nil {
-			conn.sendError(*em, sender, serial)
-			return
+	if out_n > 0 && ret[out_n-1].Type().Implements(goErrorType) {
+		v := ret[out_n-1].Interface()
+		if v != nil {
+			if em, ok := v.(dbusError); ok {
+				conn.sendError(em, sender, serial)
+				return
+			} else {
+				conn.sendError(NewOtherError(v), sender, serial)
+				return
+			}
 		}
 		ret = ret[:out_n-1]
 	}

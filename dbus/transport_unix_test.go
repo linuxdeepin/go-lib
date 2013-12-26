@@ -10,13 +10,13 @@ This text should be read from the file that is created by this test.`
 
 type unixFDTest struct{}
 
-func (t unixFDTest) Test(fd UnixFD) (string, *Error) {
+func (t unixFDTest) Test(fd UnixFD) (string, error) {
 	var b [4096]byte
 	file := os.NewFile(uintptr(fd), "testfile")
 	defer file.Close()
 	n, err := file.Read(b[:])
 	if err != nil {
-		return "", &Error{"com.github.guelfey.test.Error", nil}
+		return "", &dbusError{"com.github.guelfey.test.Error", nil}
 	}
 	return string(b[:n]), nil
 }

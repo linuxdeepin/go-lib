@@ -284,7 +284,7 @@ func (conn *Conn) inWorker() {
 				if c, ok := conn.calls[serial]; ok {
 					if msg.Type == TypeError {
 						name, _ := msg.Headers[FieldErrorName].value.(string)
-						c.Err = Error{name, msg.Body}
+						c.Err = dbusError{name, msg.Body}
 					} else {
 						c.Body = msg.Body
 					}
@@ -439,7 +439,7 @@ func (conn *Conn) Send(msg *Message, ch chan *Call) *Call {
 
 // sendError creates an error message corresponding to the parameters and sends
 // it to conn.out.
-func (conn *Conn) sendError(e Error, dest string, serial uint32) {
+func (conn *Conn) sendError(e dbusError, dest string, serial uint32) {
 	msg := new(Message)
 	msg.Type = TypeError
 	msg.serial = conn.getSerial()
@@ -513,22 +513,6 @@ func (conn *Conn) DetachSignal(removingChan chan<- *Signal) {
 // not be sent.
 func (conn *Conn) SupportsUnixFDs() bool {
 	return conn.unixFD
-}
-
-// Error represents a D-Bus message of type Error.
-type Error struct {
-	Name string
-	Body []interface{}
-}
-
-func (e Error) Error() string {
-	if len(e.Body) >= 1 {
-		s, ok := e.Body[0].(string)
-		if ok {
-			return e.Name + ":" + s
-		}
-	}
-	return e.Name
 }
 
 // Signal represents a D-Bus message of type Signal. The name member is given in
