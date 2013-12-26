@@ -73,10 +73,10 @@ func Destroy{{ExportName}}(obj *{{ExportName}}) {
 
 {{$obj_name := .Name}}
 {{range .Methods }}
-func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}}) {
-	err := {{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
-	if err != nil {
-		log.Println("Invoked", {{OBJ_NAME}}.Path, ":{{$obj_name}}.{{.Name}}("{{GetParamterNames .Args}}, ") failed:", err)
+func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}} {{with GetParamterOuts .Args}},{{end}}_err error) {
+	_err = {{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
+	if _err != nil {
+		log.Println(_err)
 	}
 	return
 }
