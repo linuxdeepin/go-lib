@@ -40,7 +40,7 @@ func NewCustomError(name string, args ...interface{}) dbusError {
 func NewNoObjectError(path ObjectPath) dbusError {
 	return dbusError{
 		"org.freedesktop.DBus.Error.NoSuchObject",
-		[]interface{}{"No such object" + path},
+		[]interface{}{"No such object" + string(path)},
 	}
 }
 func newError(errType int, args ...interface{}) dbusError {
