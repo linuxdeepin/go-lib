@@ -60,7 +60,7 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 		}
 		for i := 0; i < n_out; i++ {
 			t := m.Out(i)
-			if t == dbusErrorType {
+			if t.Implements(goErrorType) {
 				continue
 			}
 			args = append(args, ArgInfo{
