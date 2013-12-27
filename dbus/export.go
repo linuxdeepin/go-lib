@@ -146,8 +146,8 @@ func (conn *Conn) handleCall(msg *Message) {
 			if em, ok := v.(dbusError); ok {
 				conn.sendError(em, sender, serial)
 				return
-			} else {
-				conn.sendError(NewOtherError(v), sender, serial)
+			} else if goErr, ok := v.(error); ok {
+				conn.sendError(NewOtherError(goErr.Error()), sender, serial)
 				return
 			}
 		}
