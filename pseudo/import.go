@@ -6,8 +6,10 @@ import "dlib"
 import "dlib/gobject-2.0"
 import "dlib/gio-2.0"
 import "dlib/glib-2.0"
+import "dlib/logger"
 
 func nothing() {
+	_ = logger.Println
 	_ = property.NewGSettingsBoolProperty
 	_ = gio.DBusConnectionFlagsAuthenticationClient
 	_ = glib.CanInline

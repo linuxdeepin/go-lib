@@ -23,7 +23,7 @@ import "dlib/dbus/property"
 import "reflect"
 import "sync"
 import "runtime"
-import "log"
+import "dlib/logger"
 import "errors"
 import "strings"
 /*prevent compile error*/
@@ -76,7 +76,7 @@ func Destroy{{ExportName}}(obj *{{ExportName}}) {
 func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}} {{with GetParamterOuts .Args}},{{end}}_err error) {
 	_err = {{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
 	if _err != nil {
-		log.Println(_err)
+		logger.Println(_err)
 	}
 	return
 }
@@ -115,14 +115,14 @@ type dbusProperty{{ExportName}}{{.Name}} struct{
 	if reflect.TypeOf(v) == reflect.TypeOf((*{{TypeFor .Type}})(nil)).Elem() {
 		this.core.Call("org.freedesktop.DBus.Properties.Set", 0, "{{IfcName}}", "{{.Name}}", dbus.MakeVariant(v))
 	} else {
-		log.Println("The property {{.Name}} of {{IfcName}} is an {{TypeFor .Type}} but Set with an ", reflect.TypeOf(v))
+		logger.Println("The property {{.Name}} of {{IfcName}} is an {{TypeFor .Type}} but Set with an ", reflect.TypeOf(v))
 	}
 }
 func (this *dbusProperty{{ExportName}}{{.Name}}) Set(v {{TypeFor .Type}}) {
 	this.SetValue(v)
 }{{else}}
 func (this *dbusProperty{{ExportName}}{{.Name}}) SetValue(notwritable interface{}) {
-	log.Printf("{{IfcName}}.{{.Name}} is not writable")
+	logger.Println("{{IfcName}}.{{.Name}} is not writable")
 }{{end}}
 {{ $convert := TryConvertObjectPath . }}
 func (this *dbusProperty{{ExportName}}{{.Name}}) Get() {{GetObjectPathType .}} {
@@ -137,7 +137,7 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetValue() interface{} /*{{GetO
 		return after{{else}}
 		return r.Value().({{TypeFor .Type}}){{end}}
 	}  else {
-		log.Println("dbusProperty:{{.Name}} error:", err, "at {{IfcName}}")
+		logger.Println("dbusProperty:{{.Name}} error:", err, "at {{IfcName}}")
 		return *new({{TypeFor .Type}})
 	}
 }
