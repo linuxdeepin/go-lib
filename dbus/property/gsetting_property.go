@@ -13,6 +13,15 @@ type _GSettingsProperty struct {
 	propName  string
 }
 
+var (
+	boolType    = reflect.TypeOf(false)
+	int32Type   = reflect.TypeOf(int32(0))
+	uint32Type  = reflect.TypeOf(uint32(0))
+	float64Type = reflect.TypeOf(float64(0))
+	stringType  = reflect.TypeOf("")
+	strvType    = reflect.TypeOf([]string{})
+)
+
 type GSettingsBoolProperty struct{ *_GSettingsProperty }
 type GSettingsIntProperty struct{ *_GSettingsProperty }
 type GSettingsUintProperty struct{ *_GSettingsProperty }
@@ -109,7 +118,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 	prop.propName = propName
 	switch real_type {
 	case "b":
-		prop.valueType = reflect.TypeOf(false)
+		prop.valueType = boolType
 		prop.getFn = func() interface{} {
 			return s.GetBoolean(keyName)
 		}
@@ -117,7 +126,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			s.SetBoolean(keyName, v.(bool))
 		}
 	case "i":
-		prop.valueType = reflect.TypeOf(int32(0))
+		prop.valueType = int32Type
 		prop.getFn = func() interface{} {
 			return int32(s.GetInt(keyName))
 		}
@@ -125,7 +134,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			s.SetInt(keyName, int(reflect.ValueOf(v).Int()))
 		}
 	case "u":
-		prop.valueType = reflect.TypeOf(uint32(0))
+		prop.valueType = uint32Type
 		prop.getFn = func() interface{} {
 			return uint32(s.GetUint(keyName))
 		}
@@ -133,7 +142,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			s.SetUint(keyName, int(reflect.ValueOf(v).Uint()))
 		}
 	case "d":
-		prop.valueType = reflect.TypeOf(float64(0))
+		prop.valueType = float64Type
 		prop.getFn = func() interface{} {
 			return s.GetDouble(keyName)
 		}
@@ -141,7 +150,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			s.SetDouble(keyName, reflect.ValueOf(v).Float())
 		}
 	case "s":
-		prop.valueType = reflect.TypeOf("")
+		prop.valueType = stringType
 		prop.getFn = func() interface{} {
 			return s.GetString(keyName)
 		}
@@ -149,7 +158,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			s.SetString(keyName, reflect.ValueOf(v).String())
 		}
 	case "as":
-		prop.valueType = reflect.TypeOf([]string{})
+		prop.valueType = strvType
 		prop.getFn = func() interface{} {
 			return s.GetStrv(keyName)
 		}
@@ -165,10 +174,32 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 	return prop
 }
 
+func compareStrinv(a []string, b []string) bool {
+	an := len(a)
+	bn := len(b)
+	if an != bn {
+		return false
+	}
+	for i, v := range a {
+		if b[i] != v {
+			return false
+		}
+	}
+	return true
+}
 func (p _GSettingsProperty) SetValue(v interface{}) {
-	if v != p.getFn() {
-		p.setFn(v)
-		dbus.NotifyChange(p.core, p.propName)
+	// []string is not comparable
+	if strv, ok := v.([]string); ok {
+		oldv, ok := p.getFn().([]string)
+		if ok && compareStrinv(strv, oldv) {
+			p.setFn(v)
+			dbus.NotifyChange(p.core, p.propName)
+		}
+	} else {
+		if v != p.getFn() {
+			p.setFn(v)
+			dbus.NotifyChange(p.core, p.propName)
+		}
 	}
 }
 
