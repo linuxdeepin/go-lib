@@ -174,7 +174,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 	return prop
 }
 
-func compareStrinv(a []string, b []string) bool {
+func strvEqual(a []string, b []string) bool {
 	an := len(a)
 	bn := len(b)
 	if an != bn {
@@ -191,7 +191,7 @@ func (p _GSettingsProperty) SetValue(v interface{}) {
 	// []string is not comparable
 	if strv, ok := v.([]string); ok {
 		oldv, ok := p.getFn().([]string)
-		if ok && compareStrinv(strv, oldv) {
+		if ok && !strvEqual(strv, oldv) {
 			p.setFn(v)
 			dbus.NotifyChange(p.core, p.propName)
 		}
