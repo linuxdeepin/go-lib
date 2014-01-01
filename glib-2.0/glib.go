@@ -48,6 +48,7 @@ func _GoInterfaceToCInterface(iface interface{}) *unsafe.Pointer {
 }
 
 
+const AnalyzerAnalyzing = 1
 const AsciiDtostrBufSize = 39
 // blacklisted: Array (struct)
 type AsciiType C.uint32_t
@@ -79,7 +80,90 @@ const (
 	BookmarkFileErrorFileNotFound BookmarkFileError = 7
 )
 // blacklisted: ByteArray (struct)
-// blacklisted: Bytes (struct)
+type Bytes struct {}
+func NewBytes(data0 []int) *Bytes {
+	var data1 *C.uint8_t
+	var size1 C.uint64_t
+	data1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*data1)) * len(data0))))
+	defer C.free(unsafe.Pointer(data1))
+	for i, e := range data0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(data1)))[i] = C.uint8_t(e)
+	}
+	size1 = C.uint64_t(len(data0))
+	ret1 := C.g_bytes_new(data1, size1)
+	var ret2 *Bytes
+	ret2 = (*Bytes)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewBytesTake(data0 []int) *Bytes {
+	var data1 *C.uint8_t
+	var size1 C.uint64_t
+	data1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*data1)) * len(data0))))
+	defer C.free(unsafe.Pointer(data1))
+	for i, e := range data0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(data1)))[i] = C.uint8_t(e)
+	}
+	size1 = C.uint64_t(len(data0))
+	ret1 := C.g_bytes_new_take(data1, size1)
+	var ret2 *Bytes
+	ret2 = (*Bytes)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *Bytes) Compare(bytes20 *Bytes) int {
+	var this1 *C.GBytes
+	var bytes21 *C.GBytes
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	bytes21 = (*C.GBytes)(unsafe.Pointer(bytes20))
+	ret1 := C.g_bytes_compare(this1, bytes21)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *Bytes) Equal(bytes20 *Bytes) bool {
+	var this1 *C.GBytes
+	var bytes21 *C.GBytes
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	bytes21 = (*C.GBytes)(unsafe.Pointer(bytes20))
+	ret1 := C.g_bytes_equal(this1, bytes21)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *Bytes) GetSize() uint64 {
+	var this1 *C.GBytes
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	ret1 := C.g_bytes_get_size(this1)
+	var ret2 uint64
+	ret2 = uint64(ret1)
+	return ret2
+}
+func (this0 *Bytes) Hash() int {
+	var this1 *C.GBytes
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	ret1 := C.g_bytes_hash(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *Bytes) NewFromBytes(offset0 uint64, length0 uint64) *Bytes {
+	var this1 *C.GBytes
+	var offset1 C.uint64_t
+	var length1 C.uint64_t
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	offset1 = C.uint64_t(offset0)
+	length1 = C.uint64_t(length0)
+	ret1 := C.g_bytes_new_from_bytes(this1, offset1, length1)
+	var ret2 *Bytes
+	ret2 = (*Bytes)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *Bytes) UnrefToData(size0 *uint64) {
+	var this1 *C.GBytes
+	var size1 *C.uint64_t
+	this1 = (*C.GBytes)(unsafe.Pointer(this0))
+	size1 = (*C.uint64_t)(unsafe.Pointer(size0))
+	C.g_bytes_unref_to_data(this1, size1)
+}
 const CanInline = 1
 // blacklisted: CSET_A_2_Z (constant)
 const CsetDigits = "0123456789"
@@ -136,7 +220,444 @@ const (
 	DateMonthNovember DateMonth = 11
 	DateMonthDecember DateMonth = 12
 )
-// blacklisted: DateTime (struct)
+type DateTime struct {}
+func NewDateTime(tz0 *TimeZone, year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+	var tz1 *C.GTimeZone
+	var year1 C.int32_t
+	var month1 C.int32_t
+	var day1 C.int32_t
+	var hour1 C.int32_t
+	var minute1 C.int32_t
+	var seconds1 C.double
+	tz1 = (*C.GTimeZone)(unsafe.Pointer(tz0))
+	year1 = C.int32_t(year0)
+	month1 = C.int32_t(month0)
+	day1 = C.int32_t(day0)
+	hour1 = C.int32_t(hour0)
+	minute1 = C.int32_t(minute0)
+	seconds1 = C.double(seconds0)
+	ret1 := C.g_date_time_new(tz1, year1, month1, day1, hour1, minute1, seconds1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeFromTimevalLocal(tv0 *TimeVal) *DateTime {
+	var tv1 *C.GTimeVal
+	tv1 = (*C.GTimeVal)(unsafe.Pointer(tv0))
+	ret1 := C.g_date_time_new_from_timeval_local(tv1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeFromTimevalUtc(tv0 *TimeVal) *DateTime {
+	var tv1 *C.GTimeVal
+	tv1 = (*C.GTimeVal)(unsafe.Pointer(tv0))
+	ret1 := C.g_date_time_new_from_timeval_utc(tv1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeFromUnixLocal(t0 int64) *DateTime {
+	var t1 C.int64_t
+	t1 = C.int64_t(t0)
+	ret1 := C.g_date_time_new_from_unix_local(t1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeFromUnixUtc(t0 int64) *DateTime {
+	var t1 C.int64_t
+	t1 = C.int64_t(t0)
+	ret1 := C.g_date_time_new_from_unix_utc(t1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeLocal(year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+	var year1 C.int32_t
+	var month1 C.int32_t
+	var day1 C.int32_t
+	var hour1 C.int32_t
+	var minute1 C.int32_t
+	var seconds1 C.double
+	year1 = C.int32_t(year0)
+	month1 = C.int32_t(month0)
+	day1 = C.int32_t(day0)
+	hour1 = C.int32_t(hour0)
+	minute1 = C.int32_t(minute0)
+	seconds1 = C.double(seconds0)
+	ret1 := C.g_date_time_new_local(year1, month1, day1, hour1, minute1, seconds1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeNow(tz0 *TimeZone) *DateTime {
+	var tz1 *C.GTimeZone
+	tz1 = (*C.GTimeZone)(unsafe.Pointer(tz0))
+	ret1 := C.g_date_time_new_now(tz1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeNowLocal() *DateTime {
+	ret1 := C.g_date_time_new_now_local()
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeNowUtc() *DateTime {
+	ret1 := C.g_date_time_new_now_utc()
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewDateTimeUtc(year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+	var year1 C.int32_t
+	var month1 C.int32_t
+	var day1 C.int32_t
+	var hour1 C.int32_t
+	var minute1 C.int32_t
+	var seconds1 C.double
+	year1 = C.int32_t(year0)
+	month1 = C.int32_t(month0)
+	day1 = C.int32_t(day0)
+	hour1 = C.int32_t(hour0)
+	minute1 = C.int32_t(minute0)
+	seconds1 = C.double(seconds0)
+	ret1 := C.g_date_time_new_utc(year1, month1, day1, hour1, minute1, seconds1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) Add(timespan0 int64) *DateTime {
+	var this1 *C.GDateTime
+	var timespan1 C.int64_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	timespan1 = C.int64_t(timespan0)
+	ret1 := C.g_date_time_add(this1, timespan1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddDays(days0 int) *DateTime {
+	var this1 *C.GDateTime
+	var days1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	days1 = C.int32_t(days0)
+	ret1 := C.g_date_time_add_days(this1, days1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddFull(years0 int, months0 int, days0 int, hours0 int, minutes0 int, seconds0 float64) *DateTime {
+	var this1 *C.GDateTime
+	var years1 C.int32_t
+	var months1 C.int32_t
+	var days1 C.int32_t
+	var hours1 C.int32_t
+	var minutes1 C.int32_t
+	var seconds1 C.double
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	years1 = C.int32_t(years0)
+	months1 = C.int32_t(months0)
+	days1 = C.int32_t(days0)
+	hours1 = C.int32_t(hours0)
+	minutes1 = C.int32_t(minutes0)
+	seconds1 = C.double(seconds0)
+	ret1 := C.g_date_time_add_full(this1, years1, months1, days1, hours1, minutes1, seconds1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddHours(hours0 int) *DateTime {
+	var this1 *C.GDateTime
+	var hours1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	hours1 = C.int32_t(hours0)
+	ret1 := C.g_date_time_add_hours(this1, hours1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddMinutes(minutes0 int) *DateTime {
+	var this1 *C.GDateTime
+	var minutes1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	minutes1 = C.int32_t(minutes0)
+	ret1 := C.g_date_time_add_minutes(this1, minutes1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddMonths(months0 int) *DateTime {
+	var this1 *C.GDateTime
+	var months1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	months1 = C.int32_t(months0)
+	ret1 := C.g_date_time_add_months(this1, months1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddSeconds(seconds0 float64) *DateTime {
+	var this1 *C.GDateTime
+	var seconds1 C.double
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	seconds1 = C.double(seconds0)
+	ret1 := C.g_date_time_add_seconds(this1, seconds1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddWeeks(weeks0 int) *DateTime {
+	var this1 *C.GDateTime
+	var weeks1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	weeks1 = C.int32_t(weeks0)
+	ret1 := C.g_date_time_add_weeks(this1, weeks1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) AddYears(years0 int) *DateTime {
+	var this1 *C.GDateTime
+	var years1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	years1 = C.int32_t(years0)
+	ret1 := C.g_date_time_add_years(this1, years1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) Difference(begin0 *DateTime) int64 {
+	var this1 *C.GDateTime
+	var begin1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	begin1 = (*C.GDateTime)(unsafe.Pointer(begin0))
+	ret1 := C.g_date_time_difference(this1, begin1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *DateTime) Format(format0 string) string {
+	var this1 *C.GDateTime
+	var format1 *C.char
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	format1 = _GoStringToGString(format0)
+	defer C.free(unsafe.Pointer(format1))
+	ret1 := C.g_date_time_format(this1, format1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) GetDayOfMonth() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_day_of_month(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetDayOfWeek() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_day_of_week(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetDayOfYear() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_day_of_year(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetHour() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_hour(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetMicrosecond() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_microsecond(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetMinute() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_minute(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetMonth() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_month(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetSecond() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_second(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetSeconds() float64 {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_seconds(this1)
+	var ret2 float64
+	ret2 = float64(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetTimezoneAbbreviation() string {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_timezone_abbreviation(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetUtcOffset() int64 {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_utc_offset(this1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetWeekNumberingYear() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_week_numbering_year(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetWeekOfYear() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_week_of_year(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetYear() int {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_get_year(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *DateTime) GetYmd() (int, int, int) {
+	var this1 *C.GDateTime
+	var year1 C.int32_t
+	var month1 C.int32_t
+	var day1 C.int32_t
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	C.g_date_time_get_ymd(this1, &year1, &month1, &day1)
+	var year2 int
+	var month2 int
+	var day2 int
+	year2 = int(year1)
+	month2 = int(month1)
+	day2 = int(day1)
+	return year2, month2, day2
+}
+func (this0 *DateTime) IsDaylightSavings() bool {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_is_daylight_savings(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DateTime) ToLocal() *DateTime {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_to_local(this1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) ToTimeval(tv0 *TimeVal) bool {
+	var this1 *C.GDateTime
+	var tv1 *C.GTimeVal
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	tv1 = (*C.GTimeVal)(unsafe.Pointer(tv0))
+	ret1 := C.g_date_time_to_timeval(this1, tv1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DateTime) ToTimezone(tz0 *TimeZone) *DateTime {
+	var this1 *C.GDateTime
+	var tz1 *C.GTimeZone
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	tz1 = (*C.GTimeZone)(unsafe.Pointer(tz0))
+	ret1 := C.g_date_time_to_timezone(this1, tz1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DateTime) ToUnix() int64 {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_to_unix(this1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *DateTime) ToUtc() *DateTime {
+	var this1 *C.GDateTime
+	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
+	ret1 := C.g_date_time_to_utc(this1)
+	var ret2 *DateTime
+	ret2 = (*DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func DateTimeCompare(dt10 unsafe.Pointer, dt20 unsafe.Pointer) int {
+	var dt11 unsafe.Pointer
+	var dt21 unsafe.Pointer
+	dt11 = unsafe.Pointer(dt10)
+	dt21 = unsafe.Pointer(dt20)
+	ret1 := C.g_date_time_compare(dt11, dt21)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func DateTimeEqual(dt10 unsafe.Pointer, dt20 unsafe.Pointer) bool {
+	var dt11 unsafe.Pointer
+	var dt21 unsafe.Pointer
+	dt11 = unsafe.Pointer(dt10)
+	dt21 = unsafe.Pointer(dt20)
+	ret1 := C.g_date_time_equal(dt11, dt21)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func DateTimeHash(datetime0 unsafe.Pointer) int {
+	var datetime1 unsafe.Pointer
+	datetime1 = unsafe.Pointer(datetime0)
+	ret1 := C.g_date_time_hash(datetime1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
 type DateWeekday C.uint32_t
 const (
 	DateWeekdayBadWeekday DateWeekday = 0
@@ -228,6 +749,7 @@ const GnucPrettyFunction = ""
 const GsizeFormat = "lu"
 const GsizeModifier = "l"
 const GssizeFormat = "li"
+const GssizeModifier = "l"
 const Guint16Format = "hu"
 const Guint32Format = "u"
 const Guint64Format = "lu"
@@ -316,8 +838,10 @@ const (
 	IOStatusAgain IOStatus = 3
 )
 const KeyFileDesktopGroup = "Desktop Entry"
+const KeyFileDesktopKeyActions = "Actions"
 const KeyFileDesktopKeyCategories = "Categories"
 const KeyFileDesktopKeyComment = "Comment"
+const KeyFileDesktopKeyDbusActivatable = "DBusActivatable"
 const KeyFileDesktopKeyExec = "Exec"
 const KeyFileDesktopKeyFullname = "X-GNOME-FullName"
 const KeyFileDesktopKeyGenericName = "GenericName"
@@ -1196,7 +1720,7 @@ const Minint16 = -32768
 const Minint32 = -2147483648
 const Minint64 = -9223372036854775808
 const Minint8 = -128
-const MinorVersion = 36
+const MinorVersion = 38
 const ModuleSuffix = "so"
 // blacklisted: MainContext (struct)
 // blacklisted: MainLoop (struct)
@@ -1441,6 +1965,7 @@ const SearchpathSeparator = 59
 const SearchpathSeparatorS = ";"
 const SizeofLong = 8
 const SizeofSizeT = 8
+const SizeofSsizeT = 8
 const SizeofVoidP = 8
 // blacklisted: SList (struct)
 const Sqrt2 = 1.414214
@@ -1511,6 +2036,7 @@ const (
 )
 type SpawnFlags C.uint32_t
 const (
+	SpawnFlagsDefault SpawnFlags = 0
 	SpawnFlagsLeaveDescriptorsOpen SpawnFlags = 1
 	SpawnFlagsDoNotReapChild SpawnFlags = 2
 	SpawnFlagsSearchPath SpawnFlags = 4
@@ -1531,6 +2057,11 @@ const TimeSpanSecond = 1000000
 // blacklisted: TestCase (struct)
 // blacklisted: TestConfig (struct)
 // blacklisted: TestDataFunc (callback)
+type TestFileType C.uint32_t
+const (
+	TestFileTypeDist TestFileType = 0
+	TestFileTypeBuilt TestFileType = 1
+)
 // blacklisted: TestFixtureFunc (callback)
 // blacklisted: TestFunc (callback)
 // blacklisted: TestLogBuffer (struct)
@@ -1548,6 +2079,14 @@ const (
 	TestLogTypeMinResult TestLogType = 7
 	TestLogTypeMaxResult TestLogType = 8
 	TestLogTypeMessage TestLogType = 9
+	TestLogTypeStartSuite TestLogType = 10
+	TestLogTypeStopSuite TestLogType = 11
+)
+type TestSubprocessFlags C.uint32_t
+const (
+	TestSubprocessFlagsStdin TestSubprocessFlags = 1
+	TestSubprocessFlagsStdout TestSubprocessFlags = 2
+	TestSubprocessFlagsStderr TestSubprocessFlags = 4
 )
 // blacklisted: TestSuite (struct)
 type TestTrapFlags C.uint32_t
@@ -1568,8 +2107,114 @@ const (
 	TimeTypeDaylight TimeType = 1
 	TimeTypeUniversal TimeType = 2
 )
-// blacklisted: TimeVal (struct)
-// blacklisted: TimeZone (struct)
+type TimeVal struct {
+	TvSec int64
+	TvUsec int64
+}
+func (this0 *TimeVal) Add(microseconds0 int64) {
+	var this1 *C.GTimeVal
+	var microseconds1 C.int64_t
+	this1 = (*C.GTimeVal)(unsafe.Pointer(this0))
+	microseconds1 = C.int64_t(microseconds0)
+	C.g_time_val_add(this1, microseconds1)
+}
+func (this0 *TimeVal) ToIso8601() string {
+	var this1 *C.GTimeVal
+	this1 = (*C.GTimeVal)(unsafe.Pointer(this0))
+	ret1 := C.g_time_val_to_iso8601(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func TimeValFromIso8601(iso_date0 string) (TimeVal, bool) {
+	var iso_date1 *C.char
+	var time_1 C.GTimeVal
+	iso_date1 = _GoStringToGString(iso_date0)
+	defer C.free(unsafe.Pointer(iso_date1))
+	ret1 := C.g_time_val_from_iso8601(iso_date1, &time_1)
+	var time_2 TimeVal
+	var ret2 bool
+	time_2 = *(*TimeVal)(unsafe.Pointer(&time_1))
+	ret2 = ret1 != 0
+	return time_2, ret2
+}
+type TimeZone struct {}
+func NewTimeZone(identifier0 string) *TimeZone {
+	var identifier1 *C.char
+	identifier1 = _GoStringToGString(identifier0)
+	defer C.free(unsafe.Pointer(identifier1))
+	ret1 := C.g_time_zone_new(identifier1)
+	var ret2 *TimeZone
+	ret2 = (*TimeZone)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewTimeZoneLocal() *TimeZone {
+	ret1 := C.g_time_zone_new_local()
+	var ret2 *TimeZone
+	ret2 = (*TimeZone)(unsafe.Pointer(ret1))
+	return ret2
+}
+func NewTimeZoneUtc() *TimeZone {
+	ret1 := C.g_time_zone_new_utc()
+	var ret2 *TimeZone
+	ret2 = (*TimeZone)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *TimeZone) AdjustTime(type0 TimeType, time_0 *int64) int {
+	var this1 *C.GTimeZone
+	var type1 C.GTimeType
+	var time_1 *C.int64_t
+	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
+	type1 = C.GTimeType(type0)
+	time_1 = (*C.int64_t)(unsafe.Pointer(time_0))
+	ret1 := C.g_time_zone_adjust_time(this1, type1, time_1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *TimeZone) FindInterval(type0 TimeType, time_0 int64) int {
+	var this1 *C.GTimeZone
+	var type1 C.GTimeType
+	var time_1 C.int64_t
+	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
+	type1 = C.GTimeType(type0)
+	time_1 = C.int64_t(time_0)
+	ret1 := C.g_time_zone_find_interval(this1, type1, time_1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *TimeZone) GetAbbreviation(interval0 int) string {
+	var this1 *C.GTimeZone
+	var interval1 C.int32_t
+	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
+	interval1 = C.int32_t(interval0)
+	ret1 := C.g_time_zone_get_abbreviation(this1, interval1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *TimeZone) GetOffset(interval0 int) int {
+	var this1 *C.GTimeZone
+	var interval1 C.int32_t
+	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
+	interval1 = C.int32_t(interval0)
+	ret1 := C.g_time_zone_get_offset(this1, interval1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *TimeZone) IsDst(interval0 int) bool {
+	var this1 *C.GTimeZone
+	var interval1 C.int32_t
+	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
+	interval1 = C.int32_t(interval0)
+	ret1 := C.g_time_zone_is_dst(this1, interval1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
 // blacklisted: Timer (struct)
 type TokenType C.uint32_t
 const (
@@ -3141,6 +3786,9 @@ const Win32MsgHandle = 19981206
 // blacklisted: test_bug_base (function)
 // blacklisted: test_expect_message (function)
 // blacklisted: test_fail (function)
+// blacklisted: test_failed (function)
+// blacklisted: test_get_dir (function)
+// blacklisted: test_incomplete (function)
 // blacklisted: test_log_type_name (function)
 // blacklisted: test_queue_destroy (function)
 // blacklisted: test_queue_free (function)
@@ -3150,6 +3798,9 @@ const Win32MsgHandle = 19981206
 // blacklisted: test_rand_int_range (function)
 // blacklisted: test_run (function)
 // blacklisted: test_run_suite (function)
+// blacklisted: test_set_nonfatal_assertions (function)
+// blacklisted: test_skip (function)
+// blacklisted: test_subprocess (function)
 // blacklisted: test_timer_elapsed (function)
 // blacklisted: test_timer_last (function)
 // blacklisted: test_timer_start (function)
@@ -3157,6 +3808,7 @@ const Win32MsgHandle = 19981206
 // blacklisted: test_trap_fork (function)
 // blacklisted: test_trap_has_passed (function)
 // blacklisted: test_trap_reached_timeout (function)
+// blacklisted: test_trap_subprocess (function)
 // blacklisted: thread_error_quark (function)
 // blacklisted: thread_exit (function)
 // blacklisted: thread_pool_get_max_idle_time (function)

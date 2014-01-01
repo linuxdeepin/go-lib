@@ -73,12 +73,16 @@ type Action struct {
 	ActionImpl
 }
 
+func (*Action) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_action_get_type())
+}
+
+
 type ActionImpl struct {}
 
 func ToAction(objlike gobject.ObjectLike) *Action {
-	t := (*ActionImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_action_get_type()))
 	if obj != nil {
 		return (*Action)(obj)
 	}
@@ -89,13 +93,48 @@ func (this0 *ActionImpl) ImplementsGAction() *C.GAction {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GAction)((*gobject.Object)(unsafe.Pointer(obj)).C)
 }
-
-func (this0 *ActionImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_action_get_type())
+func ActionNameIsValid(action_name0 string) bool {
+	var action_name1 *C.char
+	action_name1 = _GoStringToGString(action_name0)
+	defer C.free(unsafe.Pointer(action_name1))
+	ret1 := C.g_action_name_is_valid(action_name1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
 }
-
-func ActionGetType() gobject.Type {
-	return (*ActionImpl)(nil).GetStaticType()
+func ActionParseDetailedName(detailed_name0 string) (string, *glib.Variant, bool, error) {
+	var detailed_name1 *C.char
+	var action_name1 *C.char
+	var target_value1 *C.GVariant
+	var err1 *C.GError
+	detailed_name1 = _GoStringToGString(detailed_name0)
+	defer C.free(unsafe.Pointer(detailed_name1))
+	ret1 := C.g_action_parse_detailed_name(detailed_name1, &action_name1, &target_value1, &err1)
+	var action_name2 string
+	var target_value2 *glib.Variant
+	var ret2 bool
+	var err2 error
+	action_name2 = C.GoString(action_name1)
+	C.g_free(unsafe.Pointer(action_name1))
+	target_value2 = (*glib.Variant)(unsafe.Pointer(target_value1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return action_name2, target_value2, ret2, err2
+}
+func ActionPrintDetailedName(action_name0 string, parameter0 *glib.Variant) string {
+	var action_name1 *C.char
+	var parameter1 *C.GVariant
+	action_name1 = _GoStringToGString(action_name0)
+	defer C.free(unsafe.Pointer(action_name1))
+	parameter1 = (*C.GVariant)(unsafe.Pointer(parameter0))
+	ret1 := C.g_action_print_detailed_name(action_name1, parameter1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
 }
 func (this0 *ActionImpl) Activate(parameter0 *glib.Variant) {
 	var this1 *C.GAction
@@ -207,12 +246,16 @@ type ActionGroup struct {
 	ActionGroupImpl
 }
 
+func (*ActionGroup) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_action_group_get_type())
+}
+
+
 type ActionGroupImpl struct {}
 
 func ToActionGroup(objlike gobject.ObjectLike) *ActionGroup {
-	t := (*ActionGroupImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_action_group_get_type()))
 	if obj != nil {
 		return (*ActionGroup)(obj)
 	}
@@ -222,14 +265,6 @@ func ToActionGroup(objlike gobject.ObjectLike) *ActionGroup {
 func (this0 *ActionGroupImpl) ImplementsGActionGroup() *C.GActionGroup {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GActionGroup)((*gobject.Object)(unsafe.Pointer(obj)).C)
-}
-
-func (this0 *ActionGroupImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_action_group_get_type())
-}
-
-func ActionGroupGetType() gobject.Type {
-	return (*ActionGroupImpl)(nil).GetStaticType()
 }
 func (this0 *ActionGroupImpl) ActionAdded(action_name0 string) {
 	var this1 *C.GActionGroup
@@ -430,12 +465,16 @@ type ActionMap struct {
 	ActionMapImpl
 }
 
+func (*ActionMap) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_action_map_get_type())
+}
+
+
 type ActionMapImpl struct {}
 
 func ToActionMap(objlike gobject.ObjectLike) *ActionMap {
-	t := (*ActionMapImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_action_map_get_type()))
 	if obj != nil {
 		return (*ActionMap)(obj)
 	}
@@ -445,14 +484,6 @@ func ToActionMap(objlike gobject.ObjectLike) *ActionMap {
 func (this0 *ActionMapImpl) ImplementsGActionMap() *C.GActionMap {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GActionMap)((*gobject.Object)(unsafe.Pointer(obj)).C)
-}
-
-func (this0 *ActionMapImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_action_map_get_type())
-}
-
-func ActionMapGetType() gobject.Type {
-	return (*ActionMapImpl)(nil).GetStaticType()
 }
 func (this0 *ActionMapImpl) AddAction(action0 ActionLike) {
 	var this1 *C.GActionMap
@@ -515,12 +546,16 @@ type AppInfo struct {
 	AppInfoImpl
 }
 
+func (*AppInfo) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_app_info_get_type())
+}
+
+
 type AppInfoImpl struct {}
 
 func ToAppInfo(objlike gobject.ObjectLike) *AppInfo {
-	t := (*AppInfoImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_app_info_get_type()))
 	if obj != nil {
 		return (*AppInfo)(obj)
 	}
@@ -530,14 +565,6 @@ func ToAppInfo(objlike gobject.ObjectLike) *AppInfo {
 func (this0 *AppInfoImpl) ImplementsGAppInfo() *C.GAppInfo {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GAppInfo)((*gobject.Object)(unsafe.Pointer(obj)).C)
-}
-
-func (this0 *AppInfoImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_app_info_get_type())
-}
-
-func AppInfoGetType() gobject.Type {
-	return (*AppInfoImpl)(nil).GetStaticType()
 }
 func AppInfoCreateFromCommandline(commandline0 string, application_name0 string, flags0 AppInfoCreateFlags) (*AppInfo, error) {
 	var commandline1 *C.char
@@ -559,100 +586,14 @@ func AppInfoCreateFromCommandline(commandline0 string, application_name0 string,
 	}
 	return ret2, err2
 }
-func AppInfoGetAll() []*AppInfo {
-	ret1 := C.g_app_info_get_all()
-	var ret2 []*AppInfo
-	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
-		var elt *AppInfo
-		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
-		ret2 = append(ret2, elt)
-	}
-	return ret2
-}
-func AppInfoGetAllForType(content_type0 string) []*AppInfo {
-	var content_type1 *C.char
-	content_type1 = _GoStringToGString(content_type0)
-	defer C.free(unsafe.Pointer(content_type1))
-	ret1 := C.g_app_info_get_all_for_type(content_type1)
-	var ret2 []*AppInfo
-	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
-		var elt *AppInfo
-		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
-		ret2 = append(ret2, elt)
-	}
-	return ret2
-}
-func AppInfoGetDefaultForType(content_type0 string, must_support_uris0 bool) *AppInfo {
-	var content_type1 *C.char
-	var must_support_uris1 C.int
-	content_type1 = _GoStringToGString(content_type0)
-	defer C.free(unsafe.Pointer(content_type1))
-	must_support_uris1 = _GoBoolToCBool(must_support_uris0)
-	ret1 := C.g_app_info_get_default_for_type(content_type1, must_support_uris1)
-	var ret2 *AppInfo
-	ret2 = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
-	return ret2
-}
-func AppInfoGetDefaultForUriScheme(uri_scheme0 string) *AppInfo {
-	var uri_scheme1 *C.char
-	uri_scheme1 = _GoStringToGString(uri_scheme0)
-	defer C.free(unsafe.Pointer(uri_scheme1))
-	ret1 := C.g_app_info_get_default_for_uri_scheme(uri_scheme1)
-	var ret2 *AppInfo
-	ret2 = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
-	return ret2
-}
-func AppInfoGetFallbackForType(content_type0 string) []*AppInfo {
-	var content_type1 *C.char
-	content_type1 = _GoStringToGString(content_type0)
-	defer C.free(unsafe.Pointer(content_type1))
-	ret1 := C.g_app_info_get_fallback_for_type(content_type1)
-	var ret2 []*AppInfo
-	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
-		var elt *AppInfo
-		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
-		ret2 = append(ret2, elt)
-	}
-	return ret2
-}
-func AppInfoGetRecommendedForType(content_type0 string) []*AppInfo {
-	var content_type1 *C.char
-	content_type1 = _GoStringToGString(content_type0)
-	defer C.free(unsafe.Pointer(content_type1))
-	ret1 := C.g_app_info_get_recommended_for_type(content_type1)
-	var ret2 []*AppInfo
-	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
-		var elt *AppInfo
-		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
-		ret2 = append(ret2, elt)
-	}
-	return ret2
-}
-func AppInfoLaunchDefaultForUri(uri0 string, launch_context0 AppLaunchContextLike) (bool, error) {
-	var uri1 *C.char
-	var launch_context1 *C.GAppLaunchContext
-	var err1 *C.GError
-	uri1 = _GoStringToGString(uri0)
-	defer C.free(unsafe.Pointer(uri1))
-	if launch_context0 != nil {
-		launch_context1 = launch_context0.InheritedFromGAppLaunchContext()
-	}
-	ret1 := C.g_app_info_launch_default_for_uri(uri1, launch_context1, &err1)
-	var ret2 bool
-	var err2 error
-	ret2 = ret1 != 0
-	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
-		C.g_error_free(err1)
-	}
-	return ret2, err2
-}
-func AppInfoResetTypeAssociations(content_type0 string) {
-	var content_type1 *C.char
-	content_type1 = _GoStringToGString(content_type0)
-	defer C.free(unsafe.Pointer(content_type1))
-	C.g_app_info_reset_type_associations(content_type1)
-}
+// blacklisted: AppInfo.get_all (method)
+// blacklisted: AppInfo.get_all_for_type (method)
+// blacklisted: AppInfo.get_default_for_type (method)
+// blacklisted: AppInfo.get_default_for_uri_scheme (method)
+// blacklisted: AppInfo.get_fallback_for_type (method)
+// blacklisted: AppInfo.get_recommended_for_type (method)
+// blacklisted: AppInfo.launch_default_for_uri (method)
+// blacklisted: AppInfo.reset_type_associations (method)
 func (this0 *AppInfoImpl) AddSupportsType(content_type0 string) (bool, error) {
 	var this1 *C.GAppInfo
 	var content_type1 *C.char
@@ -1089,264 +1030,7 @@ func (this0 *AppLaunchContext) Unsetenv(variable0 string) {
 }
 // blacklisted: AppLaunchContextClass (struct)
 // blacklisted: AppLaunchContextPrivate (struct)
-type ApplicationLike interface {
-	gobject.ObjectLike
-	InheritedFromGApplication() *C.GApplication
-}
-
-type Application struct {
-	gobject.Object
-	ActionGroupImpl
-	ActionMapImpl
-}
-
-func ToApplication(objlike gobject.ObjectLike) *Application {
-	c := objlike.InheritedFromGObject()
-	if c == nil {
-		return nil
-	}
-	t := (*Application)(nil).GetStaticType()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
-	if obj != nil {
-		return (*Application)(obj)
-	}
-	panic("cannot cast to Application")
-}
-
-func (this0 *Application) InheritedFromGApplication() *C.GApplication {
-	if this0 == nil {
-		return nil
-	}
-	return (*C.GApplication)(this0.C)
-}
-
-func (this0 *Application) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_application_get_type())
-}
-
-func ApplicationGetType() gobject.Type {
-	return (*Application)(nil).GetStaticType()
-}
-func NewApplication(application_id0 string, flags0 ApplicationFlags) *Application {
-	var application_id1 *C.char
-	var flags1 C.GApplicationFlags
-	application_id1 = _GoStringToGString(application_id0)
-	defer C.free(unsafe.Pointer(application_id1))
-	flags1 = C.GApplicationFlags(flags0)
-	ret1 := C.g_application_new(application_id1, flags1)
-	var ret2 *Application
-	ret2 = (*Application)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
-	return ret2
-}
-func ApplicationGetDefault() *Application {
-	ret1 := C.g_application_get_default()
-	var ret2 *Application
-	ret2 = (*Application)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
-	return ret2
-}
-func ApplicationIdIsValid(application_id0 string) bool {
-	var application_id1 *C.char
-	application_id1 = _GoStringToGString(application_id0)
-	defer C.free(unsafe.Pointer(application_id1))
-	ret1 := C.g_application_id_is_valid(application_id1)
-	var ret2 bool
-	ret2 = ret1 != 0
-	return ret2
-}
-func (this0 *Application) Activate() {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	C.g_application_activate(this1)
-}
-func (this0 *Application) GetApplicationId() string {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_application_id(this1)
-	var ret2 string
-	ret2 = C.GoString(ret1)
-	return ret2
-}
-// blacklisted: Application.get_dbus_connection (method)
-func (this0 *Application) GetDbusObjectPath() string {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_dbus_object_path(this1)
-	var ret2 string
-	ret2 = C.GoString(ret1)
-	return ret2
-}
-func (this0 *Application) GetFlags() ApplicationFlags {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_flags(this1)
-	var ret2 ApplicationFlags
-	ret2 = ApplicationFlags(ret1)
-	return ret2
-}
-func (this0 *Application) GetInactivityTimeout() int {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_inactivity_timeout(this1)
-	var ret2 int
-	ret2 = int(ret1)
-	return ret2
-}
-func (this0 *Application) GetIsRegistered() bool {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_is_registered(this1)
-	var ret2 bool
-	ret2 = ret1 != 0
-	return ret2
-}
-func (this0 *Application) GetIsRemote() bool {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	ret1 := C.g_application_get_is_remote(this1)
-	var ret2 bool
-	ret2 = ret1 != 0
-	return ret2
-}
-func (this0 *Application) Hold() {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	C.g_application_hold(this1)
-}
-func (this0 *Application) Open(files0 []FileLike, hint0 string) {
-	var this1 *C.GApplication
-	var files1 **C.GFile
-	var n_files1 C.int32_t
-	var hint1 *C.char
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	files1 = (**C.GFile)(C.malloc(C.size_t(int(unsafe.Sizeof(*files1)) * len(files0))))
-	defer C.free(unsafe.Pointer(files1))
-	for i, e := range files0 {
-		if e != nil {
-			(*(*[999999]*C.GFile)(unsafe.Pointer(files1)))[i] = e.ImplementsGFile()
-		}
-	}
-	n_files1 = C.int32_t(len(files0))
-	hint1 = _GoStringToGString(hint0)
-	defer C.free(unsafe.Pointer(hint1))
-	C.g_application_open(this1, files1, n_files1, hint1)
-}
-func (this0 *Application) Quit() {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	C.g_application_quit(this1)
-}
-func (this0 *Application) Register(cancellable0 CancellableLike) (bool, error) {
-	var this1 *C.GApplication
-	var cancellable1 *C.GCancellable
-	var err1 *C.GError
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	if cancellable0 != nil {
-		cancellable1 = cancellable0.InheritedFromGCancellable()
-	}
-	ret1 := C.g_application_register(this1, cancellable1, &err1)
-	var ret2 bool
-	var err2 error
-	ret2 = ret1 != 0
-	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
-		C.g_error_free(err1)
-	}
-	return ret2, err2
-}
-func (this0 *Application) Release() {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	C.g_application_release(this1)
-}
-func (this0 *Application) Run(argv0 []string) int {
-	var this1 *C.GApplication
-	var argv1 **C.char
-	var argc1 C.int32_t
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	argv1 = (**C.char)(C.malloc(C.size_t(int(unsafe.Sizeof(*argv1)) * len(argv0))))
-	defer C.free(unsafe.Pointer(argv1))
-	for i, e := range argv0 {
-		(*(*[999999]*C.char)(unsafe.Pointer(argv1)))[i] = _GoStringToGString(e)
-		defer C.free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(argv1)))[i]))
-	}
-	argc1 = C.int32_t(len(argv0))
-	ret1 := C.g_application_run(this1, argc1, argv1)
-	var ret2 int
-	ret2 = int(ret1)
-	return ret2
-}
-func (this0 *Application) SetActionGroup(action_group0 ActionGroupLike) {
-	var this1 *C.GApplication
-	var action_group1 *C.GActionGroup
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	if action_group0 != nil {
-		action_group1 = action_group0.ImplementsGActionGroup()
-	}
-	C.g_application_set_action_group(this1, action_group1)
-}
-func (this0 *Application) SetApplicationId(application_id0 string) {
-	var this1 *C.GApplication
-	var application_id1 *C.char
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	application_id1 = _GoStringToGString(application_id0)
-	defer C.free(unsafe.Pointer(application_id1))
-	C.g_application_set_application_id(this1, application_id1)
-}
-func (this0 *Application) SetDefault() {
-	var this1 *C.GApplication
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	C.g_application_set_default(this1)
-}
-func (this0 *Application) SetFlags(flags0 ApplicationFlags) {
-	var this1 *C.GApplication
-	var flags1 C.GApplicationFlags
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	flags1 = C.GApplicationFlags(flags0)
-	C.g_application_set_flags(this1, flags1)
-}
-func (this0 *Application) SetInactivityTimeout(inactivity_timeout0 int) {
-	var this1 *C.GApplication
-	var inactivity_timeout1 C.uint32_t
-	if this0 != nil {
-		this1 = this0.InheritedFromGApplication()
-	}
-	inactivity_timeout1 = C.uint32_t(inactivity_timeout0)
-	C.g_application_set_inactivity_timeout(this1, inactivity_timeout1)
-}
+// blacklisted: Application (object)
 // blacklisted: ApplicationClass (struct)
 // blacklisted: ApplicationCommandLine (object)
 // blacklisted: ApplicationCommandLineClass (struct)
@@ -1397,12 +1081,16 @@ type AsyncResult struct {
 	AsyncResultImpl
 }
 
+func (*AsyncResult) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_async_result_get_type())
+}
+
+
 type AsyncResultImpl struct {}
 
 func ToAsyncResult(objlike gobject.ObjectLike) *AsyncResult {
-	t := (*AsyncResultImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_async_result_get_type()))
 	if obj != nil {
 		return (*AsyncResult)(obj)
 	}
@@ -1412,14 +1100,6 @@ func ToAsyncResult(objlike gobject.ObjectLike) *AsyncResult {
 func (this0 *AsyncResultImpl) ImplementsGAsyncResult() *C.GAsyncResult {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GAsyncResult)((*gobject.Object)(unsafe.Pointer(obj)).C)
-}
-
-func (this0 *AsyncResultImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_async_result_get_type())
-}
-
-func AsyncResultGetType() gobject.Type {
-	return (*AsyncResultImpl)(nil).GetStaticType()
 }
 func (this0 *AsyncResultImpl) GetSourceObject() *gobject.Object {
 	var this1 *C.GAsyncResult
@@ -1496,6 +1176,7 @@ const (
 	BusTypeSystem BusType = 1
 	BusTypeSession BusType = 2
 )
+// blacklisted: BytesIcon (object)
 type CancellableLike interface {
 	gobject.ObjectLike
 	InheritedFromGCancellable() *C.GCancellable
@@ -1852,6 +1533,8 @@ type DBusSignalFlags C.uint32_t
 const (
 	DBusSignalFlagsNone DBusSignalFlags = 0
 	DBusSignalFlagsNoMatchRule DBusSignalFlags = 1
+	DBusSignalFlagsMatchArg0Namespace DBusSignalFlags = 2
+	DBusSignalFlagsMatchArg0Path DBusSignalFlags = 4
 )
 // blacklisted: DBusSignalInfo (struct)
 // blacklisted: DBusSubtreeDispatchFunc (callback)
@@ -1882,12 +1565,669 @@ const (
 	DataStreamNewlineTypeCrLf DataStreamNewlineType = 2
 	DataStreamNewlineTypeAny DataStreamNewlineType = 3
 )
-// blacklisted: DesktopAppInfo (object)
+type DesktopAppInfoLike interface {
+	gobject.ObjectLike
+	InheritedFromGDesktopAppInfo() *C.GDesktopAppInfo
+}
+
+type DesktopAppInfo struct {
+	gobject.Object
+	AppInfoImpl
+}
+
+func ToDesktopAppInfo(objlike gobject.ObjectLike) *DesktopAppInfo {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*DesktopAppInfo)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*DesktopAppInfo)(obj)
+	}
+	panic("cannot cast to DesktopAppInfo")
+}
+
+func (this0 *DesktopAppInfo) InheritedFromGDesktopAppInfo() *C.GDesktopAppInfo {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GDesktopAppInfo)(this0.C)
+}
+
+func (this0 *DesktopAppInfo) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_desktop_app_info_get_type())
+}
+
+func DesktopAppInfoGetType() gobject.Type {
+	return (*DesktopAppInfo)(nil).GetStaticType()
+}
+func NewDesktopAppInfo(desktop_id0 string) *DesktopAppInfo {
+	var desktop_id1 *C.char
+	desktop_id1 = _GoStringToGString(desktop_id0)
+	defer C.free(unsafe.Pointer(desktop_id1))
+	ret1 := C.g_desktop_app_info_new(desktop_id1)
+	var ret2 *DesktopAppInfo
+	ret2 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func NewDesktopAppInfoFromFilename(filename0 string) *DesktopAppInfo {
+	var filename1 *C.char
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_desktop_app_info_new_from_filename(filename1)
+	var ret2 *DesktopAppInfo
+	ret2 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func NewDesktopAppInfoFromKeyfile(key_file0 *glib.KeyFile) *DesktopAppInfo {
+	var key_file1 *C.GKeyFile
+	key_file1 = (*C.GKeyFile)(unsafe.Pointer(key_file0))
+	ret1 := C.g_desktop_app_info_new_from_keyfile(key_file1)
+	var ret2 *DesktopAppInfo
+	ret2 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func DesktopAppInfoSetDesktopEnv(desktop_env0 string) {
+	var desktop_env1 *C.char
+	desktop_env1 = _GoStringToGString(desktop_env0)
+	defer C.free(unsafe.Pointer(desktop_env1))
+	C.g_desktop_app_info_set_desktop_env(desktop_env1)
+}
+func (this0 *DesktopAppInfo) GetActionName(action_name0 string) string {
+	var this1 *C.GDesktopAppInfo
+	var action_name1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	action_name1 = _GoStringToGString(action_name0)
+	defer C.free(unsafe.Pointer(action_name1))
+	ret1 := C.g_desktop_app_info_get_action_name(this1, action_name1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetBoolean(key0 string) bool {
+	var this1 *C.GDesktopAppInfo
+	var key1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	key1 = _GoStringToGString(key0)
+	defer C.free(unsafe.Pointer(key1))
+	ret1 := C.g_desktop_app_info_get_boolean(this1, key1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetCategories() string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_categories(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetFilename() string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_filename(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetGenericName() string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_generic_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetIsHidden() bool {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_is_hidden(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetKeywords() []string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_keywords(this1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+	}
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetNodisplay() bool {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_nodisplay(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetShowIn(desktop_env0 string) bool {
+	var this1 *C.GDesktopAppInfo
+	var desktop_env1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	desktop_env1 = _GoStringToGString(desktop_env0)
+	defer C.free(unsafe.Pointer(desktop_env1))
+	ret1 := C.g_desktop_app_info_get_show_in(this1, desktop_env1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetStartupWmClass() string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_get_startup_wm_class(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DesktopAppInfo) GetString(key0 string) string {
+	var this1 *C.GDesktopAppInfo
+	var key1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	key1 = _GoStringToGString(key0)
+	defer C.free(unsafe.Pointer(key1))
+	ret1 := C.g_desktop_app_info_get_string(this1, key1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DesktopAppInfo) HasKey(key0 string) bool {
+	var this1 *C.GDesktopAppInfo
+	var key1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	key1 = _GoStringToGString(key0)
+	defer C.free(unsafe.Pointer(key1))
+	ret1 := C.g_desktop_app_info_has_key(this1, key1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DesktopAppInfo) LaunchAction(action_name0 string, launch_context0 AppLaunchContextLike) {
+	var this1 *C.GDesktopAppInfo
+	var action_name1 *C.char
+	var launch_context1 *C.GAppLaunchContext
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	action_name1 = _GoStringToGString(action_name0)
+	defer C.free(unsafe.Pointer(action_name1))
+	if launch_context0 != nil {
+		launch_context1 = launch_context0.InheritedFromGAppLaunchContext()
+	}
+	C.g_desktop_app_info_launch_action(this1, action_name1, launch_context1)
+}
+// blacklisted: DesktopAppInfo.launch_uris_as_manager (method)
+func (this0 *DesktopAppInfo) ListActions() []string {
+	var this1 *C.GDesktopAppInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGDesktopAppInfo()
+	}
+	ret1 := C.g_desktop_app_info_list_actions(this1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+	}
+	return ret2
+}
 // blacklisted: DesktopAppInfoClass (struct)
 // blacklisted: DesktopAppInfoLookup (interface)
 // blacklisted: DesktopAppInfoLookupIface (struct)
-// blacklisted: DesktopAppLaunchCallback (callback)
-// blacklisted: Drive (interface)
+type DesktopAppLaunchCallback func(appinfo *DesktopAppInfo, pid int)
+//export _GDesktopAppLaunchCallback_c_wrapper
+func _GDesktopAppLaunchCallback_c_wrapper(appinfo0 unsafe.Pointer, pid0 int32, user_data0 unsafe.Pointer) {
+	var appinfo1 *DesktopAppInfo
+	var pid1 int
+	var user_data1 DesktopAppLaunchCallback
+	appinfo1 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GDesktopAppInfo)(appinfo0)), true))
+	pid1 = int((C.int32_t)(pid0))
+	user_data1 = *(*DesktopAppLaunchCallback)(user_data0)
+	user_data1(appinfo1, pid1)
+}
+//export _GDesktopAppLaunchCallback_c_wrapper_once
+func _GDesktopAppLaunchCallback_c_wrapper_once(appinfo0 unsafe.Pointer, pid0 int32, user_data0 unsafe.Pointer) {
+	_GDesktopAppLaunchCallback_c_wrapper(appinfo0, pid0, user_data0)
+	gobject.Holder.Release(user_data0)
+}
+type DriveLike interface {
+	ImplementsGDrive() *C.GDrive
+}
+
+type Drive struct {
+	gobject.Object
+	DriveImpl
+}
+
+func (*Drive) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_drive_get_type())
+}
+
+
+type DriveImpl struct {}
+
+func ToDrive(objlike gobject.ObjectLike) *Drive {
+	c := objlike.InheritedFromGObject()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_drive_get_type()))
+	if obj != nil {
+		return (*Drive)(obj)
+	}
+	panic("cannot cast to Drive")
+}
+
+func (this0 *DriveImpl) ImplementsGDrive() *C.GDrive {
+	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
+	return (*C.GDrive)((*gobject.Object)(unsafe.Pointer(obj)).C)
+}
+func (this0 *DriveImpl) CanEject() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_can_eject(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) CanPollForMedia() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_can_poll_for_media(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) CanStart() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_can_start(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) CanStartDegraded() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_can_start_degraded(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) CanStop() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_can_stop(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) Eject(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GDrive
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_drive_eject(this1, flags1, cancellable1, callback1)
+}
+func (this0 *DriveImpl) EjectFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GDrive
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_drive_eject_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *DriveImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GDrive
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_drive_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *DriveImpl) EjectWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GDrive
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_drive_eject_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *DriveImpl) EnumerateIdentifiers() []string {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_enumerate_identifiers(this1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	return ret2
+}
+func (this0 *DriveImpl) GetIcon() *Icon {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *DriveImpl) GetIdentifier(kind0 string) string {
+	var this1 *C.GDrive
+	var kind1 *C.char
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	kind1 = _GoStringToGString(kind0)
+	defer C.free(unsafe.Pointer(kind1))
+	ret1 := C.g_drive_get_identifier(this1, kind1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DriveImpl) GetName() string {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *DriveImpl) GetSortKey() string {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_sort_key(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *DriveImpl) GetStartStopType() DriveStartStopType {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_start_stop_type(this1)
+	var ret2 DriveStartStopType
+	ret2 = DriveStartStopType(ret1)
+	return ret2
+}
+func (this0 *DriveImpl) GetSymbolicIcon() *Icon {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_symbolic_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *DriveImpl) GetVolumes() []*Volume {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_get_volumes(this1)
+	var ret2 []*Volume
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *Volume
+		elt = (*Volume)(gobject.ObjectWrap(unsafe.Pointer((*C.GVolume)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func (this0 *DriveImpl) HasMedia() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_has_media(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) HasVolumes() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_has_volumes(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) IsMediaCheckAutomatic() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_is_media_check_automatic(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) IsMediaRemovable() bool {
+	var this1 *C.GDrive
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	ret1 := C.g_drive_is_media_removable(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *DriveImpl) PollForMedia(cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GDrive
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_drive_poll_for_media(this1, cancellable1, callback1)
+}
+func (this0 *DriveImpl) PollForMediaFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GDrive
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_drive_poll_for_media_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *DriveImpl) Start(flags0 DriveStartFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GDrive
+	var flags1 C.GDriveStartFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	flags1 = C.GDriveStartFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_drive_start(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *DriveImpl) StartFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GDrive
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_drive_start_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *DriveImpl) Stop(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GDrive
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_drive_stop(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *DriveImpl) StopFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GDrive
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGDrive()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_drive_stop_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: DriveIface (struct)
 type DriveStartFlags C.uint32_t
 const (
@@ -2169,12 +2509,16 @@ type File struct {
 	FileImpl
 }
 
+func (*File) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_get_type())
+}
+
+
 type FileImpl struct {}
 
 func ToFile(objlike gobject.ObjectLike) *File {
-	t := (*FileImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_file_get_type()))
 	if obj != nil {
 		return (*File)(obj)
 	}
@@ -2185,137 +2529,2440 @@ func (this0 *FileImpl) ImplementsGFile() *C.GFile {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GFile)((*gobject.Object)(unsafe.Pointer(obj)).C)
 }
-
-func (this0 *FileImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_file_get_type())
-}
-
-func FileGetType() gobject.Type {
-	return (*FileImpl)(nil).GetStaticType()
-}
 // blacklisted: File.new_for_commandline_arg (method)
 // blacklisted: File.new_for_commandline_arg_and_cwd (method)
 // blacklisted: File.new_for_path (method)
 // blacklisted: File.new_for_uri (method)
 // blacklisted: File.new_tmp (method)
 // blacklisted: File.parse_name (method)
-// blacklisted: File.append_to (method)
-// blacklisted: File.append_to_async (method)
-// blacklisted: File.append_to_finish (method)
-// blacklisted: File.copy (method)
-// blacklisted: File.copy_attributes (method)
-// blacklisted: File.copy_finish (method)
-// blacklisted: File.create (method)
-// blacklisted: File.create_async (method)
-// blacklisted: File.create_finish (method)
-// blacklisted: File.create_readwrite (method)
-// blacklisted: File.create_readwrite_async (method)
-// blacklisted: File.create_readwrite_finish (method)
-// blacklisted: File.delete (method)
-// blacklisted: File.delete_async (method)
-// blacklisted: File.delete_finish (method)
-// blacklisted: File.dup (method)
-// blacklisted: File.eject_mountable (method)
-// blacklisted: File.eject_mountable_finish (method)
-// blacklisted: File.eject_mountable_with_operation (method)
-// blacklisted: File.eject_mountable_with_operation_finish (method)
-// blacklisted: File.enumerate_children (method)
-// blacklisted: File.enumerate_children_async (method)
-// blacklisted: File.enumerate_children_finish (method)
-// blacklisted: File.equal (method)
-// blacklisted: File.find_enclosing_mount (method)
-// blacklisted: File.find_enclosing_mount_async (method)
-// blacklisted: File.find_enclosing_mount_finish (method)
-// blacklisted: File.get_basename (method)
-// blacklisted: File.get_child (method)
-// blacklisted: File.get_child_for_display_name (method)
-// blacklisted: File.get_parent (method)
-// blacklisted: File.get_parse_name (method)
-// blacklisted: File.get_path (method)
-// blacklisted: File.get_relative_path (method)
-// blacklisted: File.get_uri (method)
-// blacklisted: File.get_uri_scheme (method)
-// blacklisted: File.has_parent (method)
-// blacklisted: File.has_prefix (method)
-// blacklisted: File.has_uri_scheme (method)
-// blacklisted: File.hash (method)
-// blacklisted: File.is_native (method)
-// blacklisted: File.load_contents (method)
-// blacklisted: File.load_contents_async (method)
-// blacklisted: File.load_contents_finish (method)
-// blacklisted: File.load_partial_contents_finish (method)
-// blacklisted: File.make_directory (method)
-// blacklisted: File.make_directory_with_parents (method)
-// blacklisted: File.make_symbolic_link (method)
-// blacklisted: File.monitor (method)
-// blacklisted: File.monitor_directory (method)
-// blacklisted: File.monitor_file (method)
-// blacklisted: File.mount_enclosing_volume (method)
-// blacklisted: File.mount_enclosing_volume_finish (method)
-// blacklisted: File.mount_mountable (method)
-// blacklisted: File.mount_mountable_finish (method)
-// blacklisted: File.move (method)
-// blacklisted: File.open_readwrite (method)
-// blacklisted: File.open_readwrite_async (method)
-// blacklisted: File.open_readwrite_finish (method)
-// blacklisted: File.poll_mountable (method)
-// blacklisted: File.poll_mountable_finish (method)
-// blacklisted: File.query_default_handler (method)
-// blacklisted: File.query_exists (method)
-// blacklisted: File.query_file_type (method)
-// blacklisted: File.query_filesystem_info (method)
-// blacklisted: File.query_filesystem_info_async (method)
-// blacklisted: File.query_filesystem_info_finish (method)
-// blacklisted: File.query_info (method)
-// blacklisted: File.query_info_async (method)
-// blacklisted: File.query_info_finish (method)
-// blacklisted: File.query_settable_attributes (method)
-// blacklisted: File.query_writable_namespaces (method)
-// blacklisted: File.read (method)
-// blacklisted: File.read_async (method)
-// blacklisted: File.read_finish (method)
-// blacklisted: File.replace (method)
-// blacklisted: File.replace_async (method)
-// blacklisted: File.replace_contents (method)
-// blacklisted: File.replace_contents_async (method)
-// blacklisted: File.replace_contents_finish (method)
-// blacklisted: File.replace_finish (method)
-// blacklisted: File.replace_readwrite (method)
-// blacklisted: File.replace_readwrite_async (method)
-// blacklisted: File.replace_readwrite_finish (method)
-// blacklisted: File.resolve_relative_path (method)
-// blacklisted: File.set_attribute (method)
-// blacklisted: File.set_attribute_byte_string (method)
-// blacklisted: File.set_attribute_int32 (method)
-// blacklisted: File.set_attribute_int64 (method)
-// blacklisted: File.set_attribute_string (method)
-// blacklisted: File.set_attribute_uint32 (method)
-// blacklisted: File.set_attribute_uint64 (method)
-// blacklisted: File.set_attributes_async (method)
-// blacklisted: File.set_attributes_finish (method)
-// blacklisted: File.set_attributes_from_info (method)
-// blacklisted: File.set_display_name (method)
-// blacklisted: File.set_display_name_async (method)
-// blacklisted: File.set_display_name_finish (method)
-// blacklisted: File.start_mountable (method)
-// blacklisted: File.start_mountable_finish (method)
-// blacklisted: File.stop_mountable (method)
-// blacklisted: File.stop_mountable_finish (method)
-// blacklisted: File.supports_thread_contexts (method)
-// blacklisted: File.trash (method)
-// blacklisted: File.unmount_mountable (method)
-// blacklisted: File.unmount_mountable_finish (method)
-// blacklisted: File.unmount_mountable_with_operation (method)
-// blacklisted: File.unmount_mountable_with_operation_finish (method)
-// blacklisted: FileAttributeInfo (struct)
+func (this0 *FileImpl) AppendTo(flags0 FileCreateFlags, cancellable0 CancellableLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_append_to(this1, flags1, cancellable1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) AppendToAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_append_to_async(this1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) AppendToFinish(res0 AsyncResultLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_append_to_finish(this1, res1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Copy(destination0 FileLike, flags0 FileCopyFlags, cancellable0 CancellableLike, progress_callback0 FileProgressCallback) (bool, error) {
+	var this1 *C.GFile
+	var destination1 *C.GFile
+	var flags1 C.GFileCopyFlags
+	var cancellable1 *C.GCancellable
+	var progress_callback1 unsafe.Pointer
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if destination0 != nil {
+		destination1 = destination0.ImplementsGFile()
+	}
+	flags1 = C.GFileCopyFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if progress_callback0 != nil {
+		progress_callback1 = unsafe.Pointer(&progress_callback0)}
+	ret1 := C._g_file_copy(this1, destination1, flags1, cancellable1, progress_callback1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) CopyAttributes(destination0 FileLike, flags0 FileCopyFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var destination1 *C.GFile
+	var flags1 C.GFileCopyFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if destination0 != nil {
+		destination1 = destination0.ImplementsGFile()
+	}
+	flags1 = C.GFileCopyFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_copy_attributes(this1, destination1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) CopyFinish(res0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_copy_finish(this1, res1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Create(flags0 FileCreateFlags, cancellable0 CancellableLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_create(this1, flags1, cancellable1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) CreateAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_create_async(this1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) CreateFinish(res0 AsyncResultLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_create_finish(this1, res1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) CreateReadwrite(flags0 FileCreateFlags, cancellable0 CancellableLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_create_readwrite(this1, flags1, cancellable1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) CreateReadwriteAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GFileCreateFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileCreateFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_create_readwrite_async(this1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) CreateReadwriteFinish(res0 AsyncResultLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_create_readwrite_finish(this1, res1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Delete(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_delete(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) DeleteAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_delete_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) DeleteFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_delete_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Dup() *File {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_dup(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileImpl) EjectMountable(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_eject_mountable(this1, flags1, cancellable1, callback1)
+}
+func (this0 *FileImpl) EjectMountableFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_eject_mountable_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) EjectMountableWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_eject_mountable_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) EjectMountableWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_eject_mountable_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) EnumerateChildren(attributes0 string, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (*FileEnumerator, error) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_enumerate_children(this1, attributes1, flags1, cancellable1, &err1)
+	var ret2 *FileEnumerator
+	var err2 error
+	ret2 = (*FileEnumerator)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) EnumerateChildrenAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_enumerate_children_async(this1, attributes1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) EnumerateChildrenFinish(res0 AsyncResultLike) (*FileEnumerator, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_enumerate_children_finish(this1, res1, &err1)
+	var ret2 *FileEnumerator
+	var err2 error
+	ret2 = (*FileEnumerator)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Equal(file20 FileLike) bool {
+	var this1 *C.GFile
+	var file21 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if file20 != nil {
+		file21 = file20.ImplementsGFile()
+	}
+	ret1 := C.g_file_equal(this1, file21)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) FindEnclosingMount(cancellable0 CancellableLike) (*Mount, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_find_enclosing_mount(this1, cancellable1, &err1)
+	var ret2 *Mount
+	var err2 error
+	ret2 = (*Mount)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) FindEnclosingMountAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_find_enclosing_mount_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) FindEnclosingMountFinish(res0 AsyncResultLike) (*Mount, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_find_enclosing_mount_finish(this1, res1, &err1)
+	var ret2 *Mount
+	var err2 error
+	ret2 = (*Mount)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) GetBasename() string {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_basename(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) GetChild(name0 string) *File {
+	var this1 *C.GFile
+	var name1 *C.char
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_file_get_child(this1, name1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileImpl) GetChildForDisplayName(display_name0 string) (*File, error) {
+	var this1 *C.GFile
+	var display_name1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	display_name1 = _GoStringToGString(display_name0)
+	defer C.free(unsafe.Pointer(display_name1))
+	ret1 := C.g_file_get_child_for_display_name(this1, display_name1, &err1)
+	var ret2 *File
+	var err2 error
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) GetParent() *File {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_parent(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileImpl) GetParseName() string {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_parse_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) GetPath() string {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_path(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) GetRelativePath(descendant0 FileLike) string {
+	var this1 *C.GFile
+	var descendant1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if descendant0 != nil {
+		descendant1 = descendant0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_relative_path(this1, descendant1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) GetUri() string {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_uri(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) GetUriScheme() string {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_get_uri_scheme(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileImpl) HasParent(parent0 FileLike) bool {
+	var this1 *C.GFile
+	var parent1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if parent0 != nil {
+		parent1 = parent0.ImplementsGFile()
+	}
+	ret1 := C.g_file_has_parent(this1, parent1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) HasPrefix(prefix0 FileLike) bool {
+	var this1 *C.GFile
+	var prefix1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if prefix0 != nil {
+		prefix1 = prefix0.ImplementsGFile()
+	}
+	ret1 := C.g_file_has_prefix(this1, prefix1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) HasUriScheme(uri_scheme0 string) bool {
+	var this1 *C.GFile
+	var uri_scheme1 *C.char
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	uri_scheme1 = _GoStringToGString(uri_scheme0)
+	defer C.free(unsafe.Pointer(uri_scheme1))
+	ret1 := C.g_file_has_uri_scheme(this1, uri_scheme1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) Hash() int {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_hash(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *FileImpl) IsNative() bool {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_is_native(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) LoadContents(cancellable0 CancellableLike) ([]int, string, bool, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var contents1 *C.uint8_t
+	var length1 C.uint64_t
+	var etag_out1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_load_contents(this1, cancellable1, &contents1, &length1, &etag_out1, &err1)
+	var contents2 []int
+	var etag_out2 string
+	var ret2 bool
+	var err2 error
+	contents2 = make([]int, length1)
+	for i := range contents2 {
+		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+	}
+	etag_out2 = C.GoString(etag_out1)
+	C.g_free(unsafe.Pointer(etag_out1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return contents2, etag_out2, ret2, err2
+}
+func (this0 *FileImpl) LoadContentsAsync(cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_load_contents_async(this1, cancellable1, callback1)
+}
+func (this0 *FileImpl) LoadContentsFinish(res0 AsyncResultLike) ([]int, string, bool, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var contents1 *C.uint8_t
+	var length1 C.uint64_t
+	var etag_out1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_load_contents_finish(this1, res1, &contents1, &length1, &etag_out1, &err1)
+	var contents2 []int
+	var etag_out2 string
+	var ret2 bool
+	var err2 error
+	contents2 = make([]int, length1)
+	for i := range contents2 {
+		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+	}
+	etag_out2 = C.GoString(etag_out1)
+	C.g_free(unsafe.Pointer(etag_out1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return contents2, etag_out2, ret2, err2
+}
+func (this0 *FileImpl) LoadPartialContentsFinish(res0 AsyncResultLike) ([]int, string, bool, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var contents1 *C.uint8_t
+	var length1 C.uint64_t
+	var etag_out1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_load_partial_contents_finish(this1, res1, &contents1, &length1, &etag_out1, &err1)
+	var contents2 []int
+	var etag_out2 string
+	var ret2 bool
+	var err2 error
+	contents2 = make([]int, length1)
+	for i := range contents2 {
+		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+	}
+	etag_out2 = C.GoString(etag_out1)
+	C.g_free(unsafe.Pointer(etag_out1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return contents2, etag_out2, ret2, err2
+}
+func (this0 *FileImpl) MakeDirectory(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_make_directory(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MakeDirectoryAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_make_directory_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) MakeDirectoryFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_make_directory_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MakeDirectoryWithParents(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_make_directory_with_parents(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MakeSymbolicLink(symlink_value0 string, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var symlink_value1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	symlink_value1 = _GoStringToGString(symlink_value0)
+	defer C.free(unsafe.Pointer(symlink_value1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_make_symbolic_link(this1, symlink_value1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MeasureDiskUsageFinish(result0 AsyncResultLike) (uint64, uint64, uint64, bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var disk_usage1 C.uint64_t
+	var num_dirs1 C.uint64_t
+	var num_files1 C.uint64_t
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_measure_disk_usage_finish(this1, result1, &disk_usage1, &num_dirs1, &num_files1, &err1)
+	var disk_usage2 uint64
+	var num_dirs2 uint64
+	var num_files2 uint64
+	var ret2 bool
+	var err2 error
+	disk_usage2 = uint64(disk_usage1)
+	num_dirs2 = uint64(num_dirs1)
+	num_files2 = uint64(num_files1)
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return disk_usage2, num_dirs2, num_files2, ret2, err2
+}
+func (this0 *FileImpl) Monitor(flags0 FileMonitorFlags, cancellable0 CancellableLike) (*FileMonitor, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileMonitorFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileMonitorFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_monitor(this1, flags1, cancellable1, &err1)
+	var ret2 *FileMonitor
+	var err2 error
+	ret2 = (*FileMonitor)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MonitorDirectory(flags0 FileMonitorFlags, cancellable0 CancellableLike) (*FileMonitor, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileMonitorFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileMonitorFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_monitor_directory(this1, flags1, cancellable1, &err1)
+	var ret2 *FileMonitor
+	var err2 error
+	ret2 = (*FileMonitor)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MonitorFile(flags0 FileMonitorFlags, cancellable0 CancellableLike) (*FileMonitor, error) {
+	var this1 *C.GFile
+	var flags1 C.GFileMonitorFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileMonitorFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_monitor_file(this1, flags1, cancellable1, &err1)
+	var ret2 *FileMonitor
+	var err2 error
+	ret2 = (*FileMonitor)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MountEnclosingVolume(flags0 MountMountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountMountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountMountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_mount_enclosing_volume(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) MountEnclosingVolumeFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_mount_enclosing_volume_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) MountMountable(flags0 MountMountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountMountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountMountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_mount_mountable(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) MountMountableFinish(result0 AsyncResultLike) (*File, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_mount_mountable_finish(this1, result1, &err1)
+	var ret2 *File
+	var err2 error
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Move(destination0 FileLike, flags0 FileCopyFlags, cancellable0 CancellableLike, progress_callback0 FileProgressCallback) (bool, error) {
+	var this1 *C.GFile
+	var destination1 *C.GFile
+	var flags1 C.GFileCopyFlags
+	var cancellable1 *C.GCancellable
+	var progress_callback1 unsafe.Pointer
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if destination0 != nil {
+		destination1 = destination0.ImplementsGFile()
+	}
+	flags1 = C.GFileCopyFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if progress_callback0 != nil {
+		progress_callback1 = unsafe.Pointer(&progress_callback0)}
+	ret1 := C._g_file_move(this1, destination1, flags1, cancellable1, progress_callback1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) OpenReadwrite(cancellable0 CancellableLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_open_readwrite(this1, cancellable1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) OpenReadwriteAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_open_readwrite_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) OpenReadwriteFinish(res0 AsyncResultLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_open_readwrite_finish(this1, res1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) PollMountable(cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_poll_mountable(this1, cancellable1, callback1)
+}
+func (this0 *FileImpl) PollMountableFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_poll_mountable_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryDefaultHandler(cancellable0 CancellableLike) (*AppInfo, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_default_handler(this1, cancellable1, &err1)
+	var ret2 *AppInfo
+	var err2 error
+	ret2 = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryExists(cancellable0 CancellableLike) bool {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_exists(this1, cancellable1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) QueryFileType(flags0 FileQueryInfoFlags, cancellable0 CancellableLike) FileType {
+	var this1 *C.GFile
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_file_type(this1, flags1, cancellable1)
+	var ret2 FileType
+	ret2 = FileType(ret1)
+	return ret2
+}
+func (this0 *FileImpl) QueryFilesystemInfo(attributes0 string, cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_filesystem_info(this1, attributes1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryFilesystemInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_query_filesystem_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) QueryFilesystemInfoFinish(res0 AsyncResultLike) (*FileInfo, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_query_filesystem_info_finish(this1, res1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryInfo(attributes0 string, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_info(this1, attributes1, flags1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryInfoAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var attributes1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_query_info_async(this1, attributes1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) QueryInfoFinish(res0 AsyncResultLike) (*FileInfo, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_query_info_finish(this1, res1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QuerySettableAttributes(cancellable0 CancellableLike) (*FileAttributeInfoList, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_settable_attributes(this1, cancellable1, &err1)
+	var ret2 *FileAttributeInfoList
+	var err2 error
+	ret2 = (*FileAttributeInfoList)(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) QueryWritableNamespaces(cancellable0 CancellableLike) (*FileAttributeInfoList, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_query_writable_namespaces(this1, cancellable1, &err1)
+	var ret2 *FileAttributeInfoList
+	var err2 error
+	ret2 = (*FileAttributeInfoList)(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Read(cancellable0 CancellableLike) (*FileInputStream, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_read(this1, cancellable1, &err1)
+	var ret2 *FileInputStream
+	var err2 error
+	ret2 = (*FileInputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) ReadAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_read_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) ReadFinish(res0 AsyncResultLike) (*FileInputStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_read_finish(this1, res1, &err1)
+	var ret2 *FileInputStream
+	var err2 error
+	ret2 = (*FileInputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) Replace(etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_replace(this1, etag1, make_backup1, flags1, cancellable1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) ReplaceAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_replace_async(this1, etag1, make_backup1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) ReplaceContents(contents0 []int, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike) (string, bool, error) {
+	var this1 *C.GFile
+	var contents1 *C.uint8_t
+	var length1 C.uint64_t
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var new_etag1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	contents1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*contents1)) * len(contents0))))
+	defer C.free(unsafe.Pointer(contents1))
+	for i, e := range contents0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i] = C.uint8_t(e)
+	}
+	length1 = C.uint64_t(len(contents0))
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_replace_contents(this1, contents1, length1, etag1, make_backup1, flags1, &new_etag1, cancellable1, &err1)
+	var new_etag2 string
+	var ret2 bool
+	var err2 error
+	new_etag2 = C.GoString(new_etag1)
+	C.g_free(unsafe.Pointer(new_etag1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return new_etag2, ret2, err2
+}
+func (this0 *FileImpl) ReplaceContentsAsync(contents0 []int, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var contents1 *C.uint8_t
+	var length1 C.uint64_t
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	contents1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*contents1)) * len(contents0))))
+	defer C.free(unsafe.Pointer(contents1))
+	for i, e := range contents0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i] = C.uint8_t(e)
+	}
+	length1 = C.uint64_t(len(contents0))
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_replace_contents_async(this1, contents1, length1, etag1, make_backup1, flags1, cancellable1, callback1)
+}
+func (this0 *FileImpl) ReplaceContentsFinish(res0 AsyncResultLike) (string, bool, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var new_etag1 *C.char
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_replace_contents_finish(this1, res1, &new_etag1, &err1)
+	var new_etag2 string
+	var ret2 bool
+	var err2 error
+	new_etag2 = C.GoString(new_etag1)
+	C.g_free(unsafe.Pointer(new_etag1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return new_etag2, ret2, err2
+}
+func (this0 *FileImpl) ReplaceFinish(res0 AsyncResultLike) (*FileOutputStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_replace_finish(this1, res1, &err1)
+	var ret2 *FileOutputStream
+	var err2 error
+	ret2 = (*FileOutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) ReplaceReadwrite(etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_replace_readwrite(this1, etag1, make_backup1, flags1, cancellable1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) ReplaceReadwriteAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var etag1 *C.char
+	var make_backup1 C.int
+	var flags1 C.GFileCreateFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	etag1 = _GoStringToGString(etag0)
+	defer C.free(unsafe.Pointer(etag1))
+	make_backup1 = _GoBoolToCBool(make_backup0)
+	flags1 = C.GFileCreateFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_replace_readwrite_async(this1, etag1, make_backup1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) ReplaceReadwriteFinish(res0 AsyncResultLike) (*FileIOStream, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_replace_readwrite_finish(this1, res1, &err1)
+	var ret2 *FileIOStream
+	var err2 error
+	ret2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) ResolveRelativePath(relative_path0 string) *File {
+	var this1 *C.GFile
+	var relative_path1 *C.char
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	relative_path1 = _GoStringToGString(relative_path0)
+	defer C.free(unsafe.Pointer(relative_path1))
+	ret1 := C.g_file_resolve_relative_path(this1, relative_path1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileImpl) SetAttribute(attribute0 string, type0 FileAttributeType, value_p0 unsafe.Pointer, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var type1 C.GFileAttributeType
+	var value_p1 unsafe.Pointer
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	type1 = C.GFileAttributeType(type0)
+	value_p1 = unsafe.Pointer(value_p0)
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute(this1, attribute1, type1, value_p1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeByteString(attribute0 string, value0 string, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = _GoStringToGString(value0)
+	defer C.free(unsafe.Pointer(value1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_byte_string(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeInt32(attribute0 string, value0 int, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 C.int32_t
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = C.int32_t(value0)
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_int32(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeInt64(attribute0 string, value0 int64, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 C.int64_t
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = C.int64_t(value0)
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_int64(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeString(attribute0 string, value0 string, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 *C.char
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = _GoStringToGString(value0)
+	defer C.free(unsafe.Pointer(value1))
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_string(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeUint32(attribute0 string, value0 int, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 C.uint32_t
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = C.uint32_t(value0)
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_uint32(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributeUint64(attribute0 string, value0 uint64, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var attribute1 *C.char
+	var value1 C.uint64_t
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	value1 = C.uint64_t(value0)
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attribute_uint64(this1, attribute1, value1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetAttributesAsync(info0 FileInfoLike, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var info1 *C.GFileInfo
+	var flags1 C.GFileQueryInfoFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if info0 != nil {
+		info1 = info0.InheritedFromGFileInfo()
+	}
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_set_attributes_async(this1, info1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) SetAttributesFinish(result0 AsyncResultLike) (*FileInfo, bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var info1 *C.GFileInfo
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_set_attributes_finish(this1, result1, &info1, &err1)
+	var info2 *FileInfo
+	var ret2 bool
+	var err2 error
+	info2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(info1), false))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return info2, ret2, err2
+}
+func (this0 *FileImpl) SetAttributesFromInfo(info0 FileInfoLike, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var info1 *C.GFileInfo
+	var flags1 C.GFileQueryInfoFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if info0 != nil {
+		info1 = info0.InheritedFromGFileInfo()
+	}
+	flags1 = C.GFileQueryInfoFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_attributes_from_info(this1, info1, flags1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetDisplayName(display_name0 string, cancellable0 CancellableLike) (*File, error) {
+	var this1 *C.GFile
+	var display_name1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	display_name1 = _GoStringToGString(display_name0)
+	defer C.free(unsafe.Pointer(display_name1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_set_display_name(this1, display_name1, cancellable1, &err1)
+	var ret2 *File
+	var err2 error
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SetDisplayNameAsync(display_name0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var display_name1 *C.char
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	display_name1 = _GoStringToGString(display_name0)
+	defer C.free(unsafe.Pointer(display_name1))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_set_display_name_async(this1, display_name1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) SetDisplayNameFinish(res0 AsyncResultLike) (*File, error) {
+	var this1 *C.GFile
+	var res1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if res0 != nil {
+		res1 = res0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_set_display_name_finish(this1, res1, &err1)
+	var ret2 *File
+	var err2 error
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) StartMountable(flags0 DriveStartFlags, start_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GDriveStartFlags
+	var start_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GDriveStartFlags(flags0)
+	if start_operation0 != nil {
+		start_operation1 = start_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_start_mountable(this1, flags1, start_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) StartMountableFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_start_mountable_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) StopMountable(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_stop_mountable(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) StopMountableFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_stop_mountable_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) SupportsThreadContexts() bool {
+	var this1 *C.GFile
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	ret1 := C.g_file_supports_thread_contexts(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileImpl) Trash(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFile
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_trash(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) TrashAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_trash_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileImpl) TrashFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_trash_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) UnmountMountable(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_unmount_mountable(this1, flags1, cancellable1, callback1)
+}
+func (this0 *FileImpl) UnmountMountableFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_unmount_mountable_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileImpl) UnmountMountableWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFile
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_unmount_mountable_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *FileImpl) UnmountMountableWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFile
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGFile()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_unmount_mountable_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+type FileAttributeInfo struct {
+	name0 *C.char
+	Type FileAttributeType
+	Flags FileAttributeInfoFlags
+}
+func (this0 *FileAttributeInfo) Name() string {
+	var name1 string
+	name1 = C.GoString(this0.name0)
+	return name1
+}
 type FileAttributeInfoFlags C.uint32_t
 const (
 	FileAttributeInfoFlagsNone FileAttributeInfoFlags = 0
 	FileAttributeInfoFlagsCopyWithFile FileAttributeInfoFlags = 1
 	FileAttributeInfoFlagsCopyWhenMoved FileAttributeInfoFlags = 2
 )
-// blacklisted: FileAttributeInfoList (struct)
-// blacklisted: FileAttributeMatcher (struct)
+type FileAttributeInfoList struct {
+	Infos *FileAttributeInfo
+	NInfos int32
+	_ [4]byte
+}
+func NewFileAttributeInfoList() *FileAttributeInfoList {
+	ret1 := C.g_file_attribute_info_list_new()
+	var ret2 *FileAttributeInfoList
+	ret2 = (*FileAttributeInfoList)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileAttributeInfoList) Add(name0 string, type0 FileAttributeType, flags0 FileAttributeInfoFlags) {
+	var this1 *C.GFileAttributeInfoList
+	var name1 *C.char
+	var type1 C.GFileAttributeType
+	var flags1 C.GFileAttributeInfoFlags
+	this1 = (*C.GFileAttributeInfoList)(unsafe.Pointer(this0))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	type1 = C.GFileAttributeType(type0)
+	flags1 = C.GFileAttributeInfoFlags(flags0)
+	C.g_file_attribute_info_list_add(this1, name1, type1, flags1)
+}
+func (this0 *FileAttributeInfoList) Dup() *FileAttributeInfoList {
+	var this1 *C.GFileAttributeInfoList
+	this1 = (*C.GFileAttributeInfoList)(unsafe.Pointer(this0))
+	ret1 := C.g_file_attribute_info_list_dup(this1)
+	var ret2 *FileAttributeInfoList
+	ret2 = (*FileAttributeInfoList)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileAttributeInfoList) Lookup(name0 string) *FileAttributeInfo {
+	var this1 *C.GFileAttributeInfoList
+	var name1 *C.char
+	this1 = (*C.GFileAttributeInfoList)(unsafe.Pointer(this0))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_file_attribute_info_list_lookup(this1, name1)
+	var ret2 *FileAttributeInfo
+	ret2 = (*FileAttributeInfo)(unsafe.Pointer(ret1))
+	return ret2
+}
+type FileAttributeMatcher struct {}
+func NewFileAttributeMatcher(attributes0 string) *FileAttributeMatcher {
+	var attributes1 *C.char
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	ret1 := C.g_file_attribute_matcher_new(attributes1)
+	var ret2 *FileAttributeMatcher
+	ret2 = (*FileAttributeMatcher)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileAttributeMatcher) EnumerateNamespace(ns0 string) bool {
+	var this1 *C.GFileAttributeMatcher
+	var ns1 *C.char
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	ns1 = _GoStringToGString(ns0)
+	defer C.free(unsafe.Pointer(ns1))
+	ret1 := C.g_file_attribute_matcher_enumerate_namespace(this1, ns1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileAttributeMatcher) EnumerateNext() string {
+	var this1 *C.GFileAttributeMatcher
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	ret1 := C.g_file_attribute_matcher_enumerate_next(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileAttributeMatcher) Matches(attribute0 string) bool {
+	var this1 *C.GFileAttributeMatcher
+	var attribute1 *C.char
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_attribute_matcher_matches(this1, attribute1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileAttributeMatcher) MatchesOnly(attribute0 string) bool {
+	var this1 *C.GFileAttributeMatcher
+	var attribute1 *C.char
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_attribute_matcher_matches_only(this1, attribute1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileAttributeMatcher) Subtract(subtract0 *FileAttributeMatcher) *FileAttributeMatcher {
+	var this1 *C.GFileAttributeMatcher
+	var subtract1 *C.GFileAttributeMatcher
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	subtract1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(subtract0))
+	ret1 := C.g_file_attribute_matcher_subtract(this1, subtract1)
+	var ret2 *FileAttributeMatcher
+	ret2 = (*FileAttributeMatcher)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileAttributeMatcher) ToString() string {
+	var this1 *C.GFileAttributeMatcher
+	this1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(this0))
+	ret1 := C.g_file_attribute_matcher_to_string(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
 type FileAttributeStatus C.uint32_t
 const (
 	FileAttributeStatusUnset FileAttributeStatus = 0
@@ -2353,21 +5000,1283 @@ const (
 )
 // blacklisted: FileDescriptorBased (interface)
 // blacklisted: FileDescriptorBasedIface (struct)
-// blacklisted: FileEnumerator (object)
+type FileEnumeratorLike interface {
+	gobject.ObjectLike
+	InheritedFromGFileEnumerator() *C.GFileEnumerator
+}
+
+type FileEnumerator struct {
+	gobject.Object
+	
+}
+
+func ToFileEnumerator(objlike gobject.ObjectLike) *FileEnumerator {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileEnumerator)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileEnumerator)(obj)
+	}
+	panic("cannot cast to FileEnumerator")
+}
+
+func (this0 *FileEnumerator) InheritedFromGFileEnumerator() *C.GFileEnumerator {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileEnumerator)(this0.C)
+}
+
+func (this0 *FileEnumerator) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_enumerator_get_type())
+}
+
+func FileEnumeratorGetType() gobject.Type {
+	return (*FileEnumerator)(nil).GetStaticType()
+}
+func (this0 *FileEnumerator) Close(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GFileEnumerator
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_enumerator_close(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileEnumerator) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFileEnumerator
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_enumerator_close_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileEnumerator) CloseFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GFileEnumerator
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_enumerator_close_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileEnumerator) GetChild(info0 FileInfoLike) *File {
+	var this1 *C.GFileEnumerator
+	var info1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	if info0 != nil {
+		info1 = info0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_enumerator_get_child(this1, info1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileEnumerator) GetContainer() *File {
+	var this1 *C.GFileEnumerator
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	ret1 := C.g_file_enumerator_get_container(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *FileEnumerator) HasPending() bool {
+	var this1 *C.GFileEnumerator
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	ret1 := C.g_file_enumerator_has_pending(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileEnumerator) IsClosed() bool {
+	var this1 *C.GFileEnumerator
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	ret1 := C.g_file_enumerator_is_closed(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileEnumerator) NextFile(cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFileEnumerator
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_enumerator_next_file(this1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileEnumerator) NextFilesAsync(num_files0 int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFileEnumerator
+	var num_files1 C.int32_t
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	num_files1 = C.int32_t(num_files0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_enumerator_next_files_async(this1, num_files1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileEnumerator) NextFilesFinish(result0 AsyncResultLike) ([]*FileInfo, error) {
+	var this1 *C.GFileEnumerator
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_enumerator_next_files_finish(this1, result1, &err1)
+	var ret2 []*FileInfo
+	var err2 error
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *FileInfo
+		elt = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GFileInfo)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileEnumerator) SetPending(pending0 bool) {
+	var this1 *C.GFileEnumerator
+	var pending1 C.int
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileEnumerator()
+	}
+	pending1 = _GoBoolToCBool(pending0)
+	C.g_file_enumerator_set_pending(this1, pending1)
+}
 // blacklisted: FileEnumeratorClass (struct)
 // blacklisted: FileEnumeratorPrivate (struct)
-// blacklisted: FileIOStream (object)
+type FileIOStreamLike interface {
+	IOStreamLike
+	InheritedFromGFileIOStream() *C.GFileIOStream
+}
+
+type FileIOStream struct {
+	IOStream
+	SeekableImpl
+}
+
+func ToFileIOStream(objlike gobject.ObjectLike) *FileIOStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileIOStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileIOStream)(obj)
+	}
+	panic("cannot cast to FileIOStream")
+}
+
+func (this0 *FileIOStream) InheritedFromGFileIOStream() *C.GFileIOStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileIOStream)(this0.C)
+}
+
+func (this0 *FileIOStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_io_stream_get_type())
+}
+
+func FileIOStreamGetType() gobject.Type {
+	return (*FileIOStream)(nil).GetStaticType()
+}
+func (this0 *FileIOStream) GetEtag() string {
+	var this1 *C.GFileIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileIOStream()
+	}
+	ret1 := C.g_file_io_stream_get_etag(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileIOStream) QueryInfo(attributes0 string, cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFileIOStream
+	var attributes1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileIOStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_io_stream_query_info(this1, attributes1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileIOStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFileIOStream
+	var attributes1 *C.char
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileIOStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_io_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileIOStream) QueryInfoFinish(result0 AsyncResultLike) (*FileInfo, error) {
+	var this1 *C.GFileIOStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileIOStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_io_stream_query_info_finish(this1, result1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: FileIOStreamClass (struct)
 // blacklisted: FileIOStreamPrivate (struct)
 // blacklisted: FileIcon (object)
 // blacklisted: FileIconClass (struct)
 // blacklisted: FileIface (struct)
-// blacklisted: FileInfo (object)
+type FileInfoLike interface {
+	gobject.ObjectLike
+	InheritedFromGFileInfo() *C.GFileInfo
+}
+
+type FileInfo struct {
+	gobject.Object
+	
+}
+
+func ToFileInfo(objlike gobject.ObjectLike) *FileInfo {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileInfo)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileInfo)(obj)
+	}
+	panic("cannot cast to FileInfo")
+}
+
+func (this0 *FileInfo) InheritedFromGFileInfo() *C.GFileInfo {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileInfo)(this0.C)
+}
+
+func (this0 *FileInfo) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_info_get_type())
+}
+
+func FileInfoGetType() gobject.Type {
+	return (*FileInfo)(nil).GetStaticType()
+}
+func NewFileInfo() *FileInfo {
+	ret1 := C.g_file_info_new()
+	var ret2 *FileInfo
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileInfo) ClearStatus() {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	C.g_file_info_clear_status(this1)
+}
+func (this0 *FileInfo) CopyInto(dest_info0 FileInfoLike) {
+	var this1 *C.GFileInfo
+	var dest_info1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	if dest_info0 != nil {
+		dest_info1 = dest_info0.InheritedFromGFileInfo()
+	}
+	C.g_file_info_copy_into(this1, dest_info1)
+}
+func (this0 *FileInfo) Dup() *FileInfo {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_dup(this1)
+	var ret2 *FileInfo
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeAsString(attribute0 string) string {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_as_string(this1, attribute1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeBoolean(attribute0 string) bool {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_boolean(this1, attribute1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeByteString(attribute0 string) string {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_byte_string(this1, attribute1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeData(attribute0 string) (FileAttributeType, unsafe.Pointer, FileAttributeStatus, bool) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var type1 C.GFileAttributeType
+	var value_pp1 unsafe.Pointer
+	var status1 C.GFileAttributeStatus
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_data(this1, attribute1, &type1, &value_pp1, &status1)
+	var type2 FileAttributeType
+	var value_pp2 unsafe.Pointer
+	var status2 FileAttributeStatus
+	var ret2 bool
+	type2 = FileAttributeType(type1)
+	value_pp2 = value_pp1
+	status2 = FileAttributeStatus(status1)
+	ret2 = ret1 != 0
+	return type2, value_pp2, status2, ret2
+}
+func (this0 *FileInfo) GetAttributeInt32(attribute0 string) int {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_int32(this1, attribute1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeInt64(attribute0 string) int64 {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_int64(this1, attribute1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeObject(attribute0 string) *gobject.Object {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_object(this1, attribute1)
+	var ret2 *gobject.Object
+	ret2 = (*gobject.Object)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeStatus(attribute0 string) FileAttributeStatus {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_status(this1, attribute1)
+	var ret2 FileAttributeStatus
+	ret2 = FileAttributeStatus(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeString(attribute0 string) string {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_string(this1, attribute1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeStringv(attribute0 string) []string {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_stringv(this1, attribute1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+	}
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeType(attribute0 string) FileAttributeType {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_type(this1, attribute1)
+	var ret2 FileAttributeType
+	ret2 = FileAttributeType(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeUint32(attribute0 string) int {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_uint32(this1, attribute1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetAttributeUint64(attribute0 string) uint64 {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_get_attribute_uint64(this1, attribute1)
+	var ret2 uint64
+	ret2 = uint64(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetContentType() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_content_type(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetDeletionDate() *glib.DateTime {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_deletion_date(this1)
+	var ret2 *glib.DateTime
+	ret2 = (*glib.DateTime)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileInfo) GetDisplayName() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_display_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetEditName() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_edit_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetEtag() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_etag(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetFileType() FileType {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_file_type(this1)
+	var ret2 FileType
+	ret2 = FileType(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetIcon() *Icon {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *FileInfo) GetIsBackup() bool {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_is_backup(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) GetIsHidden() bool {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_is_hidden(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) GetIsSymlink() bool {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_is_symlink(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) GetModificationTime() glib.TimeVal {
+	var this1 *C.GFileInfo
+	var result1 C.GTimeVal
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	C.g_file_info_get_modification_time(this1, &result1)
+	var result2 glib.TimeVal
+	result2 = *(*glib.TimeVal)(unsafe.Pointer(&result1))
+	return result2
+}
+func (this0 *FileInfo) GetName() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetSize() int64 {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_size(this1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetSortOrder() int {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_sort_order(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *FileInfo) GetSymbolicIcon() *Icon {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_symbolic_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *FileInfo) GetSymlinkTarget() string {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	ret1 := C.g_file_info_get_symlink_target(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *FileInfo) HasAttribute(attribute0 string) bool {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	ret1 := C.g_file_info_has_attribute(this1, attribute1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) HasNamespace(name_space0 string) bool {
+	var this1 *C.GFileInfo
+	var name_space1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	name_space1 = _GoStringToGString(name_space0)
+	defer C.free(unsafe.Pointer(name_space1))
+	ret1 := C.g_file_info_has_namespace(this1, name_space1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) ListAttributes(name_space0 string) []string {
+	var this1 *C.GFileInfo
+	var name_space1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	name_space1 = _GoStringToGString(name_space0)
+	defer C.free(unsafe.Pointer(name_space1))
+	ret1 := C.g_file_info_list_attributes(this1, name_space1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	return ret2
+}
+func (this0 *FileInfo) RemoveAttribute(attribute0 string) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	C.g_file_info_remove_attribute(this1, attribute1)
+}
+func (this0 *FileInfo) SetAttribute(attribute0 string, type0 FileAttributeType, value_p0 unsafe.Pointer) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var type1 C.GFileAttributeType
+	var value_p1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	type1 = C.GFileAttributeType(type0)
+	value_p1 = unsafe.Pointer(value_p0)
+	C.g_file_info_set_attribute(this1, attribute1, type1, value_p1)
+}
+func (this0 *FileInfo) SetAttributeBoolean(attribute0 string, attr_value0 bool) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 C.int
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = _GoBoolToCBool(attr_value0)
+	C.g_file_info_set_attribute_boolean(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeByteString(attribute0 string, attr_value0 string) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = _GoStringToGString(attr_value0)
+	defer C.free(unsafe.Pointer(attr_value1))
+	C.g_file_info_set_attribute_byte_string(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeInt32(attribute0 string, attr_value0 int) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 C.int32_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = C.int32_t(attr_value0)
+	C.g_file_info_set_attribute_int32(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeInt64(attribute0 string, attr_value0 int64) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 C.int64_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = C.int64_t(attr_value0)
+	C.g_file_info_set_attribute_int64(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeMask(mask0 *FileAttributeMatcher) {
+	var this1 *C.GFileInfo
+	var mask1 *C.GFileAttributeMatcher
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	mask1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(mask0))
+	C.g_file_info_set_attribute_mask(this1, mask1)
+}
+func (this0 *FileInfo) SetAttributeObject(attribute0 string, attr_value0 gobject.ObjectLike) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 *C.GObject
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	if attr_value0 != nil {
+		attr_value1 = attr_value0.InheritedFromGObject()
+	}
+	C.g_file_info_set_attribute_object(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeStatus(attribute0 string, status0 FileAttributeStatus) bool {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var status1 C.GFileAttributeStatus
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	status1 = C.GFileAttributeStatus(status0)
+	ret1 := C.g_file_info_set_attribute_status(this1, attribute1, status1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileInfo) SetAttributeString(attribute0 string, attr_value0 string) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = _GoStringToGString(attr_value0)
+	defer C.free(unsafe.Pointer(attr_value1))
+	C.g_file_info_set_attribute_string(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeStringv(attribute0 string, attr_value0 []string) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 **C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = (**C.char)(C.malloc(C.size_t(int(unsafe.Sizeof(*attr_value1)) * len(attr_value0))))
+	defer C.free(unsafe.Pointer(attr_value1))
+	for i, e := range attr_value0 {
+		(*(*[999999]*C.char)(unsafe.Pointer(attr_value1)))[i] = _GoStringToGString(e)
+		defer C.free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(attr_value1)))[i]))
+	}
+	C.g_file_info_set_attribute_stringv(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeUint32(attribute0 string, attr_value0 int) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 C.uint32_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = C.uint32_t(attr_value0)
+	C.g_file_info_set_attribute_uint32(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetAttributeUint64(attribute0 string, attr_value0 uint64) {
+	var this1 *C.GFileInfo
+	var attribute1 *C.char
+	var attr_value1 C.uint64_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	attribute1 = _GoStringToGString(attribute0)
+	defer C.free(unsafe.Pointer(attribute1))
+	attr_value1 = C.uint64_t(attr_value0)
+	C.g_file_info_set_attribute_uint64(this1, attribute1, attr_value1)
+}
+func (this0 *FileInfo) SetContentType(content_type0 string) {
+	var this1 *C.GFileInfo
+	var content_type1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	C.g_file_info_set_content_type(this1, content_type1)
+}
+func (this0 *FileInfo) SetDisplayName(display_name0 string) {
+	var this1 *C.GFileInfo
+	var display_name1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	display_name1 = _GoStringToGString(display_name0)
+	defer C.free(unsafe.Pointer(display_name1))
+	C.g_file_info_set_display_name(this1, display_name1)
+}
+func (this0 *FileInfo) SetEditName(edit_name0 string) {
+	var this1 *C.GFileInfo
+	var edit_name1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	edit_name1 = _GoStringToGString(edit_name0)
+	defer C.free(unsafe.Pointer(edit_name1))
+	C.g_file_info_set_edit_name(this1, edit_name1)
+}
+func (this0 *FileInfo) SetFileType(type0 FileType) {
+	var this1 *C.GFileInfo
+	var type1 C.GFileType
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	type1 = C.GFileType(type0)
+	C.g_file_info_set_file_type(this1, type1)
+}
+func (this0 *FileInfo) SetIcon(icon0 IconLike) {
+	var this1 *C.GFileInfo
+	var icon1 *C.GIcon
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	if icon0 != nil {
+		icon1 = icon0.ImplementsGIcon()
+	}
+	C.g_file_info_set_icon(this1, icon1)
+}
+func (this0 *FileInfo) SetIsHidden(is_hidden0 bool) {
+	var this1 *C.GFileInfo
+	var is_hidden1 C.int
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	is_hidden1 = _GoBoolToCBool(is_hidden0)
+	C.g_file_info_set_is_hidden(this1, is_hidden1)
+}
+func (this0 *FileInfo) SetIsSymlink(is_symlink0 bool) {
+	var this1 *C.GFileInfo
+	var is_symlink1 C.int
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	is_symlink1 = _GoBoolToCBool(is_symlink0)
+	C.g_file_info_set_is_symlink(this1, is_symlink1)
+}
+func (this0 *FileInfo) SetModificationTime(mtime0 *glib.TimeVal) {
+	var this1 *C.GFileInfo
+	var mtime1 *C.GTimeVal
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	mtime1 = (*C.GTimeVal)(unsafe.Pointer(mtime0))
+	C.g_file_info_set_modification_time(this1, mtime1)
+}
+func (this0 *FileInfo) SetName(name0 string) {
+	var this1 *C.GFileInfo
+	var name1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	C.g_file_info_set_name(this1, name1)
+}
+func (this0 *FileInfo) SetSize(size0 int64) {
+	var this1 *C.GFileInfo
+	var size1 C.int64_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	size1 = C.int64_t(size0)
+	C.g_file_info_set_size(this1, size1)
+}
+func (this0 *FileInfo) SetSortOrder(sort_order0 int) {
+	var this1 *C.GFileInfo
+	var sort_order1 C.int32_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	sort_order1 = C.int32_t(sort_order0)
+	C.g_file_info_set_sort_order(this1, sort_order1)
+}
+func (this0 *FileInfo) SetSymbolicIcon(icon0 IconLike) {
+	var this1 *C.GFileInfo
+	var icon1 *C.GIcon
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	if icon0 != nil {
+		icon1 = icon0.ImplementsGIcon()
+	}
+	C.g_file_info_set_symbolic_icon(this1, icon1)
+}
+func (this0 *FileInfo) SetSymlinkTarget(symlink_target0 string) {
+	var this1 *C.GFileInfo
+	var symlink_target1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	symlink_target1 = _GoStringToGString(symlink_target0)
+	defer C.free(unsafe.Pointer(symlink_target1))
+	C.g_file_info_set_symlink_target(this1, symlink_target1)
+}
+func (this0 *FileInfo) UnsetAttributeMask() {
+	var this1 *C.GFileInfo
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInfo()
+	}
+	C.g_file_info_unset_attribute_mask(this1)
+}
 // blacklisted: FileInfoClass (struct)
-// blacklisted: FileInputStream (object)
+type FileInputStreamLike interface {
+	InputStreamLike
+	InheritedFromGFileInputStream() *C.GFileInputStream
+}
+
+type FileInputStream struct {
+	InputStream
+	SeekableImpl
+}
+
+func ToFileInputStream(objlike gobject.ObjectLike) *FileInputStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileInputStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileInputStream)(obj)
+	}
+	panic("cannot cast to FileInputStream")
+}
+
+func (this0 *FileInputStream) InheritedFromGFileInputStream() *C.GFileInputStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileInputStream)(this0.C)
+}
+
+func (this0 *FileInputStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_input_stream_get_type())
+}
+
+func FileInputStreamGetType() gobject.Type {
+	return (*FileInputStream)(nil).GetStaticType()
+}
+func (this0 *FileInputStream) QueryInfo(attributes0 string, cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFileInputStream
+	var attributes1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInputStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_input_stream_query_info(this1, attributes1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileInputStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFileInputStream
+	var attributes1 *C.char
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInputStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_input_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileInputStream) QueryInfoFinish(result0 AsyncResultLike) (*FileInfo, error) {
+	var this1 *C.GFileInputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileInputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_input_stream_query_info_finish(this1, result1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: FileInputStreamClass (struct)
 // blacklisted: FileInputStreamPrivate (struct)
-// blacklisted: FileMonitor (object)
+type FileMeasureFlags C.uint32_t
+const (
+	FileMeasureFlagsNone FileMeasureFlags = 0
+	FileMeasureFlagsReportAnyError FileMeasureFlags = 2
+	FileMeasureFlagsApparentSize FileMeasureFlags = 4
+	FileMeasureFlagsNoXdev FileMeasureFlags = 8
+)
+// blacklisted: FileMeasureProgressCallback (callback)
+type FileMonitorLike interface {
+	gobject.ObjectLike
+	InheritedFromGFileMonitor() *C.GFileMonitor
+}
+
+type FileMonitor struct {
+	gobject.Object
+	
+}
+
+func ToFileMonitor(objlike gobject.ObjectLike) *FileMonitor {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileMonitor)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileMonitor)(obj)
+	}
+	panic("cannot cast to FileMonitor")
+}
+
+func (this0 *FileMonitor) InheritedFromGFileMonitor() *C.GFileMonitor {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileMonitor)(this0.C)
+}
+
+func (this0 *FileMonitor) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_monitor_get_type())
+}
+
+func FileMonitorGetType() gobject.Type {
+	return (*FileMonitor)(nil).GetStaticType()
+}
+func (this0 *FileMonitor) Cancel() bool {
+	var this1 *C.GFileMonitor
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileMonitor()
+	}
+	ret1 := C.g_file_monitor_cancel(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileMonitor) EmitEvent(child0 FileLike, other_file0 FileLike, event_type0 FileMonitorEvent) {
+	var this1 *C.GFileMonitor
+	var child1 *C.GFile
+	var other_file1 *C.GFile
+	var event_type1 C.GFileMonitorEvent
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileMonitor()
+	}
+	if child0 != nil {
+		child1 = child0.ImplementsGFile()
+	}
+	if other_file0 != nil {
+		other_file1 = other_file0.ImplementsGFile()
+	}
+	event_type1 = C.GFileMonitorEvent(event_type0)
+	C.g_file_monitor_emit_event(this1, child1, other_file1, event_type1)
+}
+func (this0 *FileMonitor) IsCancelled() bool {
+	var this1 *C.GFileMonitor
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileMonitor()
+	}
+	ret1 := C.g_file_monitor_is_cancelled(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *FileMonitor) SetRateLimit(limit_msecs0 int) {
+	var this1 *C.GFileMonitor
+	var limit_msecs1 C.int32_t
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileMonitor()
+	}
+	limit_msecs1 = C.int32_t(limit_msecs0)
+	C.g_file_monitor_set_rate_limit(this1, limit_msecs1)
+}
 // blacklisted: FileMonitorClass (struct)
 type FileMonitorEvent C.uint32_t
 const (
@@ -2388,10 +6297,135 @@ const (
 	FileMonitorFlagsWatchHardLinks FileMonitorFlags = 4
 )
 // blacklisted: FileMonitorPrivate (struct)
-// blacklisted: FileOutputStream (object)
+type FileOutputStreamLike interface {
+	OutputStreamLike
+	InheritedFromGFileOutputStream() *C.GFileOutputStream
+}
+
+type FileOutputStream struct {
+	OutputStream
+	SeekableImpl
+}
+
+func ToFileOutputStream(objlike gobject.ObjectLike) *FileOutputStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*FileOutputStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*FileOutputStream)(obj)
+	}
+	panic("cannot cast to FileOutputStream")
+}
+
+func (this0 *FileOutputStream) InheritedFromGFileOutputStream() *C.GFileOutputStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GFileOutputStream)(this0.C)
+}
+
+func (this0 *FileOutputStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_file_output_stream_get_type())
+}
+
+func FileOutputStreamGetType() gobject.Type {
+	return (*FileOutputStream)(nil).GetStaticType()
+}
+func (this0 *FileOutputStream) GetEtag() string {
+	var this1 *C.GFileOutputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileOutputStream()
+	}
+	ret1 := C.g_file_output_stream_get_etag(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *FileOutputStream) QueryInfo(attributes0 string, cancellable0 CancellableLike) (*FileInfo, error) {
+	var this1 *C.GFileOutputStream
+	var attributes1 *C.char
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileOutputStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_file_output_stream_query_info(this1, attributes1, cancellable1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *FileOutputStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GFileOutputStream
+	var attributes1 *C.char
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileOutputStream()
+	}
+	attributes1 = _GoStringToGString(attributes0)
+	defer C.free(unsafe.Pointer(attributes1))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_file_output_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
+}
+func (this0 *FileOutputStream) QueryInfoFinish(result0 AsyncResultLike) (*FileInfo, error) {
+	var this1 *C.GFileOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGFileOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_file_output_stream_query_info_finish(this1, result1, &err1)
+	var ret2 *FileInfo
+	var err2 error
+	ret2 = (*FileInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: FileOutputStreamClass (struct)
 // blacklisted: FileOutputStreamPrivate (struct)
-// blacklisted: FileProgressCallback (callback)
+type FileProgressCallback func(current_num_bytes int64, total_num_bytes int64)
+//export _GFileProgressCallback_c_wrapper
+func _GFileProgressCallback_c_wrapper(current_num_bytes0 int64, total_num_bytes0 int64, user_data0 unsafe.Pointer) {
+	var current_num_bytes1 int64
+	var total_num_bytes1 int64
+	var user_data1 FileProgressCallback
+	current_num_bytes1 = int64((C.int64_t)(current_num_bytes0))
+	total_num_bytes1 = int64((C.int64_t)(total_num_bytes0))
+	user_data1 = *(*FileProgressCallback)(user_data0)
+	user_data1(current_num_bytes1, total_num_bytes1)
+}
+//export _GFileProgressCallback_c_wrapper_once
+func _GFileProgressCallback_c_wrapper_once(current_num_bytes0 int64, total_num_bytes0 int64, user_data0 unsafe.Pointer) {
+	_GFileProgressCallback_c_wrapper(current_num_bytes0, total_num_bytes0, user_data0)
+	gobject.Holder.Release(user_data0)
+}
 type FileQueryInfoFlags C.uint32_t
 const (
 	FileQueryInfoFlagsNone FileQueryInfoFlags = 0
@@ -2480,7 +6514,202 @@ const (
 )
 // blacklisted: IOSchedulerJob (struct)
 // blacklisted: IOSchedulerJobFunc (callback)
-// blacklisted: IOStream (object)
+type IOStreamLike interface {
+	gobject.ObjectLike
+	InheritedFromGIOStream() *C.GIOStream
+}
+
+type IOStream struct {
+	gobject.Object
+	
+}
+
+func ToIOStream(objlike gobject.ObjectLike) *IOStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*IOStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*IOStream)(obj)
+	}
+	panic("cannot cast to IOStream")
+}
+
+func (this0 *IOStream) InheritedFromGIOStream() *C.GIOStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GIOStream)(this0.C)
+}
+
+func (this0 *IOStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_io_stream_get_type())
+}
+
+func IOStreamGetType() gobject.Type {
+	return (*IOStream)(nil).GetStaticType()
+}
+func IOStreamSpliceFinish(result0 AsyncResultLike) (bool, error) {
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_io_stream_splice_finish(result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *IOStream) ClearPending() {
+	var this1 *C.GIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	C.g_io_stream_clear_pending(this1)
+}
+func (this0 *IOStream) Close(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GIOStream
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_io_stream_close(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *IOStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GIOStream
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_io_stream_close_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *IOStream) CloseFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GIOStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_io_stream_close_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *IOStream) GetInputStream() *InputStream {
+	var this1 *C.GIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	ret1 := C.g_io_stream_get_input_stream(this1)
+	var ret2 *InputStream
+	ret2 = (*InputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *IOStream) GetOutputStream() *OutputStream {
+	var this1 *C.GIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	ret1 := C.g_io_stream_get_output_stream(this1)
+	var ret2 *OutputStream
+	ret2 = (*OutputStream)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
+	return ret2
+}
+func (this0 *IOStream) HasPending() bool {
+	var this1 *C.GIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	ret1 := C.g_io_stream_has_pending(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *IOStream) IsClosed() bool {
+	var this1 *C.GIOStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	ret1 := C.g_io_stream_is_closed(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *IOStream) SetPending() (bool, error) {
+	var this1 *C.GIOStream
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	ret1 := C.g_io_stream_set_pending(this1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *IOStream) SpliceAsync(stream20 IOStreamLike, flags0 IOStreamSpliceFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GIOStream
+	var stream21 *C.GIOStream
+	var flags1 C.GIOStreamSpliceFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGIOStream()
+	}
+	if stream20 != nil {
+		stream21 = stream20.InheritedFromGIOStream()
+	}
+	flags1 = C.GIOStreamSpliceFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_io_stream_splice_async(this1, stream21, flags1, io_priority1, cancellable1, callback1)
+}
 // blacklisted: IOStreamAdapter (struct)
 // blacklisted: IOStreamClass (struct)
 // blacklisted: IOStreamPrivate (struct)
@@ -2500,12 +6729,16 @@ type Icon struct {
 	IconImpl
 }
 
+func (*Icon) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_icon_get_type())
+}
+
+
 type IconImpl struct {}
 
 func ToIcon(objlike gobject.ObjectLike) *Icon {
-	t := (*IconImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_icon_get_type()))
 	if obj != nil {
 		return (*Icon)(obj)
 	}
@@ -2516,18 +6749,72 @@ func (this0 *IconImpl) ImplementsGIcon() *C.GIcon {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GIcon)((*gobject.Object)(unsafe.Pointer(obj)).C)
 }
-
-func (this0 *IconImpl) GetStaticType() gobject.Type {
-	return gobject.Type(C.g_icon_get_type())
+func IconDeserialize(value0 *glib.Variant) *Icon {
+	var value1 *C.GVariant
+	value1 = (*C.GVariant)(unsafe.Pointer(value0))
+	ret1 := C.g_icon_deserialize(value1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
 }
-
-func IconGetType() gobject.Type {
-	return (*IconImpl)(nil).GetStaticType()
+func IconHash(icon0 unsafe.Pointer) int {
+	var icon1 unsafe.Pointer
+	icon1 = unsafe.Pointer(icon0)
+	ret1 := C.g_icon_hash(icon1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
 }
-// blacklisted: Icon.hash (method)
-// blacklisted: Icon.new_for_string (method)
-// blacklisted: Icon.equal (method)
-// blacklisted: Icon.to_string (method)
+func IconNewForString(str0 string) (*Icon, error) {
+	var str1 *C.char
+	var err1 *C.GError
+	str1 = _GoStringToGString(str0)
+	defer C.free(unsafe.Pointer(str1))
+	ret1 := C.g_icon_new_for_string(str1, &err1)
+	var ret2 *Icon
+	var err2 error
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *IconImpl) Equal(icon20 IconLike) bool {
+	var this1 *C.GIcon
+	var icon21 *C.GIcon
+	if this0 != nil {
+		this1 = this0.ImplementsGIcon()
+	}
+	if icon20 != nil {
+		icon21 = icon20.ImplementsGIcon()
+	}
+	ret1 := C.g_icon_equal(this1, icon21)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *IconImpl) Serialize() *glib.Variant {
+	var this1 *C.GIcon
+	if this0 != nil {
+		this1 = this0.ImplementsGIcon()
+	}
+	ret1 := C.g_icon_serialize(this1)
+	var ret2 *glib.Variant
+	ret2 = (*glib.Variant)(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *IconImpl) ToString() string {
+	var this1 *C.GIcon
+	if this0 != nil {
+		this1 = this0.ImplementsGIcon()
+	}
+	ret1 := C.g_icon_to_string(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
 // blacklisted: IconIface (struct)
 // blacklisted: InetAddress (object)
 // blacklisted: InetAddressClass (struct)
@@ -2540,7 +6827,369 @@ func IconGetType() gobject.Type {
 // blacklisted: InetSocketAddressPrivate (struct)
 // blacklisted: Initable (interface)
 // blacklisted: InitableIface (struct)
-// blacklisted: InputStream (object)
+type InputStreamLike interface {
+	gobject.ObjectLike
+	InheritedFromGInputStream() *C.GInputStream
+}
+
+type InputStream struct {
+	gobject.Object
+	
+}
+
+func ToInputStream(objlike gobject.ObjectLike) *InputStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*InputStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*InputStream)(obj)
+	}
+	panic("cannot cast to InputStream")
+}
+
+func (this0 *InputStream) InheritedFromGInputStream() *C.GInputStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GInputStream)(this0.C)
+}
+
+func (this0 *InputStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_input_stream_get_type())
+}
+
+func InputStreamGetType() gobject.Type {
+	return (*InputStream)(nil).GetStaticType()
+}
+func (this0 *InputStream) ClearPending() {
+	var this1 *C.GInputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	C.g_input_stream_clear_pending(this1)
+}
+func (this0 *InputStream) Close(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GInputStream
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_input_stream_close(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GInputStream
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_input_stream_close_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *InputStream) CloseFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GInputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_input_stream_close_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) HasPending() bool {
+	var this1 *C.GInputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	ret1 := C.g_input_stream_has_pending(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *InputStream) IsClosed() bool {
+	var this1 *C.GInputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	ret1 := C.g_input_stream_is_closed(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *InputStream) Read(buffer0 []int, cancellable0 CancellableLike) (int64, error) {
+	var this1 *C.GInputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_input_stream_read(this1, buffer1, count1, cancellable1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) ReadAll(buffer0 []int, cancellable0 CancellableLike) (uint64, bool, error) {
+	var this1 *C.GInputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var bytes_read1 C.uint64_t
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_input_stream_read_all(this1, buffer1, count1, &bytes_read1, cancellable1, &err1)
+	var bytes_read2 uint64
+	var ret2 bool
+	var err2 error
+	bytes_read2 = uint64(bytes_read1)
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return bytes_read2, ret2, err2
+}
+func (this0 *InputStream) ReadAsync(buffer0 []int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GInputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_input_stream_read_async(this1, buffer1, count1, io_priority1, cancellable1, callback1)
+}
+func (this0 *InputStream) ReadBytes(count0 uint64, cancellable0 CancellableLike) (*glib.Bytes, error) {
+	var this1 *C.GInputStream
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	count1 = C.uint64_t(count0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_input_stream_read_bytes(this1, count1, cancellable1, &err1)
+	var ret2 *glib.Bytes
+	var err2 error
+	ret2 = (*glib.Bytes)(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) ReadBytesAsync(count0 uint64, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GInputStream
+	var count1 C.uint64_t
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	count1 = C.uint64_t(count0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_input_stream_read_bytes_async(this1, count1, io_priority1, cancellable1, callback1)
+}
+func (this0 *InputStream) ReadBytesFinish(result0 AsyncResultLike) (*glib.Bytes, error) {
+	var this1 *C.GInputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_input_stream_read_bytes_finish(this1, result1, &err1)
+	var ret2 *glib.Bytes
+	var err2 error
+	ret2 = (*glib.Bytes)(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) ReadFinish(result0 AsyncResultLike) (int64, error) {
+	var this1 *C.GInputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_input_stream_read_finish(this1, result1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) SetPending() (bool, error) {
+	var this1 *C.GInputStream
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	ret1 := C.g_input_stream_set_pending(this1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) Skip(count0 uint64, cancellable0 CancellableLike) (int64, error) {
+	var this1 *C.GInputStream
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	count1 = C.uint64_t(count0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_input_stream_skip(this1, count1, cancellable1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *InputStream) SkipAsync(count0 uint64, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GInputStream
+	var count1 C.uint64_t
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	count1 = C.uint64_t(count0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_input_stream_skip_async(this1, count1, io_priority1, cancellable1, callback1)
+}
+func (this0 *InputStream) SkipFinish(result0 AsyncResultLike) (int64, error) {
+	var this1 *C.GInputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGInputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_input_stream_skip_finish(this1, result1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: InputStreamClass (struct)
 // blacklisted: InputStreamPrivate (struct)
 // blacklisted: InputVector (struct)
@@ -2548,6 +7197,7 @@ func IconGetType() gobject.Type {
 // blacklisted: LoadableIconIface (struct)
 const MenuAttributeAction = "action"
 const MenuAttributeActionNamespace = "action-namespace"
+const MenuAttributeIcon = "icon"
 const MenuAttributeLabel = "label"
 const MenuAttributeTarget = "target"
 const MenuLinkSection = "section"
@@ -2858,8 +7508,435 @@ func (this0 *MenuModel) IterateItemLinks(item_index0 int) *MenuLinkIter {
 }
 // blacklisted: MenuModelClass (struct)
 // blacklisted: MenuModelPrivate (struct)
-// blacklisted: Mount (interface)
-// blacklisted: MountIface (struct)
+type MountLike interface {
+	ImplementsGMount() *C.GMount
+}
+
+type Mount struct {
+	gobject.Object
+	MountImpl
+}
+
+func (*Mount) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_mount_get_type())
+}
+
+
+type MountImpl struct {}
+
+func ToMount(objlike gobject.ObjectLike) *Mount {
+	c := objlike.InheritedFromGObject()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_mount_get_type()))
+	if obj != nil {
+		return (*Mount)(obj)
+	}
+	panic("cannot cast to Mount")
+}
+
+func (this0 *MountImpl) ImplementsGMount() *C.GMount {
+	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
+	return (*C.GMount)((*gobject.Object)(unsafe.Pointer(obj)).C)
+}
+func (this0 *MountImpl) CanEject() bool {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_can_eject(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *MountImpl) CanUnmount() bool {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_can_unmount(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *MountImpl) Eject(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_eject(this1, flags1, cancellable1, callback1)
+}
+func (this0 *MountImpl) EjectFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_eject_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *MountImpl) EjectWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_eject_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) GetDefaultLocation() *File {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_default_location(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GetDrive() *Drive {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_drive(this1)
+	var ret2 *Drive
+	ret2 = (*Drive)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GetIcon() *Icon {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GetName() string {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *MountImpl) GetRoot() *File {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_root(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GetSortKey() string {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_sort_key(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *MountImpl) GetSymbolicIcon() *Icon {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_symbolic_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GetUuid() string {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_uuid(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *MountImpl) GetVolume() *Volume {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_get_volume(this1)
+	var ret2 *Volume
+	ret2 = (*Volume)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *MountImpl) GuessContentType(force_rescan0 bool, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var force_rescan1 C.int
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	force_rescan1 = _GoBoolToCBool(force_rescan0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_guess_content_type(this1, force_rescan1, cancellable1, callback1)
+}
+func (this0 *MountImpl) GuessContentTypeFinish(result0 AsyncResultLike) ([]string, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_guess_content_type_finish(this1, result1, &err1)
+	var ret2 []string
+	var err2 error
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) GuessContentTypeSync(force_rescan0 bool, cancellable0 CancellableLike) ([]string, error) {
+	var this1 *C.GMount
+	var force_rescan1 C.int
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	force_rescan1 = _GoBoolToCBool(force_rescan0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_mount_guess_content_type_sync(this1, force_rescan1, cancellable1, &err1)
+	var ret2 []string
+	var err2 error
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) IsShadowed() bool {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	ret1 := C.g_mount_is_shadowed(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *MountImpl) Remount(flags0 MountMountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var flags1 C.GMountMountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	flags1 = C.GMountMountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_remount(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *MountImpl) RemountFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_remount_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) Shadow() {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	C.g_mount_shadow(this1)
+}
+func (this0 *MountImpl) Unmount(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_unmount(this1, flags1, cancellable1, callback1)
+}
+func (this0 *MountImpl) UnmountFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_unmount_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) UnmountWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GMount
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_mount_unmount_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *MountImpl) UnmountWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GMount
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_mount_unmount_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *MountImpl) Unshadow() {
+	var this1 *C.GMount
+	if this0 != nil {
+		this1 = this0.ImplementsGMount()
+	}
+	C.g_mount_unshadow(this1)
+}
 type MountMountFlags C.uint32_t
 const (
 	MountMountFlagsNone MountMountFlags = 0
@@ -3058,7 +8135,444 @@ const NetworkMonitorExtensionPointName = "gio-network-monitor"
 // blacklisted: NetworkService (object)
 // blacklisted: NetworkServiceClass (struct)
 // blacklisted: NetworkServicePrivate (struct)
-// blacklisted: OutputStream (object)
+type OutputStreamLike interface {
+	gobject.ObjectLike
+	InheritedFromGOutputStream() *C.GOutputStream
+}
+
+type OutputStream struct {
+	gobject.Object
+	
+}
+
+func ToOutputStream(objlike gobject.ObjectLike) *OutputStream {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*OutputStream)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*OutputStream)(obj)
+	}
+	panic("cannot cast to OutputStream")
+}
+
+func (this0 *OutputStream) InheritedFromGOutputStream() *C.GOutputStream {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GOutputStream)(this0.C)
+}
+
+func (this0 *OutputStream) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_output_stream_get_type())
+}
+
+func OutputStreamGetType() gobject.Type {
+	return (*OutputStream)(nil).GetStaticType()
+}
+func (this0 *OutputStream) ClearPending() {
+	var this1 *C.GOutputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	C.g_output_stream_clear_pending(this1)
+}
+func (this0 *OutputStream) Close(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GOutputStream
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_close(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GOutputStream
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_output_stream_close_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *OutputStream) CloseFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_output_stream_close_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) Flush(cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GOutputStream
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_flush(this1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) FlushAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GOutputStream
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_output_stream_flush_async(this1, io_priority1, cancellable1, callback1)
+}
+func (this0 *OutputStream) FlushFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_output_stream_flush_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) HasPending() bool {
+	var this1 *C.GOutputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	ret1 := C.g_output_stream_has_pending(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *OutputStream) IsClosed() bool {
+	var this1 *C.GOutputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	ret1 := C.g_output_stream_is_closed(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *OutputStream) IsClosing() bool {
+	var this1 *C.GOutputStream
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	ret1 := C.g_output_stream_is_closing(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *OutputStream) SetPending() (bool, error) {
+	var this1 *C.GOutputStream
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	ret1 := C.g_output_stream_set_pending(this1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) Splice(source0 InputStreamLike, flags0 OutputStreamSpliceFlags, cancellable0 CancellableLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var source1 *C.GInputStream
+	var flags1 C.GOutputStreamSpliceFlags
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if source0 != nil {
+		source1 = source0.InheritedFromGInputStream()
+	}
+	flags1 = C.GOutputStreamSpliceFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_splice(this1, source1, flags1, cancellable1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) SpliceAsync(source0 InputStreamLike, flags0 OutputStreamSpliceFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GOutputStream
+	var source1 *C.GInputStream
+	var flags1 C.GOutputStreamSpliceFlags
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if source0 != nil {
+		source1 = source0.InheritedFromGInputStream()
+	}
+	flags1 = C.GOutputStreamSpliceFlags(flags0)
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_output_stream_splice_async(this1, source1, flags1, io_priority1, cancellable1, callback1)
+}
+func (this0 *OutputStream) SpliceFinish(result0 AsyncResultLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_output_stream_splice_finish(this1, result1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) Write(buffer0 []int, cancellable0 CancellableLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_write(this1, buffer1, count1, cancellable1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) WriteAll(buffer0 []int, cancellable0 CancellableLike) (uint64, bool, error) {
+	var this1 *C.GOutputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var cancellable1 *C.GCancellable
+	var bytes_written1 C.uint64_t
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_write_all(this1, buffer1, count1, &bytes_written1, cancellable1, &err1)
+	var bytes_written2 uint64
+	var ret2 bool
+	var err2 error
+	bytes_written2 = uint64(bytes_written1)
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return bytes_written2, ret2, err2
+}
+func (this0 *OutputStream) WriteAsync(buffer0 []int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GOutputStream
+	var buffer1 *C.uint8_t
+	var count1 C.uint64_t
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	buffer1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*buffer1)) * len(buffer0))))
+	defer C.free(unsafe.Pointer(buffer1))
+	for i, e := range buffer0 {
+		(*(*[999999]C.uint8_t)(unsafe.Pointer(buffer1)))[i] = C.uint8_t(e)
+	}
+	count1 = C.uint64_t(len(buffer0))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_output_stream_write_async(this1, buffer1, count1, io_priority1, cancellable1, callback1)
+}
+func (this0 *OutputStream) WriteBytes(bytes0 *glib.Bytes, cancellable0 CancellableLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var bytes1 *C.GBytes
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	bytes1 = (*C.GBytes)(unsafe.Pointer(bytes0))
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_output_stream_write_bytes(this1, bytes1, cancellable1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) WriteBytesAsync(bytes0 *glib.Bytes, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GOutputStream
+	var bytes1 *C.GBytes
+	var io_priority1 C.int32_t
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	bytes1 = (*C.GBytes)(unsafe.Pointer(bytes0))
+	io_priority1 = C.int32_t(io_priority0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_output_stream_write_bytes_async(this1, bytes1, io_priority1, cancellable1, callback1)
+}
+func (this0 *OutputStream) WriteBytesFinish(result0 AsyncResultLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_output_stream_write_bytes_finish(this1, result1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *OutputStream) WriteFinish(result0 AsyncResultLike) (int64, error) {
+	var this1 *C.GOutputStream
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.InheritedFromGOutputStream()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_output_stream_write_finish(this1, result1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: OutputStreamClass (struct)
 // blacklisted: OutputStreamPrivate (struct)
 type OutputStreamSpliceFlags C.uint32_t
@@ -3273,6 +8787,7 @@ func (this0 *Permission) ReleaseFinish(result0 AsyncResultLike) (bool, error) {
 // blacklisted: PollableOutputStream (interface)
 // blacklisted: PollableOutputStreamInterface (struct)
 // blacklisted: PollableSourceFunc (callback)
+// blacklisted: PropertyAction (object)
 // blacklisted: Proxy (interface)
 // blacklisted: ProxyAddress (object)
 // blacklisted: ProxyAddressClass (struct)
@@ -3317,7 +8832,111 @@ type ResourceLookupFlags C.uint32_t
 const (
 	ResourceLookupFlagsNone ResourceLookupFlags = 0
 )
-// blacklisted: Seekable (interface)
+type SeekableLike interface {
+	ImplementsGSeekable() *C.GSeekable
+}
+
+type Seekable struct {
+	gobject.Object
+	SeekableImpl
+}
+
+func (*Seekable) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_seekable_get_type())
+}
+
+
+type SeekableImpl struct {}
+
+func ToSeekable(objlike gobject.ObjectLike) *Seekable {
+	c := objlike.InheritedFromGObject()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_seekable_get_type()))
+	if obj != nil {
+		return (*Seekable)(obj)
+	}
+	panic("cannot cast to Seekable")
+}
+
+func (this0 *SeekableImpl) ImplementsGSeekable() *C.GSeekable {
+	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
+	return (*C.GSeekable)((*gobject.Object)(unsafe.Pointer(obj)).C)
+}
+func (this0 *SeekableImpl) CanSeek() bool {
+	var this1 *C.GSeekable
+	if this0 != nil {
+		this1 = this0.ImplementsGSeekable()
+	}
+	ret1 := C.g_seekable_can_seek(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *SeekableImpl) CanTruncate() bool {
+	var this1 *C.GSeekable
+	if this0 != nil {
+		this1 = this0.ImplementsGSeekable()
+	}
+	ret1 := C.g_seekable_can_truncate(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *SeekableImpl) Seek(offset0 int64, type0 glib.SeekType, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GSeekable
+	var offset1 C.int64_t
+	var type1 C.GSeekType
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGSeekable()
+	}
+	offset1 = C.int64_t(offset0)
+	type1 = C.GSeekType(type0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_seekable_seek(this1, offset1, type1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *SeekableImpl) Tell() int64 {
+	var this1 *C.GSeekable
+	if this0 != nil {
+		this1 = this0.ImplementsGSeekable()
+	}
+	ret1 := C.g_seekable_tell(this1)
+	var ret2 int64
+	ret2 = int64(ret1)
+	return ret2
+}
+func (this0 *SeekableImpl) Truncate(offset0 int64, cancellable0 CancellableLike) (bool, error) {
+	var this1 *C.GSeekable
+	var offset1 C.int64_t
+	var cancellable1 *C.GCancellable
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGSeekable()
+	}
+	offset1 = C.int64_t(offset0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	ret1 := C.g_seekable_truncate(this1, offset1, cancellable1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
 // blacklisted: SeekableIface (struct)
 type SettingsLike interface {
 	gobject.ObjectLike
@@ -3365,9 +8984,44 @@ func NewSettings(schema_id0 string) *Settings {
 	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
-// blacklisted: Settings.new_full (method)
-// blacklisted: Settings.new_with_backend (method)
-// blacklisted: Settings.new_with_backend_and_path (method)
+func NewSettingsFull(schema0 *SettingsSchema, backend0 *SettingsBackend, path0 string) *Settings {
+	var schema1 *C.GSettingsSchema
+	var backend1 *C.GSettingsBackend
+	var path1 *C.char
+	schema1 = (*C.GSettingsSchema)(unsafe.Pointer(schema0))
+	backend1 = (*C.GSettingsBackend)(unsafe.Pointer(backend0))
+	path1 = _GoStringToGString(path0)
+	defer C.free(unsafe.Pointer(path1))
+	ret1 := C.g_settings_new_full(schema1, backend1, path1)
+	var ret2 *Settings
+	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func NewSettingsWithBackend(schema_id0 string, backend0 *SettingsBackend) *Settings {
+	var schema_id1 *C.char
+	var backend1 *C.GSettingsBackend
+	schema_id1 = _GoStringToGString(schema_id0)
+	defer C.free(unsafe.Pointer(schema_id1))
+	backend1 = (*C.GSettingsBackend)(unsafe.Pointer(backend0))
+	ret1 := C.g_settings_new_with_backend(schema_id1, backend1)
+	var ret2 *Settings
+	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func NewSettingsWithBackendAndPath(schema_id0 string, backend0 *SettingsBackend, path0 string) *Settings {
+	var schema_id1 *C.char
+	var backend1 *C.GSettingsBackend
+	var path1 *C.char
+	schema_id1 = _GoStringToGString(schema_id0)
+	defer C.free(unsafe.Pointer(schema_id1))
+	backend1 = (*C.GSettingsBackend)(unsafe.Pointer(backend0))
+	path1 = _GoStringToGString(path0)
+	defer C.free(unsafe.Pointer(path1))
+	ret1 := C.g_settings_new_with_backend_and_path(schema_id1, backend1, path1)
+	var ret2 *Settings
+	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
 func NewSettingsWithPath(schema_id0 string, path0 string) *Settings {
 	var schema_id1 *C.char
 	var path1 *C.char
@@ -3848,7 +9502,7 @@ func (this0 *Settings) SetValue(key0 string, value0 *glib.Variant) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-// blacklisted: SettingsBackend (struct)
+type SettingsBackend struct {}
 type SettingsBindFlags C.uint32_t
 const (
 	SettingsBindFlagsDefault SettingsBindFlags = 0
@@ -3863,7 +9517,23 @@ const (
 // blacklisted: SettingsClass (struct)
 // blacklisted: SettingsGetMapping (callback)
 // blacklisted: SettingsPrivate (struct)
-// blacklisted: SettingsSchema (struct)
+type SettingsSchema struct {}
+func (this0 *SettingsSchema) GetId() string {
+	var this1 *C.GSettingsSchema
+	this1 = (*C.GSettingsSchema)(unsafe.Pointer(this0))
+	ret1 := C.g_settings_schema_get_id(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *SettingsSchema) GetPath() string {
+	var this1 *C.GSettingsSchema
+	this1 = (*C.GSettingsSchema)(unsafe.Pointer(this0))
+	ret1 := C.g_settings_schema_get_path(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
 // blacklisted: SettingsSchemaSource (struct)
 // blacklisted: SimpleAction (object)
 // blacklisted: SimpleActionGroup (object)
@@ -4087,9 +9757,416 @@ const VolumeIdentifierKindUuid = "uuid"
 const VolumeMonitorExtensionPointName = "gio-volume-monitor"
 // blacklisted: Vfs (object)
 // blacklisted: VfsClass (struct)
-// blacklisted: Volume (interface)
+type VolumeLike interface {
+	ImplementsGVolume() *C.GVolume
+}
+
+type Volume struct {
+	gobject.Object
+	VolumeImpl
+}
+
+func (*Volume) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_volume_get_type())
+}
+
+
+type VolumeImpl struct {}
+
+func ToVolume(objlike gobject.ObjectLike) *Volume {
+	c := objlike.InheritedFromGObject()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), gobject.Type(C.g_volume_get_type()))
+	if obj != nil {
+		return (*Volume)(obj)
+	}
+	panic("cannot cast to Volume")
+}
+
+func (this0 *VolumeImpl) ImplementsGVolume() *C.GVolume {
+	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
+	return (*C.GVolume)((*gobject.Object)(unsafe.Pointer(obj)).C)
+}
+func (this0 *VolumeImpl) CanEject() bool {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_can_eject(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *VolumeImpl) CanMount() bool {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_can_mount(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *VolumeImpl) Eject(flags0 MountUnmountFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GVolume
+	var flags1 C.GMountUnmountFlags
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_volume_eject(this1, flags1, cancellable1, callback1)
+}
+func (this0 *VolumeImpl) EjectFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GVolume
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_volume_eject_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *VolumeImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GVolume
+	var flags1 C.GMountUnmountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	flags1 = C.GMountUnmountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_volume_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *VolumeImpl) EjectWithOperationFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GVolume
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_volume_eject_with_operation_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *VolumeImpl) EnumerateIdentifiers() []string {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_enumerate_identifiers(this1)
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	return ret2
+}
+func (this0 *VolumeImpl) GetActivationRoot() *File {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_activation_root(this1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeImpl) GetDrive() *Drive {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_drive(this1)
+	var ret2 *Drive
+	ret2 = (*Drive)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeImpl) GetIcon() *Icon {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeImpl) GetIdentifier(kind0 string) string {
+	var this1 *C.GVolume
+	var kind1 *C.char
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	kind1 = _GoStringToGString(kind0)
+	defer C.free(unsafe.Pointer(kind1))
+	ret1 := C.g_volume_get_identifier(this1, kind1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *VolumeImpl) GetMount() *Mount {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_mount(this1)
+	var ret2 *Mount
+	ret2 = (*Mount)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeImpl) GetName() string {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_name(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *VolumeImpl) GetSortKey() string {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_sort_key(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func (this0 *VolumeImpl) GetSymbolicIcon() *Icon {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_symbolic_icon(this1)
+	var ret2 *Icon
+	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeImpl) GetUuid() string {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_get_uuid(this1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func (this0 *VolumeImpl) Mount(flags0 MountMountFlags, mount_operation0 MountOperationLike, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+	var this1 *C.GVolume
+	var flags1 C.GMountMountFlags
+	var mount_operation1 *C.GMountOperation
+	var cancellable1 *C.GCancellable
+	var callback1 unsafe.Pointer
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	flags1 = C.GMountMountFlags(flags0)
+	if mount_operation0 != nil {
+		mount_operation1 = mount_operation0.InheritedFromGMountOperation()
+	}
+	if cancellable0 != nil {
+		cancellable1 = cancellable0.InheritedFromGCancellable()
+	}
+	if callback0 != nil {
+		callback1 = unsafe.Pointer(&callback0)}
+	gobject.Holder.Grab(callback1)
+	C._g_volume_mount(this1, flags1, mount_operation1, cancellable1, callback1)
+}
+func (this0 *VolumeImpl) MountFinish(result0 AsyncResultLike) (bool, error) {
+	var this1 *C.GVolume
+	var result1 *C.GAsyncResult
+	var err1 *C.GError
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	if result0 != nil {
+		result1 = result0.ImplementsGAsyncResult()
+	}
+	ret1 := C.g_volume_mount_finish(this1, result1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *VolumeImpl) ShouldAutomount() bool {
+	var this1 *C.GVolume
+	if this0 != nil {
+		this1 = this0.ImplementsGVolume()
+	}
+	ret1 := C.g_volume_should_automount(this1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
 // blacklisted: VolumeIface (struct)
-// blacklisted: VolumeMonitor (object)
+type VolumeMonitorLike interface {
+	gobject.ObjectLike
+	InheritedFromGVolumeMonitor() *C.GVolumeMonitor
+}
+
+type VolumeMonitor struct {
+	gobject.Object
+	
+}
+
+func ToVolumeMonitor(objlike gobject.ObjectLike) *VolumeMonitor {
+	c := objlike.InheritedFromGObject()
+	if c == nil {
+		return nil
+	}
+	t := (*VolumeMonitor)(nil).GetStaticType()
+	obj := gobject.ObjectGrabIfType(unsafe.Pointer(c), t)
+	if obj != nil {
+		return (*VolumeMonitor)(obj)
+	}
+	panic("cannot cast to VolumeMonitor")
+}
+
+func (this0 *VolumeMonitor) InheritedFromGVolumeMonitor() *C.GVolumeMonitor {
+	if this0 == nil {
+		return nil
+	}
+	return (*C.GVolumeMonitor)(this0.C)
+}
+
+func (this0 *VolumeMonitor) GetStaticType() gobject.Type {
+	return gobject.Type(C.g_volume_monitor_get_type())
+}
+
+func VolumeMonitorGetType() gobject.Type {
+	return (*VolumeMonitor)(nil).GetStaticType()
+}
+func VolumeMonitorAdoptOrphanMount(mount0 MountLike) *Volume {
+	var mount1 *C.GMount
+	if mount0 != nil {
+		mount1 = mount0.ImplementsGMount()
+	}
+	ret1 := C.g_volume_monitor_adopt_orphan_mount(mount1)
+	var ret2 *Volume
+	ret2 = (*Volume)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func VolumeMonitorGet() *VolumeMonitor {
+	ret1 := C.g_volume_monitor_get()
+	var ret2 *VolumeMonitor
+	ret2 = (*VolumeMonitor)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeMonitor) GetConnectedDrives() []*Drive {
+	var this1 *C.GVolumeMonitor
+	if this0 != nil {
+		this1 = this0.InheritedFromGVolumeMonitor()
+	}
+	ret1 := C.g_volume_monitor_get_connected_drives(this1)
+	var ret2 []*Drive
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *Drive
+		elt = (*Drive)(gobject.ObjectWrap(unsafe.Pointer((*C.GDrive)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func (this0 *VolumeMonitor) GetMountForUuid(uuid0 string) *Mount {
+	var this1 *C.GVolumeMonitor
+	var uuid1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGVolumeMonitor()
+	}
+	uuid1 = _GoStringToGString(uuid0)
+	defer C.free(unsafe.Pointer(uuid1))
+	ret1 := C.g_volume_monitor_get_mount_for_uuid(this1, uuid1)
+	var ret2 *Mount
+	ret2 = (*Mount)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeMonitor) GetMounts() []*Mount {
+	var this1 *C.GVolumeMonitor
+	if this0 != nil {
+		this1 = this0.InheritedFromGVolumeMonitor()
+	}
+	ret1 := C.g_volume_monitor_get_mounts(this1)
+	var ret2 []*Mount
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *Mount
+		elt = (*Mount)(gobject.ObjectWrap(unsafe.Pointer((*C.GMount)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func (this0 *VolumeMonitor) GetVolumeForUuid(uuid0 string) *Volume {
+	var this1 *C.GVolumeMonitor
+	var uuid1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGVolumeMonitor()
+	}
+	uuid1 = _GoStringToGString(uuid0)
+	defer C.free(unsafe.Pointer(uuid1))
+	ret1 := C.g_volume_monitor_get_volume_for_uuid(this1, uuid1)
+	var ret2 *Volume
+	ret2 = (*Volume)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func (this0 *VolumeMonitor) GetVolumes() []*Volume {
+	var this1 *C.GVolumeMonitor
+	if this0 != nil {
+		this1 = this0.InheritedFromGVolumeMonitor()
+	}
+	ret1 := C.g_volume_monitor_get_volumes(this1)
+	var ret2 []*Volume
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *Volume
+		elt = (*Volume)(gobject.ObjectWrap(unsafe.Pointer((*C.GVolume)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
 // blacklisted: VolumeMonitorClass (struct)
 // blacklisted: ZlibCompressor (object)
 // blacklisted: ZlibCompressorClass (struct)
@@ -4101,15 +10178,104 @@ const (
 )
 // blacklisted: ZlibDecompressor (object)
 // blacklisted: ZlibDecompressorClass (struct)
+// blacklisted: action_name_is_valid (function)
+// blacklisted: action_parse_detailed_name (function)
+// blacklisted: action_print_detailed_name (function)
 // blacklisted: app_info_create_from_commandline (function)
-// blacklisted: app_info_get_all (function)
-// blacklisted: app_info_get_all_for_type (function)
-// blacklisted: app_info_get_default_for_type (function)
-// blacklisted: app_info_get_default_for_uri_scheme (function)
-// blacklisted: app_info_get_fallback_for_type (function)
-// blacklisted: app_info_get_recommended_for_type (function)
-// blacklisted: app_info_launch_default_for_uri (function)
-// blacklisted: app_info_reset_type_associations (function)
+func AppInfoGetAll() []*AppInfo {
+	ret1 := C.g_app_info_get_all()
+	var ret2 []*AppInfo
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *AppInfo
+		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func AppInfoGetAllForType(content_type0 string) []*AppInfo {
+	var content_type1 *C.char
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	ret1 := C.g_app_info_get_all_for_type(content_type1)
+	var ret2 []*AppInfo
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *AppInfo
+		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func AppInfoGetDefaultForType(content_type0 string, must_support_uris0 bool) *AppInfo {
+	var content_type1 *C.char
+	var must_support_uris1 C.int
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	must_support_uris1 = _GoBoolToCBool(must_support_uris0)
+	ret1 := C.g_app_info_get_default_for_type(content_type1, must_support_uris1)
+	var ret2 *AppInfo
+	ret2 = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func AppInfoGetDefaultForUriScheme(uri_scheme0 string) *AppInfo {
+	var uri_scheme1 *C.char
+	uri_scheme1 = _GoStringToGString(uri_scheme0)
+	defer C.free(unsafe.Pointer(uri_scheme1))
+	ret1 := C.g_app_info_get_default_for_uri_scheme(uri_scheme1)
+	var ret2 *AppInfo
+	ret2 = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func AppInfoGetFallbackForType(content_type0 string) []*AppInfo {
+	var content_type1 *C.char
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	ret1 := C.g_app_info_get_fallback_for_type(content_type1)
+	var ret2 []*AppInfo
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *AppInfo
+		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func AppInfoGetRecommendedForType(content_type0 string) []*AppInfo {
+	var content_type1 *C.char
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	ret1 := C.g_app_info_get_recommended_for_type(content_type1)
+	var ret2 []*AppInfo
+	for iter := (*_GList)(unsafe.Pointer(ret1)); iter != nil; iter = iter.next {
+		var elt *AppInfo
+		elt = (*AppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GAppInfo)(iter.data)), false))
+		ret2 = append(ret2, elt)
+	}
+	return ret2
+}
+func AppInfoLaunchDefaultForUri(uri0 string, launch_context0 AppLaunchContextLike) (bool, error) {
+	var uri1 *C.char
+	var launch_context1 *C.GAppLaunchContext
+	var err1 *C.GError
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	if launch_context0 != nil {
+		launch_context1 = launch_context0.InheritedFromGAppLaunchContext()
+	}
+	ret1 := C.g_app_info_launch_default_for_uri(uri1, launch_context1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func AppInfoResetTypeAssociations(content_type0 string) {
+	var content_type1 *C.char
+	content_type1 = _GoStringToGString(content_type0)
+	defer C.free(unsafe.Pointer(content_type1))
+	C.g_app_info_reset_type_associations(content_type1)
+}
 // blacklisted: async_initable_newv_async (function)
 // blacklisted: bus_get (function)
 // blacklisted: bus_get_finish (function)
@@ -4158,12 +10324,73 @@ const (
 // blacklisted: dbus_is_name (function)
 // blacklisted: dbus_is_supported_address (function)
 // blacklisted: dbus_is_unique_name (function)
-// blacklisted: file_new_for_commandline_arg (function)
-// blacklisted: file_new_for_commandline_arg_and_cwd (function)
-// blacklisted: file_new_for_path (function)
-// blacklisted: file_new_for_uri (function)
-// blacklisted: file_new_tmp (function)
-// blacklisted: file_parse_name (function)
+func FileNewForCommandlineArg(arg0 string) *File {
+	var arg1 *C.char
+	arg1 = _GoStringToGString(arg0)
+	defer C.free(unsafe.Pointer(arg1))
+	ret1 := C.g_file_new_for_commandline_arg(arg1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func FileNewForCommandlineArgAndCwd(arg0 string, cwd0 string) *File {
+	var arg1 *C.char
+	var cwd1 *C.char
+	arg1 = _GoStringToGString(arg0)
+	defer C.free(unsafe.Pointer(arg1))
+	cwd1 = _GoStringToGString(cwd0)
+	defer C.free(unsafe.Pointer(cwd1))
+	ret1 := C.g_file_new_for_commandline_arg_and_cwd(arg1, cwd1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func FileNewForPath(path0 string) *File {
+	var path1 *C.char
+	path1 = _GoStringToGString(path0)
+	defer C.free(unsafe.Pointer(path1))
+	ret1 := C.g_file_new_for_path(path1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func FileNewForUri(uri0 string) *File {
+	var uri1 *C.char
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_file_new_for_uri(uri1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func FileNewTmp(tmpl0 string) (*FileIOStream, *File, error) {
+	var tmpl1 *C.char
+	var iostream1 *C.GFileIOStream
+	var err1 *C.GError
+	tmpl1 = _GoStringToGString(tmpl0)
+	defer C.free(unsafe.Pointer(tmpl1))
+	ret1 := C.g_file_new_tmp(tmpl1, &iostream1, &err1)
+	var iostream2 *FileIOStream
+	var ret2 *File
+	var err2 error
+	iostream2 = (*FileIOStream)(gobject.ObjectWrap(unsafe.Pointer(iostream1), false))
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	if err1 != nil {
+		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		C.g_error_free(err1)
+	}
+	return iostream2, ret2, err2
+}
+func FileParseName(parse_name0 string) *File {
+	var parse_name1 *C.char
+	parse_name1 = _GoStringToGString(parse_name0)
+	defer C.free(unsafe.Pointer(parse_name1))
+	ret1 := C.g_file_parse_name(parse_name1)
+	var ret2 *File
+	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+// blacklisted: icon_deserialize (function)
 // blacklisted: icon_hash (function)
 // blacklisted: icon_new_for_string (function)
 // blacklisted: initable_newv (function)
