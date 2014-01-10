@@ -185,7 +185,7 @@ MOC_DIR = tmp
 HEADERS += plugin.h {{range GetModules}}{{.}}.h {{end}}
 
 
-test.depends = {{PkgName}}/$(TARGET)
+test.depends = lib/$(TARGET)
 test.commands = (qmlscene -I . test.qml)
 QMAKE_EXTRA_TARGETS += test
 `
