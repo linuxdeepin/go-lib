@@ -2,6 +2,7 @@ package glib
 
 /*
 #include "glib.gen.h"
+extern void g_key_file_free(GKeyFile*);
 #cgo pkg-config: glib-2.0
 */
 import "C"
@@ -3973,3 +3974,13 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: variant_type_string_is_valid (function)
 // blacklisted: variant_type_string_scan (function)
 // blacklisted: warn_message (function)
+
+
+
+
+//workaround
+func (this0 *KeyFile) Free() {
+	var this1 *C.GKeyFile
+	this1 = (*C.GKeyFile)(unsafe.Pointer(this0))
+	C.g_key_file_free(this1)
+}
