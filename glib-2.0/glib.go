@@ -3592,11 +3592,22 @@ const Win32MsgHandle = 19981206
 // blacklisted: get_application_name (function)
 // blacklisted: get_charset (function)
 // blacklisted: get_codeset (function)
-// blacklisted: get_current_dir (function)
+func GetCurrentDir() string {
+	ret1 := C.g_get_current_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
 // blacklisted: get_current_time (function)
 // blacklisted: get_environ (function)
 // blacklisted: get_filename_charsets (function)
-// blacklisted: get_home_dir (function)
+func GetHomeDir() string {
+	ret1 := C.g_get_home_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
 // blacklisted: get_host_name (function)
 // blacklisted: get_language_names (function)
 // blacklisted: get_locale_variants (function)
@@ -3605,15 +3616,63 @@ const Win32MsgHandle = 19981206
 // blacklisted: get_prgname (function)
 // blacklisted: get_real_name (function)
 // blacklisted: get_real_time (function)
-// blacklisted: get_system_config_dirs (function)
-// blacklisted: get_system_data_dirs (function)
-// blacklisted: get_tmp_dir (function)
-// blacklisted: get_user_cache_dir (function)
-// blacklisted: get_user_config_dir (function)
-// blacklisted: get_user_data_dir (function)
+func GetSystemConfigDirs() []string {
+	ret1 := C.g_get_system_config_dirs()
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+	}
+	return ret2
+}
+func GetSystemDataDirs() []string {
+	ret1 := C.g_get_system_data_dirs()
+	var ret2 []string
+	ret2 = make([]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+	}
+	return ret2
+}
+func GetTmpDir() string {
+	ret1 := C.g_get_tmp_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func GetUserCacheDir() string {
+	ret1 := C.g_get_user_cache_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func GetUserConfigDir() string {
+	ret1 := C.g_get_user_config_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func GetUserDataDir() string {
+	ret1 := C.g_get_user_data_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
 // blacklisted: get_user_name (function)
-// blacklisted: get_user_runtime_dir (function)
-// blacklisted: get_user_special_dir (function)
+func GetUserRuntimeDir() string {
+	ret1 := C.g_get_user_runtime_dir()
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
+func GetUserSpecialDir(directory0 UserDirectory) string {
+	var directory1 C.GUserDirectory
+	directory1 = C.GUserDirectory(directory0)
+	ret1 := C.g_get_user_special_dir(directory1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	return ret2
+}
 // blacklisted: getenv (function)
 // blacklisted: hash_table_add (function)
 // blacklisted: hash_table_contains (function)
