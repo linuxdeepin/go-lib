@@ -318,7 +318,7 @@ func getQtSignaturesType() (sigs map[string]string) {
 			sigs[sig] = "QStringList"
 		} else if sig == "so" {
 			fmt.Println("Warning: `so` isn't supported")
-			sigs[sig] = "QVriant"
+			sigs[sig] = "QStringList"
 		} else if sig[0] == 'a' {
 			if sig[1] == '(' {
 				sigs[sig] = "QVariantList"

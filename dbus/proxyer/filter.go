@@ -50,6 +50,7 @@ func getGoKeyword() map[string]bool {
 		"int":         true,
 		"uintptr":     true,
 		"string":      true,
+		"class":	true,
 		"bool":        true,
 	}
 }
