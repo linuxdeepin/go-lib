@@ -83,6 +83,9 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 		argKeyword := keyword()
 		for j := 0; j < len(info.Methods[i].Args); j++ {
 			name := &info.Methods[i].Args[j].Name
+			if info.Methods[i].Args[j].Direction == "" {
+				info.Methods[i].Args[j].Direction = "in"
+			}
 			if len(*name) == 0 {
 				*name = "arg" + strconv.Itoa(j)
 			}
@@ -102,6 +105,9 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 
 		argKeyword := keyword()
 		for j, _ := range info.Signals[i].Args {
+			if info.Signals[i].Args[j].Direction == "" {
+				info.Signals[i].Args[j].Direction = "out"
+			}
 			name := &info.Signals[i].Args[j].Name
 			if len(*name) == 0 {
 				*name = "arg" + strconv.Itoa(j)

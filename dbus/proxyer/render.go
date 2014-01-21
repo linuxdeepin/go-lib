@@ -70,7 +70,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"GetOuts": func(args []dbus.ArgInfo) []dbus.ArgInfo {
 			ret := make([]dbus.ArgInfo, 0)
 			for _, a := range args {
-				if a.Direction != "out" {
+				if a.Direction == "in" {
 					ret = append(ret, a)
 				}
 			}
@@ -95,7 +95,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		},
 		"GetParamterNames": func(args []dbus.ArgInfo) (ret string) {
 			for _, arg := range args {
-				if arg.Direction != "out" {
+				if arg.Direction == "in" {
 					ret += ", "
 					ret += arg.Name
 				}
@@ -105,7 +105,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"GetParamterOuts": func(args []dbus.ArgInfo) (ret string) {
 			var notFirst = false
 			for _, arg := range args {
-				if arg.Direction != "in" {
+				if arg.Direction == "out" {
 					if notFirst {
 						ret += ","
 					}
@@ -118,7 +118,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"GetParamterOutsProto": func(args []dbus.ArgInfo) (ret string) {
 			var notFirst = false
 			for _, arg := range args {
-				if arg.Direction != "in" {
+				if arg.Direction == "out" {
 					if notFirst {
 						ret += ","
 					}
@@ -131,7 +131,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 		"GetParamterInsProto": func(args []dbus.ArgInfo) (ret string) {
 			var notFirst = false
 			for _, arg := range args {
-				if arg.Direction != "out" {
+				if arg.Direction == "in" {
 					if notFirst {
 						ret += ","
 					}
