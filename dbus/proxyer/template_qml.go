@@ -305,6 +305,7 @@ var sigToQtType = map[string]string{
 	"g": "QDBusVariant",
 	"o": "QDBusObjectPath",
 	"v": "QDBusSignature",
+	"h": "uint",
 }
 
 func getQtSignaturesType() (sigs map[string]string) {
@@ -315,6 +316,9 @@ func getQtSignaturesType() (sigs map[string]string) {
 			sigs[sig] = v
 		} else if sig == "as" {
 			sigs[sig] = "QStringList"
+		} else if sig == "so" {
+			fmt.Println("Warning: `so` isn't supported")
+			sigs[sig] = "QVriant"
 		} else if sig[0] == 'a' {
 			if sig[1] == '(' {
 				sigs[sig] = "QVariantList"
@@ -332,7 +336,7 @@ func getQtSignaturesType() (sigs map[string]string) {
 		} else if sig[0] == '(' {
 			sigs[sig] = "QVariantList"
 		} else {
-			panic("parse signature failed:" + sig)
+			panic(fmt.Sprintf("parse signature failed:%q\n", sig))
 		}
 	}
 	for _, ifc := range INFOS.Interfaces {
