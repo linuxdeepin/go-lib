@@ -9,7 +9,7 @@ import (
 )
 
 func sessionBusPlatform() (*Conn, error) {
-	cmd := exec.Command("dbus-launch")
+	cmd := exec.Command("/usr/bin/dbus-launch")
 	b, err := cmd.CombinedOutput()
 
 	if err != nil {
