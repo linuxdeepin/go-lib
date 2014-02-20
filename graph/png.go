@@ -19,32 +19,56 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  **/
 
-package image
+package graph
 
 import (
 	_image "image"
+	"image/draw"
 	_ "image/jpeg"
-	_ "image/png"
+	"image/png"
 	"os"
 )
 
-func GetImageSize(imageFile string) (w, h int32, err error) {
-	// open the image file
-	fr, err := os.Open(imageFile)
+// Converts from any recognized format to PNG.
+func ConvertToPNG(src, dest string) (err error) {
+	sf, err := os.Open(src)
 	if err != nil {
-		// logError(err.Error()) // TODO
 		return
 	}
-	defer fr.Close()
-
-	img, _, err := _image.Decode(fr)
+	defer sf.Close()
+	df, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
-		// image format not support
-		// logError(err.Error()) // TODO
+		return
+	}
+	defer df.Close()
+
+	img, _, err := _image.Decode(sf)
+	if err != nil {
+		return
+	}
+	return png.Encode(df, img)
+}
+
+// Clip any recognized format image and save to PNG.
+func ClipPNG(src, dest string, x0, y0, x1, y1 int32) (err error) {
+	sf, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer sf.Close()
+
+	df, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return
+	}
+	defer df.Close()
+
+	imgSrc, _, err := _image.Decode(sf)
+	if err != nil {
 		return
 	}
 
-	w = int32(img.Bounds().Max.X)
-	h = int32(img.Bounds().Max.Y)
-	return
+	imgDest := _image.NewRGBA(_image.Rect(int(x0), int(y0), int(x1), int(y1)))
+	draw.Draw(imgDest, imgDest.Bounds(), imgSrc, _image.Point{0, 0}, draw.Src)
+	return png.Encode(df, imgDest)
 }
