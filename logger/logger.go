@@ -16,68 +16,74 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
  **/
 
 package logger
 
 import (
-	"dlib/dbus"
+	logapi "dbus/com/deepin/api/logger"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 )
 
 const (
-	_DEST = "com.deepin.api.Logger"
 	_PATH = "/com/deepin/api/Logger"
 )
 
-var __conn *dbus.Conn = nil
+var _LOGAPI *logapi.Logger
 
-func getBus() *dbus.Conn {
-	if __conn == nil {
-		var err error
-		__conn, err = dbus.SystemBus()
-		if err != nil {
-			panic(err)
-		}
-	}
-	return __conn
+type Logger struct {
+	name string
+	id   uint64
 }
 
-// TODO
-func getBusObject() {
+func initLogApi() (err error) {
+	if _LOGAPI == nil {
+		_LOGAPI, err = logapi.NewLogger(_PATH)
+	}
+	return
 }
 
-// TODO remove
-func NewImage(path dbus.ObjectPath) (*Image, error) {
-	if !path.IsValid() {
-		return nil, errors.New("The path of '" + string(path) + "' is invalid.")
+func DestroyLogger(obj *Logger) {
+	Println("DestroyLogger")
+	_LOGAPI.DeleteLogger(obj.id)
+}
+
+func New(name string) (logger *Logger, err error) {
+	err = initLogApi()
+	if err != nil {
+		return
 	}
 
-	core := getBus().Object("com.deepin.api.Image", path)
-	var v string
-	core.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&v)
-	if strings.Index(v, "com.deepin.api.Image") == -1 {
-		return nil, errors.New("'" + string(path) + "' hasn't interface 'com.deepin.api.Image'.")
+	logger = &Logger{name: name}
+	logger.id, err = _LOGAPI.NewLogger(name)
+	if err != nil {
+		return
 	}
 
-	obj := &Image{Path: path, core: core}
+	// TODO fix
+	// runtime.SetFinalizer(logger, DestroyLogger)
+	runtime.SetFinalizer(logger, func(obj *Logger) { DestroyLogger(obj) })
 
-	return obj, nil
+	return
+}
+
+func buildMsg(calldepth int, format string, v ...interface{}) string {
+	s := fmt.Sprintf(format, v...)
+	_, file, line, _ := runtime.Caller(calldepth)
+	return fmt.Sprintf("%s:%d : %s", file, line, s)
 }
 
 func Println(v ...interface{}) {
 	r := fmt.Sprintln(v...)
-	_, file, line, _ := runtime.Caller(1)
-	log.Printf("%s:%d :%s", file, line, r)
+	log.Printf(buildMsg(2, r))
 }
 
 func Printf(format string, v ...interface{}) {
 	r := fmt.Sprintf(format, v...)
-	_, file, line, _ := runtime.Caller(1)
-	log.Printf("%s:%d :%s", file, line, r)
+	log.Printf(buildMsg(2, r))
 }
 
 func Assert(exp bool, v ...interface{}) {
@@ -85,6 +91,45 @@ func Assert(exp bool, v ...interface{}) {
 		panic(fmt.Sprintln(v...))
 	}
 }
+
 func AssertNotReached() {
 	panic("Shouldn't reached")
+}
+
+func (logger *Logger) Debug(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Debug(logger.id, s)
+	log.Println("[DEBUG] " + s)
+}
+
+func (logger *Logger) Info(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Info(logger.id, s)
+	log.Println("[INFO] " + s)
+}
+
+func (logger *Logger) Warning(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Warning(logger.id, s)
+	log.Println("[WARNING] " + s)
+}
+
+func (logger *Logger) Error(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Error(logger.id, s)
+	log.Println("[ERROR] " + s)
+}
+
+func (logger *Logger) Panic(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Error(logger.id, s)
+	log.Println("[PANIC] " + s)
+	panic(s)
+}
+
+func (logger *Logger) Fatal(format string, v ...interface{}) {
+	s := buildMsg(2, format, v...)
+	_LOGAPI.Fatal(logger.id, s)
+	log.Println("[FATAL] " + s)
+	os.Exit(1)
 }
