@@ -21,7 +21,6 @@
 package logger
 
 import (
-	logapi "dbus/com/deepin/api/logger"
 	"fmt"
 	"log"
 	"os"
@@ -32,7 +31,7 @@ const (
 	_PATH = "/com/deepin/api/Logger"
 )
 
-var _LOGAPI *logapi.Logger
+var _LOGAPI *Logapi
 
 type Logger struct {
 	name string
@@ -41,7 +40,7 @@ type Logger struct {
 
 func initLogApi() (err error) {
 	if _LOGAPI == nil {
-		_LOGAPI, err = logapi.NewLogger(_PATH)
+		_LOGAPI, err = NewLogapi(_PATH)
 	}
 	return
 }
