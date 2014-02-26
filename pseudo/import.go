@@ -7,10 +7,10 @@ import "dlib/gobject-2.0"
 import "dlib/gio-2.0"
 import "dlib/glib-2.0"
 import "dlib/logger"
-import "dlib/graph"
+import "dlib/graphic"
 
 func nothing() {
-	_ = graph.ClipPNG
+	_ = graphic.ClipPNG
 	_ = logger.Println
 	_ = property.NewGSettingsBoolProperty
 	_ = gio.DBusConnectionFlagsAuthenticationClient
