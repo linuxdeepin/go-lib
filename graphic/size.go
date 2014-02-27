@@ -22,7 +22,7 @@
 package graphic
 
 import (
-	_image "image"
+	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
@@ -37,7 +37,7 @@ func GetImageSize(imageFile string) (w, h int32, err error) {
 	}
 	defer fr.Close()
 
-	img, _, err := _image.Decode(fr)
+	img, _, err := image.Decode(fr)
 	if err != nil {
 		// image format not support
 		// logError(err.Error()) // TODO

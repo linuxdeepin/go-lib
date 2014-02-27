@@ -22,7 +22,7 @@
 package graphic
 
 import (
-	_image "image"
+	"image"
 	"image/draw"
 	_ "image/jpeg"
 	"image/png"
@@ -42,7 +42,7 @@ func ConvertToPNG(src, dest string) (err error) {
 	}
 	defer df.Close()
 
-	img, _, err := _image.Decode(sf)
+	img, _, err := image.Decode(sf)
 	if err != nil {
 		return
 	}
@@ -63,12 +63,12 @@ func ClipPNG(src, dest string, x0, y0, x1, y1 int32) (err error) {
 	}
 	defer df.Close()
 
-	imgSrc, _, err := _image.Decode(sf)
+	imgSrc, _, err := image.Decode(sf)
 	if err != nil {
 		return
 	}
 
-	imgDest := _image.NewRGBA(_image.Rect(int(x0), int(y0), int(x1), int(y1)))
-	draw.Draw(imgDest, imgDest.Bounds(), imgSrc, _image.Point{0, 0}, draw.Src)
+	imgDest := image.NewRGBA(image.Rect(int(x0), int(y0), int(x1), int(y1)))
+	draw.Draw(imgDest, imgDest.Bounds(), imgSrc, image.Point{0, 0}, draw.Src)
 	return png.Encode(df, imgDest)
 }

@@ -22,7 +22,7 @@
 package graphic
 
 import (
-	_image "image"
+	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"log"
@@ -40,7 +40,7 @@ func GetDominantColorOfImage(imagePath string) (h, s, v float64) {
 	}
 	defer fr.Close()
 
-	img, _, err := _image.Decode(fr)
+	img, _, err := image.Decode(fr)
 	if err != nil {
 		log.Printf(err.Error()) // TODO
 		return def_h, def_s, def_v
