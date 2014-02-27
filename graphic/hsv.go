@@ -25,6 +25,7 @@ import (
 	"math"
 )
 
+// RGB2HSV convert color format from RGB(r, g, b=[0..255]) to HSV(h=[0..360), s,v=[0..1]).
 func RGB2HSV(r, g, b uint8) (h, s, v float64) {
 	fr := float64(r) / 255
 	fg := float64(g) / 255
@@ -60,6 +61,7 @@ func RGB2HSV(r, g, b uint8) (h, s, v float64) {
 	return
 }
 
+// HSV2RGB convert color format from HSV(h=[0..360), s,v=[0..1]) to RGB(r, g, b=[0..255]).
 func HSV2RGB(h, s, v float64) (r, g, b uint8) {
 	var fr, fg, fb float64
 	hi := int(math.Floor(h/60)) % 6

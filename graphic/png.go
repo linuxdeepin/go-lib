@@ -29,7 +29,7 @@ import (
 	"os"
 )
 
-// Converts from any recognized format to PNG.
+// ConvertToPNG converts from any recognized format to PNG.
 func ConvertToPNG(src, dest string) (err error) {
 	sf, err := os.Open(src)
 	if err != nil {
@@ -49,7 +49,7 @@ func ConvertToPNG(src, dest string) (err error) {
 	return png.Encode(df, img)
 }
 
-// Clip any recognized format image and save to PNG.
+// ClipPNG clip any recognized format image and save to PNG.
 func ClipPNG(src, dest string, x0, y0, x1, y1 int32) (err error) {
 	sf, err := os.Open(src)
 	if err != nil {

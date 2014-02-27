@@ -29,46 +29,47 @@ import (
 	"os"
 )
 
+// GetDominantColorOfImage return the dominant hsv color of a image.
 func GetDominantColorOfImage(imagePath string) (h, s, v float64) {
-	var def_h, def_s, def_v float64 = 200, 0.5, 0.8 // default hsv
+	var defH, defS, defV float64 = 200, 0.5, 0.8 // default hsv
 
 	// open the image file
 	fr, err := os.Open(imagePath)
 	if err != nil {
 		log.Printf(err.Error()) // TODO
-		return def_h, def_s, def_v
+		return defH, defS, defV
 	}
 	defer fr.Close()
 
 	img, _, err := image.Decode(fr)
 	if err != nil {
 		log.Printf(err.Error()) // TODO
-		return def_h, def_s, def_v
+		return defH, defS, defV
 	}
 
 	// loop all points in image
-	var sum_r, sum_g, sum_b, count uint64
+	var sumR, sumG, sumB, count uint64
 	mx := img.Bounds().Max.X
 	my := img.Bounds().Max.Y
 	count = uint64(mx * my)
 	if count == 0 {
-		return def_h, def_s, def_v
+		return defH, defS, defV
 	}
 	if mx == 0 && my == 0 {
-		return def_h, def_s, def_v
+		return defH, defS, defV
 	}
 	for x := 1; x <= mx; x++ {
 		for y := 1; y <= my; y++ {
 			c := img.At(x, y)
 			rr, gg, bb, _ := c.RGBA()
 			r, g, b := rr>>8, gg>>8, bb>>8
-			sum_r += uint64(r)
-			sum_g += uint64(g)
-			sum_b += uint64(b)
+			sumR += uint64(r)
+			sumG += uint64(g)
+			sumB += uint64(b)
 		}
 	}
 
-	h, s, v = RGB2HSV(uint8(sum_r/count), uint8(sum_g/count), uint8(sum_b/count))
+	h, s, v = RGB2HSV(uint8(sumR/count), uint8(sumG/count), uint8(sumB/count))
 	log.Printf("h=%f, s=%f, v=%f", h, s, v) // TODO
 	return
 }
