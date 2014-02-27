@@ -27,37 +27,37 @@ import (
 	"runtime"
 )
 
-const (
-	_PATH = "/com/deepin/api/Logger"
-)
+var logapi *Logapi
 
-var _LOGAPI *Logapi
-
+// Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
 	name string
 	id   uint64
 }
 
-func initLogApi() (err error) {
-	if _LOGAPI == nil {
-		_LOGAPI, err = NewLogapi(_PATH)
+func initLogapi() (err error) {
+	if logapi == nil {
+		logapi, err = NewLogapi("/com/deepin/api/Logger")
 	}
 	return
 }
 
+// DestroyLogger TODO[remove]
 func DestroyLogger(obj *Logger) {
 	Println("DestroyLogger")
-	_LOGAPI.DeleteLogger(obj.id)
+	logapi.DeleteLogger(obj.id)
 }
 
+// New create a new Logger object, it need a string as name to
+// register Logger dbus service.
 func New(name string) (logger *Logger, err error) {
-	err = initLogApi()
+	err = initLogapi()
 	if err != nil {
 		return
 	}
 
 	logger = &Logger{name: name}
-	logger.id, err = _LOGAPI.NewLogger(name)
+	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
 		return
 	}
@@ -75,60 +75,73 @@ func buildMsg(calldepth int, format string, v ...interface{}) string {
 	return fmt.Sprintf("%s:%d : %s", file, line, s)
 }
 
+// Println print message to console directly.
 func Println(v ...interface{}) {
 	r := fmt.Sprintln(v...)
 	log.Printf(buildMsg(2, r))
 }
 
+// Printf print message to console directly.
+// Arguments are handled in the manner of fmt.Printf.
 func Printf(format string, v ...interface{}) {
 	r := fmt.Sprintf(format, v...)
 	log.Printf(buildMsg(2, r))
 }
 
+// Assert will check if a expression is true, or will call panic().
+// Arguments are handled in the manner of fmt.Sprintln.
 func Assert(exp bool, v ...interface{}) {
 	if exp == false {
 		panic(fmt.Sprintln(v...))
 	}
 }
 
+// AssertNotReached is a helper function which just call panic().
 func AssertNotReached() {
 	panic("Shouldn't reached")
 }
 
+// Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Debug(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Debug(logger.id, s)
+	logapi.Debug(logger.id, s)
 	log.Println("[DEBUG] " + s)
 }
 
+// Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Info(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Info(logger.id, s)
+	logapi.Info(logger.id, s)
 	log.Println("[INFO] " + s)
 }
 
+// Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Warning(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Warning(logger.id, s)
+	logapi.Warning(logger.id, s)
 	log.Println("[WARNING] " + s)
 }
 
+// Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Error(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Error(logger.id, s)
+	logapi.Error(logger.id, s)
 	log.Println("[ERROR] " + s)
 }
 
+// Panic is equivalent to Error() followed by a call to panic().
 func (logger *Logger) Panic(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Error(logger.id, s)
+	logapi.Error(logger.id, s)
 	log.Println("[PANIC] " + s)
 	panic(s)
 }
 
+// Fatal send a log message with 'FATAL' as prefix to Logger dbus service
+// and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
 	s := buildMsg(2, format, v...)
-	_LOGAPI.Fatal(logger.id, s)
+	logapi.Fatal(logger.id, s)
 	log.Println("[FATAL] " + s)
 	os.Exit(1)
 }
