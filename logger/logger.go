@@ -22,17 +22,28 @@ package logger
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 )
 
 var logapi *Logapi
 
+// Definition of log levels, the larger of the value, the higher of
+// the priority.
+const (
+	LEVEL_DEBUG int = iota
+	LEVEL_INFO
+	LEVEL_WARNING
+	LEVEL_ERROR
+	LEVEL_PANIC
+	LEVEL_FATAL
+)
+
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
-	name string
-	id   uint64
+	name  string
+	id    uint64
+	level int
 }
 
 func initLogapi() (err error) {
@@ -42,29 +53,19 @@ func initLogapi() (err error) {
 	return
 }
 
-// DestroyLogger TODO[remove]
-func DestroyLogger(obj *Logger) {
-	Println("DestroyLogger")
-	logapi.DeleteLogger(obj.id)
-}
-
 // New create a new Logger object, it need a string as name to
-// register Logger dbus service.
+// register Logger dbus service, default log level is LEVEL_INFO.
 func New(name string) (logger *Logger, err error) {
 	err = initLogapi()
 	if err != nil {
 		return
 	}
 
-	logger = &Logger{name: name}
+	logger = &Logger{name: name, level: LEVEL_INFO}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
 		return
 	}
-
-	// TODO fix
-	// runtime.SetFinalizer(logger, DestroyLogger)
-	runtime.SetFinalizer(logger, func(obj *Logger) { DestroyLogger(obj) })
 
 	return
 }
@@ -78,14 +79,14 @@ func buildMsg(calldepth int, format string, v ...interface{}) string {
 // Println print message to console directly.
 func Println(v ...interface{}) {
 	r := fmt.Sprintln(v...)
-	log.Printf(buildMsg(2, r))
+	fmt.Printf(buildMsg(2, r))
 }
 
 // Printf print message to console directly.
 // Arguments are handled in the manner of fmt.Printf.
 func Printf(format string, v ...interface{}) {
 	r := fmt.Sprintf(format, v...)
-	log.Printf(buildMsg(2, r))
+	fmt.Printf(buildMsg(2, r))
 }
 
 // Assert will check if a expression is true, or will call panic().
@@ -101,47 +102,69 @@ func AssertNotReached() {
 	panic("Shouldn't reached")
 }
 
+// SetLogLevel will reset the log level.
+func (logger *Logger) SetLogLevel(level int) {
+	logger.level = level
+}
+
+func (logger *Logger) doLog(level int, format string, v ...interface{}) {
+	if level >= logger.level {
+		return
+	}
+
+	s := buildMsg(2, format, v...)
+	switch level {
+	case LEVEL_DEBUG:
+		logapi.Debug(logger.id, s)
+		fmt.Println("[DEBUG] " + s)
+	case LEVEL_INFO:
+		logapi.Info(logger.id, s)
+		fmt.Println("[INFO] " + s)
+	case LEVEL_WARNING:
+		logapi.Warning(logger.id, s)
+		fmt.Println("[WARNING] " + s)
+	case LEVEL_ERROR:
+		logapi.Error(logger.id, s)
+		fmt.Println("[ERROR] " + s)
+	case LEVEL_PANIC:
+		logapi.Error(logger.id, s)
+		fmt.Println("[PANIC] " + s)
+	case LEVEL_FATAL:
+		logapi.Fatal(logger.id, s)
+		fmt.Println("[FATAL] " + s)
+	}
+}
+
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Debug(format string, v ...interface{}) {
-	s := buildMsg(2, format, v...)
-	logapi.Debug(logger.id, s)
-	log.Println("[DEBUG] " + s)
+	logger.doLog(LEVEL_DEBUG, format, v...)
 }
 
 // Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Info(format string, v ...interface{}) {
-	s := buildMsg(2, format, v...)
-	logapi.Info(logger.id, s)
-	log.Println("[INFO] " + s)
+	logger.doLog(LEVEL_INFO, format, v...)
 }
 
 // Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Warning(format string, v ...interface{}) {
-	s := buildMsg(2, format, v...)
-	logapi.Warning(logger.id, s)
-	log.Println("[WARNING] " + s)
+	logger.doLog(LEVEL_WARNING, format, v...)
 }
 
 // Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Error(format string, v ...interface{}) {
-	s := buildMsg(2, format, v...)
-	logapi.Error(logger.id, s)
-	log.Println("[ERROR] " + s)
+	logger.doLog(LEVEL_ERROR, format, v...)
 }
 
 // Panic is equivalent to Error() followed by a call to panic().
 func (logger *Logger) Panic(format string, v ...interface{}) {
+	logger.doLog(LEVEL_PANIC, format, v...)
 	s := buildMsg(2, format, v...)
-	logapi.Error(logger.id, s)
-	log.Println("[PANIC] " + s)
 	panic(s)
 }
 
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
-	s := buildMsg(2, format, v...)
-	logapi.Fatal(logger.id, s)
-	log.Println("[FATAL] " + s)
+	logger.doLog(LEVEL_FATAL, format, v...)
 	os.Exit(1)
 }
