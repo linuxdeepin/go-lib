@@ -26,7 +26,7 @@ import (
 	"runtime"
 )
 
-var logapi *Logapi
+const defaultDebugEnv = "DDE_DEBUG"
 
 // Definition of log levels, the larger of the value, the higher of
 // the priority.
@@ -37,6 +37,14 @@ const (
 	LEVEL_ERROR
 	LEVEL_PANIC
 	LEVEL_FATAL
+)
+
+var (
+	logapi *Logapi
+
+	// DebugEnv is the name of environment variable that if exists the
+	// default log level will be LEVEL_DEBUG.
+	DebugEnv = defaultDebugEnv
 )
 
 // Logger is a wrapper object to access Logger dbus service.
@@ -53,10 +61,22 @@ func initLogapi() (err error) {
 	return
 }
 
-// New create a new Logger object, it need a string as name to
-// register Logger dbus service, default log level is LEVEL_INFO.
+func isEnvExists(name string) bool {
+	value := os.Getenv(name)
+	return len(value) != 0
+}
+
+// New create a Logger object, it need a string as name to register
+// Logger dbus service, if the environment variable which name stores
+// in variable "DebugEnvexist", the default log level will be "LEVEL_DEBUG" or is "LEVEL_INFO".
 func New(name string) (logger *Logger, err error) {
-	logger = &Logger{name: name, level: LEVEL_INFO}
+	logger = &Logger{name: name}
+	if isEnvExists(DebugEnv) {
+		logger.level = LEVEL_DEBUG
+	} else {
+		logger.level = LEVEL_INFO
+	}
+
 	err = initLogapi()
 	if err != nil {
 		return
