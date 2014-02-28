@@ -110,7 +110,7 @@ func (logger *Logger) doLog(level int, format string, v ...interface{}) {
 		return
 	}
 
-	s := buildMsg(2, format, v...)
+	s := buildMsg(3, format, v...)
 	switch level {
 	case LEVEL_DEBUG:
 		if logapi != nil {
