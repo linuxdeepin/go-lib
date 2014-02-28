@@ -10,18 +10,17 @@ func Test(t *testing.T) { TestingT(t) }
 var logger *Logger
 
 func init() {
-	// logger = &Logger{}
 	var err error
 	logger, err = New("logger_test")
 	if err == nil {
-		// run test only new logger success
+		// run test only create logger successful
 		Suite(logger)
 	}
 }
 
 func (logger *Logger) TestFunc(c *C) {
 	Println("test println")
-	Printf("test printf: %s", "test")
+	Printf("test printf: %s\n", "test")
 	logger.Debug("test debug")
 	logger.Info("test info")
 	logger.Warning("test warning")

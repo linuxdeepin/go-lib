@@ -56,24 +56,22 @@ func initLogapi() (err error) {
 // New create a new Logger object, it need a string as name to
 // register Logger dbus service, default log level is LEVEL_INFO.
 func New(name string) (logger *Logger, err error) {
+	logger = &Logger{name: name, level: LEVEL_INFO}
 	err = initLogapi()
 	if err != nil {
 		return
 	}
-
-	logger = &Logger{name: name, level: LEVEL_INFO}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
 		return
 	}
-
 	return
 }
 
 func buildMsg(calldepth int, format string, v ...interface{}) string {
 	s := fmt.Sprintf(format, v...)
 	_, file, line, _ := runtime.Caller(calldepth)
-	return fmt.Sprintf("%s:%d : %s", file, line, s)
+	return fmt.Sprintf("%s:%d: %s", file, line, s)
 }
 
 // Println print message to console directly.
@@ -108,29 +106,41 @@ func (logger *Logger) SetLogLevel(level int) {
 }
 
 func (logger *Logger) doLog(level int, format string, v ...interface{}) {
-	if level >= logger.level {
+	if level < logger.level {
 		return
 	}
 
 	s := buildMsg(2, format, v...)
 	switch level {
 	case LEVEL_DEBUG:
-		logapi.Debug(logger.id, s)
+		if logapi != nil {
+			logapi.Debug(logger.id, s)
+		}
 		fmt.Println("[DEBUG] " + s)
 	case LEVEL_INFO:
-		logapi.Info(logger.id, s)
+		if logapi != nil {
+			logapi.Info(logger.id, s)
+		}
 		fmt.Println("[INFO] " + s)
 	case LEVEL_WARNING:
-		logapi.Warning(logger.id, s)
+		if logapi != nil {
+			logapi.Warning(logger.id, s)
+		}
 		fmt.Println("[WARNING] " + s)
 	case LEVEL_ERROR:
-		logapi.Error(logger.id, s)
+		if logapi != nil {
+			logapi.Error(logger.id, s)
+		}
 		fmt.Println("[ERROR] " + s)
 	case LEVEL_PANIC:
-		logapi.Error(logger.id, s)
+		if logapi != nil {
+			logapi.Error(logger.id, s)
+		}
 		fmt.Println("[PANIC] " + s)
 	case LEVEL_FATAL:
-		logapi.Fatal(logger.id, s)
+		if logapi != nil {
+			logapi.Fatal(logger.id, s)
+		}
 		fmt.Println("[FATAL] " + s)
 	}
 }
