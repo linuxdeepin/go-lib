@@ -23,15 +23,18 @@ package logger
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
 const defaultDebugEnv = "DDE_DEBUG"
 
+type Priority int
+
 // Definition of log levels, the larger of the value, the higher of
 // the priority.
 const (
-	LEVEL_DEBUG int = iota
+	LEVEL_DEBUG Priority = iota
 	LEVEL_INFO
 	LEVEL_WARNING
 	LEVEL_ERROR
@@ -42,17 +45,11 @@ const (
 var (
 	logapi *Logapi
 
-	// DebugEnv is the name of environment variable that if exists the
-	// default log level will be LEVEL_DEBUG.
+	// DebugEnv is the name of environment variable to control the
+	// default log level, if exists the default log level will be
+	// "LEVEL_DEBUG".
 	DebugEnv = defaultDebugEnv
 )
-
-// Logger is a wrapper object to access Logger dbus service.
-type Logger struct {
-	name  string
-	id    uint64
-	level int
-}
 
 func initLogapi() (err error) {
 	if logapi == nil {
@@ -61,31 +58,24 @@ func initLogapi() (err error) {
 	return
 }
 
-func isEnvExists(name string) bool {
-	value := os.Getenv(name)
-	return len(value) != 0
+// ProcessInfo store the process information which will be
+// used to restart if application fataled.
+type ProcessInfo struct {
+	uid     int32    // Real user ID
+	dir     string   // Working directory
+	environ []string // Environment variables
+	exefile string   // Program file
+	args    []string // Command-line arguments
 }
 
-// New create a Logger object, it need a string as name to register
-// Logger dbus service, if the environment variable which name stores
-// in variable "DebugEnvexist", the default log level will be "LEVEL_DEBUG" or is "LEVEL_INFO".
-func New(name string) (logger *Logger, err error) {
-	logger = &Logger{name: name}
-	if isEnvExists(DebugEnv) {
-		logger.level = LEVEL_DEBUG
-	} else {
-		logger.level = LEVEL_INFO
-	}
-
-	err = initLogapi()
-	if err != nil {
-		return
-	}
-	logger.id, err = logapi.NewLogger(name)
-	if err != nil {
-		return
-	}
-	return
+func getProcessInfo() *ProcessInfo {
+	processInfo := &ProcessInfo{}
+	processInfo.uid = int32(os.Getuid())
+	processInfo.dir, _ = os.Getwd()
+	processInfo.exefile, _ = filepath.Abs(os.Args[0])
+	processInfo.args = os.Args[1:]
+	processInfo.environ = os.Environ()
+	return processInfo
 }
 
 func buildMsg(calldepth int, format string, v ...interface{}) string {
@@ -120,12 +110,52 @@ func AssertNotReached() {
 	panic("Shouldn't reached")
 }
 
-// SetLogLevel will reset the log level.
-func (logger *Logger) SetLogLevel(level int) {
+// Logger is a wrapper object to access Logger dbus service.
+type Logger struct {
+	name        string
+	id          uint64
+	level       Priority
+	processInfo *ProcessInfo
+}
+
+// NewLogger create a Logger object, it need a string as name to register
+// Logger dbus service, if the environment variable exists which name
+// stores in variable "DebugEnv", the default log level will be
+// "LEVEL_DEBUG" or is "LEVEL_INFO".
+func NewLogger(name string) (logger *Logger, err error) {
+	logger = &Logger{name: name}
+	if isEnvExists(DebugEnv) {
+		logger.level = LEVEL_DEBUG
+	} else {
+		logger.level = LEVEL_INFO
+	}
+	logger.processInfo = getProcessInfo()
+
+	err = initLogapi()
+	if err != nil {
+		return
+	}
+	logger.id, err = logapi.NewLogger(name)
+	if err != nil {
+		return
+	}
+	return
+}
+
+// SetLogLevel reset the log level.
+func (logger *Logger) SetLogLevel(level Priority) {
 	logger.level = level
 }
 
-func (logger *Logger) doLog(level int, format string, v ...interface{}) {
+// AddExtArgForRestart set the command option which be used when
+// process fataled and restart by Logger dbus service.
+func (logger *Logger) AddExtArgForRestart(arg string) {
+	if !stringInSlice(arg, logger.processInfo.args) {
+		logger.processInfo.args = append(logger.processInfo.args, arg)
+	}
+}
+
+func (logger *Logger) doLog(level Priority, format string, v ...interface{}) {
 	if level < logger.level {
 		return
 	}
@@ -196,5 +226,7 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
 	logger.doLog(LEVEL_FATAL, format, v...)
+	logapi.NotifyRestart(logger.id, logger.processInfo.uid, logger.processInfo.dir,
+		logger.processInfo.environ, logger.processInfo.exefile, logger.processInfo.args)
 	os.Exit(1)
 }
