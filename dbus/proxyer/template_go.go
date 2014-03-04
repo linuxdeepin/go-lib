@@ -20,6 +20,7 @@ var __IFC_TEMPLATE_INIT_GoLang = `/*This file is auto generate by dlib/dbus/prox
 package {{PkgName}}
 import "dlib/dbus"
 import "dlib/dbus/property"
+import "dlib/logger"
 import "reflect"
 import "sync"
 import "runtime"
@@ -27,6 +28,7 @@ import "fmt"
 import "errors"
 import "strings"
 /*prevent compile error*/
+var _ = logger.NewLogger
 var _ = runtime.SetFinalizer
 var _ = sync.NewCond
 var _ = reflect.TypeOf
