@@ -172,6 +172,12 @@ func (conn *Conn) BusObject() *Object {
 	return conn.busObj
 }
 
+var quit = make(chan error)
+
+func Wait() error {
+	return <-quit
+}
+
 // Close closes the connection. Any blocked operations will return with errors
 // and the channels passed to Eavesdrop and Signal are closed. This method must
 // not be called on shared connections.
@@ -190,7 +196,9 @@ func (conn *Conn) Close() error {
 		close(conn.eavesdropped)
 	}
 	conn.eavesdroppedLck.Unlock()
-	return conn.transport.Close()
+	e := conn.transport.Close()
+	quit <- e
+	return e
 }
 
 // Eavesdrop causes conn to send all incoming messages to the given channel
