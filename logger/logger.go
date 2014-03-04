@@ -84,32 +84,6 @@ func buildMsg(calldepth int, format string, v ...interface{}) string {
 	return fmt.Sprintf("%s:%d: %s", file, line, s)
 }
 
-// Println print message to console directly.
-func Println(v ...interface{}) {
-	r := fmt.Sprintln(v...)
-	fmt.Printf(buildMsg(2, r))
-}
-
-// Printf print message to console directly.
-// Arguments are handled in the manner of fmt.Printf.
-func Printf(format string, v ...interface{}) {
-	r := fmt.Sprintf(format, v...)
-	fmt.Printf(buildMsg(2, r))
-}
-
-// Assert will check if a expression is true, or will call panic().
-// Arguments are handled in the manner of fmt.Sprintln.
-func Assert(exp bool, v ...interface{}) {
-	if exp == false {
-		panic(fmt.Sprintln(v...))
-	}
-}
-
-// AssertNotReached is a helper function which just call panic().
-func AssertNotReached() {
-	panic("Shouldn't reached")
-}
-
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
 	name        string
@@ -133,11 +107,11 @@ func NewLogger(name string) (logger *Logger) {
 
 	err := initLogapi()
 	if err != nil {
-		Println("init logger dbus api failed: %v", err)
+		fmt.Println("init logger dbus api failed: %v", err)
 	}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
-		Println("create logger api object failed: %v", err)
+		fmt.Println("create logger api object failed: %v", err)
 	}
 	return
 }

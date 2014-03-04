@@ -16,8 +16,6 @@ func init() {
 }
 
 func (logger *Logger) TestFunc(c *C) {
-	Println("test println")
-	Printf("test printf: %s\n", "test")
 	logger.Debug("test debug")
 	logger.Info("test info")
 	logger.Warning("test warning: %v", fmt.Errorf("error message"))

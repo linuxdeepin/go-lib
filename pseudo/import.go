@@ -11,7 +11,7 @@ import "dlib/graphic"
 
 func nothing() {
 	_ = graphic.ClipPNG
-	_ = logger.Println
+	_ = logger.NewLogger
 	_ = property.NewGSettingsBoolProperty
 	_ = gio.DBusConnectionFlagsAuthenticationClient
 	_ = glib.CanInline

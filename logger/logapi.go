@@ -8,6 +8,7 @@ import "sync"
 import "runtime"
 import "errors"
 import "strings"
+import "fmt"
 
 /*prevent compile error*/
 var _ = runtime.SetFinalizer
@@ -36,7 +37,7 @@ type Logapi struct {
 func (obj Logapi) Debug(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Debug", 0, arg0, arg1).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -44,7 +45,7 @@ func (obj Logapi) Debug(arg0 uint64, arg1 string) (_err error) {
 func (obj Logapi) Error(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Error", 0, arg0, arg1).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -52,7 +53,7 @@ func (obj Logapi) Error(arg0 uint64, arg1 string) (_err error) {
 func (obj Logapi) Fatal(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Fatal", 0, arg0, arg1).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -60,7 +61,7 @@ func (obj Logapi) Fatal(arg0 uint64, arg1 string) (_err error) {
 func (obj Logapi) Info(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Info", 0, arg0, arg1).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -68,7 +69,7 @@ func (obj Logapi) Info(arg0 uint64, arg1 string) (_err error) {
 func (obj Logapi) NewLogger(arg0 string) (arg1 uint64, _err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.NewLogger", 0, arg0).Store(&arg1)
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -76,7 +77,7 @@ func (obj Logapi) NewLogger(arg0 string) (arg1 uint64, _err error) {
 func (obj Logapi) NotifyRestart(arg0 uint64, arg1 int32, arg2 string, arg3 []string, arg4 string, arg5 []string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.NotifyRestart", 0, arg0, arg1, arg2, arg3, arg4, arg5).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
@@ -84,7 +85,7 @@ func (obj Logapi) NotifyRestart(arg0 uint64, arg1 int32, arg2 string, arg3 []str
 func (obj Logapi) Warning(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Warning", 0, arg0, arg1).Store()
 	if _err != nil {
-		Println(_err)
+		fmt.Println(_err)
 	}
 	return
 }
