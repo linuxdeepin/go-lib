@@ -89,7 +89,7 @@ func (obj Logapi) Warning(arg0 uint64, arg1 string) (_err error) {
 	return
 }
 
-func NewLogapi(path dbus.ObjectPath) (*Logapi, error) {
+func newLogapi(path dbus.ObjectPath) (*Logapi, error) {
 	if !path.IsValid() {
 		return nil, errors.New("The path of '" + string(path) + "' is invalid.")
 	}

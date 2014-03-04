@@ -53,7 +53,7 @@ var (
 
 func initLogapi() (err error) {
 	if logapi == nil {
-		logapi, err = NewLogapi("/com/deepin/api/Logger")
+		logapi, err = newLogapi("/com/deepin/api/Logger")
 	}
 	return
 }
@@ -122,7 +122,7 @@ type Logger struct {
 // Logger dbus service, if the environment variable exists which name
 // stores in variable "DebugEnv", the default log level will be
 // "LEVEL_DEBUG" or is "LEVEL_INFO".
-func NewLogger(name string) (logger *Logger, err error) {
+func NewLogger(name string) (logger *Logger) {
 	logger = &Logger{name: name}
 	if isEnvExists(DebugEnv) {
 		logger.level = LEVEL_DEBUG
@@ -131,13 +131,13 @@ func NewLogger(name string) (logger *Logger, err error) {
 	}
 	logger.processInfo = getProcessInfo()
 
-	err = initLogapi()
+	err := initLogapi()
 	if err != nil {
-		return
+		Println("init logger dbus api failed: %v", err)
 	}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
-		return
+		Println("create logger api object failed: %v", err)
 	}
 	return
 }
