@@ -147,7 +147,13 @@ func (logger *Logger) SetLogLevel(level Priority) {
 	logger.level = level
 }
 
-// AddExtArgForRestart set the command option which be used when
+// SetRestartCommand reset the command and argument when restart after fatal.
+func (logger *Logger) SetRestartCommand(exefile string, args ...string) {
+	logger.processInfo.exefile = exefile
+	logger.processInfo.args = args
+}
+
+// AddExtArgForRestart add the command option which be used when
 // process fataled and restart by Logger dbus service.
 func (logger *Logger) AddExtArgForRestart(arg string) {
 	if !stringInSlice(arg, logger.processInfo.args) {
