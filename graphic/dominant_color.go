@@ -54,8 +54,8 @@ func doGetDominantColorOfImage(img image.Image) (h, s, v float64, err error) {
 		err = fmt.Errorf("image is empty")
 		return
 	}
-	for x := 1; x <= mx; x++ {
-		for y := 1; y <= my; y++ {
+	for x := 0; x < mx; x++ {
+		for y := 0; y < my; y++ {
 			c := img.At(x, y)
 			rr, gg, bb, _ := c.RGBA()
 			r, g, b := rr>>8, gg>>8, bb>>8
