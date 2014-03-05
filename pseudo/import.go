@@ -10,7 +10,7 @@ import "dlib/logger"
 import "dlib/graphic"
 
 func nothing() {
-	_ = graphic.ClipPNG
+	_ = graphic.GetDominantColorOfImage
 	_ = logger.NewLogger
 	_ = property.NewGSettingsBoolProperty
 	_ = gio.DBusConnectionFlagsAuthenticationClient
