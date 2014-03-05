@@ -108,10 +108,12 @@ func NewLogger(name string) (logger *Logger) {
 	err := initLogapi()
 	if err != nil {
 		fmt.Println("init logger dbus api failed: %v", err)
+		return
 	}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
 		fmt.Println("create logger api object failed: %v", err)
+		return
 	}
 	return
 }
