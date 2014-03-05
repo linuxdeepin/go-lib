@@ -29,35 +29,15 @@ import (
 	"os"
 )
 
-// ConvertToPNG converts from any recognized format to PNG.
-func ConvertToPNG(src, dest string) (err error) {
-	sf, err := os.Open(src)
-	if err != nil {
-		return
-	}
-	defer sf.Close()
-	df, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return
-	}
-	defer df.Close()
-
-	img, _, err := image.Decode(sf)
-	if err != nil {
-		return
-	}
-	return png.Encode(df, img)
-}
-
 // ClipPNG clip any recognized format image and save to PNG.
-func ClipPNG(src, dest string, x0, y0, x1, y1 int32) (err error) {
-	sf, err := os.Open(src)
+func ClipPNG(srcfile, destfile string, x0, y0, x1, y1 int32) (err error) {
+	sf, err := os.Open(srcfile)
 	if err != nil {
 		return
 	}
 	defer sf.Close()
 
-	df, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0644)
+	df, err := os.OpenFile(destfile, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return
 	}

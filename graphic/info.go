@@ -29,9 +29,9 @@ import (
 )
 
 // GetImageSize return a image's width and height.
-func GetImageSize(imageFile string) (w, h int32, err error) {
+func GetImageSize(imgfile string) (w, h int32, err error) {
 	// open the image file
-	fr, err := os.Open(imageFile)
+	fr, err := os.Open(imgfile)
 	if err != nil {
 		// logError(err.Error()) // TODO
 		return

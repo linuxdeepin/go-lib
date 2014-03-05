@@ -30,11 +30,11 @@ import (
 )
 
 // GetDominantColorOfImage return the dominant hsv color of a image.
-func GetDominantColorOfImage(imagePath string) (h, s, v float64) {
+func GetDominantColorOfImage(imgfile string) (h, s, v float64) {
 	var defH, defS, defV float64 = 200, 0.5, 0.8 // default hsv
 
 	// open the image file
-	fr, err := os.Open(imagePath)
+	fr, err := os.Open(imgfile)
 	if err != nil {
 		log.Printf(err.Error()) // TODO
 		return defH, defS, defV
