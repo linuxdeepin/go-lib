@@ -21,26 +21,9 @@
 
 package graphic
 
-import (
-	"image"
-	"image/jpeg"
-	"image/png"
-	"io"
-	"os"
+type format string
+
+const (
+	PNG  format = "png"
+	JPEG        = "jpeg"
 )
-
-func openFileOrCreate(file string) (*os.File, error) {
-	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
-}
-
-func encodeImage(w io.Writer, m image.Image, f format) (err error) {
-	switch f {
-	case PNG:
-		err = png.Encode(w, m)
-	case JPEG:
-		err = jpeg.Encode(w, m, nil)
-	default:
-		err = png.Encode(w, m)
-	}
-	return
-}

@@ -24,12 +24,11 @@ package graphic
 import (
 	"image"
 	"image/draw"
-	_ "image/jpeg"
 	"image/png"
 	"os"
 )
 
-// ClipPNG clip any recognized format image and save to PNG.
+// TODO[remove] ClipPNG clip any recognized format image and save to PNG.
 func ClipPNG(srcfile, dstfile string, x0, y0, x1, y1 int32) (err error) {
 	sf, err := os.Open(srcfile)
 	if err != nil {
@@ -51,4 +50,33 @@ func ClipPNG(srcfile, dstfile string, x0, y0, x1, y1 int32) (err error) {
 	dstimg := image.NewRGBA(image.Rect(int(x0), int(y0), int(x1), int(y1)))
 	draw.Draw(dstimg, dstimg.Bounds(), srcimg, image.Point{0, 0}, draw.Src)
 	return png.Encode(df, dstimg)
+}
+
+// ClipImage clip any recognized format image and save to target format image.
+func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f format) (err error) {
+	sf, err := os.Open(srcfile)
+	if err != nil {
+		return
+	}
+	defer sf.Close()
+
+	df, err := openFileOrCreate(dstfile)
+	if err != nil {
+		return
+	}
+	defer df.Close()
+
+	srcimg, _, err := image.Decode(sf)
+	if err != nil {
+		return
+	}
+
+	dstimg := doClipImage(srcimg, x0, y0, x1, y1)
+	return encodeImage(df, dstimg, f)
+}
+
+func doClipImage(srcimg image.Image, x0, y0, x1, y1 int32) (dstimg draw.Image) {
+	dstimg = image.NewRGBA(image.Rect(int(x0), int(y0), int(x1), int(y1)))
+	draw.Draw(dstimg, dstimg.Bounds(), srcimg, image.Point{0, 0}, draw.Src)
+	return
 }

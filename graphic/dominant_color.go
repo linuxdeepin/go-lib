@@ -22,41 +22,37 @@
 package graphic
 
 import (
+	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/png"
-	"log"
 	"os"
 )
 
 // GetDominantColorOfImage return the dominant hsv color of a image.
-func GetDominantColorOfImage(imgfile string) (h, s, v float64) {
-	var defH, defS, defV float64 = 200, 0.5, 0.8 // default hsv
-
+func GetDominantColorOfImage(imgfile string) (h, s, v float64, err error) {
 	// open the image file
 	fr, err := os.Open(imgfile)
 	if err != nil {
-		log.Printf(err.Error()) // TODO
-		return defH, defS, defV
+		return
 	}
 	defer fr.Close()
 
 	img, _, err := image.Decode(fr)
 	if err != nil {
-		log.Printf(err.Error()) // TODO
-		return defH, defS, defV
+		return
 	}
 
+	return doGetDominantColorOfImage(img)
+}
+
+func doGetDominantColorOfImage(img image.Image) (h, s, v float64, err error) {
 	// loop all points in image
 	var sumR, sumG, sumB, count uint64
 	mx := img.Bounds().Max.X
 	my := img.Bounds().Max.Y
 	count = uint64(mx * my)
 	if count == 0 {
-		return defH, defS, defV
-	}
-	if mx == 0 && my == 0 {
-		return defH, defS, defV
+		err = fmt.Errorf("image is empty")
+		return
 	}
 	for x := 1; x <= mx; x++ {
 		for y := 1; y <= my; y++ {
@@ -70,6 +66,5 @@ func GetDominantColorOfImage(imgfile string) (h, s, v float64) {
 	}
 
 	h, s, v = RGB2HSV(uint8(sumR/count), uint8(sumG/count), uint8(sumB/count))
-	log.Printf("h=%f, s=%f, v=%f", h, s, v) // TODO
 	return
 }
