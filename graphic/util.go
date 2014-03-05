@@ -35,12 +35,12 @@ func openFileOrCreate(file string) (*os.File, error) {
 
 func encodeImage(w io.Writer, m image.Image, f Format) (err error) {
 	switch f {
+	default:
+		err = png.Encode(w, m)
 	case PNG:
 		err = png.Encode(w, m)
 	case JPEG:
 		err = jpeg.Encode(w, m, nil)
-	default:
-		err = png.Encode(w, m)
 	}
 	return
 }

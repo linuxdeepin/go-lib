@@ -21,11 +21,10 @@
 
 package graphic
 
-// Format defines the type of image format.
-type Format string
+func ResizeImage() (err error) {
+	return
+}
 
-// Registered image format.
-const (
-	PNG  Format = "png"
-	JPEG        = "jpeg"
-)
+func doResizeImage(img image.Image, newWidth, newHeight int) (newimg draw.Image, err error) {
+	return
+}
