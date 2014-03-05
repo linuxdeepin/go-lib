@@ -21,9 +21,9 @@
 
 package graphic
 
-type format string
+type Format string
 
 const (
-	PNG  format = "png"
+	PNG  Format = "png"
 	JPEG        = "jpeg"
 )

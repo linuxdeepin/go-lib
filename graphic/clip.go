@@ -28,7 +28,7 @@ import (
 )
 
 // ClipImage clip any recognized format image and save to target format image.
-func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f format) (err error) {
+func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err error) {
 	sf, err := os.Open(srcfile)
 	if err != nil {
 		return

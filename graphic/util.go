@@ -33,7 +33,7 @@ func openFileOrCreate(file string) (*os.File, error) {
 	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
 }
 
-func encodeImage(w io.Writer, m image.Image, f format) (err error) {
+func encodeImage(w io.Writer, m image.Image, f Format) (err error) {
 	switch f {
 	case PNG:
 		err = png.Encode(w, m)

@@ -27,7 +27,7 @@ import (
 )
 
 // ConvertImage converts from any recognized format to target format image.
-func ConvertImage(srcfile, dstfile string, f format) (err error) {
+func ConvertImage(srcfile, dstfile string, f Format) (err error) {
 	sf, err := os.Open(srcfile)
 	if err != nil {
 		return
