@@ -3,6 +3,43 @@ package dbus
 import "encoding/xml"
 import "bytes"
 import "reflect"
+import "sync"
+
+type LifeManager struct {
+	name        string
+	path        ObjectPath
+	count       int32
+	onDestroy   func()
+	countLocker sync.Mutex
+}
+
+func RegisterLifeManagerCallback(m DBusObject, cb func()) {
+	if con := detectConnByDBusObject(m); con != nil {
+		path := ObjectPath(m.GetDBusInfo().ObjectPath)
+		if infos, ok := con.handlers[path]; ok {
+			if i, ok := (infos["org.freedesktop.DBus.LifeManager"]).(*LifeManager); ok {
+				i.onDestroy = cb
+			}
+		}
+	}
+}
+func (ifc *LifeManager) Ref() {
+	ifc.countLocker.Lock()
+
+	ifc.count++
+
+	ifc.countLocker.Unlock()
+}
+func (ifc *LifeManager) Unref() {
+	ifc.countLocker.Lock()
+
+	ifc.count--
+	if ifc.count == 0 && ifc.onDestroy != nil {
+		ifc.onDestroy()
+	}
+
+	ifc.countLocker.Unlock()
+}
 
 type IntrospectProxy struct {
 	infos map[string]interface{}

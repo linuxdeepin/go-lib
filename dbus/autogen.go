@@ -230,6 +230,9 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 	if _, ok := infos["org.freedesktop.DBus.Properties"]; !ok {
 		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos, nil}
 	}
+	if _, ok := infos["org.freedesktop.DBus.LifeManager"]; !ok {
+		infos["org.freedesktop.DBus.LifeManager"] = &LifeManager{name:name, path:path, count:1}
+	}
 
 	return nil
 }
