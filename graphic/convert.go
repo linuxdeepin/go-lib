@@ -29,13 +29,13 @@ import (
 )
 
 // ConvertToPNG converts from any recognized format to PNG.
-func ConvertToPNG(srcfile, destfile string) (err error) {
+func ConvertToPNG(srcfile, dstfile string) (err error) {
 	sf, err := os.Open(srcfile)
 	if err != nil {
 		return
 	}
 	defer sf.Close()
-	df, err := os.OpenFile(destfile, os.O_WRONLY|os.O_CREATE, 0644)
+	df, err := openFileOrCreate(dstfile)
 	if err != nil {
 		return
 	}
