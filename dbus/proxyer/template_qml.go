@@ -57,7 +57,7 @@ private:
 	    foreach(const QString &prop, changedProps.keys()) {
 		    if (0) { {{range .Properties}}
 		    } else if (prop == "{{.Name}}") {
-			    Q_EMIT {{Lower .Name}}Changed(unmarsh(changedProps.value(prop)));{{end}}
+			    Q_EMIT ___{{Lower .Name}}Changed___(unmarsh(changedProps.value(prop)));{{end}}
 		    }
 	    }
     }
@@ -95,7 +95,7 @@ public:
 	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
     }
     {{range .Properties}}
-    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}} NOTIFY {{Lower .Name}}Changed){{end}}
+    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}} NOTIFY ___{{Lower .Name}}Changed___){{end}}
 
     //Property read methods{{range .Properties}}
     const QVariant {{.Name}}() { return unmarsh(m_ifc->property("{{.Name}}")); }{{end}}
@@ -103,7 +103,7 @@ public:
     void set{{.Name}}(const QVariant &v) {
 	    QVariant marshedValue = marsh(QDBusArgument(), v, "{{.Type}}");
 	    m_ifc->setProperty("{{.Name}}", marshedValue);
-	    Q_EMIT {{Lower .Name}}Changed(marshedValue);
+	    Q_EMIT ___{{Lower .Name}}Changed___(marshedValue);
     }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
@@ -137,7 +137,7 @@ public Q_SLOTS:{{range .Methods}}
 
 Q_SIGNALS:
 //Property changed notify signal{{range .Properties}}
-    void {{Lower .Name}}Changed(QVariant);{{end}}
+    void ___{{Lower .Name}}Changed___(QVariant);{{end}}
 
 //DBus Interface's signal{{range .Signals}}
     void {{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}} {{$e.Name}}{{end}});{{end}}
