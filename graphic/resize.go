@@ -21,10 +21,56 @@
 
 package graphic
 
-func ResizeImage() (err error) {
-	return
+import (
+	"image"
+	"image/draw"
+	"os"
+)
+
+// ResizeImage returns a new image file with the given width and
+// height created by resizing the given image.
+func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (err error) {
+	sf, err := os.Open(srcfile)
+	if err != nil {
+		return
+	}
+	defer sf.Close()
+
+	df, err := openFileOrCreate(dstfile)
+	if err != nil {
+		return
+	}
+	defer df.Close()
+
+	srcimg, _, err := image.Decode(sf)
+	if err != nil {
+		return
+	}
+
+	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
+	return encodeImage(df, dstimg, f)
 }
 
-func doResizeImage(img image.Image, newWidth, newHeight int) (newimg draw.Image, err error) {
-	return
+// TODO doResizeNearestNeighbor returns a new RGBA image with the given width and
+// height created by resizing the given image using the nearest neighbor
+// algorithm.
+func doResizeNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg draw.Image) {
+	w := img.Bounds().Max.X
+	h := img.Bounds().Max.Y
+	newimg = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+
+	xr := (w<<16)/newWidth + 1
+	yr := (h<<16)/newHeight + 1
+
+	for yo := 0; yo < newHeight; yo++ {
+		y2 := (yo * yr) >> 16
+		for xo := 0; xo < newWidth; xo++ {
+			x2 := (xo * xr) >> 16
+			newimg.Set(xo, yo, img.At(x2, y2))
+			//Much faster, but requires some image type.
+			//newimg.Pix[offset] = img.Pix[y2*w+x2]
+			//offset++
+		}
+	}
+	return newimg
 }
