@@ -21,14 +21,20 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 )
 
-const defaultDebugEnv = "DDE_DEBUG"
+const (
+	defaultDebugEnv  = "DDE_DEBUG"
+	crashReporterExe = "/usr/bin/deepin-crash-reporter"
+	crashReporterArg = "--config"
+)
 
 type Priority int
 
@@ -218,8 +224,31 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 func (logger *Logger) Fatal(format string, v ...interface{}) {
 	logger.doLog(LEVEL_FATAL, format, v...)
 
-	// TODO save config to a tmp json file
-	logger.config.LogDetail, _ = logapi.GetLog(logger.id)
+	// if deepin-crash-reporter exists, launch it
+	if isFileExists(crashReporterExe) {
+		// save config to a temporary json file
+		logger.config.LogDetail, _ = logapi.GetLog(logger.id)
+		fileContent, err := json.Marshal(logger.config)
+		if err != nil {
+			logger.Error("%v", err)
+		}
+
+		f, err := ioutil.TempFile("", "deepin_crash_reporter_config_")
+		defer f.Close()
+		if err != nil {
+			logger.Error("%v", err)
+		}
+		_, err = f.Write(fileContent)
+		if err != nil {
+			logger.Error("%v", err)
+		}
+
+		// launch crash reporter
+		_, err = os.StartProcess(crashReporterExe, []string{crashReporterArg, f.Name()}, nil)
+		if err != nil {
+			logger.Error("launch deepin-crash-reporter failed: %v", err)
+		}
+	}
 
 	os.Exit(1)
 }
