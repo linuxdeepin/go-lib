@@ -208,7 +208,6 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
 	logger.doLog(LEVEL_FATAL, format, v...)
-	logapi.NotifyRestart(logger.id, logger.processInfo.uid, logger.processInfo.dir,
-		logger.processInfo.environ, logger.processInfo.exefile, logger.processInfo.args)
+
 	os.Exit(1)
 }

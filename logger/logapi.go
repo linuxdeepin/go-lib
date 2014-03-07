@@ -74,14 +74,6 @@ func (obj Logapi) NewLogger(arg0 string) (arg1 uint64, _err error) {
 	return
 }
 
-func (obj Logapi) NotifyRestart(arg0 uint64, arg1 int32, arg2 string, arg3 []string, arg4 string, arg5 []string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.NotifyRestart", 0, arg0, arg1, arg2, arg3, arg4, arg5).Store()
-	if _err != nil {
-		fmt.Println(_err)
-	}
-	return
-}
-
 func (obj Logapi) Warning(arg0 uint64, arg1 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Warning", 0, arg0, arg1).Store()
 	if _err != nil {
