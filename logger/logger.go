@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -33,8 +34,9 @@ import (
 const (
 	defaultDebugEnv  = "DDE_DEBUG"
 	crashReporterExe = "/usr/bin/deepin-crash-reporter"
-	crashReporterArg = "--config"
 )
+
+var crashReporterArgs = []string{crashReporterExe, "--remove-config", "--config"}
 
 type Priority int
 
@@ -123,12 +125,12 @@ func NewLogger(name string) (logger *Logger) {
 
 	err := initLogapi()
 	if err != nil {
-		fmt.Printf("init logger dbus api failed: %v\n", err)
+		log.Printf("init logger dbus api failed: %v\n", err)
 		return
 	}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
-		fmt.Printf("create logger api object failed: %v\n", err)
+		log.Printf("create logger api object failed: %v\n", err)
 		return
 	}
 	return
@@ -222,6 +224,12 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
+	// defer func() {
+	// 	if err := recover(); err != nil {
+	// 		logger.Error("%v", err)
+	// 	}
+	// }()
+
 	logger.doLog(LEVEL_FATAL, format, v...)
 
 	// if deepin-crash-reporter exists, launch it
@@ -233,6 +241,7 @@ func (logger *Logger) Fatal(format string, v ...interface{}) {
 			logger.Error("%v", err)
 		}
 
+		// create temporary json file and it will be removed by deepin-crash-reporter
 		f, err := ioutil.TempFile("", "deepin_crash_reporter_config_")
 		defer f.Close()
 		if err != nil {
@@ -244,7 +253,9 @@ func (logger *Logger) Fatal(format string, v ...interface{}) {
 		}
 
 		// launch crash reporter
-		_, err = os.StartProcess(crashReporterExe, []string{crashReporterArg, f.Name()}, nil)
+		logger.Info("launch deepin-crash-reporter: %s %s", crashReporterExe, append(crashReporterArgs, f.Name()))
+		_, err = os.StartProcess(crashReporterExe, append(crashReporterArgs, f.Name()),
+			&os.ProcAttr{Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}})
 		if err != nil {
 			logger.Error("launch deepin-crash-reporter failed: %v", err)
 		}
