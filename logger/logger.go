@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const defaultDebugEnv = "DDE_DEBUG"
@@ -58,24 +59,33 @@ func initLogapi() (err error) {
 	return
 }
 
-// ProcessInfo store the process information which will be
-// used to restart if application fataled.
-type ProcessInfo struct {
-	uid     int32    // Real user ID
-	dir     string   // Working directory
-	environ []string // Environment variables
-	exefile string   // Program file
-	args    []string // Command-line arguments
+// restartConfig stores data to be used by deepin-crash-reporter
+type restartConfig struct {
+	AppName          string
+	RestartCommand   []string
+	RestartEnv       map[string]string
+	RestartDirectory string
+	LogDetail        string
 }
 
-func getProcessInfo() *ProcessInfo {
-	processInfo := &ProcessInfo{}
-	processInfo.uid = int32(os.Getuid())
-	processInfo.dir, _ = os.Getwd()
-	processInfo.exefile, _ = filepath.Abs(os.Args[0])
-	processInfo.args = os.Args[1:]
-	processInfo.environ = os.Environ()
-	return processInfo
+func newRestartConfig(logname string) *restartConfig {
+	config := &restartConfig{}
+	config.AppName = logname
+	config.RestartCommand = os.Args
+	config.RestartCommand[0], _ = filepath.Abs(os.Args[0])
+	config.RestartDirectory, _ = os.Getwd()
+
+	// setup envrionment variables
+	config.RestartEnv = make(map[string]string)
+	environs := os.Environ()
+	for _, env := range environs {
+		values := strings.SplitN(env, "=", 2)
+		// values[0] is environment variable name, values[1] is the value
+		if len(values) == 2 {
+			config.RestartEnv[values[0]] = values[1]
+		}
+	}
+	return config
 }
 
 func buildMsg(calldepth int, format string, v ...interface{}) string {
@@ -86,10 +96,10 @@ func buildMsg(calldepth int, format string, v ...interface{}) string {
 
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
-	name        string
-	id          uint64
-	level       Priority
-	processInfo *ProcessInfo
+	name   string
+	id     string
+	level  Priority
+	config *restartConfig
 }
 
 // NewLogger create a Logger object, it need a string as name to register
@@ -103,7 +113,7 @@ func NewLogger(name string) (logger *Logger) {
 	} else {
 		logger.level = LEVEL_INFO
 	}
-	logger.processInfo = getProcessInfo()
+	logger.config = newRestartConfig(name)
 
 	err := initLogapi()
 	if err != nil {
@@ -125,15 +135,14 @@ func (logger *Logger) SetLogLevel(level Priority) {
 
 // SetRestartCommand reset the command and argument when restart after fatal.
 func (logger *Logger) SetRestartCommand(exefile string, args ...string) {
-	logger.processInfo.exefile = exefile
-	logger.processInfo.args = args
+	logger.config.RestartCommand = append([]string{exefile}, args...)
 }
 
 // AddExtArgForRestart add the command option which be used when
 // process fataled and restart by Logger dbus service.
 func (logger *Logger) AddExtArgForRestart(arg string) {
-	if !stringInSlice(arg, logger.processInfo.args) {
-		logger.processInfo.args = append(logger.processInfo.args, arg)
+	if !stringInSlice(arg, logger.config.RestartCommand[1:]) {
+		logger.config.RestartCommand = append(logger.config.RestartCommand, arg)
 	}
 }
 
@@ -208,6 +217,9 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(format string, v ...interface{}) {
 	logger.doLog(LEVEL_FATAL, format, v...)
+
+	// TODO save config to a tmp json file
+	logger.config.LogDetail, _ = logapi.GetLog(logger.id)
 
 	os.Exit(1)
 }
