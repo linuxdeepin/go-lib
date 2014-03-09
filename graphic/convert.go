@@ -21,27 +21,11 @@
 
 package graphic
 
-import (
-	"image"
-	"os"
-)
-
 // ConvertImage converts from any recognized format to target format image.
 func ConvertImage(srcfile, dstfile string, f Format) (err error) {
-	sf, err := os.Open(srcfile)
+	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return
 	}
-	defer sf.Close()
-	df, err := openFileOrCreate(dstfile)
-	if err != nil {
-		return
-	}
-	defer df.Close()
-
-	img, _, err := image.Decode(sf)
-	if err != nil {
-		return
-	}
-	return encodeImage(df, img, f)
+	return saveImage(dstfile, srcimg, f)
 }

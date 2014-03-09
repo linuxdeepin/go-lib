@@ -43,7 +43,16 @@ func loadImage(imgfile string) (img image.Image, err error) {
 	return
 }
 
-func encodeImage(w io.Writer, m image.Image, f Format) (err error) {
+func saveImage(dstfile string, m image.Image, f Format) (err error) {
+	df, err := openFileOrCreate(dstfile)
+	if err != nil {
+		return
+	}
+	defer df.Close()
+	return doSaveImage(df, m, f)
+}
+
+func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 	switch f {
 	default:
 		err = png.Encode(w, m)

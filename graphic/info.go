@@ -21,25 +21,12 @@
 
 package graphic
 
-import (
-	"image"
-	"os"
-)
-
 // GetImageSize return a image's width and height.
 func GetImageSize(imgfile string) (w, h int32, err error) {
-	// open the image file
-	fr, err := os.Open(imgfile)
+	img, err := loadImage(imgfile)
 	if err != nil {
 		return
 	}
-	defer fr.Close()
-
-	img, _, err := image.Decode(fr)
-	if err != nil {
-		return
-	}
-
 	w = int32(img.Bounds().Max.X)
 	h = int32(img.Bounds().Max.Y)
 	return

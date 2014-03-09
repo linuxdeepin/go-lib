@@ -24,30 +24,16 @@ package graphic
 import (
 	"image"
 	"image/draw"
-	"os"
 )
 
 // ClipImage clip any recognized format image and save to target format image.
 func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err error) {
-	sf, err := os.Open(srcfile)
+	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return
 	}
-	defer sf.Close()
-
-	df, err := openFileOrCreate(dstfile)
-	if err != nil {
-		return
-	}
-	defer df.Close()
-
-	srcimg, _, err := image.Decode(sf)
-	if err != nil {
-		return
-	}
-
 	dstimg := doClipImage(srcimg, int(x0), int(y0), int(x1), int(y1))
-	return encodeImage(df, dstimg, f)
+	return saveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA

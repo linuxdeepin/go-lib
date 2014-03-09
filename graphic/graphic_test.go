@@ -1,15 +1,17 @@
 package graphic
 
 import (
-	"fmt"
 	. "launchpad.net/gocheck"
 	"testing"
 )
 
 const (
-	originTestImage = "testdata/origin_2560x1600.jpg"
-	originImgWidth  = 2560
-	originImgHeight = 1600
+	originTestImage         = "testdata/origin_2560x1600.jpg"
+	originImgWidth          = 2560
+	originImgHeight         = 1600
+	originImgDominantColorH = 205
+	originImgDominantColorS = 0.69
+	originImgDominantColorV = 0.42
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -18,7 +20,7 @@ type Graphic struct{}
 
 var _ = Suite(&Graphic{})
 
-func delta(x, y uint8) uint8 {
+func delta(x, y float64) float64 {
 	if x >= y {
 		return x - y
 	}
@@ -26,7 +28,7 @@ func delta(x, y uint8) uint8 {
 }
 
 func (g *Graphic) TestClipImage(c *C) {
-	resultFile := "test_clipimage_100x200.png"
+	resultFile := "testdata/test_clipimage_100x200.png"
 	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, PNG)
 	if err != nil {
 		c.Error(err)
@@ -44,7 +46,11 @@ func (g *Graphic) TestGetDominantColor(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-	fmt.Println("h, s, v = ", h, s, v)
+	if delta(h, originImgDominantColorH) > 1 ||
+		delta(s, originImgDominantColorS) > 0.1 ||
+		delta(v, originImgDominantColorV) > 0.1 {
+		c.Error("h, s, v = ", h, s, v)
+	}
 }
 
 func (g *Graphic) TestGetImageSize(c *C) {
@@ -57,7 +63,7 @@ func (g *Graphic) TestGetImageSize(c *C) {
 }
 
 func (g *Graphic) TestResizeImage(c *C) {
-	resultFile := "test_resizeimage_500x600"
+	resultFile := "testdata/test_resizeimage_500x600"
 	err := ResizeImage(originTestImage, resultFile, 500, 600, PNG)
 	if err != nil {
 		c.Error(err)
@@ -86,7 +92,7 @@ func (g *Graphic) TestHSV(c *C) {
 				r0, g0, b0 := uint8(r), uint8(g), uint8(b)
 				h, s, v := RGB2HSV(r0, g0, b0)
 				r1, g1, b1 := HSV2RGB(h, s, v)
-				if delta(r0, r1) > 1 || delta(g0, g1) > 1 || delta(b0, b1) > 1 {
+				if delta(float64(r0), float64(r1)) > 1 || delta(float64(g0), float64(g1)) > 1 || delta(float64(b0), float64(b1)) > 1 {
 					c.Fatalf("r0, g0, b0 = %d, %d, %d   r1, g1, b1 = %d, %d, %d", r0, g0, b0, r1, g1, b1)
 				}
 			}

@@ -24,31 +24,17 @@ package graphic
 import (
 	"image"
 	"image/draw"
-	"os"
 )
 
 // ResizeImage returns a new image file with the given width and
 // height created by resizing the given image.
 func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (err error) {
-	sf, err := os.Open(srcfile)
+	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return
 	}
-	defer sf.Close()
-
-	df, err := openFileOrCreate(dstfile)
-	if err != nil {
-		return
-	}
-	defer df.Close()
-
-	srcimg, _, err := image.Decode(sf)
-	if err != nil {
-		return
-	}
-
 	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
-	return encodeImage(df, dstimg, f)
+	return saveImage(dstfile, dstimg, f)
 }
 
 // TODO doResizeNearestNeighbor returns a new RGBA image with the given width and

@@ -24,23 +24,14 @@ package graphic
 import (
 	"fmt"
 	"image"
-	"os"
 )
 
 // GetDominantColorOfImage return the dominant hsv color of a image.
 func GetDominantColorOfImage(imgfile string) (h, s, v float64, err error) {
-	// open the image file
-	fr, err := os.Open(imgfile)
+	img, err := loadImage(imgfile)
 	if err != nil {
 		return
 	}
-	defer fr.Close()
-
-	img, _, err := image.Decode(fr)
-	if err != nil {
-		return
-	}
-
 	return doGetDominantColorOfImage(img)
 }
 
