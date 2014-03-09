@@ -33,6 +33,16 @@ func openFileOrCreate(file string) (*os.File, error) {
 	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
 }
 
+func loadImage(imgfile string) (img image.Image, err error) {
+	file, err := os.Open(imgfile)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	img, _, err = image.Decode(file)
+	return
+}
+
 func encodeImage(w io.Writer, m image.Image, f Format) (err error) {
 	switch f {
 	default:
