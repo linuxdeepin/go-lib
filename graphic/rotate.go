@@ -22,20 +22,41 @@
 package graphic
 
 import (
+	libgraphic "code.google.com/p/graphics-go/graphics"
 	"image"
+	"math"
 )
 
-// GetImageSize return a image's width and height.
-func GetImageSize(imgfile string) (w, h int32, err error) {
-	img, err := loadImage(imgfile)
+func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
+	srcimg, err := loadImage(srcfile)
 	if err != nil {
-		return
+		return err
 	}
-	return doGetImageSize(img)
+	w, h, err := doGetImageSize(srcimg)
+	if err != nil {
+		return err
+	}
+	dstimg := image.NewRGBA(image.Rect(0, 0, int(h), int(w)))
+	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / -2})
+	if err != nil {
+		return err
+	}
+	return saveImage(dstfile, dstimg, f)
 }
 
-func doGetImageSize(img image.Image) (w, h int32, err error) {
-	w = int32(img.Bounds().Max.X)
-	h = int32(img.Bounds().Max.Y)
-	return
+func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
+	srcimg, err := loadImage(srcfile)
+	if err != nil {
+		return err
+	}
+	w, h, err := doGetImageSize(srcimg)
+	if err != nil {
+		return err
+	}
+	dstimg := image.NewRGBA(image.Rect(0, 0, int(h), int(w)))
+	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / 2})
+	if err != nil {
+		return err
+	}
+	return saveImage(dstfile, dstimg, f)
 }

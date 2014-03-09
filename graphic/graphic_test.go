@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	originTestImage         = "testdata/origin_2560x1600.jpg"
-	originImgWidth          = 2560
-	originImgHeight         = 1600
+	originTestImage         = "testdata/origin_1280x800.jpg"
+	originImgWidth          = 1280
+	originImgHeight         = 800
 	originImgDominantColorH = 205
 	originImgDominantColorS = 0.69
 	originImgDominantColorV = 0.42
@@ -41,6 +41,14 @@ func (g *Graphic) TestClipImage(c *C) {
 	c.Check(int(h), Equals, 200)
 }
 
+func (g *Graphic) TestConvertImage(c *C) {
+	resultFile := "testdata/test_convertimage.png"
+	err := ConvertImage(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
 func (g *Graphic) TestGetDominantColor(c *C) {
 	h, s, v, err := GetDominantColorOfImage(originTestImage)
 	if err != nil {
@@ -52,36 +60,6 @@ func (g *Graphic) TestGetDominantColor(c *C) {
 		c.Error("h, s, v = ", h, s, v)
 	}
 }
-
-func (g *Graphic) TestGetImageSize(c *C) {
-	w, h, err := GetImageSize(originTestImage)
-	if err != nil {
-		c.Error(err)
-	}
-	c.Check(int(w), Equals, originImgWidth)
-	c.Check(int(h), Equals, originImgHeight)
-}
-
-func (g *Graphic) TestResizeImage(c *C) {
-	resultFile := "testdata/test_resizeimage_500x600"
-	err := ResizeImage(originTestImage, resultFile, 500, 600, PNG)
-	if err != nil {
-		c.Error(err)
-	}
-	w, h, err := GetImageSize(resultFile)
-	if err != nil {
-		c.Error(err)
-	}
-	c.Check(int(w), Equals, 500)
-	c.Check(int(h), Equals, 600)
-}
-
-// TODO
-// func (g *Graphic) TestRotateImage(c *C) {
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// }
 
 // Test that a subset of RGB space can be converted to HSV and back to within
 // 1/256 tolerance.
@@ -97,5 +75,44 @@ func (g *Graphic) TestHSV(c *C) {
 				}
 			}
 		}
+	}
+}
+
+func (g *Graphic) TestGetImageSize(c *C) {
+	w, h, err := GetImageSize(originTestImage)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(int(w), Equals, originImgWidth)
+	c.Check(int(h), Equals, originImgHeight)
+}
+
+func (g *Graphic) TestResizeImage(c *C) {
+	resultFile := "testdata/test_resizeimage_500x600.png"
+	err := ResizeImage(originTestImage, resultFile, 500, 600, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	w, h, err := GetImageSize(resultFile)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(int(w), Equals, 500)
+	c.Check(int(h), Equals, 600)
+}
+
+func (g *Graphic) TestRotateImageLeft(c *C) {
+	resultFile := "testdata/test_rotateimageleft.png"
+	err := RotateImageLeft(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+func (g *Graphic) TestRotateImageRight(c *C) {
+	resultFile := "testdata/test_rotateimageright.png"
+	err := RotateImageRight(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
 	}
 }

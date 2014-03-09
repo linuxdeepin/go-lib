@@ -29,10 +29,6 @@ import (
 	"os"
 )
 
-func openFileOrCreate(file string) (*os.File, error) {
-	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
-}
-
 func loadImage(imgfile string) (img image.Image, err error) {
 	file, err := os.Open(imgfile)
 	if err != nil {
@@ -62,4 +58,8 @@ func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 		err = jpeg.Encode(w, m, nil)
 	}
 	return
+}
+
+func openFileOrCreate(file string) (*os.File, error) {
+	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
 }
