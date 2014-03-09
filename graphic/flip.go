@@ -46,7 +46,7 @@ func FlipImageVertical(srcfile, dstfile string, f Format) (err error) {
 
 // FIXME return draw.Image or *image.RGBA
 func doFlipImageHorizontal(srcimg image.Image) (dstimg draw.Image) {
-	w, h, _ := doGetImageSize(srcimg)
+	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 
 	for x := 0; x < w; x++ {
@@ -60,7 +60,7 @@ func doFlipImageHorizontal(srcimg image.Image) (dstimg draw.Image) {
 
 // FIXME return draw.Image or *image.RGBA
 func doFlipImageVertical(srcimg image.Image) (dstimg draw.Image) {
-	w, h, _ := doGetImageSize(srcimg)
+	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 
 	for x := 0; x < w; x++ {

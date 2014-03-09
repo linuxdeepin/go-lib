@@ -27,6 +27,14 @@ func delta(x, y float64) float64 {
 	return y - x
 }
 
+func (g *Graphic) TestBlurImage(c *C) {
+	resultFile := "testdata/test_blurimage.png"
+	err := BlurImage(originTestImage, resultFile, 15, 10, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
 func (g *Graphic) TestClipImage(c *C) {
 	resultFile := "testdata/test_clipimage_100x200.png"
 	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, PNG)

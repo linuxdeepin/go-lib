@@ -22,52 +22,21 @@
 package graphic
 
 import (
+	libgraphic "code.google.com/p/graphics-go/graphics"
 	"image"
-	"image/draw"
 )
 
-func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
+func BlurImage(srcfile, dstfile string, stddev, size float64, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return err
 	}
-	dstimg := doRotateImageLeft(srcimg)
-	return saveImage(dstfile, dstimg, f)
-}
-
-func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	w, h := doGetImageSize(srcimg)
+	dstimg := image.NewRGBA(image.Rect(0, 0, w, h))
+	// dstimg := doRotateImageLeft(srcimg)
+	err = libgraphic.Blur(dstimg, srcimg, &libgraphic.BlurOptions{stddev, int(size)})
 	if err != nil {
-		return err
+		return
 	}
-	dstimg := doRotateImageRight(srcimg)
 	return saveImage(dstfile, dstimg, f)
-}
-
-// FIXME return draw.Image or *image.RGBA
-func doRotateImageLeft(srcimg image.Image) (dstimg draw.Image) {
-	w, h := doGetImageSize(srcimg)
-	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
-
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			dstimg.Set(y, w-x-1, srcimg.At(x, y))
-		}
-	}
-
-	return
-}
-
-// FIXME return draw.Image or *image.RGBA
-func doRotateImageRight(srcimg image.Image) (dstimg draw.Image) {
-	w, h := doGetImageSize(srcimg)
-	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
-
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			dstimg.Set(h-y-1, x, srcimg.At(x, y))
-		}
-	}
-
-	return
 }

@@ -31,11 +31,11 @@ func GetImageSize(imgfile string) (w, h int32, err error) {
 	if err != nil {
 		return
 	}
-	iw, ih, err := doGetImageSize(img)
+	iw, ih := doGetImageSize(img)
 	return int32(iw), int32(ih), err
 }
 
-func doGetImageSize(img image.Image) (w, h int, err error) {
+func doGetImageSize(img image.Image) (w, h int) {
 	w = img.Bounds().Max.X
 	h = img.Bounds().Max.Y
 	return
