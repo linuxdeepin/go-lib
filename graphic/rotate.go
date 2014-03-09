@@ -22,9 +22,8 @@
 package graphic
 
 import (
-	libgraphic "code.google.com/p/graphics-go/graphics"
 	"image"
-	"math"
+	"image/draw"
 )
 
 func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
@@ -32,15 +31,7 @@ func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
 	if err != nil {
 		return err
 	}
-	w, h, err := doGetImageSize(srcimg)
-	if err != nil {
-		return err
-	}
-	dstimg := image.NewRGBA(image.Rect(0, 0, h, w))
-	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / -2})
-	if err != nil {
-		return err
-	}
+	dstimg := doRotateImageLeft(srcimg)
 	return saveImage(dstfile, dstimg, f)
 }
 
@@ -49,14 +40,34 @@ func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
 	if err != nil {
 		return err
 	}
-	w, h, err := doGetImageSize(srcimg)
-	if err != nil {
-		return err
-	}
-	dstimg := image.NewRGBA(image.Rect(0, 0, h, w))
-	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / 2})
-	if err != nil {
-		return err
-	}
+	dstimg := doRotateImageRight(srcimg)
 	return saveImage(dstfile, dstimg, f)
+}
+
+// FIXME return draw.Image or *image.RGBA
+func doRotateImageLeft(srcimg image.Image) (dstimg draw.Image) {
+	w, h, _ := doGetImageSize(srcimg)
+	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			dstimg.Set(y, w-x-1, srcimg.At(x, y))
+		}
+	}
+
+	return
+}
+
+// FIXME return draw.Image or *image.RGBA
+func doRotateImageRight(srcimg image.Image) (dstimg draw.Image) {
+	w, h, _ := doGetImageSize(srcimg)
+	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			dstimg.Set(h-y-1, x, srcimg.At(x, y))
+		}
+	}
+
+	return
 }
