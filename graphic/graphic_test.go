@@ -116,3 +116,19 @@ func (g *Graphic) TestRotateImageRight(c *C) {
 		c.Error(err)
 	}
 }
+
+func (g *Graphic) TestFlipImageHorizontal(c *C) {
+	resultFile := "testdata/test_flipimagehorizontal.png"
+	err := FlipImageHorizontal(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+func (g *Graphic) TestFlipImageVertical(c *C) {
+	resultFile := "testdata/test_flipimagevertical.png"
+	err := FlipImageVertical(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}

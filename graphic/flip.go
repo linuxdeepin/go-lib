@@ -22,41 +22,52 @@
 package graphic
 
 import (
-	libgraphic "code.google.com/p/graphics-go/graphics"
 	"image"
-	"math"
+	"image/draw"
 )
 
-func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
+func FlipImageHorizontal(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return err
 	}
-	w, h, err := doGetImageSize(srcimg)
-	if err != nil {
-		return err
-	}
-	dstimg := image.NewRGBA(image.Rect(0, 0, h, w))
-	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / -2})
-	if err != nil {
-		return err
-	}
+	dstimg := doFlipImageHorizontal(srcimg)
 	return saveImage(dstfile, dstimg, f)
 }
 
-func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
+func FlipImageVertical(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
 		return err
 	}
-	w, h, err := doGetImageSize(srcimg)
-	if err != nil {
-		return err
-	}
-	dstimg := image.NewRGBA(image.Rect(0, 0, h, w))
-	err = libgraphic.Rotate(dstimg, srcimg, &libgraphic.RotateOptions{math.Pi / 2})
-	if err != nil {
-		return err
-	}
+	dstimg := doFlipImageVertical(srcimg)
 	return saveImage(dstfile, dstimg, f)
+}
+
+// FIXME return draw.Image or *image.RGBA
+func doFlipImageHorizontal(srcimg image.Image) (dstimg draw.Image) {
+	w, h, _ := doGetImageSize(srcimg)
+	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			dstimg.Set(w-x-1, y, srcimg.At(x, y))
+		}
+	}
+
+	return
+}
+
+// FIXME return draw.Image or *image.RGBA
+func doFlipImageVertical(srcimg image.Image) (dstimg draw.Image) {
+	w, h, _ := doGetImageSize(srcimg)
+	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			dstimg.Set(x, h-y-1, srcimg.At(x, y))
+		}
+	}
+
+	return
 }
