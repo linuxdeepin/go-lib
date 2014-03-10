@@ -21,22 +21,31 @@
 
 package graphic
 
-import (
-	libgraphic "code.google.com/p/graphics-go/graphics"
-	"image"
-)
+// #cgo pkg-config: glib-2.0 gdk-pixbuf-2.0
+// #cgo LDFLAGS: -lm
+// #include <stdlib.h>
+// #include "blur_pict.h"
+import "C"
+import "unsafe"
+import "fmt"
 
-func BlurImage(srcfile, dstfile string, stddev, size float64, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
-	if err != nil {
-		return err
+func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err error) {
+	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
+	if !ok {
+		err = fmt.Errorf("generate blur pict failed")
 	}
-	w, h := doGetImageSize(srcimg)
-	dstimg := image.NewRGBA(image.Rect(0, 0, w, h))
-	// dstimg := doRotateImageLeft(srcimg)
-	err = libgraphic.Blur(dstimg, srcimg, &libgraphic.BlurOptions{stddev, int(size)})
-	if err != nil {
-		return
+	return
+}
+
+func generateBlurPict(srcfile, dstfile string, sigma, numsteps float64) bool {
+	src := C.CString(srcfile)
+	defer C.free(unsafe.Pointer(src))
+	dest := C.CString(dstfile)
+	defer C.free(unsafe.Pointer(dest))
+
+	ok := C.generate_blur_pict(src, dest, C.double(sigma), C.double(numsteps))
+	if ok == 0 {
+		return false
 	}
-	return saveImage(dstfile, dstimg, f)
+	return true
 }

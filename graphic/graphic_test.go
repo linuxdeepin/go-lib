@@ -14,6 +14,7 @@ const (
 	originImgDominantColorV = 0.42
 )
 
+// Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
 
 type Graphic struct{}
