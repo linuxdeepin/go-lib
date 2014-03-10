@@ -36,6 +36,14 @@ func (g *Graphic) TestBlurImage(c *C) {
 	}
 }
 
+func (g *Graphic) TestFastBlurImage(c *C) {
+	resultFile := "testdata/test_fastblurimage.png"
+	err := FastBlurImage(originTestImage, resultFile, 15, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
 func (g *Graphic) TestClipImage(c *C) {
 	resultFile := "testdata/test_clipimage_100x200.png"
 	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, PNG)

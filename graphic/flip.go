@@ -26,6 +26,8 @@ import (
 	"image/draw"
 )
 
+// FlipImageHorizontal flip image in horizontal direction, and save as
+// target format.
 func FlipImageHorizontal(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
@@ -35,6 +37,8 @@ func FlipImageHorizontal(srcfile, dstfile string, f Format) (err error) {
 	return saveImage(dstfile, dstimg, f)
 }
 
+// FlipImageVertical  flip image  in vertical  direction, and  save as
+// target format.
 func FlipImageVertical(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {

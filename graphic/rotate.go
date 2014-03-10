@@ -26,6 +26,7 @@ import (
 	"image/draw"
 )
 
+// RotateImageLeft rotate image to left side.
 func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
@@ -35,6 +36,7 @@ func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
 	return saveImage(dstfile, dstimg, f)
 }
 
+// RotateImageLeft rotate image to right side.
 func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := loadImage(srcfile)
 	if err != nil {
