@@ -37,6 +37,7 @@ var _ = property.BaseObserver{}
 var __IFC_TEMPLATE_GoLang = `
 type {{ExportName}} struct {
 	Path dbus.ObjectPath
+	DestName string
 	core *dbus.Object
 {{if or .Properties .Signals}}
 	signals map[chan *dbus.Signal]bool
@@ -86,7 +87,7 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{range .Signals}}
 func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) func() {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
-		"type='signal',path='"+string({{OBJ_NAME}}.Path)+"', interface='{{IfcName}}',sender='{{DestName}}',member='{{.Name}}'")
+		"type='signal',path='"+string({{OBJ_NAME}}.Path)+"', interface='{{IfcName}}',sender='{{OBJ_NAME}}.DestName',member='{{.Name}}'")
 	sigChan := {{OBJ_NAME}}._createSignalChan()
 	go func() {
 		for v := range(sigChan) {
@@ -147,24 +148,24 @@ func (this *dbusProperty{{ExportName}}{{.Name}}) GetType() reflect.Type {
 }
 {{end}}
 
-func New{{ExportName}}(path dbus.ObjectPath) (*{{ExportName}}, error) {
+func New{{ExportName}}(destName string, path dbus.ObjectPath) (*{{ExportName}}, error) {
 	if !path.IsValid() {
 		return nil, errors.New("The path of '" + string(path) + "' is invalid.")
 	}
 
-	core := getBus().Object("{{DestName}}", path)
+	core := getBus().Object(destName, path)
 	var v string
 	core.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&v)
 	if strings.Index(v, "{{IfcName}}") == -1 {
 		return nil, errors.New("'" + string(path) + "' hasn't interface '{{IfcName}}'.")
 	}
 
-	obj := &{{ExportName}}{Path:path, core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
+	obj := &{{ExportName}}{Path:path, DestName:destName, core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
 	{{range .Properties}}
 	obj.{{.Name}} = &dbusProperty{{ExportName}}{{.Name}}{&property.BaseObserver{}, core}{{end}}
 {{with .Properties}}
-	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='org.freedesktop.DBus.Properties',sender='{{DestName}}',member='PropertiesChanged'")
-	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='{{IfcName}}',sender='{{DestName}}',member='PropertiesChanged'")
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='org.freedesktop.DBus.Properties',sender='"+destName+"',member='PropertiesChanged'")
+	getBus().BusObject().Call("org.freedesktop.DBus.AddMatch", 0, "type='signal',path='"+string(path)+"',interface='{{IfcName}}',sender='"+destName+"',member='PropertiesChanged'")
 	sigChan := obj._createSignalChan()
 	go func() {
 		typeString := reflect.TypeOf("")
