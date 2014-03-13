@@ -58,6 +58,72 @@ func (g *Graphic) TestConvertImage(c *C) {
 	}
 }
 
+func (g *Graphic) TestFlipImageHorizontal(c *C) {
+	resultFile := "testdata/test_flipimagehorizontal.png"
+	err := FlipImageHorizontal(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+func (g *Graphic) TestFillImage(c *C) {
+	resultFile := "testdata/test_flllimage_tile_200x200.png"
+	err := FillImage(originTestImage, resultFile, 200, 200, FillTile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_tile_1600x1000.png"
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillTile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_center_400x400.png"
+	err = FillImage(originTestImage, resultFile, 400, 400, FillCenter, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_center_1600x1000.png"
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillCenter, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_stretch_400x400.png"
+	err = FillImage(originTestImage, resultFile, 400, 400, FillStretch, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_stretch_1600x1000.png"
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillStretch, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_scalestretch_400x400.png"
+	err = FillImage(originTestImage, resultFile, 400, 400, FillScaleStretch, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+
+	resultFile = "testdata/test_flllimage_scalestretch_1600x1000.png"
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillScaleStretch, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+func (g *Graphic) TestFlipImageVertical(c *C) {
+	resultFile := "testdata/test_flipimagevertical.png"
+	err := FlipImageVertical(originTestImage, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
 func (g *Graphic) TestGetDominantColor(c *C) {
 	h, s, v, err := GetDominantColorOfImage(originTestImage)
 	if err != nil {
@@ -121,22 +187,6 @@ func (g *Graphic) TestRotateImageLeft(c *C) {
 func (g *Graphic) TestRotateImageRight(c *C) {
 	resultFile := "testdata/test_rotateimageright.png"
 	err := RotateImageRight(originTestImage, resultFile, PNG)
-	if err != nil {
-		c.Error(err)
-	}
-}
-
-func (g *Graphic) TestFlipImageHorizontal(c *C) {
-	resultFile := "testdata/test_flipimagehorizontal.png"
-	err := FlipImageHorizontal(originTestImage, resultFile, PNG)
-	if err != nil {
-		c.Error(err)
-	}
-}
-
-func (g *Graphic) TestFlipImageVertical(c *C) {
-	resultFile := "testdata/test_flipimagevertical.png"
-	err := FlipImageVertical(originTestImage, resultFile, PNG)
 	if err != nil {
 		c.Error(err)
 	}
