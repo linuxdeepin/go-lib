@@ -87,7 +87,7 @@ func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({
 {{range .Signals}}
 func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterOutsProto .Args}})) func() {
 	__conn.BusObject().Call("org.freedesktop.DBus.AddMatch", 0,
-		"type='signal',path='"+string({{OBJ_NAME}}.Path)+"', interface='{{IfcName}}',sender='{{OBJ_NAME}}.DestName',member='{{.Name}}'")
+		"type='signal',path='"+string({{OBJ_NAME}}.Path)+"', interface='{{IfcName}}',sender='"+{{OBJ_NAME}}.DestName+"',member='{{.Name}}'")
 	sigChan := {{OBJ_NAME}}._createSignalChan()
 	go func() {
 		for v := range(sigChan) {
