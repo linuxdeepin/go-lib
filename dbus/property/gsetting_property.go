@@ -169,6 +169,9 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 		panic("GSettingsProperty didn't support gsettings key " + keyName)
 	}
 	s.Connect("changed::"+keyName, func(s *gio.Settings, name string) {
+		prop.Notify()
+	})
+	prop.ConnectChanged(func() {
 		dbus.NotifyChange(prop.core, prop.propName)
 	})
 	return prop
