@@ -48,6 +48,18 @@ func (g *Graphic) TestClipImage(c *C) {
 	}
 	c.Check(int(w), Equals, 100)
 	c.Check(int(h), Equals, 200)
+
+	resultFile = "testdata/test_clipimage_160x160.png"
+	err = ClipImage(originTestImage, resultFile, 40, 40, 200, 200, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	w, h, err = GetImageSize(resultFile)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(int(w), Equals, 160)
+	c.Check(int(h), Equals, 160)
 }
 
 func (g *Graphic) TestConvertImage(c *C) {
