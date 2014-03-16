@@ -128,3 +128,13 @@ func NotifyChange(obj DBusObject, propName string) {
 		}
 	}
 }
+
+func ReleaseName(obj DBusObject) {
+	if obj == nil {
+		return
+	}
+	con := detectConnByDBusObject(obj)
+	if con != nil {
+		con.busObj.Call("org.freedesktop.DBus.ReleaseName", 0, obj.GetDBusInfo().Dest)
+	}
+}
