@@ -195,27 +195,49 @@ func (logger *Logger) doLog(level Priority, format string, v ...interface{}) {
 }
 
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Debug(format string, v ...interface{}) {
+func (logger *Logger) Debug(v ...interface{}) {
+	logger.doLog(LEVEL_DEBUG, fmt.Sprint(v...))
+}
+
+func (logger *Logger) Debugf(format string, v ...interface{}) {
 	logger.doLog(LEVEL_DEBUG, format, v...)
 }
 
 // Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Info(format string, v ...interface{}) {
+func (logger *Logger) Info(v ...interface{}) {
+	logger.doLog(LEVEL_INFO, fmt.Sprint(v...))
+}
+
+func (logger *Logger) Infof(format string, v ...interface{}) {
 	logger.doLog(LEVEL_INFO, format, v...)
 }
 
 // Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Warning(format string, v ...interface{}) {
+func (logger *Logger) Warning(v ...interface{}) {
+	logger.doLog(LEVEL_WARNING, fmt.Sprint(v...))
+}
+
+func (logger *Logger) Warningf(format string, v ...interface{}) {
 	logger.doLog(LEVEL_WARNING, format, v...)
 }
 
 // Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Error(format string, v ...interface{}) {
+func (logger *Logger) Error(v ...interface{}) {
+	logger.doLog(LEVEL_ERROR, fmt.Sprint(v...))
+}
+
+func (logger *Logger) Errorf(format string, v ...interface{}) {
 	logger.doLog(LEVEL_ERROR, format, v...)
 }
 
 // Panic is equivalent to Error() followed by a call to panic().
-func (logger *Logger) Panic(format string, v ...interface{}) {
+func (logger *Logger) Panic(v ...interface{}) {
+	logger.doLog(LEVEL_PANIC, fmt.Sprint(v...))
+	s := buildMsg(2, fmt.Sprint(v...))
+	panic(s)
+}
+
+func (logger *Logger) Panicf(format string, v ...interface{}) {
 	logger.doLog(LEVEL_PANIC, format, v...)
 	s := buildMsg(2, format, v...)
 	panic(s)
@@ -223,15 +245,19 @@ func (logger *Logger) Panic(format string, v ...interface{}) {
 
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
-func (logger *Logger) Fatal(format string, v ...interface{}) {
-	// defer func() {
-	// 	if err := recover(); err != nil {
-	// 		logger.Error("%v", err)
-	// 	}
-	// }()
+func (logger *Logger) Fatal(v ...interface{}) {
+	logger.doLog(LEVEL_FATAL, fmt.Sprint(v...))
+	logger.launchCrashReporter()
+	os.Exit(1)
+}
 
+func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	logger.doLog(LEVEL_FATAL, format, v...)
+	logger.launchCrashReporter()
+	os.Exit(1)
+}
 
+func (logger *Logger) launchCrashReporter() {
 	// if deepin-crash-reporter exists, launch it
 	if isFileExists(crashReporterExe) {
 		// save config to a temporary json file
@@ -260,6 +286,4 @@ func (logger *Logger) Fatal(format string, v ...interface{}) {
 			logger.Error("launch deepin-crash-reporter failed: %v", err)
 		}
 	}
-
-	os.Exit(1)
 }
