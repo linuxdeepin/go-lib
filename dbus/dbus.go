@@ -69,7 +69,7 @@ func store(src, dest interface{}) error {
 			ndest := make([]interface{}, 0, rv.NumField())
 			for i := 0; i < rv.NumField(); i++ {
 				field := t.Field(i)
-				if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
+				if isExportedStructField(field) {
 					ndest = append(ndest, rv.Field(i).Addr().Interface())
 				}
 			}

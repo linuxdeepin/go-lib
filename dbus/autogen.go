@@ -79,6 +79,9 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 	n = o_type.NumField()
 	for i := 0; i < n; i++ {
 		field := o_type.Field(i)
+		if !isExportedStructField(field) {
+			continue
+		}
 		if field.Type.Kind() == reflect.Func {
 			ifc_info.Signals = append(ifc_info.Signals, SignalInfo{
 				Name: field.Name,
@@ -231,7 +234,7 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos, nil}
 	}
 	if _, ok := infos["org.freedesktop.DBus.LifeManager"]; !ok {
-		infos["org.freedesktop.DBus.LifeManager"] = &LifeManager{name:name, path:path, count:1}
+		infos["org.freedesktop.DBus.LifeManager"] = &LifeManager{name: name, path: path, count: 1}
 	}
 
 	return nil
