@@ -121,18 +121,26 @@ func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style
 	return
 }
 
-// get rectangle in image which with the same scale to reference width/heigh
+// get rectangle in image which with the same scale to reference
+// width/heigh, and the rectangle will placed in center.
 func getScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int) {
 	scale := float32(refWidth) / float32(refHeight)
 	w := imgWidth
 	h := int(float32(w) / scale)
-	if h > imgHeight {
+	if h < imgHeight {
+		offsetY := (imgHeight - h) / 2
+		x0 = 0
+		y0 = 0 + offsetY
+		x1 = x0 + w
+		y1 = y0 + h
+	} else {
 		h = imgHeight
 		w = int(float32(h) * scale)
+		offsetX := (imgWidth - w) / 2
+		x0 = 0 + offsetX
+		y0 = 0
+		x1 = x0 + w
+		y1 = y0 + h
 	}
-	x0 = 0
-	y0 = 0
-	x1 = x0 + w
-	y1 = y0 + h
 	return
 }
