@@ -23,9 +23,9 @@ package graphic
 
 // ConvertImage converts from any recognized format to target format image.
 func ConvertImage(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	return saveImage(dstfile, srcimg, f)
+	return SaveImage(dstfile, srcimg, f)
 }

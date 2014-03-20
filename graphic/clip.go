@@ -28,12 +28,12 @@ import (
 
 // ClipImage clip any recognized format image and save to target format image.
 func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
 	dstimg := doClipImage(srcimg, int(x0), int(y0), int(x1), int(y1))
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA

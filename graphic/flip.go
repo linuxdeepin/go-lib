@@ -29,23 +29,23 @@ import (
 // FlipImageHorizontal flip image in horizontal direction, and save as
 // target format.
 func FlipImageHorizontal(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return err
 	}
 	dstimg := doFlipImageHorizontal(srcimg)
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // FlipImageVertical  flip image  in vertical  direction, and  save as
 // target format.
 func FlipImageVertical(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return err
 	}
 	dstimg := doFlipImageVertical(srcimg)
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA

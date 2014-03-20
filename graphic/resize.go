@@ -29,12 +29,12 @@ import (
 // ResizeImage returns a new image file with the given width and
 // height created by resizing the given image.
 func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
 	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // TODO doResizeNearestNeighbor returns a new RGBA image with the given width and

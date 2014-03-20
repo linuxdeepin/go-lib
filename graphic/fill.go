@@ -26,6 +26,7 @@ import (
 	"image/draw"
 )
 
+// FillStyle define the type to fill image.
 type FillStyle string
 
 const (
@@ -38,16 +39,16 @@ const (
 // FillImage generate a new image in target width and height through
 // source image, there are many fill sytles to choice from.
 func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg := doFillImage(srcimg, int(width), int(height), style)
-	return saveImage(dstfile, dstimg, f)
+	dstimg := ImplFillImage(srcimg, int(width), int(height), style)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA
-func doFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
 	switch style {
 	case FillTile:
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)

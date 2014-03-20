@@ -29,7 +29,8 @@ import (
 	"os"
 )
 
-func loadImage(imgfile string) (img image.Image, err error) {
+// LoadImage load image file and return image.Image object.
+func LoadImage(imgfile string) (img image.Image, err error) {
 	file, err := os.Open(imgfile)
 	if err != nil {
 		return
@@ -39,7 +40,8 @@ func loadImage(imgfile string) (img image.Image, err error) {
 	return
 }
 
-func saveImage(dstfile string, m image.Image, f Format) (err error) {
+// SaveImage save image.Image object to target filie.
+func SaveImage(dstfile string, m image.Image, f Format) (err error) {
 	df, err := openFileOrCreate(dstfile)
 	if err != nil {
 		return

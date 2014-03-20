@@ -28,22 +28,22 @@ import (
 
 // RotateImageLeft rotate image to left side.
 func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return err
 	}
 	dstimg := doRotateImageLeft(srcimg)
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // RotateImageLeft rotate image to right side.
 func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
-	srcimg, err := loadImage(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return err
 	}
 	dstimg := doRotateImageRight(srcimg)
-	return saveImage(dstfile, dstimg, f)
+	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA
