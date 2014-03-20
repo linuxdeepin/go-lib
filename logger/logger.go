@@ -96,7 +96,13 @@ func newRestartConfig(logname string) *restartConfig {
 	return config
 }
 
-func buildMsg(calldepth int, format string, v ...interface{}) string {
+func buildMsg(calldepth int, v ...interface{}) string {
+	s := fmt.Sprint(v...)
+	_, file, line, _ := runtime.Caller(calldepth)
+	return fmt.Sprintf("%s:%d: %s", file, line, s)
+}
+
+func buildFormatMsg(calldepth int, format string, v ...interface{}) string {
 	s := fmt.Sprintf(format, v...)
 	_, file, line, _ := runtime.Caller(calldepth)
 	return fmt.Sprintf("%s:%d: %s", file, line, s)
@@ -154,12 +160,23 @@ func (logger *Logger) AddExtArgForRestart(arg string) {
 	}
 }
 
-func (logger *Logger) doLog(level Priority, format string, v ...interface{}) {
+func (logger *Logger) log(level Priority, v ...interface{}) {
 	if level < logger.level {
 		return
 	}
+	s := buildMsg(3, v...)
+	logger.doLog(level, s)
+}
 
-	s := buildMsg(3, format, v...)
+func (logger *Logger) logf(level Priority, format string, v ...interface{}) {
+	if level < logger.level {
+		return
+	}
+	s := buildFormatMsg(3, format, v...)
+	logger.doLog(level, s)
+}
+
+func (logger *Logger) doLog(level Priority, s string) {
 	switch level {
 	case LEVEL_DEBUG:
 		if logapi != nil {
@@ -196,63 +213,63 @@ func (logger *Logger) doLog(level Priority, format string, v ...interface{}) {
 
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Debug(v ...interface{}) {
-	logger.doLog(LEVEL_DEBUG, fmt.Sprint(v...))
+	logger.log(LEVEL_DEBUG, v...)
 }
 
 func (logger *Logger) Debugf(format string, v ...interface{}) {
-	logger.doLog(LEVEL_DEBUG, format, v...)
+	logger.logf(LEVEL_DEBUG, format, v...)
 }
 
 // Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Info(v ...interface{}) {
-	logger.doLog(LEVEL_INFO, fmt.Sprint(v...))
+	logger.log(LEVEL_INFO, v...)
 }
 
 func (logger *Logger) Infof(format string, v ...interface{}) {
-	logger.doLog(LEVEL_INFO, format, v...)
+	logger.logf(LEVEL_INFO, format, v...)
 }
 
 // Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Warning(v ...interface{}) {
-	logger.doLog(LEVEL_WARNING, fmt.Sprint(v...))
+	logger.log(LEVEL_WARNING, v...)
 }
 
 func (logger *Logger) Warningf(format string, v ...interface{}) {
-	logger.doLog(LEVEL_WARNING, format, v...)
+	logger.logf(LEVEL_WARNING, format, v...)
 }
 
 // Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Error(v ...interface{}) {
-	logger.doLog(LEVEL_ERROR, fmt.Sprint(v...))
+	logger.log(LEVEL_ERROR, v...)
 }
 
 func (logger *Logger) Errorf(format string, v ...interface{}) {
-	logger.doLog(LEVEL_ERROR, format, v...)
+	logger.logf(LEVEL_ERROR, format, v...)
 }
 
 // Panic is equivalent to Error() followed by a call to panic().
 func (logger *Logger) Panic(v ...interface{}) {
-	logger.doLog(LEVEL_PANIC, fmt.Sprint(v...))
-	s := buildMsg(2, fmt.Sprint(v...))
+	logger.log(LEVEL_PANIC, v...)
+	s := buildMsg(2, v...)
 	panic(s)
 }
 
 func (logger *Logger) Panicf(format string, v ...interface{}) {
-	logger.doLog(LEVEL_PANIC, format, v...)
-	s := buildMsg(2, format, v...)
+	logger.logf(LEVEL_PANIC, format, v...)
+	s := buildFormatMsg(2, format, v...)
 	panic(s)
 }
 
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(v ...interface{}) {
-	logger.doLog(LEVEL_FATAL, fmt.Sprint(v...))
+	logger.log(LEVEL_FATAL, v...)
 	logger.launchCrashReporter()
 	os.Exit(1)
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
-	logger.doLog(LEVEL_FATAL, format, v...)
+	logger.logf(LEVEL_FATAL, format, v...)
 	logger.launchCrashReporter()
 	os.Exit(1)
 }
