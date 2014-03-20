@@ -132,16 +132,14 @@ func GetScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, 
 		offsetY := (imgHeight - h) / 2
 		x0 = 0
 		y0 = 0 + offsetY
-		x1 = x0 + w
-		y1 = y0 + h
 	} else {
 		h = imgHeight
 		w = int(float32(h) * scale)
 		offsetX := (imgWidth - w) / 2
 		x0 = 0 + offsetX
 		y0 = 0
-		x1 = x0 + w
-		y1 = y0 + h
 	}
+	x1 = x0 + w
+	y1 = y0 + h
 	return
 }
