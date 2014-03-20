@@ -32,12 +32,12 @@ func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err err
 	if err != nil {
 		return
 	}
-	dstimg := doClipImage(srcimg, int(x0), int(y0), int(x1), int(y1))
+	dstimg := ImplClipImage(srcimg, int(x0), int(y0), int(x1), int(y1))
 	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA
-func doClipImage(srcimg image.Image, x0, y0, x1, y1 int) (dstimg draw.Image) {
+func ImplClipImage(srcimg image.Image, x0, y0, x1, y1 int) (dstimg draw.Image) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, x1-x0, y1-y0))
 	draw.Draw(dstimg, dstimg.Bounds(), srcimg, image.Point{x0, y0}, draw.Src)
 	return

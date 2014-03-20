@@ -115,15 +115,16 @@ func doFillImageInStretchStyle(srcimg image.Image, width, height int, style Fill
 
 func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
 	iw, ih := doGetImageSize(srcimg)
-	x0, y0, x1, y1 := getScaleRectInImage(width, height, iw, ih)
-	dstimg = doClipImage(srcimg, x0, y0, x1, y1)
+	x0, y0, x1, y1 := GetScaleRectInImage(width, height, iw, ih)
+	dstimg = ImplClipImage(srcimg, x0, y0, x1, y1)
 	dstimg = doResizeNearestNeighbor(dstimg, width, height)
 	return
 }
 
-// get rectangle in image which with the same scale to reference
-// width/heigh, and the rectangle will placed in center.
-func getScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int) {
+// GetScaleRectInImage get rectangle in image which with the same
+// scale to reference width/heigh, and the rectangle will placed in
+// center.
+func GetScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int) {
 	scale := float32(refWidth) / float32(refHeight)
 	w := imgWidth
 	h := int(float32(w) / scale)
