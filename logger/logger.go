@@ -143,8 +143,9 @@ func NewLogger(name string) (logger *Logger) {
 }
 
 // SetLogLevel reset the log level.
-func (logger *Logger) SetLogLevel(level Priority) {
+func (logger *Logger) SetLogLevel(level Priority) *Logger {
 	logger.level = level
+	return logger
 }
 
 // SetRestartCommand reset the command and argument when restart after fatal.
