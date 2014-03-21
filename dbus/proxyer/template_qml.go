@@ -365,6 +365,8 @@ int getTypeId(const QString& sig) {
     if (0) { {{ range $key, $value := GetQtSignaturesType }}
     } else if (sig == "{{$key}}") {
 	    return qDBusRegisterMetaType<{{$value}} >();{{end}}
+    } else if (sig == "(iiii)") {
+	    return qDBusRegisterMetaType<QRect>();
     } else {
 	    qDebug() << "Didn't support getTypeId" << sig << " please report it to snyh@snyh.org";
     }
