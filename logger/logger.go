@@ -119,7 +119,7 @@ func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
 			if ok {
-				msg = fmt.Sprintf("%s\n%s:%d: ->", msg, file, line)
+				msg = fmt.Sprintf("-> %s\n%s:%d", msg, file, line)
 			}
 		}
 	}
