@@ -27,7 +27,7 @@ import (
 
 type Manager struct{}
 
-var logger = liblogger.NewLogger("dde-api/utils")
+var logger = liblogger.NewLogger("dlib/utils")
 
 func NewUtils() *Manager {
         defer func() {
