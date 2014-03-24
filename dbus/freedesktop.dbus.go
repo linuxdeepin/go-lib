@@ -2,6 +2,7 @@ package dbus
 
 import "encoding/xml"
 import "bytes"
+import "fmt"
 import "reflect"
 import "sync"
 
@@ -167,8 +168,14 @@ func (propProxy PropertiesProxy) Get(ifcName string, propName string) (Variant, 
 	if ifc, ok := propProxy.infos[ifcName]; ok {
 		value := getValueOf(ifc).FieldByName(propName)
 		if value.Type().Implements(propertyType) {
-			t := value.MethodByName("GetValue").Interface().(func() interface{})()
-			return MakeVariant(t), nil
+			if value.IsNil() {
+				return MakeVariant(""), fmt.Errorf("nil dbus.Property(%s:%s)", ifcName, propName)
+			} else if fun, ok := value.MethodByName("GetValue").Interface().(func() interface{}); ok {
+				t := fun()
+				return MakeVariant(t), nil
+			} else {
+				return MakeVariant(""), NewUnknowPropertyError(propName)
+			}
 		} else if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
 			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)), value)
 			//TODO: if ifc is not an DBusObject then we need try get the Conn object by other way
