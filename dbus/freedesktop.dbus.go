@@ -167,6 +167,10 @@ func (propProxy PropertiesProxy) Set(ifcName string, propName string, value Vari
 func (propProxy PropertiesProxy) Get(ifcName string, propName string) (Variant, error) {
 	if ifc, ok := propProxy.infos[ifcName]; ok {
 		value := getValueOf(ifc).FieldByName(propName)
+		if value.IsValid() == false {
+			return MakeVariant(""), NewUnknowPropertyError(propName)
+		}
+
 		if value.Type().Implements(propertyType) {
 			if value.IsNil() {
 				return MakeVariant(""), fmt.Errorf("nil dbus.Property(%s:%s)", ifcName, propName)
