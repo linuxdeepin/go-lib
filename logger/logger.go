@@ -33,6 +33,7 @@ import (
 
 const (
 	defaultDebugEnv  = "DDE_DEBUG"
+	defaultDebugFile = "/var/cache/dde_debug"
 	crashReporterExe = "/usr/bin/deepin-crash-reporter"
 )
 
@@ -58,6 +59,10 @@ var (
 	// default log level, if exists the default log level will be
 	// "LEVEL_DEBUG".
 	DebugEnv = defaultDebugEnv
+
+	// DebugFile if the file name that if exist the default log level
+	// will be "LEVEL_DEBUG".
+	DebugFile = defaultDebugFile
 )
 
 func initLogapi() (err error) {
@@ -119,7 +124,7 @@ func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
 			if ok {
-				msg = fmt.Sprintf("-> %s\n%s:%d", msg, file, line)
+				msg = fmt.Sprintf("%s\n-> %s:%d", msg, file, line)
 			}
 		}
 	}
@@ -140,7 +145,7 @@ type Logger struct {
 // "LEVEL_DEBUG" or is "LEVEL_INFO".
 func NewLogger(name string) (logger *Logger) {
 	logger = &Logger{name: name}
-	if isEnvExists(DebugEnv) {
+	if isEnvExists(DebugEnv) || isFileExists(DebugFile) {
 		logger.level = LEVEL_DEBUG
 	} else {
 		logger.level = LEVEL_INFO
