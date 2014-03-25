@@ -22,6 +22,7 @@
 package graphic
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
 )
@@ -43,12 +44,15 @@ func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f 
 	if err != nil {
 		return
 	}
-	dstimg := ImplFillImage(srcimg, int(width), int(height), style)
+	dstimg, err := ImplFillImage(srcimg, int(width), int(height), style)
+	if err != nil {
+		return
+	}
 	return SaveImage(dstfile, dstimg, f)
 }
 
 // FIXME return draw.Image or *image.RGBA
-func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
 	switch style {
 	case FillTile:
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
@@ -57,7 +61,7 @@ func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dsti
 	case FillStretch:
 		dstimg = doFillImageInStretchStyle(srcimg, width, height, style)
 	case FillScaleStretch:
-		dstimg = doFillImageInScaleStretchStyle(srcimg, width, height, style)
+		dstimg, err = doFillImageInScaleStretchStyle(srcimg, width, height, style)
 	default:
 		// default to use FilleTile style
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
@@ -113,9 +117,12 @@ func doFillImageInStretchStyle(srcimg image.Image, width, height int, style Fill
 	return
 }
 
-func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
 	iw, ih := doGetImageSize(srcimg)
-	x0, y0, x1, y1 := GetScaleRectInImage(width, height, iw, ih)
+	x0, y0, x1, y1, err := GetScaleRectInImage(width, height, iw, ih)
+	if err != nil {
+		return
+	}
 	dstimg = ImplClipImage(srcimg, x0, y0, x1, y1)
 	dstimg = doResizeNearestNeighbor(dstimg, width, height)
 	return
@@ -124,7 +131,11 @@ func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style
 // GetScaleRectInImage get rectangle in image which with the same
 // scale to reference width/heigh, and the rectangle will placed in
 // center.
-func GetScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int) {
+func GetScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int, err error) {
+	if refWidth*refHeight == 0 || imgWidth*imgHeight == 0 {
+		err = fmt.Errorf("argument is invalid: ", refWidth, refHeight, imgWidth, imgHeight)
+		return
+	}
 	scale := float32(refWidth) / float32(refHeight)
 	w := imgWidth
 	h := int(float32(w) / scale)
