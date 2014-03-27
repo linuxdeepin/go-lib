@@ -103,7 +103,6 @@ func newRestartConfig(logname string) *restartConfig {
 
 func buildMsg(calldepth int, loop bool, v ...interface{}) (msg string) {
 	s := fmt.Sprintln(v...)
-	// s = s[:len(s)-1] // remove last endline
 	s = strings.TrimSuffix(s, "\n")
 	msg = doBuildMsg(calldepth+1, loop, s)
 	return
