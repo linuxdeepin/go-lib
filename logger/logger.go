@@ -102,12 +102,9 @@ func newRestartConfig(logname string) *restartConfig {
 }
 
 func buildMsg(calldepth int, loop bool, v ...interface{}) (msg string) {
-	var s string
-	if !loop {
-		s = fmt.Sprintln(v...)
-	} else {
-		s = fmt.Sprint(v...)
-	}
+	s := fmt.Sprintln(v...)
+	// s = s[:len(s)-1] // remove last endline
+	s = strings.TrimSuffix(s, "\n")
 	msg = doBuildMsg(calldepth+1, loop, s)
 	return
 }
@@ -253,7 +250,7 @@ func (logger *Logger) doLog(level Priority, s string) {
 func (logger *Logger) printLocal(prefix, msg string) {
 	fmtmsg := prefix + " " + msg
 	fmtmsg = strings.Replace(fmtmsg, "\n", "\n"+prefix+" ", -1) // format multi-lines message
-	fmt.Print(fmtmsg)
+	fmt.Println(fmtmsg)
 }
 
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
