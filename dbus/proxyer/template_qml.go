@@ -31,9 +31,9 @@ public:
     }
 
 {{range .Properties}}
-    Q_PROPERTY(QVariant {{.Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}})
-    QVariant {{.Name}}() { return unmarsh(property("{{.Name}}")); }
-    {{if PropWritable .}}void set{{.Name}}(const QVariant &v) { setProperty("{{.Name}}", v); }{{end}}
+    Q_PROPERTY(QVariant {{.Name}} READ __get_{{.Name}}__ {{if PropWritable .}}WRITE __set_{{.Name}}__{{end}})
+    QVariant __get_{{.Name}}__() { return unmarsh(property("{{.Name}}")); }
+    {{if PropWritable .}}void __set_{{.Name}}__(const QVariant &v) { setProperty("{{.Name}}", v); }{{end}}
     {{end}}
 
 Q_SIGNALS:{{range .Signals}}
@@ -57,7 +57,7 @@ private:
 	    foreach(const QString &prop, changedProps.keys()) {
 		    if (0) { {{range .Properties}}
 		    } else if (prop == "{{.Name}}") {
-			    Q_EMIT ___{{Lower .Name}}Changed___(unmarsh(changedProps.value(prop)));{{end}}
+			    Q_EMIT __{{Lower .Name}}Changed__(unmarsh(changedProps.value(prop)));{{end}}
 		    }
 	    }
     }
@@ -95,15 +95,15 @@ public:
 	    				"sa{sv}as", this, SLOT(_propertiesChanged(QDBusMessage)));
     }
     {{range .Properties}}
-    Q_PROPERTY(QVariant {{Lower .Name}} READ {{.Name}} {{if PropWritable .}}WRITE set{{.Name}}{{end}} NOTIFY ___{{Lower .Name}}Changed___){{end}}
+    Q_PROPERTY(QVariant {{Lower .Name}} READ __get_{{.Name}}__ {{if PropWritable .}}WRITE __set_{{.Name}}__{{end}} NOTIFY __{{Lower .Name}}Changed__){{end}}
 
     //Property read methods{{range .Properties}}
-    const QVariant {{.Name}}() { return unmarsh(m_ifc->property("{{.Name}}")); }{{end}}
+    const QVariant __get_{{.Name}}__() { return unmarsh(m_ifc->property("{{.Name}}")); }{{end}}
     //Property set methods :TODO check access{{range .Properties}}{{if PropWritable .}}
-    void set{{.Name}}(const QVariant &v) {
+    void __set_{{.Name}}__(const QVariant &v) {
 	    QVariant marshedValue = marsh(QDBusArgument(), v, "{{.Type}}");
 	    m_ifc->setProperty("{{.Name}}", marshedValue);
-	    Q_EMIT ___{{Lower .Name}}Changed___(marshedValue);
+	    Q_EMIT __{{Lower .Name}}Changed__(marshedValue);
     }{{end}}{{end}}
 
 public Q_SLOTS:{{range .Methods}}
@@ -137,7 +137,7 @@ public Q_SLOTS:{{range .Methods}}
 
 Q_SIGNALS:
 //Property changed notify signal{{range .Properties}}
-    void ___{{Lower .Name}}Changed___(QVariant);{{end}}
+    void __{{Lower .Name}}Changed__(QVariant);{{end}}
 
 //DBus Interface's signal{{range .Signals}}
     void {{Lower .Name}}({{range $i, $e := .Args}}{{if ne $i 0}},{{end}}{{getQType $e.Type}} {{$e.Name}}{{end}});{{end}}
@@ -362,7 +362,7 @@ var _templateMarshUnMarsh = `
 inline
 int getTypeId(const QString& sig) {
     //TODO: this should staticly generate by xml info
-    if (0) { {{ range $key, $value := GetQtSignaturesType }}
+    if (1) { {{ range $key, $value := GetQtSignaturesType }}
     } else if (sig == "{{$key}}") {
 	    return qDBusRegisterMetaType<{{$value}} >();{{end}}
     } else if (sig == "(iiii)") {

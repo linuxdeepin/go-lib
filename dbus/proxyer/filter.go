@@ -50,7 +50,7 @@ func getGoKeyword() map[string]bool {
 		"int":         true,
 		"uintptr":     true,
 		"string":      true,
-		"class":	true,
+		"class":       true,
 		"bool":        true,
 	}
 }
@@ -141,15 +141,20 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 			}
 		}
 		for i, p := range info.Properties {
+			var propName string
 			if p.Access == "readwrite" {
-				propName := "Set" + p.Name
+				if INFOS.Config.Target == GoLang {
+					propName = "Set" + p.Name
+				}
 				if usedName[propName] {
 					newName := propName + "_"
 					info.Properties[i].Name = newName
 					usedName[newName] = true
 				}
 			}
-			propName := "Get" + p.Name
+			if INFOS.Config.Target == GoLang {
+				propName = "Get" + p.Name
+			}
 			if usedName[propName] {
 				newName := propName + "_"
 				info.Properties[i].Name = newName
