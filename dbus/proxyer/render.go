@@ -136,7 +136,11 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 						ret += ","
 					}
 					notFirst = true
-					ret += arg.Name + " " + dbus.TypeFor(arg.Type)
+					if arg.Type[0] == '(' {
+						ret += arg.Name + " interface{}"
+					} else {
+						ret += arg.Name + " " + dbus.TypeFor(arg.Type)
+					}
 				}
 			}
 			return
