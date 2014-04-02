@@ -362,7 +362,7 @@ var _templateMarshUnMarsh = `
 inline
 int getTypeId(const QString& sig) {
     //TODO: this should staticly generate by xml info
-    if (1) { {{ range $key, $value := GetQtSignaturesType }}
+    if (0) { {{ range $key, $value := GetQtSignaturesType }}
     } else if (sig == "{{$key}}") {
 	    return qDBusRegisterMetaType<{{$value}} >();{{end}}
     } else if (sig == "(iiii)") {
