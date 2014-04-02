@@ -4,6 +4,7 @@ import "text/template"
 import "dlib/dbus"
 import "io"
 import "log"
+import "strings"
 
 var TEMPLs = map[string]string{
 	"GLOBAL_pyqt":   __GLOBAL_TEMPLATE_PyQt,
@@ -136,7 +137,7 @@ func renderInterface(info dbus.InterfaceInfo, writer io.Writer, ifc_name, export
 						ret += ","
 					}
 					notFirst = true
-					if arg.Type[0] == '(' {
+					if strings.Contains(arg.Type, "(") {
 						ret += arg.Name + " interface{}"
 					} else {
 						ret += arg.Name + " " + dbus.TypeFor(arg.Type)
