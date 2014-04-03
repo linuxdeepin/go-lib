@@ -94,7 +94,7 @@ func ({{OBJ_NAME}} {{ExportName}}) Connect{{.Name}}(callback func({{GetParamterO
 			if v.Path != {{OBJ_NAME}}.Path || v.Name != "{{IfcName}}.{{.Name}}" || {{len .Args}} != len(v.Body) {
 				continue
 			}
-			{{range $index, $arg := .Args}}if reflect.TypeOf(v.Body[0]) != reflect.TypeOf((*{{TypeFor $arg.Type}})(nil)).Elem() {
+			{{range $index, $arg := .Args}}if reflect.TypeOf(v.Body[{{ $index }}]) != reflect.TypeOf((*{{TypeFor $arg.Type}})(nil)).Elem() {
 				continue
 			}
 			{{end}}
