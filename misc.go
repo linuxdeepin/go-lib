@@ -4,9 +4,11 @@ import "dlib/dbus"
 
 /*
 #include <glib.h>
+#include <locale.h>
 void _run() {
 	g_main_loop_run(g_main_loop_new(0, FALSE));
 }
+void _init_i18n() { setlocale(LC_ALL, ""); }
 #cgo pkg-config: glib-2.0
 */
 import "C"
@@ -20,6 +22,10 @@ const (
 	SystemBus  = 1
 	SessionBus = 2
 )
+
+func InitI18n() {
+	C._init_i18n()
+}
 
 func UniqueOnSession(name string) bool {
 	con, err := dbus.SessionBus()
