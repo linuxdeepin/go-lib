@@ -243,7 +243,10 @@ func renderQMLProject() {
 }
 
 func testQML() {
-	pkgName := getQMLPkgName("DBus." + INFOS.Config.DestName)
+	pkgName := INFOS.Config.PkgName
+	if pkgName == "" {
+		pkgName = getQMLPkgName("DBus." + INFOS.Config.DestName)
+	}
 	os.MkdirAll(INFOS.Config.OutputDir+"/"+strings.Replace(pkgName, ".", "/", -1), 0755)
 	cmd_str := fmt.Sprintf("cd %s && ln -sv %s lib && qmake", INFOS.Config.OutputDir, strings.Replace(pkgName, ".", "/", -1))
 	cmd := exec.Command("bash", "-c", cmd_str)
