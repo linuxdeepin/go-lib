@@ -12,7 +12,6 @@ void _init_i18n() { setlocale(LC_ALL, ""); }
 #cgo pkg-config: glib-2.0
 */
 import "C"
-import "fmt"
 
 func StartLoop() {
 	C._run()
@@ -43,16 +42,9 @@ func UniqueOnSystem(name string) bool {
 }
 
 func uniqueOnAny(bus *dbus.Conn, name string) bool {
-	var used bool
-	err := bus.BusObject().Call("NameHasOwner", 0, name).Store(&used)
-	if !used {
-		var i uint32
-		err = bus.BusObject().Call("RequestName", 0, name, uint32(0)).Store(&i)
-		fmt.Println("HUHU", err)
-		if err != nil {
-			return false
-		}
+	reply, err := bus.RequestName(name, dbus.NameFlagDoNotQueue)
+	if err != nil || reply != dbus.RequestNameReplyPrimaryOwner {
+		return false
 	}
-	fmt.Println("SD", err)
-	return used == false
+	return true
 }
