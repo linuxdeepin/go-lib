@@ -258,7 +258,7 @@ func testQML() {
 	if err != nil {
 		panic(err)
 	}
-	qmldir.WriteString("module " + pkgName + "\n")
+	qmldir.WriteString("module " + INFOS.Config.DestName + "\n")
 	qmldir.WriteString("plugin " + INFOS.Config.PkgName)
 	qmldir.Close()
 
