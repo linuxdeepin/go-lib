@@ -24,6 +24,7 @@ var (
 
 type GSettingsBoolProperty struct{ *_GSettingsProperty }
 type GSettingsIntProperty struct{ *_GSettingsProperty }
+type GSettingsEnumProperty struct{ *_GSettingsProperty }
 type GSettingsUintProperty struct{ *_GSettingsProperty }
 type GSettingsFloatProperty struct{ *_GSettingsProperty }
 type GSettingsStringProperty struct{ *_GSettingsProperty }
@@ -46,6 +47,16 @@ func (prop *GSettingsIntProperty) Get() int32 {
 	return prop.GetValue().(int32)
 }
 func (prop *GSettingsIntProperty) Set(v int32) {
+	prop.SetValue(v)
+}
+
+func NewGSettingsEnumProperty(obj dbus.DBusObject, propName string, s *gio.Settings, keyName string) *GSettingsEnumProperty {
+	return &GSettingsEnumProperty{newGSettingsProperty("e", obj, propName, s, keyName)}
+}
+func (prop *GSettingsEnumProperty) Get() int32 {
+	return prop.GetValue().(int32)
+}
+func (prop *GSettingsEnumProperty) Set(v int32) {
 	prop.SetValue(v)
 }
 
@@ -91,6 +102,10 @@ func (prop *GSettingsStrvProperty) Set(v []string) {
 
 func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *gio.Settings, keyName string) *_GSettingsProperty {
 	real_type := s.GetValue(keyName).GetTypeString()
+	if real_type == "s" && sig == "e" {
+		// note: "e" is not matched with glib type system
+		real_type = "e"
+	}
 	if real_type != sig {
 		var correct_method string
 		switch real_type {
@@ -132,6 +147,14 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 		}
 		prop.setFn = func(v interface{}) {
 			s.SetInt(keyName, int(reflect.ValueOf(v).Int()))
+		}
+	case "e":
+		prop.valueType = int32Type
+		prop.getFn = func() interface{} {
+			return int32(s.GetEnum(keyName))
+		}
+		prop.setFn = func(v interface{}) {
+			s.SetEnum(keyName, int(reflect.ValueOf(v).Int()))
 		}
 	case "u":
 		prop.valueType = uint32Type
