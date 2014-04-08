@@ -258,7 +258,13 @@ func testQML() {
 	if err != nil {
 		panic(err)
 	}
-	qmldir.WriteString("module " + INFOS.Config.DestName + "\n")
+
+	moduleName := "DBus"
+	for _, f := range strings.Split(INFOS.Config.DestName, ".") {
+		moduleName += "." + upper(f)
+	}
+
+	qmldir.WriteString("module " + moduleName + "\n")
 	qmldir.WriteString("plugin " + INFOS.Config.PkgName)
 	qmldir.Close()
 
