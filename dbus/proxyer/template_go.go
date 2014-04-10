@@ -25,7 +25,6 @@ import "sync"
 import "runtime"
 import "fmt"
 import "errors"
-import "strings"
 /*prevent compile error*/
 var _ = fmt.Println
 var _ = runtime.SetFinalizer
@@ -154,11 +153,6 @@ func New{{ExportName}}(destName string, path dbus.ObjectPath) (*{{ExportName}}, 
 	}
 
 	core := getBus().Object(destName, path)
-	var v string
-	core.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&v)
-	if strings.Index(v, "{{IfcName}}") == -1 {
-		return nil, errors.New("'" + string(path) + "' hasn't interface '{{IfcName}}'.")
-	}
 
 	obj := &{{ExportName}}{Path:path, DestName:destName, core:core{{if or .Signals .Properties}},signals:make(map[chan *dbus.Signal]bool){{end}}}
 	{{range .Properties}}
