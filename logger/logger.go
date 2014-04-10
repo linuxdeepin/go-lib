@@ -145,6 +145,13 @@ type Logger struct {
 // stores in variable "DebugEnv", the default log level will be
 // "LEVEL_DEBUG" or is "LEVEL_INFO".
 func NewLogger(name string) (logger *Logger) {
+	// ignore panic
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println(err)
+		}
+	}()
+
 	logger = &Logger{name: name}
 	if isEnvExists(DebugEnv) || isFileExists(DebugFile) {
 		logger.level = LEVEL_DEBUG
@@ -316,6 +323,9 @@ func (logger *Logger) Fatalf(format string, v ...interface{}) {
 }
 
 func (logger *Logger) launchCrashReporter() {
+	if logapi == nil {
+		return
+	}
 	// if deepin-crash-reporter exists, launch it
 	if isFileExists(crashReporterExe) {
 		// save config to a temporary json file
