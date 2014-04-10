@@ -1,0 +1,23 @@
+package gio
+
+/*
+#include "gio.gen.h"
+
+[<.g_list_funcs>]
+[<.g_object_ref_unref>]
+[<.g_error_free>]
+[<.g_free>]
+#cgo pkg-config: gio-2.0
+*/
+import "C"
+import "unsafe"
+import "errors"
+
+import (
+	"dlib/gobject-2.0"
+	"dlib/glib-2.0"
+)
+
+[<.go_utils>]
+
+[<.go_bindings>]

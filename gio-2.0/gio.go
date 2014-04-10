@@ -3,6 +3,10 @@ package gio
 /*
 #include "gio.gen.h"
 
+
+GList* g_list_append(GList*, void*);
+void g_list_free(GList*);
+
 extern GObject *g_object_ref_sink(GObject*);
 extern void g_object_unref(GObject*);
 extern void g_error_free(GError*);
@@ -124,13 +128,13 @@ func ActionParseDetailedName(detailed_name0 string) (string, *glib.Variant, bool
 	}
 	return action_name2, target_value2, ret2, err2
 }
-func ActionPrintDetailedName(action_name0 string, parameter0 *glib.Variant) string {
+func ActionPrintDetailedName(action_name0 string, target_value0 *glib.Variant) string {
 	var action_name1 *C.char
-	var parameter1 *C.GVariant
+	var target_value1 *C.GVariant
 	action_name1 = _GoStringToGString(action_name0)
 	defer C.free(unsafe.Pointer(action_name1))
-	parameter1 = (*C.GVariant)(unsafe.Pointer(parameter0))
-	ret1 := C.g_action_print_detailed_name(action_name1, parameter1)
+	target_value1 = (*C.GVariant)(unsafe.Pointer(target_value0))
+	ret1 := C.g_action_print_detailed_name(action_name1, target_value1)
 	var ret2 string
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
@@ -758,6 +762,14 @@ func (this0 *AppInfoImpl) Launch(files0 []*File, launch_context0 AppLaunchContex
 	if this0 != nil {
 		this1 = this0.ImplementsGAppInfo()
 	}
+	for _, e := range files0 {
+		var s *C.GFile
+		if e != nil {
+			s = e.ImplementsGFile()
+		}
+		files1 = C.g_list_append(files1, unsafe.Pointer(s))
+	}
+	defer C.g_list_free(files1)
 	if launch_context0 != nil {
 		launch_context1 = launch_context0.InheritedFromGAppLaunchContext()
 	}
@@ -779,6 +791,13 @@ func (this0 *AppInfoImpl) LaunchUris(uris0 []string, launch_context0 AppLaunchCo
 	if this0 != nil {
 		this1 = this0.ImplementsGAppInfo()
 	}
+	for _, e := range uris0 {
+		var s *C.char
+		s = _GoStringToGString(e)
+		defer C.free(unsafe.Pointer(s))
+		uris1 = C.g_list_append(uris1, unsafe.Pointer(s))
+	}
+	defer C.g_list_free(uris1)
 	if launch_context0 != nil {
 		launch_context1 = launch_context0.InheritedFromGAppLaunchContext()
 	}
@@ -906,6 +925,7 @@ const (
 	AppInfoCreateFlagsSupportsStartupNotification AppInfoCreateFlags = 4
 )
 // blacklisted: AppInfoIface (struct)
+// blacklisted: AppInfoMonitor (object)
 type AppLaunchContextLike interface {
 	gobject.ObjectLike
 	InheritedFromGAppLaunchContext() *C.GAppLaunchContext
@@ -959,6 +979,14 @@ func (this0 *AppLaunchContext) GetDisplay(info0 AppInfoLike, files0 []*File) str
 	if info0 != nil {
 		info1 = info0.ImplementsGAppInfo()
 	}
+	for _, e := range files0 {
+		var s *C.GFile
+		if e != nil {
+			s = e.ImplementsGFile()
+		}
+		files1 = C.g_list_append(files1, unsafe.Pointer(s))
+	}
+	defer C.g_list_free(files1)
 	ret1 := C.g_app_launch_context_get_display(this1, info1, files1)
 	var ret2 string
 	ret2 = C.GoString(ret1)
@@ -989,6 +1017,14 @@ func (this0 *AppLaunchContext) GetStartupNotifyId(info0 AppInfoLike, files0 []*F
 	if info0 != nil {
 		info1 = info0.ImplementsGAppInfo()
 	}
+	for _, e := range files0 {
+		var s *C.GFile
+		if e != nil {
+			s = e.ImplementsGFile()
+		}
+		files1 = C.g_list_append(files1, unsafe.Pointer(s))
+	}
+	defer C.g_list_free(files1)
 	ret1 := C.g_app_launch_context_get_startup_notify_id(this1, info1, files1)
 	var ret2 string
 	ret2 = C.GoString(ret1)
@@ -1353,6 +1389,7 @@ const (
 	CredentialsTypeLinuxUcred CredentialsType = 1
 	CredentialsTypeFreebsdCmsgcred CredentialsType = 2
 	CredentialsTypeOpenbsdSockpeercred CredentialsType = 3
+	CredentialsTypeSolarisUcred CredentialsType = 4
 )
 // blacklisted: DBusActionGroup (object)
 // blacklisted: DBusAnnotationInfo (struct)
@@ -1513,6 +1550,7 @@ const (
 	DBusProxyFlagsDoNotConnectSignals DBusProxyFlags = 2
 	DBusProxyFlagsDoNotAutoStart DBusProxyFlags = 4
 	DBusProxyFlagsGetInvalidatedProperties DBusProxyFlags = 8
+	DBusProxyFlagsDoNotAutoStartAtConstruction DBusProxyFlags = 16
 )
 // blacklisted: DBusProxyPrivate (struct)
 // blacklisted: DBusProxyTypeFunc (callback)
@@ -1626,6 +1664,21 @@ func NewDesktopAppInfoFromKeyfile(key_file0 *glib.KeyFile) *DesktopAppInfo {
 	ret1 := C.g_desktop_app_info_new_from_keyfile(key_file1)
 	var ret2 *DesktopAppInfo
 	ret2 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
+	return ret2
+}
+func DesktopAppInfoSearch(search_string0 string) [][]string {
+	var search_string1 *C.char
+	search_string1 = _GoStringToGString(search_string0)
+	defer C.free(unsafe.Pointer(search_string1))
+	ret1 := C.g_desktop_app_info_search(search_string1)
+	var ret2 [][]string
+	ret2 = make([][]string, uint(C._array_length(unsafe.Pointer(ret1))))
+	for i := range ret2 {
+		for i := range ret2[i] {
+			ret2[i][i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer((*(*[999999]**C.char)(unsafe.Pointer(ret1)))[i])))[i])
+			C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer((*(*[999999]**C.char)(unsafe.Pointer(ret1)))[i])))[i]))
+		}
+	}
 	return ret2
 }
 func DesktopAppInfoSetDesktopEnv(desktop_env0 string) {
@@ -2478,6 +2531,7 @@ const FileAttributeStandardSymlinkTarget = "standard::symlink-target"
 const FileAttributeStandardTargetUri = "standard::target-uri"
 const FileAttributeStandardType = "standard::type"
 const FileAttributeThumbnailingFailed = "thumbnail::failed"
+const FileAttributeThumbnailIsValid = "thumbnail::is-valid"
 const FileAttributeThumbnailPath = "thumbnail::path"
 const FileAttributeTimeAccess = "time::access"
 const FileAttributeTimeAccessUsec = "time::access-usec"
@@ -4152,6 +4206,7 @@ func (this0 *FileImpl) ReplaceContentsAsync(contents0 []int, etag0 string, make_
 	gobject.Holder.Grab(callback1)
 	C._g_file_replace_contents_async(this1, contents1, length1, etag1, make_backup1, flags1, cancellable1, callback1)
 }
+// blacklisted: File.replace_contents_bytes_async (method)
 func (this0 *FileImpl) ReplaceContentsFinish(res0 AsyncResultLike) (string, bool, error) {
 	var this1 *C.GFile
 	var res1 *C.GAsyncResult
@@ -8135,6 +8190,7 @@ const NetworkMonitorExtensionPointName = "gio-network-monitor"
 // blacklisted: NetworkService (object)
 // blacklisted: NetworkServiceClass (struct)
 // blacklisted: NetworkServicePrivate (struct)
+// blacklisted: Notification (object)
 type OutputStreamLike interface {
 	gobject.ObjectLike
 	InheritedFromGOutputStream() *C.GOutputStream
@@ -8984,19 +9040,7 @@ func NewSettings(schema_id0 string) *Settings {
 	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
-func NewSettingsFull(schema0 *SettingsSchema, backend0 *SettingsBackend, path0 string) *Settings {
-	var schema1 *C.GSettingsSchema
-	var backend1 *C.GSettingsBackend
-	var path1 *C.char
-	schema1 = (*C.GSettingsSchema)(unsafe.Pointer(schema0))
-	backend1 = (*C.GSettingsBackend)(unsafe.Pointer(backend0))
-	path1 = _GoStringToGString(path0)
-	defer C.free(unsafe.Pointer(path1))
-	ret1 := C.g_settings_new_full(schema1, backend1, path1)
-	var ret2 *Settings
-	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
-	return ret2
-}
+// blacklisted: Settings.new_full (method)
 func NewSettingsWithBackend(schema_id0 string, backend0 *SettingsBackend) *Settings {
 	var schema_id1 *C.char
 	var backend1 *C.GSettingsBackend
@@ -9154,6 +9198,19 @@ func (this0 *Settings) GetChild(name0 string) *Settings {
 	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
+func (this0 *Settings) GetDefaultValue(key0 string) *glib.Variant {
+	var this1 *C.GSettings
+	var key1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGSettings()
+	}
+	key1 = _GoStringToGString(key0)
+	defer C.free(unsafe.Pointer(key1))
+	ret1 := C.g_settings_get_default_value(this1, key1)
+	var ret2 *glib.Variant
+	ret2 = (*glib.Variant)(unsafe.Pointer(ret1))
+	return ret2
+}
 func (this0 *Settings) GetDouble(key0 string) float64 {
 	var this1 *C.GSettings
 	var key1 *C.char
@@ -9272,6 +9329,19 @@ func (this0 *Settings) GetUint(key0 string) int {
 	ret1 := C.g_settings_get_uint(this1, key1)
 	var ret2 int
 	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *Settings) GetUserValue(key0 string) *glib.Variant {
+	var this1 *C.GSettings
+	var key1 *C.char
+	if this0 != nil {
+		this1 = this0.InheritedFromGSettings()
+	}
+	key1 = _GoStringToGString(key0)
+	defer C.free(unsafe.Pointer(key1))
+	ret1 := C.g_settings_get_user_value(this1, key1)
+	var ret2 *glib.Variant
+	ret2 = (*glib.Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
 func (this0 *Settings) GetValue(key0 string) *glib.Variant {
@@ -9517,23 +9587,8 @@ const (
 // blacklisted: SettingsClass (struct)
 // blacklisted: SettingsGetMapping (callback)
 // blacklisted: SettingsPrivate (struct)
-type SettingsSchema struct {}
-func (this0 *SettingsSchema) GetId() string {
-	var this1 *C.GSettingsSchema
-	this1 = (*C.GSettingsSchema)(unsafe.Pointer(this0))
-	ret1 := C.g_settings_schema_get_id(this1)
-	var ret2 string
-	ret2 = C.GoString(ret1)
-	return ret2
-}
-func (this0 *SettingsSchema) GetPath() string {
-	var this1 *C.GSettingsSchema
-	this1 = (*C.GSettingsSchema)(unsafe.Pointer(this0))
-	ret1 := C.g_settings_schema_get_path(this1)
-	var ret2 string
-	ret2 = C.GoString(ret1)
-	return ret2
-}
+// blacklisted: SettingsSchema (struct)
+// blacklisted: SettingsSchemaKey (struct)
 // blacklisted: SettingsSchemaSource (struct)
 // blacklisted: SimpleAction (object)
 // blacklisted: SimpleActionGroup (object)
@@ -9614,6 +9669,20 @@ const (
 )
 // blacklisted: SrvTarget (struct)
 // blacklisted: StaticResource (struct)
+// blacklisted: Subprocess (object)
+type SubprocessFlags C.uint32_t
+const (
+	SubprocessFlagsNone SubprocessFlags = 0
+	SubprocessFlagsStdinPipe SubprocessFlags = 1
+	SubprocessFlagsStdinInherit SubprocessFlags = 2
+	SubprocessFlagsStdoutPipe SubprocessFlags = 4
+	SubprocessFlagsStdoutSilence SubprocessFlags = 8
+	SubprocessFlagsStderrPipe SubprocessFlags = 16
+	SubprocessFlagsStderrSilence SubprocessFlags = 32
+	SubprocessFlagsStderrMerge SubprocessFlags = 64
+	SubprocessFlagsInheritFds SubprocessFlags = 128
+)
+// blacklisted: SubprocessLauncher (object)
 const TlsBackendExtensionPointName = "gio-tls-backend"
 const TlsDatabasePurposeAuthenticateClient = "1.3.6.1.5.5.7.3.2"
 const TlsDatabasePurposeAuthenticateServer = "1.3.6.1.5.5.7.3.1"
@@ -9658,6 +9727,10 @@ const (
 	TlsCertificateFlagsValidateAll TlsCertificateFlags = 127
 )
 // blacklisted: TlsCertificatePrivate (struct)
+type TlsCertificateRequestFlags C.uint32_t
+const (
+	TlsCertificateRequestFlagsNone TlsCertificateRequestFlags = 0
+)
 // blacklisted: TlsClientConnection (interface)
 // blacklisted: TlsClientConnectionInterface (struct)
 // blacklisted: TlsConnection (object)
@@ -10421,6 +10494,8 @@ func FileParseName(parse_name0 string) *File {
 // blacklisted: resources_get_info (function)
 // blacklisted: resources_lookup_data (function)
 // blacklisted: resources_open_stream (function)
+// blacklisted: resources_register (function)
+// blacklisted: resources_unregister (function)
 // blacklisted: settings_schema_source_get_default (function)
 // blacklisted: simple_async_report_gerror_in_idle (function)
 // blacklisted: tls_backend_get_default (function)
