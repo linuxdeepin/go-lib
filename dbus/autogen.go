@@ -53,6 +53,9 @@ func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
 		//Method's first paramter is the struct which this method bound to.
 		for i := 1; i < n_in; i++ {
 			t := m.In(i)
+			if i == 1 && t == dbusMessageType {
+				continue
+			}
 			args = append(args, ArgInfo{
 				Type:      SignatureOfType(t).String(),
 				Direction: "in",

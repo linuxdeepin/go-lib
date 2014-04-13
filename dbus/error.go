@@ -82,6 +82,12 @@ func NewOtherError(body interface{}) dbusError {
 		[]interface{}{body},
 	}
 }
+func newInternalError(body interface{}) dbusError {
+	return dbusError{
+		"com.deepin.DBus.Error.InternalError",
+		[]interface{}{body},
+	}
+}
 func NewUnknowMethod(path ObjectPath, ifc, name string) dbusError {
 	return dbusError{
 		"org.freedesktop.DBus.Error.UnknownMethod",

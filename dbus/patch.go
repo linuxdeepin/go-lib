@@ -11,6 +11,20 @@ type DBusInfo struct {
 type DBusObject interface {
 	GetDBusInfo() DBusInfo
 }
+type DMessage struct {
+	m *Message
+	c *Conn
+}
+
+func (msg DMessage) GetSender() string {
+	sender := msg.m.Headers[FieldSender].value.(string)
+	return sender
+}
+
+func (msg DMessage) GetSenderPID() (r uint32) {
+	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixProcessID", 0, msg.GetSender()).Store(&r)
+	return
+}
 
 var (
 	dbusObject          DBusObject
@@ -18,7 +32,30 @@ var (
 	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
 	propertyType        = reflect.TypeOf((*Property)(nil)).Elem()
 	dbusStructType      = reflect.TypeOf((*[]interface{})(nil)).Elem()
+	dbusMessageType     = reflect.TypeOf((*DMessage)(nil)).Elem()
 )
+
+const (
+	UserMethodFlagNone = 1 << iota
+	UserMethodFlagWillThrowError
+	UserMethodFlagNeedDMessage
+)
+
+func detectExportMethodFlags(t reflect.Type) int {
+	flags := UserMethodFlagNone
+	if n := t.NumOut(); n > 0 {
+		if t.Out(n - 1).Implements(goErrorType) {
+			flags = flags | UserMethodFlagWillThrowError
+		}
+	}
+
+	if n := t.NumIn(); n > 0 {
+		if t.In(0).ConvertibleTo(dbusMessageType) {
+			flags = flags | UserMethodFlagNeedDMessage
+		}
+	}
+	return flags
+}
 
 func isStructureMatched(structValue interface{}, dbusValue interface{}) bool {
 	dValues, ok := dbusValue.([]interface{})

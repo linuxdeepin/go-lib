@@ -58,6 +58,11 @@ func (conn *Conn) handleCall(msg *Message) {
 	ifaceName, hasIface := msg.Headers[FieldInterface].value.(string)
 	sender := msg.Headers[FieldSender].value.(string)
 	serial := msg.serial
+	defer func() {
+		if err := recover(); err != nil {
+			conn.sendError(newInternalError(err), sender, serial)
+		}
+	}()
 	if ifaceName == "org.freedesktop.DBus.Peer" {
 		switch name {
 		case "Ping":
@@ -81,7 +86,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		return
 	}
 
-	var m reflect.Value
+	var userMethod reflect.Value
 	if hasIface {
 		conn.handlersLck.RLock()
 		obj, ok := conn.handlers[path]
@@ -92,7 +97,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		}
 		iface := obj[ifaceName]
 		conn.handlersLck.RUnlock()
-		m = exportedMethod(iface, name)
+		userMethod = exportedMethod(iface, name)
 	} else {
 		conn.handlersLck.RLock()
 		if _, ok := conn.handlers[path]; !ok {
@@ -101,30 +106,35 @@ func (conn *Conn) handleCall(msg *Message) {
 			return
 		}
 		for _, v := range conn.handlers[path] {
-			m = exportedMethod(v, name)
-			if m.IsValid() {
+			userMethod = exportedMethod(v, name)
+			if userMethod.IsValid() {
 				break
 			}
 		}
 		conn.handlersLck.RUnlock()
 	}
-	if !m.IsValid() {
+
+	flags := detectExportMethodFlags(userMethod.Type())
+
+	if !userMethod.IsValid() {
 		conn.sendError(NewUnknowMethod(path, ifaceName, name), sender, serial)
 		return
 	}
-	t := m.Type()
+	t := userMethod.Type()
 	vs := msg.Body
-	pointers := make([]interface{}, t.NumIn())
-	decode := make([]interface{}, 0, len(vs))
-	for i := 0; i < t.NumIn(); i++ {
-		tp := t.In(i)
+
+	pointers := make([]interface{}, len(vs))
+	decode := make([]interface{}, 0)
+	for i := 0; i < len(vs); i++ {
+		var tp reflect.Type
+		if flags&UserMethodFlagNeedDMessage != 0 {
+			tp = t.In(i + 1)
+		} else {
+			tp = t.In(i)
+		}
 		val := reflect.New(tp)
 		pointers[i] = val.Interface()
-		if tp == reflect.TypeOf((*Sender)(nil)).Elem() {
-			val.Elem().SetString(sender)
-		} else {
-			decode = append(decode, pointers[i])
-		}
+		decode = append(decode, pointers[i])
 	}
 	if len(decode) != len(vs) {
 		conn.sendError(NewInvalidArg(fmt.Sprintf("Need %d paramters but get %d", len(decode), len(vs))), sender, serial)
@@ -138,9 +148,14 @@ func (conn *Conn) handleCall(msg *Message) {
 	for i := 0; i < len(pointers); i++ {
 		params[i] = reflect.ValueOf(pointers[i]).Elem()
 	}
-	ret := m.Call(params)
-	out_n := t.NumOut()
-	if out_n > 0 && ret[out_n-1].Type().Implements(goErrorType) {
+	if flags&UserMethodFlagNeedDMessage != 0 {
+		params = append([]reflect.Value{reflect.ValueOf(DMessage{msg, conn})}, params...)
+	}
+
+	ret := userMethod.Call(params)
+
+	if flags&UserMethodFlagWillThrowError != 0 {
+		out_n := t.NumOut()
 		v := ret[out_n-1].Interface()
 		if v != nil {
 			if em, ok := v.(dbusError); ok {
