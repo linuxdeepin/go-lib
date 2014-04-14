@@ -59,10 +59,15 @@ func (op *Manager) PolkitAuthWithPid(actionId string, pid uint32) bool {
         flags := uint32(1)
         cancelId := ""
 
-        _, err = objPolkit.CheckAuthorization(subject, actionId, details,
+        ret, err1 := objPolkit.CheckAuthorization(subject, actionId, details,
                 flags, cancelId)
-        if err != nil {
-                logger.Warning("CheckAuthorization Failed: ", err)
+        if err1 != nil {
+                logger.Warning("CheckAuthorization Failed: ", err1)
+                return false
+        }
+
+        // Is Authority
+        if !ret[0].(bool) {
                 return false
         }
 
