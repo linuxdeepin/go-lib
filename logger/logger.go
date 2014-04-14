@@ -145,10 +145,12 @@ type Logger struct {
 // stores in variable "DebugEnv", the default log level will be
 // "LEVEL_DEBUG" or is "LEVEL_INFO".
 func NewLogger(name string) (logger *Logger) {
+	log.SetFlags(log.Llongfile)
+
 	// ignore panic
 	defer func() {
 		if err := recover(); err != nil {
-			log.Println(err)
+			log.Println("[INFO] dbus unavailable,", err)
 		}
 	}()
 

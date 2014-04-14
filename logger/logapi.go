@@ -23,7 +23,7 @@ func getBus() *dbus.Conn {
 		var err error
 		__conn, err = dbus.SystemBus()
 		if err != nil {
-			log.Println(err)
+			log.Println("[INFO] dbus unavailable,", err)
 		}
 	}
 	return __conn
