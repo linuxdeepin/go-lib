@@ -31,10 +31,10 @@ import (
 type FillStyle string
 
 const (
-	FillTile         FillStyle = "tile"         // 平铺
-	FillCenter                 = "center"       // 居中
-	FillStretch                = "stretch"      // 拉伸
-	FillScaleStretch           = "scalestretch" // 等比拉伸
+	FillTile                  FillStyle = "tile"                    // 平铺
+	FillCenter                          = "center"                  // 居中
+	FillScale                           = "scale"                   // 拉伸
+	FillProportionCenterScale           = "proportion-center-scale" // 等比居中拉伸
 )
 
 // FillImage generate a new image in target width and height through
@@ -58,10 +58,10 @@ func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dsti
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
 	case FillCenter:
 		dstimg = doFillImageInCenterStyle(srcimg, width, height, style)
-	case FillStretch:
-		dstimg = doFillImageInStretchStyle(srcimg, width, height, style)
-	case FillScaleStretch:
-		dstimg, err = doFillImageInScaleStretchStyle(srcimg, width, height, style)
+	case FillScale:
+		dstimg = doFillImageInScaleStyle(srcimg, width, height, style)
+	case FillProportionCenterScale:
+		dstimg, err = doFillImageInProportionCenterScaleStyle(srcimg, width, height, style)
 	default:
 		// default to use FilleTile style
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
@@ -112,45 +112,43 @@ func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillS
 	return
 }
 
-func doFillImageInStretchStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func doFillImageInScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
 	dstimg = doResizeNearestNeighbor(srcimg, width, height)
 	return
 }
 
-func doFillImageInScaleStretchStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
+func doFillImageInProportionCenterScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
 	iw, ih := doGetImageSize(srcimg)
-	x0, y0, x1, y1, err := GetScaleRectInImage(width, height, iw, ih)
+	x, y, w, h, err := GetProportionCenterScaleRect(width, height, iw, ih)
 	if err != nil {
 		return
 	}
-	dstimg = ImplClipImage(srcimg, x0, y0, x1, y1)
+	dstimg = ImplClipImage(srcimg, x, y, w, h)
 	dstimg = doResizeNearestNeighbor(dstimg, width, height)
 	return
 }
 
-// GetScaleRectInImage get rectangle in image which with the same
+// GetProportionCenterScaleRect get rectangle in image which with the same
 // scale to reference width/heigh, and the rectangle will placed in
 // center.
-func GetScaleRectInImage(refWidth, refHeight, imgWidth, imgHeight int) (x0, y0, x1, y1 int, err error) {
+func GetProportionCenterScaleRect(refWidth, refHeight, imgWidth, imgHeight int) (x, y, w, h int, err error) {
 	if refWidth*refHeight == 0 || imgWidth*imgHeight == 0 {
 		err = fmt.Errorf("argument is invalid: ", refWidth, refHeight, imgWidth, imgHeight)
 		return
 	}
 	scale := float32(refWidth) / float32(refHeight)
-	w := imgWidth
-	h := int(float32(w) / scale)
+	w = imgWidth
+	h = int(float32(w) / scale)
 	if h < imgHeight {
 		offsetY := (imgHeight - h) / 2
-		x0 = 0
-		y0 = 0 + offsetY
+		x = 0
+		y = 0 + offsetY
 	} else {
 		h = imgHeight
 		w = int(float32(h) * scale)
 		offsetX := (imgWidth - w) / 2
-		x0 = 0 + offsetX
-		y0 = 0
+		x = 0 + offsetX
+		y = 0
 	}
-	x1 = x0 + w
-	y1 = y0 + h
 	return
 }
