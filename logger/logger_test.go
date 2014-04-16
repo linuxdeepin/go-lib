@@ -16,6 +16,7 @@ func init() {
 }
 
 func (logger *Logger) TestFunc(c *C) {
+	defer logger.EndTracing()
 	logger.SetLogLevel(LEVEL_DEBUG)
 	logger.Debug("test debug")
 	logger.Info("test info")
@@ -24,6 +25,6 @@ func (logger *Logger) TestFunc(c *C) {
 	logger.Warningf("test warningf: %v", fmt.Errorf("error message"))
 	logger.Error("test error: ", fmt.Errorf("error message"))
 	logger.Errorf("test errorf: %v", fmt.Errorf("error message"))
-	// logger.Panic("test panic")
+	logger.Panic("test panic")
 	// logger.Fatal("test fatal")
 }

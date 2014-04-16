@@ -194,6 +194,22 @@ func (logger *Logger) AddExtArgForRestart(arg string) {
 	}
 }
 
+func (logger *Logger) EndTracing() {
+	if err := recover(); err != nil {
+		logger.Fatal(err)
+	} else {
+		logger.logEndSuccess()
+	}
+}
+
+func (logger *Logger) logEndSuccess() {
+	logger.Debug("<program ends normally>")
+}
+
+func (logger *Logger) logEndFailed() {
+	logger.Debug("<program interruption>")
+}
+
 func (logger *Logger) log(level Priority, v ...interface{}) {
 	if level < logger.level {
 		return
@@ -315,12 +331,14 @@ func (logger *Logger) Panicf(format string, v ...interface{}) {
 func (logger *Logger) Fatal(v ...interface{}) {
 	logger.log(LEVEL_FATAL, v...)
 	logger.launchCrashReporter()
+	logger.logEndFailed()
 	os.Exit(1)
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	logger.logf(LEVEL_FATAL, format, v...)
 	logger.launchCrashReporter()
+	logger.logEndFailed()
 	os.Exit(1)
 }
 
