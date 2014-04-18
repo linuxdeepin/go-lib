@@ -30,7 +30,7 @@ func delta(x, y float64) float64 {
 
 func (g *Graphic) TestBlurImage(c *C) {
 	resultFile := "testdata/test_blurimage.png"
-	err := BlurImage(originTestImage, resultFile, 15, 10, PNG)
+	err := BlurImage(originTestImage, resultFile, 30, 1, PNG)
 	if err != nil {
 		c.Error(err)
 	}
@@ -104,25 +104,25 @@ func (g *Graphic) TestFillImage(c *C) {
 	}
 
 	resultFile = "testdata/test_flllimage_stretch_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillStretch, PNG)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillScale, PNG)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_stretch_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillStretch, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillScale, PNG)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillScaleStretch, PNG)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillProportionCenterScale, PNG)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillScaleStretch, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillProportionCenterScale, PNG)
 	if err != nil {
 		c.Error(err)
 	}
