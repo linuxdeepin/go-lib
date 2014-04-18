@@ -6,9 +6,12 @@ import (
 )
 
 const (
-	originTestImage         = "testdata/origin_1280x800.jpg"
-	originImgWidth          = 1280
-	originImgHeight         = 800
+	originTestImage = "testdata/origin_1920x1080.jpg"
+	originImgWidth  = 1920
+	originImgHeight = 1080
+	// originTestImage         = "testdata/origin_1280x800.jpg"
+	// originImgWidth          = 1280
+	// originImgHeight         = 800
 	originImgDominantColorH = 205
 	originImgDominantColorS = 0.69
 	originImgDominantColorV = 0.42
@@ -28,9 +31,13 @@ func delta(x, y float64) float64 {
 	return y - x
 }
 
+func (g *Graphic) TestLoadImage(c *C) {
+	LoadImage(originTestImage)
+}
+
 func (g *Graphic) TestBlurImage(c *C) {
 	resultFile := "testdata/test_blurimage.png"
-	err := BlurImage(originTestImage, resultFile, 30, 1, PNG)
+	err := BlurImage(originTestImage, resultFile, 50, 1, PNG)
 	if err != nil {
 		c.Error(err)
 	}
