@@ -617,13 +617,13 @@ func init() {
 func DealWithUnhandledMessage() {
 	if conn, err := SessionBus(); err == nil {
 		for _, msg := range conn.unhandledMsgs {
-			conn.handleCall(msg)
+			go conn.handleCall(msg)
 		}
 		conn.unhandledMsgs = nil
 	}
 	if conn, err := SystemBus(); err == nil {
 		for _, msg := range conn.unhandledMsgs {
-			conn.handleCall(msg)
+			go conn.handleCall(msg)
 		}
 		conn.unhandledMsgs = nil
 	}
