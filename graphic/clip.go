@@ -22,8 +22,10 @@
 package graphic
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
+	"path"
 )
 
 // ClipImage clip any recognized format image and save to target format image.
@@ -34,6 +36,18 @@ func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err err
 	}
 	dstimg := ImplClipImage(srcimg, int(x0), int(y0), int(x1-x0), int(y1-y0))
 	return SaveImage(dstfile, dstimg, f)
+}
+
+// ClipImageCache clip any recognized format image and save to cache
+// directory, if already exists, just return it.
+func ClipImageCache(srcfile string, x0, y0, x1, y1 int32, f Format) (dstfile string, err error) {
+	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ClipImageCache%s%d%d%d%d%s", srcfile, x0, y0, x1, y1, f)))
+	if isFileExists(dstfile) {
+		return
+	}
+	ensureDirExists(path.Dir(dstfile))
+	err = ClipImage(srcfile, dstfile, x0, y0, x1, y1, f)
+	return
 }
 
 // FIXME return draw.Image or *image.RGBA

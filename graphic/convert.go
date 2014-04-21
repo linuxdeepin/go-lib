@@ -21,6 +21,11 @@
 
 package graphic
 
+import (
+	"fmt"
+	"path"
+)
+
 // ConvertImage converts from any recognized format to target format image.
 func ConvertImage(srcfile, dstfile string, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
@@ -28,4 +33,16 @@ func ConvertImage(srcfile, dstfile string, f Format) (err error) {
 		return
 	}
 	return SaveImage(dstfile, srcimg, f)
+}
+
+// ConvertImageCache converts from any recognized format to cache
+// directory, if already exists, just return it.
+func ConvertImageCache(srcfile string, f Format) (dstfile string, err error) {
+	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ConvertImageCache%s%s", srcfile, f)))
+	if isFileExists(dstfile) {
+		return
+	}
+	ensureDirExists(path.Dir(dstfile))
+	err = ConvertImage(srcfile, dstfile, f)
+	return
 }

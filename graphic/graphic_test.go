@@ -144,6 +144,14 @@ func (g *Graphic) TestFillImage(c *C) {
 	}
 }
 
+func (g *Graphic) TestFillImageCache(c *C) {
+	resultFile, err := FillImageCache(originTestImage, 1024, 768, FillTile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	fmt.Println("TestFillImageCache:", resultFile)
+}
+
 func (g *Graphic) TestFlipImageVertical(c *C) {
 	resultFile := "testdata/test_flipimagevertical.png"
 	err := FlipImageVertical(originTestImage, resultFile, PNG)
