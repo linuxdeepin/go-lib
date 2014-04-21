@@ -22,6 +22,8 @@
 package graphic
 
 import (
+	"crypto/md5"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -64,4 +66,22 @@ func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 
 func openFileOrCreate(file string) (*os.File, error) {
 	return os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
+}
+
+func isFileExists(file string) bool {
+	if _, err := os.Stat(file); err == nil {
+		return true
+	} else {
+		return false
+	}
+}
+
+func ensureDirExists(dir string) {
+	os.MkdirAll(dir, 0755)
+}
+
+func encodeMD5Str(s string) string {
+	h := md5.New()
+	io.WriteString(h, s)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }

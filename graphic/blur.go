@@ -28,10 +28,30 @@ package graphic
 import "C"
 import "unsafe"
 import "fmt"
+import "os"
+import "path"
+
+var (
+	blurCacheFormat = os.Getenv("HOME") + "/.cache/dde/graphic_blur_%s"
+)
 
 // BlurImage generate blur effect to an image.
 // TODO Format always is PNG
 func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err error) {
+	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
+	if !ok {
+		err = fmt.Errorf("generate blur pict failed")
+	}
+	return
+}
+
+// BlurImageCache save the blurred image to cache, if target file already exists, just return it.
+func BlurImageCache(srcfile string, sigma, numsteps float64, f Format) (dstfile string, err error) {
+	dstfile = fmt.Sprintf(blurCacheFormat, encodeMD5Str(fmt.Sprintf("%s%f%f%s", srcfile, sigma, numsteps, f)))
+	if isFileExists(dstfile) {
+		return
+	}
+	ensureDirExists(path.Dir(dstfile))
 	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
 	if !ok {
 		err = fmt.Errorf("generate blur pict failed")

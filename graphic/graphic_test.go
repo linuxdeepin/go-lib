@@ -1,6 +1,7 @@
 package graphic
 
 import (
+	"fmt"
 	. "launchpad.net/gocheck"
 	"testing"
 )
@@ -41,6 +42,14 @@ func (g *Graphic) TestBlurImage(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
+}
+
+func (g *Graphic) TestBlurImageCache(c *C) {
+	resultFile, err := BlurImageCache(originTestImage, 50, 1, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	fmt.Println("TestBlurImageCache:", resultFile)
 }
 
 func (g *Graphic) TestClipImage(c *C) {
