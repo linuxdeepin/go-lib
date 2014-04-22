@@ -113,13 +113,12 @@ func (conn *Conn) handleCall(msg *Message) {
 		}
 		conn.handlersLck.RUnlock()
 	}
-
-	flags := detectExportMethodFlags(userMethod.Type())
-
 	if !userMethod.IsValid() {
 		conn.sendError(NewUnknowMethod(path, ifaceName, name), sender, serial)
 		return
 	}
+
+	flags := detectExportMethodFlags(userMethod.Type())
 	t := userMethod.Type()
 	vs := msg.Body
 
