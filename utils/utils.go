@@ -24,6 +24,7 @@ package utils
 import (
         "io/ioutil"
         "os"
+        "os/user"
         "strings"
 )
 
@@ -304,4 +305,28 @@ func (op *Manager) IsListEqual(l1, l2 interface{}) bool {
         }
 
         return true
+}
+
+func (op *Manager) GetHomeDir() (string, bool) {
+        info, err := user.Current()
+        if err != nil {
+                logger.Warning("Get User Info Failed: ", err)
+                return "", false
+        }
+
+        return info.HomeDir, true
+}
+
+func (op *Manager) GetConfigDir() (string, bool) {
+        if homeDir, ok := op.GetHomeDir(); ok {
+                return homeDir + "/.config", true
+        }
+        return "", false
+}
+
+func (op *Manager) GetCacheDir() (string, bool) {
+        if homeDir, ok := op.GetHomeDir(); ok {
+                return homeDir + "/.cache", true
+        }
+        return "", false
 }
