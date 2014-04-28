@@ -1,3 +1,4 @@
 */*.test
 _tmp
 graphic/testdata/test*
+*.bak
