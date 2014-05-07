@@ -45,11 +45,11 @@ func (g *Graphic) TestBlurImage(c *C) {
 }
 
 func (g *Graphic) TestBlurImageCache(c *C) {
-	resultFile, err := BlurImageCache(originTestImage, 50, 1, PNG)
+	resultFile, useCache, err := BlurImageCache(originTestImage, 50, 1, PNG)
 	if err != nil {
 		c.Error(err)
 	}
-	fmt.Println("TestBlurImageCache:", resultFile)
+	fmt.Println("TestBlurImageCache:", useCache, resultFile)
 }
 
 func (g *Graphic) TestClipImage(c *C) {
@@ -145,11 +145,11 @@ func (g *Graphic) TestFillImage(c *C) {
 }
 
 func (g *Graphic) TestFillImageCache(c *C) {
-	resultFile, err := FillImageCache(originTestImage, 1024, 768, FillTile, PNG)
+	resultFile, useCache, err := FillImageCache(originTestImage, 1024, 768, FillTile, PNG)
 	if err != nil {
 		c.Error(err)
 	}
-	fmt.Println("TestFillImageCache:", resultFile)
+	fmt.Println("TestFillImageCache:", useCache, resultFile)
 }
 
 func (g *Graphic) TestFlipImageVertical(c *C) {

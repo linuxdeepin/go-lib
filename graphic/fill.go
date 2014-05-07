@@ -55,9 +55,11 @@ func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f 
 // FillImageCache generate a new image in target width and height through
 // source image, and save it to cache directory, if already exists,
 // just return it.
-func FillImageCache(srcfile string, width, height int32, style FillStyle, f Format) (dstfile string, err error) {
+func FillImageCache(srcfile string, width, height int32, style FillStyle, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("FillImageCache%s%d%d%s%s", srcfile, width, height, style, f)))
 	if isFileExists(dstfile) {
+		// return cache file
+		useCache = true
 		return
 	}
 	ensureDirExists(path.Dir(dstfile))

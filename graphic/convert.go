@@ -37,9 +37,10 @@ func ConvertImage(srcfile, dstfile string, f Format) (err error) {
 
 // ConvertImageCache converts from any recognized format to cache
 // directory, if already exists, just return it.
-func ConvertImageCache(srcfile string, f Format) (dstfile string, err error) {
+func ConvertImageCache(srcfile string, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ConvertImageCache%s%s", srcfile, f)))
 	if isFileExists(dstfile) {
+		useCache = true
 		return
 	}
 	ensureDirExists(path.Dir(dstfile))
