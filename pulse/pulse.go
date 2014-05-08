@@ -46,7 +46,11 @@ func (c *Context) GetSinkList() (r []*Sink) {
 func (c *Context) GetSink(index uint32) *Sink {
 	ck := newCookie()
 	C.get_sink_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
-	return ck.Reply().ToSink()
+	info := ck.Reply()
+	if info == nil {
+		return nil
+	}
+	return info.ToSink()
 }
 
 func (c *Context) GetSinkInputList() (r []*SinkInput) {
@@ -62,7 +66,12 @@ func (c *Context) GetSinkInputList() (r []*SinkInput) {
 func (c *Context) GetSinkInput(index uint32) *SinkInput {
 	ck := newCookie()
 	C.get_sink_input_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
-	return ck.Reply().ToSinkInput()
+
+	info := ck.Reply()
+	if info == nil {
+		return nil
+	}
+	return info.ToSinkInput()
 }
 
 func (c *Context) GetSourceList() (r []*Source) {
