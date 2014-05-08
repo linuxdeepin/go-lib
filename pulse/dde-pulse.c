@@ -69,8 +69,7 @@ pa_context* pa_init(pa_mainloop* ml)
 	while (pa_context_get_state(ctx) != PA_CONTEXT_READY) {
 	    pa_mainloop_iterate(ml, 1, 0);
 	}
-	/*setup_monitor(ctx);*/
-	printf("HUHU\n");
+	setup_monitor(ctx);
 	success_cb = __success_cb;
 	return ctx;
 }

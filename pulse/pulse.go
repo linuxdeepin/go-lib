@@ -5,10 +5,30 @@ package pulse
 #cgo pkg-config: libpulse glib-2.0 libpulse-mainloop-glib
 */
 import "C"
-import "unsafe"
 import "fmt"
+import "unsafe"
+
+type Callback func(eventType int, idx uint32)
+
+const (
+	EventTypeNew    = C.PA_SUBSCRIPTION_EVENT_NEW
+	EventTypeChange = C.PA_SUBSCRIPTION_EVENT_CHANGE
+	EventTypeRemove = C.PA_SUBSCRIPTION_EVENT_REMOVE
+)
+const (
+	FacilitySink         = C.PA_SUBSCRIPTION_EVENT_SINK
+	FacilitySource       = C.PA_SUBSCRIPTION_EVENT_SOURCE
+	FacilitySinkInput    = C.PA_SUBSCRIPTION_EVENT_SINK_INPUT
+	FacilitySourceOutput = C.PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT
+	FacilityCard         = C.PA_SUBSCRIPTION_EVENT_CARD
+	FacilityClient       = C.PA_SUBSCRIPTION_EVENT_CLIENT
+	FacilityModule       = C.PA_SUBSCRIPTION_EVENT_MODULE
+	FacilitySampleCache  = C.PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE
+)
 
 type Context struct {
+	cbs map[int][]Callback
+
 	ctx  *C.pa_context
 	loop *C.pa_mainloop
 }
@@ -83,7 +103,11 @@ func GetContext() *Context {
 	if __context == nil {
 		loop := C.pa_mainloop_new()
 		ctx := C.pa_init(loop)
-		__context = &Context{ctx, loop}
+		__context = &Context{
+			cbs:  make(map[int][]Callback),
+			ctx:  ctx,
+			loop: loop,
+		}
 		go __context.runLoop()
 	}
 	return __context
@@ -93,12 +117,14 @@ func (c *Context) runLoop() {
 	C.pa_mainloop_run(c.loop, nil)
 }
 
-func (*Context) Connect(c, t int, cb func()) {
-}
-
 //export receive_some_info
 func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, end bool) {
 	c := fetchCookie(cookie)
+	if c == nil {
+		//NOTE: didn't know why the c will be nil, but it happened at sometimes
+		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, end)
+		return
+	}
 	if end {
 		c.EndOfList()
 	} else {
@@ -106,49 +132,22 @@ func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, end bool
 	}
 }
 
+func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
+	// sink sinkinput source sourceoutput
+	c.cbs[facility] = append(c.cbs[facility], cb)
+}
+
+func (c *Context) handlePAEvent(facility, eventType int, idx uint32) {
+	if cb, ok := c.cbs[facility]; ok {
+		for _, c := range cb {
+			go c(eventType, idx)
+		}
+	} else {
+		fmt.Println("unknow event", facility, eventType, idx)
+	}
+}
+
 //export go_handle_changed
 func go_handle_changed(facility int, event_type int, idx uint32) {
-	switch facility {
-	case C.PA_SUBSCRIPTION_EVENT_CARD:
-		if event_type == C.PA_SUBSCRIPTION_EVENT_NEW {
-			fmt.Printf("DEBUG card %d new\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_CHANGE {
-			fmt.Printf("DEBUG card %d state changed\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_REMOVE {
-			fmt.Printf("DEBUG card %d removed\n", idx)
-		}
-	case C.PA_SUBSCRIPTION_EVENT_SINK:
-		if event_type == C.PA_SUBSCRIPTION_EVENT_NEW {
-			fmt.Printf("DEBUG sink %d new\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_CHANGE {
-			fmt.Printf("DEBUG sink %d state changed\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_REMOVE {
-			fmt.Printf("DEBUG sink %d removed\n", idx)
-		}
-	case C.PA_SUBSCRIPTION_EVENT_SOURCE:
-		if event_type == C.PA_SUBSCRIPTION_EVENT_NEW {
-			fmt.Printf("DEBUG source %d new\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_CHANGE {
-			fmt.Printf("DEBUG source %d changed\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_REMOVE {
-			fmt.Printf("DEBUG source %d removed\n", idx)
-		}
-	case C.PA_SUBSCRIPTION_EVENT_SINK_INPUT:
-		if event_type == C.PA_SUBSCRIPTION_EVENT_NEW {
-			fmt.Printf("DEBUG sink input %d new\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_CHANGE {
-			fmt.Printf("DEBUG sink input %d changed\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_REMOVE {
-			fmt.Printf("DEBUG sink input %d removed\n", idx)
-		}
-	case C.PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT:
-		if event_type == C.PA_SUBSCRIPTION_EVENT_NEW {
-			fmt.Printf("DEBUG source output %d new\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_CHANGE {
-			fmt.Printf("DEBUG source output %d changed\n", idx)
-		} else if event_type == C.PA_SUBSCRIPTION_EVENT_REMOVE {
-			fmt.Printf("DEBUG source output %d removed\n", idx)
-		}
-	case C.PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE:
-	}
+	GetContext().handlePAEvent(facility, event_type, idx)
 }

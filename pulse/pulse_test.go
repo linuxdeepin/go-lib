@@ -1,20 +1,19 @@
 package pulse
 
 import (
+	"fmt"
 	fmtp "github.com/kr/pretty"
 	"testing"
-	"time"
 )
 
-func TestIntrospect(t *testing.T) {
-	_ = fmtp.Print
-	ctx := GetContext()
-	//sink := ctx.GetSink(1)
-	//sink.SetAvgVolume(1)
-	////sink.SetBalance(0)
-	//fmtp.Println(sink.Volume.Avg())
+var ctx = GetContext()
 
-	//sink.SetMute(false)
+func drain() {
+	ctx.GetSink(0)
+}
+
+func TestSinkInput(t *testing.T) {
+	defer drain()
 
 	for _, si := range ctx.GetSinkInputList() {
 		name := si.PropList["application.name"]
@@ -22,6 +21,23 @@ func TestIntrospect(t *testing.T) {
 			si.SetMute(true)
 		}
 	}
+}
 
-	<-time.After(time.Second)
+func TestEvent(t *testing.T) {
+	ctx.Connect(FacilitySinkInput, func(eType int, idx uint32) {
+		fmt.Println("SinkInput Changed...", eType, ctx.GetSinkInput(idx).GetAvgVolume())
+	})
+	fmt.Println("HEHE...")
+	select {}
+}
+
+func TestIntrospect(t *testing.T) {
+	_ = fmtp.Print
+	sink := ctx.GetSink(1)
+	sink.SetAvgVolume(1)
+	//sink.SetBalance(0)
+	fmtp.Println(sink.Volume.Avg())
+
+	sink.SetMute(false)
+
 }
