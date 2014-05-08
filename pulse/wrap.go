@@ -154,7 +154,38 @@ func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {
 
 	return s
 }
+
 func toSourceInfo(info *C.pa_source_info) *Source {
+	s := &Source{}
+	s.Index = uint32(info.index)
+	s.Name = C.GoString(info.name)
+	s.Description = C.GoString(info.description)
+	s.ChannelMap = toChannelMap(info.channel_map)
+	//sample_spec
+	s.OwnerModule = uint32(info.owner_module)
+	s.Volume = toCVolume(info.volume)
+	s.Mute = toBool(info.mute)
+	s.MonitorOfSink = uint32(info.monitor_of_sink)
+	s.MonitorOfSinkName = C.GoString(info.monitor_of_sink_name)
+
+	//latency pa_usec_t
+
+	s.Driver = C.GoString(info.driver)
+
+	//flags pa_source_flags_t
+
+	s.Proplist = toProplist(info.proplist)
+	s.BaseVolume = Volume(info.base_volume)
+
+	//state
+
+	s.NVolumeSteps = uint32(info.n_volume_steps)
+	s.Card = uint32(info.card)
+	s.Ports = toPorts(uint32(info.n_ports), (**C.pa_sink_port_info)(unsafe.Pointer(info.ports)))
+	s.ActivePort = toPort((*C.pa_sink_port_info)((unsafe.Pointer)(info.active_port)))
+
+	//n_formats
+	//formats
 	return nil
 }
 

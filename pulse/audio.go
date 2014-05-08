@@ -5,8 +5,8 @@ type Audio struct {
 	Sinks   []*Sink
 	Sources []*Source
 
-	SinkInputs    []*SinkInput
-	SourceOutputs []*SourceOutput
+	SinkInputs []*SinkInput
+	//SourceOutputs []*SourceOutput
 
 	DefaultSink   *Sink
 	DefaultSource *Sink
