@@ -107,7 +107,7 @@ func toSinkInfo(info *C.pa_sink_info) *Sink {
 
 func toPorts(n uint32, c **C.pa_sink_port_info) (r []PortInfo) {
 	if n > 0 {
-		pp := (*[1 << 30](*C.pa_sink_port_info))(unsafe.Pointer(c))[:n:n]
+		pp := (*[1 << 10](*C.pa_sink_port_info))(unsafe.Pointer(c))[:n:n]
 		for _, p := range pp {
 			r = append(r, toPort(p))
 		}
@@ -128,7 +128,7 @@ func toPort(c *C.pa_sink_port_info) PortInfo {
 
 func toSourcePorts(n uint32, c **C.pa_source_port_info) (r []PortInfo) {
 	if n > 0 {
-		pp := (*[1 << 30](*C.pa_source_port_info))(unsafe.Pointer(c))[:n:n]
+		pp := (*[1 << 10](*C.pa_source_port_info))(unsafe.Pointer(c))[:n:n]
 		for _, p := range pp {
 			r = append(r, toSourcePort(p))
 		}
