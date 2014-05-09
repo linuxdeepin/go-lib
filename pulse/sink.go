@@ -4,6 +4,7 @@ package pulse
 #include "dde-pulse.h"
 */
 import "C"
+import "unsafe"
 
 type Sink struct {
 	Index uint32
@@ -44,7 +45,10 @@ type Sink struct {
 	//formats
 }
 
-func (sink *Sink) SelectPort(portnum int32) {
+func (sink *Sink) SetPort(name string) {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	C.pa_context_set_sink_port_by_index(GetContext().ctx, C.uint32_t(sink.Index), cname, C.success_cb, nil)
 }
 
 func (sink *Sink) GetAvgVolume() float64 {

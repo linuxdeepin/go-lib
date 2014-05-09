@@ -8,6 +8,7 @@ import "dlib/gio-2.0"
 import "dlib/glib-2.0"
 import "dlib/logger"
 import "dlib/graphic"
+import "dlib/pulse"
 import "dlib/utils"
 
 func nothing() {
@@ -20,4 +21,5 @@ func nothing() {
 	_ = dlib.StartLoop
 	_ = dbus.NewConn
 	_ = utils.NewUtils
+	_ = pulse.GetContext
 }

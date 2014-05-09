@@ -33,6 +33,18 @@ DEFINE(PA_SUBSCRIPTION_EVENT_MODULE, module, );
 DEFINE(PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE, sample, _by_index);
 
 
+void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userdata)
+{
+    pa_server_info *info = NULL;
+    info = malloc(sizeof(pa_server_info));
+    memcpy(info, i, sizeof(pa_server_info));
+    receive_some_info((int64_t)userdata, PA_SUBSCRIPTION_EVENT_SERVER, (void*)info, 0);
+}
+void get_server_info(pa_context *c, int64_t cookie) 
+{
+    pa_operation_unref(pa_context_get_server_info(c, receive_server_info_cb, (void*)cookie));
+}
+
 void dpa_context_subscribe_cb(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
 {
     int facility = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;

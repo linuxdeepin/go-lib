@@ -8,6 +8,15 @@ import "C"
 import "fmt"
 import "unsafe"
 
+func (info *paInfo) ToServer() *Server {
+	switch r := info.data.(type) {
+	case *Server:
+		return r
+	default:
+		panic(fmt.Sprintln("the type of paInfo is not Sink", r))
+	}
+}
+
 func (info *paInfo) ToSink() *Sink {
 	switch r := info.data.(type) {
 	case *Sink:
@@ -97,13 +106,39 @@ func toSinkInfo(info *C.pa_sink_info) *Sink {
 }
 
 func toPorts(n uint32, c **C.pa_sink_port_info) (r []PortInfo) {
-	pp := (*[1 << 30](*C.pa_sink_port_info))(unsafe.Pointer(c))[:n:n]
-	for _, p := range pp {
-		r = append(r, toPort(p))
+	if n > 0 {
+		pp := (*[1 << 30](*C.pa_sink_port_info))(unsafe.Pointer(c))[:n:n]
+		for _, p := range pp {
+			r = append(r, toPort(p))
+		}
 	}
 	return
 }
 func toPort(c *C.pa_sink_port_info) PortInfo {
+	if c == nil {
+		return PortInfo{}
+	}
+	return PortInfo{
+		Name:        C.GoString(c.name),
+		Description: C.GoString(c.description),
+		Priority:    uint32(c.priority),
+		Available:   int(c.available),
+	}
+}
+
+func toSourcePorts(n uint32, c **C.pa_source_port_info) (r []PortInfo) {
+	if n > 0 {
+		pp := (*[1 << 30](*C.pa_source_port_info))(unsafe.Pointer(c))[:n:n]
+		for _, p := range pp {
+			r = append(r, toSourcePort(p))
+		}
+	}
+	return
+}
+func toSourcePort(c *C.pa_source_port_info) PortInfo {
+	if c == nil {
+		return PortInfo{}
+	}
 	return PortInfo{
 		Name:        C.GoString(c.name),
 		Description: C.GoString(c.description),
@@ -153,40 +188,6 @@ func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {
 	//format
 
 	return s
-}
-
-func toSourceInfo(info *C.pa_source_info) *Source {
-	s := &Source{}
-	s.Index = uint32(info.index)
-	s.Name = C.GoString(info.name)
-	s.Description = C.GoString(info.description)
-	s.ChannelMap = toChannelMap(info.channel_map)
-	//sample_spec
-	s.OwnerModule = uint32(info.owner_module)
-	s.Volume = toCVolume(info.volume)
-	s.Mute = toBool(info.mute)
-	s.MonitorOfSink = uint32(info.monitor_of_sink)
-	s.MonitorOfSinkName = C.GoString(info.monitor_of_sink_name)
-
-	//latency pa_usec_t
-
-	s.Driver = C.GoString(info.driver)
-
-	//flags pa_source_flags_t
-
-	s.Proplist = toProplist(info.proplist)
-	s.BaseVolume = Volume(info.base_volume)
-
-	//state
-
-	s.NVolumeSteps = uint32(info.n_volume_steps)
-	s.Card = uint32(info.card)
-	s.Ports = toPorts(uint32(info.n_ports), (**C.pa_sink_port_info)(unsafe.Pointer(info.ports)))
-	s.ActivePort = toPort((*C.pa_sink_port_info)((unsafe.Pointer)(info.active_port)))
-
-	//n_formats
-	//formats
-	return nil
 }
 
 func toSourceOutputInfo(info *C.pa_source_output_info) *SourceOutput {

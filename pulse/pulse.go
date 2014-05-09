@@ -90,6 +90,12 @@ func (c *Context) GetSource(index uint32) *Source {
 	return ck.Reply().ToSource()
 }
 
+func (c *Context) GetServer() *Server {
+	ck := newCookie()
+	C.get_server_info(c.ctx, C.int64_t(ck.id))
+	return ck.Reply().ToServer()
+}
+
 func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
 	ck := newCookie()
 
@@ -104,6 +110,23 @@ func (c *Context) GetSourceOutput(index uint32) *SourceOutput {
 	ck := newCookie()
 	C.get_source_output_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 	return ck.Reply().ToSourceOutput()
+}
+
+func (c *Context) GetDefaultSource() string {
+	return ""
+}
+func (c *Context) GetDefaultSink() string {
+	return ""
+}
+func (c *Context) SetDefaultSink(name string) {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
+}
+func (c *Context) SetDefaultSource(name string) {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
 }
 
 var __context *Context

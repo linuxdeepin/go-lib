@@ -12,6 +12,10 @@ func drain() {
 	ctx.GetSink(0)
 }
 
+func TestDefault(t *testing.T) {
+	fmt.Println(ctx.GetServer())
+}
+
 func TestSinkInput(t *testing.T) {
 	defer drain()
 
@@ -21,6 +25,7 @@ func TestSinkInput(t *testing.T) {
 			si.SetMute(true)
 		}
 	}
+	ctx.GetSinkInput(0)
 }
 
 func TestEvent(t *testing.T) {

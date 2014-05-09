@@ -25,6 +25,8 @@ func NewPaInfo(data unsafe.Pointer, Type int) *paInfo {
 		info.data = toSourceInfo((*C.pa_source_info)(data))
 	case C.PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT:
 		info.data = toSourceOutputInfo((*C.pa_source_output_info)(data))
+	case C.PA_SUBSCRIPTION_EVENT_SERVER:
+		info.data = toServerInfo((*C.pa_server_info)(data))
 	default:
 		panic("current didn't support this type")
 	}

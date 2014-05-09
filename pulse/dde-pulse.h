@@ -17,6 +17,8 @@ DECLARE(card);
 DECLARE(module);
 DECLARE(sample);
 
+void get_server_info(pa_context *c, int64_t cookie);
+
 pa_context* pa_init(pa_mainloop* ml);
 
 
