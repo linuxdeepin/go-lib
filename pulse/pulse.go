@@ -16,6 +16,7 @@ const (
 	EventTypeRemove = C.PA_SUBSCRIPTION_EVENT_REMOVE
 )
 const (
+	FacilityServer       = C.PA_SUBSCRIPTION_EVENT_SERVER
 	FacilitySink         = C.PA_SUBSCRIPTION_EVENT_SINK
 	FacilitySource       = C.PA_SUBSCRIPTION_EVENT_SOURCE
 	FacilitySinkInput    = C.PA_SUBSCRIPTION_EVENT_SINK_INPUT
