@@ -52,8 +52,6 @@ func (sink *Sink) SetPort(name string) {
 }
 
 func (sink *Sink) GetAvgVolume() float64 {
-	v := CVolume{}
-	v.Avg()
 	return sink.Volume.Avg()
 }
 

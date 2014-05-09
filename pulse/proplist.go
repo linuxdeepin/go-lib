@@ -33,6 +33,13 @@ func toBool(v C.int) bool {
 
 type Volume uint32
 
+func (v Volume) ToLiner() float64 {
+	return float64(C.pa_sw_volume_to_linear(C.pa_volume_t(v)))
+}
+func (v Volume) TodB() float64 {
+	return float64(C.pa_sw_volume_to_dB(C.pa_volume_t(v)))
+}
+
 type CVolume struct {
 	core     C.pa_cvolume
 	Channels uint8
