@@ -27,6 +27,6 @@ func toServerInfo(info *C.pa_server_info) *Server {
 	s.DefaultSinkName = C.GoString(info.default_sink_name)
 	s.DefaultSourceName = C.GoString(info.default_source_name)
 	s.Cookie = uint32(info.cookie)
-	s.ChannelMap = toChannelMap(info.channel_map)
+	s.ChannelMap = ChannelMap{info.channel_map}
 	return s
 }

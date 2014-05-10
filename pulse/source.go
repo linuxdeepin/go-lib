@@ -53,10 +53,10 @@ func toSourceInfo(info *C.pa_source_info) *Source {
 	s.Index = uint32(info.index)
 	s.Name = C.GoString(info.name)
 	s.Description = C.GoString(info.description)
-	s.ChannelMap = toChannelMap(info.channel_map)
+	s.ChannelMap = ChannelMap{info.channel_map}
 	//sample_spec
 	s.OwnerModule = uint32(info.owner_module)
-	s.Volume = toCVolume(info.volume)
+	s.Volume = CVolume{info.volume}
 	s.Mute = toBool(info.mute)
 	s.MonitorOfSink = uint32(info.monitor_of_sink)
 	s.MonitorOfSinkName = C.GoString(info.monitor_of_sink_name)

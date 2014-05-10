@@ -41,25 +41,14 @@ func (v Volume) TodB() float64 {
 }
 
 type CVolume struct {
-	core     C.pa_cvolume
-	Channels uint8
-	Values   []Volume
+	core C.pa_cvolume
 }
 
 func (cv *CVolume) Avg() float64 {
-	return float64(C.pa_sw_volume_to_linear(C.pa_cvolume_avg(&cv.core)))
+	return float64(C.pa_cvolume_max(&cv.core)) / C.PA_VOLUME_NORM
 }
 func (cv *CVolume) SetAvg(v float64, cm ChannelMap) {
-	C.pa_cvolume_set(&cv.core, C.uint(cv.core.channels), C.pa_sw_volume_from_linear(C.double(v)))
-}
-
-func toCVolume(c C.pa_cvolume) CVolume {
-	v := CVolume{core: c}
-	v.Channels = uint8(c.channels)
-	for i := uint8(0); i < v.Channels; i++ {
-		v.Values = append(v.Values, Volume(c.values[i]))
-	}
-	return v
+	C.pa_cvolume_scale(&cv.core, C.pa_volume_t((C.double(v) * C.PA_VOLUME_NORM)))
 }
 
 func (c *CVolume) Balance(cmap ChannelMap) float64 {
@@ -76,16 +65,5 @@ func toCWVolume(v float64) C.pa_volume_t {
 
 type ChannelPosition int32
 type ChannelMap struct {
-	core     C.pa_channel_map
-	Channels uint8
-	Map      []ChannelPosition
-}
-
-func toChannelMap(c C.pa_channel_map) ChannelMap {
-	cm := ChannelMap{core: c}
-	cm.Channels = uint8(c.channels)
-	for i := uint8(0); i < cm.Channels; i++ {
-		cm.Map = append(cm.Map, ChannelPosition(c._map[i]))
-	}
-	return cm
+	core C.pa_channel_map
 }

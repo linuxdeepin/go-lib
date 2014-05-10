@@ -62,11 +62,11 @@ func toSinkInfo(info *C.pa_sink_info) *Sink {
 
 	//sample_spec
 
-	s.ChannelMap = toChannelMap(info.channel_map)
+	s.ChannelMap = ChannelMap{info.channel_map}
 
 	s.OwnerModule = uint32(info.owner_module)
 
-	s.Volume = toCVolume(info.volume)
+	s.Volume = CVolume{info.volume}
 
 	if int(info.mute) == 0 {
 		s.Mute = false
@@ -168,8 +168,8 @@ func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {
 
 	//sample_spec
 
-	s.ChannelMap = toChannelMap(info.channel_map)
-	s.Volume = toCVolume(info.volume)
+	s.ChannelMap = ChannelMap{info.channel_map}
+	s.Volume = CVolume{info.volume}
 
 	//buffer usec
 	//sink usec

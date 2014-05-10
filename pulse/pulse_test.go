@@ -33,14 +33,14 @@ func TestEvent(t *testing.T) {
 		fmt.Println("SinkInput Changed...", eType, ctx.GetSinkInput(idx).GetAvgVolume())
 	})
 	fmt.Println("HEHE...")
-	select {}
 }
 
 func TestIntrospect(t *testing.T) {
 	_ = fmtp.Print
 	sink := ctx.GetSink(1)
-	sink.SetAvgVolume(1)
-	//sink.SetBalance(0)
+	fmt.Println(sink.Description, "Volume:", sink.Volume.Avg())
+	sink.SetAvgVolume(0.1)
+	//sink.SetBalance(-1)
 	fmtp.Println(sink.Volume.Avg())
 
 	sink.SetMute(false)
