@@ -33,24 +33,13 @@ type SinkInput struct {
 	//format
 }
 
-func (sink *SinkInput) GetAvgVolume() float64 {
-	return sink.Volume.Avg()
+func (s *SinkInput) SetVolume(v CVolume) {
+	C.pa_context_set_sink_input_volume(GetContext().ctx, C.uint32_t(s.Index), &v.core, C.success_cb, nil)
 }
-
-func (sink *SinkInput) SetAvgVolume(v float64) {
-	sink.Volume.SetAvg(v, sink.ChannelMap)
-	C.pa_context_set_sink_input_volume(GetContext().ctx, C.uint32_t(sink.Index), &sink.Volume.core, C.success_cb, nil)
-}
-
 func (sink *SinkInput) SetMute(mute bool) {
 	_mute := 0
 	if mute {
 		_mute = 1
 	}
 	C.pa_context_set_sink_input_mute(GetContext().ctx, C.uint32_t(sink.Index), C.int(_mute), C.success_cb, nil)
-}
-
-func (sink *SinkInput) SetBalance(balance float64) {
-	sink.Volume.SetBalance(sink.ChannelMap, balance)
-	C.pa_context_set_sink_input_volume(GetContext().ctx, C.uint32_t(sink.Index), &sink.Volume.core, C.success_cb, nil)
 }

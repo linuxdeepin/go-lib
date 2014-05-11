@@ -22,7 +22,7 @@ func TestSinkInput(t *testing.T) {
 	for _, si := range ctx.GetSinkInputList() {
 		name := si.PropList["application.name"]
 		if name == "mplayer2" {
-			si.SetMute(true)
+			//si.SetMute(true)
 		}
 	}
 	ctx.GetSinkInput(0)
@@ -30,7 +30,7 @@ func TestSinkInput(t *testing.T) {
 
 func TestEvent(t *testing.T) {
 	ctx.Connect(FacilitySinkInput, func(eType int, idx uint32) {
-		fmt.Println("SinkInput Changed...", eType, ctx.GetSinkInput(idx).GetAvgVolume())
+		fmt.Println("SinkInput Changed...", eType, ctx.GetSinkInput(idx).Volume.Avg())
 	})
 	fmt.Println("HEHE...")
 }
@@ -38,9 +38,9 @@ func TestEvent(t *testing.T) {
 func TestIntrospect(t *testing.T) {
 	_ = fmtp.Print
 	sink := ctx.GetSink(1)
+	sink.SetVolume(sink.Volume.SetAvg(1))
+	sink.SetVolume(sink.Volume.SetBalance(sink.ChannelMap, -0.8))
 	fmt.Println(sink.Description, "Volume:", sink.Volume.Avg())
-	sink.SetAvgVolume(0.1)
-	//sink.SetBalance(-1)
 	fmtp.Println(sink.Volume.Avg())
 
 	sink.SetMute(false)

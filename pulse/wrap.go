@@ -87,7 +87,7 @@ func toSinkInfo(info *C.pa_sink_info) *Sink {
 
 	//configured_latency
 
-	s.BaseVolume = Volume(info.base_volume)
+	s.BaseVolume = Volume{info.base_volume}
 
 	//state
 

@@ -45,31 +45,21 @@ type Sink struct {
 	//formats
 }
 
-func (sink *Sink) SetPort(name string) {
+func (s *Sink) SetPort(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
-	C.pa_context_set_sink_port_by_index(GetContext().ctx, C.uint32_t(sink.Index), cname, C.success_cb, nil)
+	C.pa_context_set_sink_port_by_index(GetContext().ctx, C.uint32_t(s.Index), cname, C.success_cb, nil)
 }
 
-func (sink *Sink) GetAvgVolume() float64 {
-	return sink.Volume.Avg()
-}
-
-func (sink *Sink) SetAvgVolume(v float64) {
-	sink.Volume.SetAvg(v, sink.ChannelMap)
-
-	C.pa_context_set_sink_volume_by_index(GetContext().ctx, C.uint32_t(sink.Index), &sink.Volume.core, C.success_cb, nil)
-}
-
-func (sink *Sink) SetMute(mute bool) {
+func (s *Sink) SetMute(mute bool) {
 	_mute := 0
 	if mute {
 		_mute = 1
 	}
-	C.pa_context_set_sink_mute_by_index(GetContext().ctx, C.uint32_t(sink.Index), C.int(_mute), C.success_cb, nil)
+	C.pa_context_set_sink_mute_by_index(GetContext().ctx, C.uint32_t(s.Index), C.int(_mute), C.success_cb, nil)
 }
 
-func (sink *Sink) SetBalance(balance float64) {
-	sink.Volume.SetBalance(sink.ChannelMap, balance)
-	C.pa_context_set_sink_volume_by_index(GetContext().ctx, C.uint32_t(sink.Index), &sink.Volume.core, C.success_cb, nil)
+func (s *Sink) SetVolume(v CVolume) {
+	s.Volume = v
+	C.pa_context_set_sink_volume_by_index(GetContext().ctx, C.uint32_t(s.Index), &v.core, C.success_cb, nil)
 }
