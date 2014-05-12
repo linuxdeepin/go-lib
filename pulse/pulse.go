@@ -165,6 +165,9 @@ func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, end bool
 	}
 }
 
+func (c *Context) ConnectPeekDetect(cb func(idx int, v float64)) {
+}
+
 func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
 	// sink sinkinput source sourceoutput
 	c.cbs[facility] = append(c.cbs[facility], cb)

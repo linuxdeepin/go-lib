@@ -7,8 +7,8 @@ import "C"
 import "unsafe"
 
 const (
-	VolumeMax   = C.PA_VOLUME_MAX
-	VolumeUIMax = 99957 // C.pa_sw_volume_from_dB(11.0)
+	VolumeMax   = C.PA_VOLUME_MAX * 1.0 / C.PA_VOLUME_NORM
+	VolumeUIMax = 99957.0 / C.PA_VOLUME_NORM // C.pa_sw_volume_from_dB(11.0)
 )
 
 func toProplist(c *C.pa_proplist) map[string]string {

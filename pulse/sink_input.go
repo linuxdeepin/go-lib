@@ -43,3 +43,35 @@ func (sink *SinkInput) SetMute(mute bool) {
 	}
 	C.pa_context_set_sink_input_mute(GetContext().ctx, C.uint32_t(sink.Index), C.int(_mute), C.success_cb, nil)
 }
+
+func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {
+	s := &SinkInput{}
+	s.Index = uint32(info.index)
+	s.Name = C.GoString(info.name)
+	s.OwnerModule = uint32(info.owner_module)
+	s.Client = uint32(info.client)
+	s.Sink = uint32(info.sink)
+
+	//sample_spec
+
+	s.ChannelMap = ChannelMap{info.channel_map}
+	s.Volume = CVolume{info.volume}
+
+	//buffer usec
+	//sink usec
+
+	s.ResampleMethod = C.GoString(info.resample_method)
+	s.Driver = C.GoString(info.driver)
+
+	s.Mute = toBool(info.mute)
+
+	s.PropList = toProplist(info.proplist)
+	s.Corked = int(info.corked)
+
+	s.HasVolume = toBool(info.has_volume)
+	s.VolumeWritable = toBool(info.volume_writable)
+
+	//format
+
+	return s
+}

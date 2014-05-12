@@ -51,60 +51,6 @@ func (info *paInfo) ToSourceOutput() *SourceOutput {
 	}
 }
 
-func toSinkInfo(info *C.pa_sink_info) *Sink {
-	s := &Sink{}
-
-	s.Index = uint32(info.index)
-
-	s.Name = C.GoString(info.name)
-
-	s.Description = C.GoString(info.description)
-
-	//sample_spec
-
-	s.ChannelMap = ChannelMap{info.channel_map}
-
-	s.OwnerModule = uint32(info.owner_module)
-
-	s.Volume = CVolume{info.volume}
-
-	if int(info.mute) == 0 {
-		s.Mute = false
-	} else {
-		s.Mute = true
-	}
-
-	s.MonitorSource = uint32(info.monitor_source)
-
-	s.MonitorSourceName = C.GoString(info.monitor_source_name)
-
-	//latency
-	//flags
-
-	s.Driver = C.GoString(info.driver)
-
-	s.PropList = toProplist(info.proplist)
-
-	//configured_latency
-
-	s.BaseVolume = Volume{info.base_volume}
-
-	//state
-
-	s.NVolumeSteps = uint32(info.n_volume_steps)
-
-	s.Card = uint32(info.card)
-
-	s.Ports = toPorts(uint32(info.n_ports), info.ports)
-
-	s.ActivePort = toPort(info.active_port)
-
-	//n_formats
-	//formats
-
-	return s
-}
-
 func toPorts(n uint32, c **C.pa_sink_port_info) (r []PortInfo) {
 	if n > 0 {
 		pp := (*[1 << 10](*C.pa_sink_port_info))(unsafe.Pointer(c))[:n:n]
@@ -155,41 +101,5 @@ type SampleSpec struct {
 }
 
 func toSampleSpec(c *C.pa_sample_spec) *SampleSpec {
-	return nil
-}
-
-func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {
-	s := &SinkInput{}
-	s.Index = uint32(info.index)
-	s.Name = C.GoString(info.name)
-	s.OwnerModule = uint32(info.owner_module)
-	s.Client = uint32(info.client)
-	s.Sink = uint32(info.sink)
-
-	//sample_spec
-
-	s.ChannelMap = ChannelMap{info.channel_map}
-	s.Volume = CVolume{info.volume}
-
-	//buffer usec
-	//sink usec
-
-	s.ResampleMethod = C.GoString(info.resample_method)
-	s.Driver = C.GoString(info.driver)
-
-	s.Mute = toBool(info.mute)
-
-	s.PropList = toProplist(info.proplist)
-	s.Corked = int(info.corked)
-
-	s.HasVolume = toBool(info.has_volume)
-	s.VolumeWritable = toBool(info.volume_writable)
-
-	//format
-
-	return s
-}
-
-func toSourceOutputInfo(info *C.pa_source_output_info) *SourceOutput {
 	return nil
 }

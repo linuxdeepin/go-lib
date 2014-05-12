@@ -7,12 +7,14 @@
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
 void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
 {\
-    pa_##TYPE##_info *info = NULL;\
-    if (eol == 0) {\
-	info = malloc(sizeof(pa_##TYPE##_info));\
-	memcpy(info, i, sizeof(pa_##TYPE##_info));\
+    if (eol < 0) { \
+	if (pa_context_errno(c) == PA_ERR_NOENTITY) {\
+	    return;\
+	}\
+	fprintf(stderr, "receive info failed");\
+	return;\
     }\
-    receive_some_info((int64_t)userdata, ID, (void*)info, eol); \
+    receive_some_info((int64_t)userdata, ID, (void*)i, eol); \
 }\
 void get_##TYPE##_info(pa_context *c, int64_t cookie, uint32_t index) \
 {\
@@ -35,6 +37,9 @@ DEFINE(PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE, sample, _by_index);
 
 void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userdata)
 {
+    if (i == NULL) {
+	return;
+    }
     pa_server_info *info = NULL;
     info = malloc(sizeof(pa_server_info));
     memcpy(info, i, sizeof(pa_server_info));

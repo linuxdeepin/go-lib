@@ -25,7 +25,7 @@ type Source struct {
 
 	Driver string
 
-	//flags pa_source_flags_t
+	Flags int
 
 	Proplist map[string]string
 
@@ -78,6 +78,7 @@ func toSourceInfo(info *C.pa_source_info) *Source {
 	s.Driver = C.GoString(info.driver)
 
 	//flags pa_source_flags_t
+	s.Flags = int(info.flags)
 
 	s.Proplist = toProplist(info.proplist)
 	s.BaseVolume = Volume{info.base_volume}

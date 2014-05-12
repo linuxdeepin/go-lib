@@ -55,10 +55,6 @@ func (c *cookie) ReplyList() []*paInfo {
 }
 
 func (c *cookie) Feed(infoType int, info unsafe.Pointer) {
-	if infoType == C.PA_SUBSCRIPTION_EVENT_SINK {
-		i := (*C.pa_sink_info)(info)
-		toProplist(i.proplist)
-	}
 	c.data <- NewPaInfo(info, infoType)
 }
 func (c *cookie) EndOfList() {

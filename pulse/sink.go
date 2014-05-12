@@ -24,7 +24,7 @@ type Sink struct {
 	//latency pa_usec_t
 
 	Driver string
-	//flags pa_sink_flags
+	Flags  int
 
 	PropList map[string]string
 
@@ -62,4 +62,55 @@ func (s *Sink) SetMute(mute bool) {
 func (s *Sink) SetVolume(v CVolume) {
 	s.Volume = v
 	C.pa_context_set_sink_volume_by_index(GetContext().ctx, C.uint32_t(s.Index), &v.core, C.success_cb, nil)
+}
+
+func toSinkInfo(info *C.pa_sink_info) *Sink {
+	s := &Sink{}
+
+	s.Index = uint32(info.index)
+
+	s.Name = C.GoString(info.name)
+
+	s.Description = C.GoString(info.description)
+
+	//sample_spec
+
+	s.ChannelMap = ChannelMap{info.channel_map}
+
+	s.OwnerModule = uint32(info.owner_module)
+
+	s.Volume = CVolume{info.volume}
+
+	s.Mute = toBool(info.mute)
+
+	s.MonitorSource = uint32(info.monitor_source)
+
+	s.MonitorSourceName = C.GoString(info.monitor_source_name)
+
+	//latency
+
+	s.Flags = int(info.flags)
+
+	s.Driver = C.GoString(info.driver)
+
+	s.PropList = toProplist(info.proplist)
+
+	//configured_latency
+
+	s.BaseVolume = Volume{info.base_volume}
+
+	//state
+
+	s.NVolumeSteps = uint32(info.n_volume_steps)
+
+	s.Card = uint32(info.card)
+
+	s.Ports = toPorts(uint32(info.n_ports), info.ports)
+
+	s.ActivePort = toPort(info.active_port)
+
+	//n_formats
+	//formats
+
+	return s
 }
