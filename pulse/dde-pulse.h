@@ -24,4 +24,6 @@ pa_context* pa_init(pa_mainloop* ml);
 
 void (*success_cb)(pa_context *c, int success, void *userdata);
 
+pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend);
+
 #endif

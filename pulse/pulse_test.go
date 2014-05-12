@@ -13,10 +13,12 @@ func drain() {
 }
 
 func TestDefault(t *testing.T) {
+	return
 	fmt.Println(ctx.GetServer())
 }
 
 func TestSinkInput(t *testing.T) {
+	return
 	defer drain()
 
 	for _, si := range ctx.GetSinkInputList() {
@@ -27,15 +29,23 @@ func TestSinkInput(t *testing.T) {
 	}
 	ctx.GetSinkInput(0)
 }
+func TestPeekDetect(t *testing.T) {
+	s := NewStream(ctx, 2)
+	s.ConnectChanged(func(v float64) {
+		fmt.Println("VV:", v)
+	})
+	select {}
+}
 
 func TestEvent(t *testing.T) {
+	return
 	ctx.Connect(FacilitySinkInput, func(eType int, idx uint32) {
 		fmt.Println("SinkInput Changed...", eType, ctx.GetSinkInput(idx).Volume.Avg())
 	})
-	fmt.Println("HEHE...")
 }
 
 func TestIntrospect(t *testing.T) {
+	return
 	_ = fmtp.Print
 	sink := ctx.GetSink(1)
 	sink.SetVolume(sink.Volume.SetAvg(1))
