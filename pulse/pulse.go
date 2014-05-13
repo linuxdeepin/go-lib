@@ -2,7 +2,7 @@ package pulse
 
 /*
 #include "dde-pulse.h"
-#cgo pkg-config: libpulse glib-2.0 libpulse-mainloop-glib
+#cgo pkg-config: libpulse glib-2.0
 */
 import "C"
 import "fmt"
@@ -31,7 +31,7 @@ type Context struct {
 	cbs map[int][]Callback
 
 	ctx  *C.pa_context
-	loop *C.pa_mainloop
+	loop *C.pa_threaded_mainloop
 }
 
 func (c *Context) GetSinkList() (r []*Sink) {
@@ -122,42 +122,53 @@ func (c *Context) GetDefaultSink() string {
 func (c *Context) SetDefaultSink(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
+
+	c.lock()
+	defer c.unlock()
 	C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
 }
 func (c *Context) SetDefaultSource(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
+
+	c.lock()
+	defer c.unlock()
+
 	C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
+}
+
+func (c *Context) lock() {
+	C.pa_threaded_mainloop_lock(c.loop)
+}
+func (c *Context) unlock() {
+	C.pa_threaded_mainloop_unlock(c.loop)
 }
 
 var __context *Context
 
 func GetContext() *Context {
 	if __context == nil {
-		loop := C.pa_mainloop_new()
+		loop := C.pa_threaded_mainloop_new()
+		C.pa_threaded_mainloop_start(loop)
 		ctx := C.pa_init(loop)
+
 		__context = &Context{
 			cbs:  make(map[int][]Callback),
 			ctx:  ctx,
 			loop: loop,
 		}
-		go __context.runLoop()
 	}
 	return __context
-}
-
-func (c *Context) runLoop() {
-	C.pa_mainloop_run(c.loop, nil)
 }
 
 //export receive_some_info
 func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, end bool) {
 	c := fetchCookie(cookie)
 	if c == nil {
-		//NOTE: didn't know why the c will be nil, but it happened at sometimes
 		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, end)
 		return
 	}
+
 	if end {
 		c.EndOfList()
 	} else {

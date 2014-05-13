@@ -2,7 +2,6 @@
 #define DDE_PULSE_H
 
 #include <pulse/pulseaudio.h>
-#include <pulse/glib-mainloop.h>
 
 #define DECLARE(TYPE) \
 void get_##TYPE##_info(pa_context*, int64_t, uint32_t);\
@@ -19,8 +18,7 @@ DECLARE(sample);
 
 void get_server_info(pa_context *c, int64_t cookie);
 
-pa_context* pa_init(pa_mainloop* ml);
-
+pa_context* pa_init(pa_threaded_mainloop* ml);
 
 void (*success_cb)(pa_context *c, int success, void *userdata);
 

@@ -34,14 +34,20 @@ type SinkInput struct {
 }
 
 func (s *SinkInput) SetVolume(v CVolume) {
-	C.pa_context_set_sink_input_volume(GetContext().ctx, C.uint32_t(s.Index), &v.core, C.success_cb, nil)
+	c := GetContext()
+	c.lock()
+	defer c.unlock()
+	C.pa_context_set_sink_input_volume(c.ctx, C.uint32_t(s.Index), &v.core, C.success_cb, nil)
 }
 func (sink *SinkInput) SetMute(mute bool) {
 	_mute := 0
 	if mute {
 		_mute = 1
 	}
-	C.pa_context_set_sink_input_mute(GetContext().ctx, C.uint32_t(sink.Index), C.int(_mute), C.success_cb, nil)
+	c := GetContext()
+	c.lock()
+	defer c.unlock()
+	C.pa_context_set_sink_input_mute(c.ctx, C.uint32_t(sink.Index), C.int(_mute), C.success_cb, nil)
 }
 
 func toSinkInputInfo(info *C.pa_sink_input_info) *SinkInput {

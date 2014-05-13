@@ -3,7 +3,10 @@ package pulse
 import (
 	"fmt"
 	fmtp "github.com/kr/pretty"
+	"math/rand"
+	"runtime"
 	"testing"
+	"time"
 )
 
 var ctx = GetContext()
@@ -17,6 +20,19 @@ func TestDefault(t *testing.T) {
 	fmt.Println(ctx.GetServer())
 }
 
+func TestRepeat(t *testing.T) {
+	fmt.Println("Begin...")
+	for i := 0; i < 100000; i++ {
+		s := ctx.GetSink(1)
+		v := s.Volume.SetAvg(float64(rand.Int31n(100)) / 100.0)
+		<-time.After(time.Microsecond * 5)
+		//fmt.Println(v)
+		s.SetVolume(v)
+	}
+	fmt.Println("PASSS")
+	runtime.Gosched()
+}
+
 func TestSinkInput(t *testing.T) {
 	return
 	defer drain()
@@ -28,13 +44,6 @@ func TestSinkInput(t *testing.T) {
 		}
 	}
 	ctx.GetSinkInput(0)
-}
-func TestPeekDetect(t *testing.T) {
-	s := NewStream(ctx, 2)
-	s.ConnectChanged(func(v float64) {
-		fmt.Println("VV:", v)
-	})
-	select {}
 }
 
 func TestEvent(t *testing.T) {
