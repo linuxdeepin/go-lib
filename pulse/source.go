@@ -53,6 +53,7 @@ func (s *Source) SetPort(name string) {
 }
 
 func (s *Source) SetVolume(v CVolume) {
+	s.Volume = v
 	c := GetContext()
 	c.lock()
 	defer c.unlock()

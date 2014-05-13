@@ -34,6 +34,7 @@ type SinkInput struct {
 }
 
 func (s *SinkInput) SetVolume(v CVolume) {
+	s.Volume = v
 	c := GetContext()
 	c.lock()
 	defer c.unlock()
