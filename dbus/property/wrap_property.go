@@ -11,6 +11,10 @@ func (o *BaseObserver) ConnectChanged(cb func()) {
 	o.cbs = append(o.cbs, cb)
 }
 
+func (o *BaseObserver) ResetConnectChanged() {
+	o.cbs = nil
+}
+
 func (o *BaseObserver) Notify() {
 	for _, c := range o.cbs {
 		c()

@@ -69,6 +69,8 @@ func Destroy{{ExportName}}(obj *{{ExportName}}) {
 	}
 	obj.signals = make(map[chan *dbus.Signal]bool)
 	obj.signalsLocker.Unlock()
+	{{range .Properties}}
+	obj.{{.Name}}.ResetConnectChanged(){{end}}
 }
 {{end}}
 
