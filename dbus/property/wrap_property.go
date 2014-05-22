@@ -11,7 +11,7 @@ func (o *BaseObserver) ConnectChanged(cb func()) {
 	o.cbs = append(o.cbs, cb)
 }
 
-func (o *BaseObserver) ResetConnectChanged() {
+func (o *BaseObserver) Reset() {
 	o.cbs = nil
 }
 
