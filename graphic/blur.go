@@ -35,7 +35,8 @@ import "path"
 func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err error) {
 	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
 	if !ok {
-		err = fmt.Errorf("generate blur pict failed")
+		err = fmt.Errorf("generate blur pict failed, srcfile=%s, dstfile=%s, sigma=%d, numsteps=%d, format=%v",
+			srcfile, dstfile, sigma, numsteps, f)
 	}
 	return
 }
@@ -50,10 +51,7 @@ func BlurImageCache(srcfile string, sigma, numsteps float64, f Format) (dstfile 
 		return
 	}
 	ensureDirExists(path.Dir(dstfile))
-	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
-	if !ok {
-		err = fmt.Errorf("generate blur pict failed")
-	}
+	err = BlurImage(srcfile, dstfile, sigma, numsteps, f)
 	return
 }
 
