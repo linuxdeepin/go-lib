@@ -22,9 +22,12 @@
 package graphic
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image"
 	"io/ioutil"
+	"strings"
 )
 
 // ConvertImageToDataUri convert image file to data uri.
@@ -39,6 +42,22 @@ func ConvertImageToDataUri(imgfile string) (dataUri string, err error) {
 	}
 	contentType := imageFormatToDataUriContentType(format)
 	dataUri = fmt.Sprintf("data:%s;base64,%s", contentType, base64.StdEncoding.EncodeToString(data))
+	return
+}
+
+// LoadImageFromDataUri convert data uri to image object.
+func LoadImageFromDataUri(dataUri string) (img image.Image, err error) {
+	strs := strings.Split(dataUri, ";base64,")
+	if len(strs) != 2 {
+		err = fmt.Errorf("invalid data uri: %s", dataUri)
+		return
+	}
+	data, err := base64.StdEncoding.DecodeString(strs[1])
+	if err != nil {
+		return
+	}
+	r := bytes.NewReader(data)
+	img, _, err = image.Decode(r)
 	return
 }
 
