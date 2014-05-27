@@ -34,12 +34,12 @@ import (
 
 // LoadImage load image file and return image.Image object.
 func LoadImage(imgfile string) (img image.Image, err error) {
-	file, err := os.Open(imgfile)
+	f, err := os.Open(imgfile)
 	if err != nil {
 		return
 	}
-	defer file.Close()
-	img, _, err = image.Decode(file)
+	defer f.Close()
+	img, _, err = image.Decode(f)
 	return
 }
 
@@ -93,5 +93,16 @@ func convertToRGBA(img image.Image) (rgba *image.RGBA) {
 	r := image.Rect(0, 0, b.Dx(), b.Dy())
 	rgba = image.NewRGBA(r)
 	draw.Draw(rgba, rgba.Bounds(), img, b.Min, draw.Src)
+	return
+}
+
+func getImageFormat(imgfile string) (format Format, err error) {
+	f, err := os.Open(imgfile)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	_, name, err := image.DecodeConfig(f)
+	format = Format(name)
 	return
 }

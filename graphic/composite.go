@@ -38,6 +38,7 @@ type CompositeInfo struct {
 	X, Y, Z int
 }
 
+// CompositeImageSet composite a set of images.
 func CompositeImageSet(srcfile string, compinfos []CompositeInfo, dstfile string, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
@@ -57,6 +58,7 @@ func CompositeImageSet(srcfile string, compinfos []CompositeInfo, dstfile string
 	return SaveImage(dstfile, dstimg, f)
 }
 
+// CompositeImage composite two images.
 func CompositeImage(srcfile, compfile, dstfile string, x, y int, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
