@@ -36,13 +36,35 @@ func ConvertImageToDataUri(imgfile string) (dataUri string, err error) {
 	if err != nil {
 		return
 	}
-	format, err := getImageFormat(imgfile)
+	f, err := getImageFormat(imgfile)
 	if err != nil {
 		return
 	}
-	contentType := imageFormatToDataUriContentType(format)
+	contentType := imageFormatToDataUriContentType(f)
 	dataUri = fmt.Sprintf("data:%s;base64,%s", contentType, base64.StdEncoding.EncodeToString(data))
 	return
+}
+
+// ConvertImageToDataUri convert image.Image object to data uri.
+func ConvertImageObjectToDataUri(img image.Image, f Format) (dataUri string, err error) {
+	byteBuf := new(bytes.Buffer)
+	err = doSaveImage(byteBuf, img, f)
+	if err != nil {
+		return
+	}
+	data := byteBuf.Bytes()
+	contentType := imageFormatToDataUriContentType(f)
+	dataUri = fmt.Sprintf("data:%s;base64,%s", contentType, base64.StdEncoding.EncodeToString(data))
+	return
+}
+
+// ConvertDataUriToImage convert data uri to image file.
+func ConvertDataUriToImage(dataUri string, dstfile string, f Format) (err error) {
+	img, err := LoadImageFromDataUri(dataUri)
+	if err != nil {
+		return
+	}
+	return SaveImage(dstfile, img, f)
 }
 
 // LoadImageFromDataUri convert data uri to image object.

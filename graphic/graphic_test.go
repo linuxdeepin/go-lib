@@ -83,6 +83,19 @@ func (g *Graphic) TestCompositeImageSet(c *C) {
 	}
 }
 
+func (g *Graphic) TestCompositeImageUri(c *C) {
+	resultFile := "testdata/test_compositeimageuri.png"
+	srcImageUri, _ := ConvertImageToDataUri(originTestImageSmall)
+	compImageUri1, _ := ConvertImageToDataUri(originTestImageIcon1)
+	compImageUri2, _ := ConvertImageToDataUri(originTestImageIcon2)
+	resultDataUri, _ := CompositeImageUri(srcImageUri, compImageUri1, 0, 0, PNG)
+	resultDataUri, _ = CompositeImageUri(resultDataUri, compImageUri2, 24, 24, PNG)
+	err := ConvertDataUriToImage(resultDataUri, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
 func (g *Graphic) TestClipImage(c *C) {
 	resultFile := "testdata/test_clipimage_100x200.png"
 	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, PNG)
@@ -123,6 +136,14 @@ func (g *Graphic) TestConvertImageToDataUri(c *C) {
 		c.Error(err)
 	}
 	c.Check(dataUri, Equals, testDataUri)
+}
+
+func (g *Graphic) TestConvertDataUriToImage(c *C) {
+	resultFile := "testdata/test_convertdatauri.png"
+	err := ConvertDataUriToImage(testDataUri, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
 }
 
 func (g *Graphic) TestLoadImageFromDataUri(c *C) {

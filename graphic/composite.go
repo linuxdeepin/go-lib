@@ -73,6 +73,21 @@ func CompositeImage(srcfile, compfile, dstfile string, x, y int, f Format) (err 
 	return SaveImage(dstfile, dstimg, f)
 }
 
+// CompositeImageUri composite two images which format in data uri.
+func CompositeImageUri(srcDatauri, compDataUri string, x, y int, f Format) (dstDataUri string, err error) {
+	srcimg, err := LoadImageFromDataUri(srcDatauri)
+	if err != nil {
+		return
+	}
+	compimg, err := LoadImageFromDataUri(compDataUri)
+	if err != nil {
+		return
+	}
+	dstimg := convertToRGBA(srcimg)
+	ImplCompositeImage(dstimg, compimg, x, y)
+	return ConvertImageObjectToDataUri(dstimg, f)
+}
+
 func ImplCompositeImage(dstimg draw.Image, compimg image.Image, x, y int) {
 	w, h := doGetImageSize(compimg)
 	r := image.Rect(x, y, x+w, y+h)
