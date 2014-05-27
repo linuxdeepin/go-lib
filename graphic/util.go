@@ -25,6 +25,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"image"
+	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io"
@@ -84,4 +85,13 @@ func encodeMD5Str(s string) string {
 	h := md5.New()
 	io.WriteString(h, s)
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+// convert image.Image to *image.RGBA
+func convertToRGBA(img image.Image) (rgba *image.RGBA) {
+	b := img.Bounds()
+	r := image.Rect(0, 0, b.Dx(), b.Dy())
+	rgba = image.NewRGBA(r)
+	draw.Draw(rgba, rgba.Bounds(), img, b.Min, draw.Src)
+	return
 }

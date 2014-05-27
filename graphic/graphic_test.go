@@ -7,12 +7,16 @@ import (
 )
 
 const (
-	originTestImage = "testdata/origin_1920x1080.jpg"
-	originImgWidth  = 1920
-	originImgHeight = 1080
-	// originTestImage         = "testdata/origin_1280x800.jpg"
-	// originImgWidth          = 1280
-	// originImgHeight         = 800
+	originTestImage         = "testdata/origin_1920x1080.jpg"
+	originWidth             = 1920
+	originHeight            = 1080
+	originTestImageSmall    = "testdata/origin_small_200x200.png"
+	originSmallWidth        = 200
+	originSmallHeight       = 200
+	originTestImageIcon1    = "testdata/origin_icon_1_48x48.png"
+	originTestImageIcon2    = "testdata/origin_icon_2_48x48.png"
+	originIconWidth         = 48
+	originIconHeight        = 48
 	originImgDominantColorH = 205
 	originImgDominantColorS = 0.69
 	originImgDominantColorV = 0.42
@@ -50,6 +54,30 @@ func (g *Graphic) TestBlurImageCache(c *C) {
 		c.Error(err)
 	}
 	fmt.Println("TestBlurImageCache:", useCache, resultFile)
+}
+
+func (g *Graphic) TestCompositeImage(c *C) {
+	resultFile := "testdata/test_compositeimage.png"
+	err := CompositeImage(originTestImageSmall, originTestImageIcon1, resultFile, 0, 0, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	err = CompositeImage(resultFile, originTestImageIcon2, resultFile, 24, 24, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+func (g *Graphic) TestCompositeImageSet(c *C) {
+	resultFile := "testdata/test_compositeimageset.png"
+	compInfos := []CompositeInfo{
+		{originTestImageIcon1, 0, 0, 10},
+		{originTestImageIcon2, 24, 24, 0},
+	}
+	err := CompositeImageSet(originTestImageSmall, compInfos, resultFile, PNG)
+	if err != nil {
+		c.Error(err)
+	}
 }
 
 func (g *Graphic) TestClipImage(c *C) {
@@ -194,8 +222,8 @@ func (g *Graphic) TestGetImageSize(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(int(w), Equals, originImgWidth)
-	c.Check(int(h), Equals, originImgHeight)
+	c.Check(int(w), Equals, originWidth)
+	c.Check(int(h), Equals, originHeight)
 }
 
 func (g *Graphic) TestResizeImage(c *C) {
