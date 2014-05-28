@@ -290,6 +290,26 @@ func (g *Graphic) TestResizeImageCache(c *C) {
 	fmt.Println("TestResizeImageCache:", useCache, resultFile)
 }
 
+func (g *Graphic) TestThumbnailImage(c *C) {
+	resultFile := "testdata/test_thumbnail.png"
+	maxWidth, maxHeight := 200, 200
+	err := ThumbnailImage(originTestImage, resultFile, uint(maxWidth), uint(maxHeight), PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	w, h, _ := GetImageSize(resultFile)
+	c.Check(int(w) <= maxWidth, Equals, true)
+	c.Check(int(h) <= maxHeight, Equals, true)
+}
+
+func (g *Graphic) TestThumbnailImageCache(c *C) {
+	resultFile, useCache, err := ThumbnailImageCache(originTestImage, 200, 200, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	fmt.Println("TestThumbnailImageCache:", useCache, resultFile)
+}
+
 func (g *Graphic) TestRotateImageLeft(c *C) {
 	resultFile := "testdata/test_rotateimageleft.png"
 	err := RotateImageLeft(originTestImage, resultFile, PNG)

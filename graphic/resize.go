@@ -52,6 +52,39 @@ func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstf
 	return
 }
 
+// ThumbnailImage scale target image with limited maximum width and height.
+func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight uint, f Format) (err error) {
+	srcimg, err := LoadImage(srcfile)
+
+	// get new width and heigh
+	var newWidth, newHeight uint
+	w, h := doGetImageSize(srcimg)
+	scale := float32(w) / float32(h)
+	newWidth = maxWidth
+	newHeight = uint(float32(newWidth) / scale)
+	if newHeight > maxHeight {
+		newHeight = maxHeight
+		newWidth = uint(float32(newHeight) * scale)
+	}
+
+	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
+	return SaveImage(dstfile, dstimg, f)
+}
+
+// ThumbnailImageCache scale target image with limited maximum width
+// and height, and save to cache directory, if already exists, just
+// return it.
+func ThumbnailImageCache(srcfile string, maxWidth, maxHeight uint, f Format) (dstfile string, useCache bool, err error) {
+	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f)))
+	if isFileExists(dstfile) {
+		useCache = true
+		return
+	}
+	ensureDirExists(path.Dir(dstfile))
+	err = ThumbnailImage(srcfile, dstfile, maxWidth, maxHeight, f)
+	return
+}
+
 // TODO doResizeNearestNeighbor returns a new RGBA image with the given width and
 // height created by resizing the given image using the nearest neighbor
 // algorithm.
