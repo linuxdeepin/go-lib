@@ -69,7 +69,7 @@ func ConvertDataUriToImage(dataUri string, dstfile string, f Format) (err error)
 
 // LoadImageFromDataUri convert data uri to image object.
 func LoadImageFromDataUri(dataUri string) (img image.Image, err error) {
-	strs := strings.Split(dataUri, ";base64,")
+	strs := strings.Split(dataUri, ",") // ;base64,
 	if len(strs) != 2 {
 		err = fmt.Errorf("invalid data uri: %s", dataUri)
 		return

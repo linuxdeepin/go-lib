@@ -22,8 +22,10 @@
 package graphic
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
+	"path"
 )
 
 // ResizeImage returns a new image file with the given width and
@@ -35,6 +37,19 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (
 	}
 	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
 	return SaveImage(dstfile, dstimg, f)
+}
+
+// ResizeImageCache resize any recognized format image and save to cache
+// directory, if already exists, just return it.
+func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstfile string, useCache bool, err error) {
+	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f)))
+	if isFileExists(dstfile) {
+		useCache = true
+		return
+	}
+	ensureDirExists(path.Dir(dstfile))
+	err = ResizeImage(srcfile, dstfile, newWidth, newHeight, f)
+	return
 }
 
 // TODO doResizeNearestNeighbor returns a new RGBA image with the given width and

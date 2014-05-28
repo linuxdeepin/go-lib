@@ -282,6 +282,14 @@ func (g *Graphic) TestResizeImage(c *C) {
 	c.Check(int(h), Equals, 600)
 }
 
+func (g *Graphic) TestResizeImageCache(c *C) {
+	resultFile, useCache, err := ResizeImageCache(originTestImage, 200, 200, PNG)
+	if err != nil {
+		c.Error(err)
+	}
+	fmt.Println("TestResizeImageCache:", useCache, resultFile)
+}
+
 func (g *Graphic) TestRotateImageLeft(c *C) {
 	resultFile := "testdata/test_rotateimageleft.png"
 	err := RotateImageLeft(originTestImage, resultFile, PNG)
