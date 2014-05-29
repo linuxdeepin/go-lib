@@ -194,8 +194,8 @@ func (logger *Logger) AddExtArgForRestart(arg string) {
 	}
 }
 
-func (logger *Logger) StartTracing() {
-	logger.Infof("%s started", logger.name)
+func (logger *Logger) BeginTracing() {
+	logger.Infof("%s begin", logger.name)
 }
 
 func (logger *Logger) EndTracing() {
@@ -209,7 +209,7 @@ func (logger *Logger) EndTracing() {
 }
 
 func (logger *Logger) logEndSuccess() {
-	logger.Infof("%s stopped", logger.name)
+	logger.Infof("%s end", logger.name)
 }
 
 func (logger *Logger) logEndFailed() {
