@@ -196,7 +196,9 @@ func (logger *Logger) AddExtArgForRestart(arg string) {
 
 func (logger *Logger) EndTracing() {
 	if err := recover(); err != nil {
-		logger.Fatal(err)
+		// TODO how to launch crash reporter
+		logger.Error(err)
+		logger.logEndFailed()
 	} else {
 		logger.logEndSuccess()
 	}
@@ -331,14 +333,12 @@ func (logger *Logger) Panicf(format string, v ...interface{}) {
 func (logger *Logger) Fatal(v ...interface{}) {
 	logger.log(LEVEL_FATAL, v...)
 	logger.launchCrashReporter()
-	logger.logEndFailed()
 	os.Exit(1)
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	logger.logf(LEVEL_FATAL, format, v...)
 	logger.launchCrashReporter()
-	logger.logEndFailed()
 	os.Exit(1)
 }
 
