@@ -18,7 +18,7 @@ func nothing() {
 	_ = gio.DBusConnectionFlagsAuthenticationClient
 	_ = glib.CanInline
 	_ = gobject.NilString
-	_ = dlib.StartLoop
+	_ = dlib.SessionBus
 	_ = dbus.NewConn
 	_ = utils.NewUtils
 	_ = pulse.GetContext
