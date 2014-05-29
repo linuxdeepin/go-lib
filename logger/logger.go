@@ -194,6 +194,10 @@ func (logger *Logger) AddExtArgForRestart(arg string) {
 	}
 }
 
+func (logger *Logger) StartTracing() {
+	logger.Infof("%s started", logger.name)
+}
+
 func (logger *Logger) EndTracing() {
 	if err := recover(); err != nil {
 		// TODO how to launch crash reporter
@@ -205,11 +209,11 @@ func (logger *Logger) EndTracing() {
 }
 
 func (logger *Logger) logEndSuccess() {
-	logger.Debug("<program ends normally>")
+	logger.Infof("%s stopped", logger.name)
 }
 
 func (logger *Logger) logEndFailed() {
-	logger.Debug("<program interruption>")
+	logger.Infof("%s interruption", logger.name)
 }
 
 func (logger *Logger) log(level Priority, v ...interface{}) {

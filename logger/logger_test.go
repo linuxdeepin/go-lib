@@ -16,6 +16,7 @@ func init() {
 }
 
 func (logger *Logger) TestFunc(c *C) {
+	logger.StartTracing()
 	defer logger.EndTracing()
 	logger.SetLogLevel(LEVEL_DEBUG)
 	logger.Debug("test debug")
