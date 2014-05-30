@@ -32,3 +32,11 @@ func Textdomain(domain string) {
 func InitI18n() {
 	C._init_i18n()
 }
+
+func Bindtextdomain(domain, dirname string) string {
+	_domain := C.CString(domain)
+	_dirname := C.CString(dirname)
+	defer C.free(unsafe.Pointer(_domain))
+	defer C.free(unsafe.Pointer(_dirname))
+	return C.GoString(C.bindtextdomain(_domain, _dirname))
+}
