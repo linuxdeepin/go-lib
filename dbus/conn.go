@@ -447,7 +447,13 @@ func (conn *Conn) Send(msg *Message, ch chan *Call) *Call {
 
 // sendError creates an error message corresponding to the parameters and sends
 // it to conn.out.
-func (conn *Conn) sendError(e dbusError, dest string, serial uint32) {
+func (conn *Conn) sendError(ee error, dest string, serial uint32) {
+	var e dbusError
+	var ok bool
+	if e, ok = ee.(dbusError); !ok {
+		e = NewOtherError(ee)
+	}
+
 	msg := new(Message)
 	msg.Type = TypeError
 	msg.serial = conn.getSerial()
