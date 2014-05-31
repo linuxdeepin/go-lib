@@ -8,6 +8,8 @@ import "unicode"
 var autoHandler = map[string]func(*Conn, *Message) error{
 	"org.freedesktop.DBus.Peer":           handlePeer,
 	"org.freedesktop.DBus.Introspectable": handleIntrospect,
+	//"org.freedesktop.DBus.LifeManager":    nil,
+	//"org.freedesktop.DBus.Properties":     nil,
 }
 
 func handlePeer(conn *Conn, msg *Message) error {
@@ -112,8 +114,6 @@ func (conn *Conn) callUserMethod(msg *Message) ([]reflect.Value, error) {
 	path := msg.Headers[FieldPath].value.(ObjectPath)
 	ifcName, _ := msg.Headers[FieldInterface].value.(string)
 
-	var userMethod reflect.Value
-
 	conn.handlersLck.RLock()
 	ifcs, ok := conn.handlers[path]
 	conn.handlersLck.RUnlock()
@@ -122,6 +122,7 @@ func (conn *Conn) callUserMethod(msg *Message) ([]reflect.Value, error) {
 		return nil, NewNoObjectError(path)
 	}
 
+	var userMethod reflect.Value
 	if ifc, ok := ifcs[ifcName]; ok {
 		userMethod = reflect.ValueOf(ifc).MethodByName(name)
 	} else {
@@ -162,7 +163,7 @@ func (conn *Conn) callUserMethod(msg *Message) ([]reflect.Value, error) {
 	for i, r := range ret {
 		ret[i] = tryTranslateDBusObjectToObjectPath(conn, r)
 	}
-	return ret, NewOtherError(nil)
+	return ret, nil
 }
 
 // handleCall handles the given method call (i.e. looks if it's one of the
@@ -188,12 +189,19 @@ func (conn *Conn) handleCall(msg *Message) {
 		err := handler(conn, msg)
 		if err != nil {
 			conn.sendError(err, sender, serial)
+			return
+		}
+		if ifcName == "org.freedesktop.DBus.Introspectable" && conn.handlers[path] != nil {
+			//workaround, continue handle
+		} else {
+			return
 		}
 	}
 
 	ret, err := conn.callUserMethod(msg)
 	if err != nil {
 		conn.sendError(err, sender, serial)
+		return
 	}
 
 	if msg.Flags&FlagNoReplyExpected == 0 {
