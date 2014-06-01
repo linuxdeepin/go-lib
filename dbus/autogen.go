@@ -191,8 +191,7 @@ func setupSignalHandler(c *Conn, v interface{}, path ObjectPath, iface string) {
 	}
 }
 
-//TODO: Need exported?
-func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) error {
+func ownerName(c *Conn, v interface{}, name string) error {
 	if name != "." {
 		not_registered := true
 		for _, _name := range c.Names() {
@@ -212,15 +211,22 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 			}
 		}
 	}
-	setupSignalHandler(c, v, path, iface)
+	return nil
+}
 
-	err := c.Export(v, path, iface)
-	if err != nil {
+//TODO: Need exported?
+func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) error {
+	if err := ownerName(c, v, name); err != nil {
 		return err
 	}
 
-	c.handlersLck.RLock()
-	infos := c.handlers[path]
+	setupSignalHandler(c, v, path, iface)
+
+	if err := c.Export(v, path, iface); err != nil {
+		return err
+	}
+
+	//handle subpath
 	parentpath, basepath := splitObjectPath(path)
 	if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
 		intro := parent["org.freedesktop.DBus.Introspectable"]
@@ -228,17 +234,14 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 			intro.(IntrospectProxy).child[basepath] = true
 		}
 	}
+
+	c.handlersLck.RLock()
+	ifcs := c.handlers[path]
 	c.handlersLck.RUnlock()
 
-	if _, ok := infos["org.freedesktop.DBus.Introspectable"]; !ok {
-		infos["org.freedesktop.DBus.Introspectable"] = IntrospectProxy{infos, make(map[string]bool)}
-	}
-	if _, ok := infos["org.freedesktop.DBus.Properties"]; !ok {
-		infos["org.freedesktop.DBus.Properties"] = PropertiesProxy{infos, nil}
-	}
-	if _, ok := infos["org.freedesktop.DBus.LifeManager"]; !ok {
-		infos["org.freedesktop.DBus.LifeManager"] = &LifeManager{name: name, path: path, count: 1}
-	}
+	c.Export(IntrospectProxy{ifcs, make(map[string]bool)}, path, "org.freedesktop.DBus.Introspectable")
+	c.Export(PropertiesProxy{ifcs, nil}, path, "org.freedesktop.DBus.Properties")
+	c.Export(&LifeManager{name: name, path: path, count: 1}, path, "org.freedesktop.DBus.LifeManager")
 
 	return nil
 }
