@@ -1,6 +1,5 @@
 package dbus
 
-import "fmt"
 import "time"
 
 var _HasNewMessage = false
@@ -10,13 +9,12 @@ func SetAutoDestroyHandler(d time.Duration, cb func() bool) {
 	if quitTimer != nil {
 		quitTimer.Stop()
 	}
-	if cb == nil || d == 0 {
-		fmt.Println("Clean AutoDestroyHandle")
+	if d == 0 {
 		return
 	}
 	quitTimer = time.AfterFunc(d, func() {
 		if !_HasNewMessage {
-			if cb() {
+			if cb == nil || cb() {
 				quit(nil)
 				return
 			}
