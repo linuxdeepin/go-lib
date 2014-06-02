@@ -24,6 +24,10 @@ import (
 	"os"
 )
 
+func getEnv(name string) string {
+	return os.Getenv(name)
+}
+
 func isEnvExists(name string) bool {
 	value := os.Getenv(name)
 	return len(value) != 0

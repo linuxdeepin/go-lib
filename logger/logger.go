@@ -32,9 +32,11 @@ import (
 )
 
 const (
-	defaultDebugEnv  = "DDE_DEBUG"
-	defaultDebugFile = "/var/cache/dde_debug"
-	crashReporterExe = "/usr/bin/deepin-crash-reporter"
+	defaultDebugEnv      = "DDE_DEBUG"
+	defaultDebugLelveEnv = "DDE_DEBUG_LEVEL"
+	defaultDebugMatchEnv = "DDE_DEBUG_MATCH"
+	defaultDebugFile     = "/var/cache/dde_debug"
+	crashReporterExe     = "/usr/bin/deepin-crash-reporter"
 )
 
 var crashReporterArgs = []string{crashReporterExe, "--remove-config", "--config"}
@@ -50,15 +52,24 @@ const (
 	LEVEL_ERROR
 	LEVEL_PANIC
 	LEVEL_FATAL
+	LEVEL_DISABLE
 )
 
 var (
 	logapi *Logapi
 
-	// DebugEnv is the name of environment variable to control the
-	// default log level, if exists the default log level will be
-	// "LEVEL_DEBUG".
+	// DebugEnv is the name of environment variable to enable debug
+	// mode , if exists the default log level will be "LEVEL_DEBUG".
 	DebugEnv = defaultDebugEnv
+
+	// DebugLevelEnv is the name of environment variable to control
+	// the log level, could be "debug", "info", "warning", "error" and
+	// "fatal".
+	DebugLevelEnv = defaultDebugLelveEnv
+
+	// DebugMatchEnv is the name of environment variable to enable
+	// debug mode for target logger object.
+	DebugMatchEnv = defaultDebugMatchEnv
 
 	// DebugFile if the file name that if exist the default log level
 	// will be "LEVEL_DEBUG".
@@ -155,12 +166,43 @@ func NewLogger(name string) (logger *Logger) {
 	}()
 
 	logger = &Logger{name: name}
-	if isEnvExists(DebugEnv) || isFileExists(DebugFile) {
-		logger.level = LEVEL_DEBUG
-	} else {
-		logger.level = LEVEL_INFO
-	}
 	logger.config = newRestartConfig(name)
+
+	// dispatch environment variables to set default log level
+	level := LEVEL_INFO
+	var customLevel Priority
+	// level := defaultLevel
+	if isEnvExists(DebugLevelEnv) {
+		switch getEnv(DebugLevelEnv) {
+		case "debug":
+			customLevel = LEVEL_DEBUG
+		case "info":
+			customLevel = LEVEL_INFO
+		case "warning":
+			customLevel = LEVEL_WARNING
+		case "error":
+			customLevel = LEVEL_ERROR
+		case "fatal":
+			customLevel = LEVEL_FATAL
+		}
+		level = customLevel
+	}
+	if isEnvExists(DebugEnv) || isFileExists(DebugFile) {
+		if !isEnvExists(DebugLevelEnv) {
+			level = LEVEL_DEBUG
+		}
+	}
+	if isEnvExists(DebugMatchEnv) {
+		if strings.Contains(strings.ToLower(name),
+			strings.ToLower(getEnv(DebugMatchEnv))) {
+			if !isEnvExists(DebugLevelEnv) {
+				level = LEVEL_DEBUG
+			}
+		} else {
+			level = LEVEL_DISABLE
+		}
+	}
+	logger.level = level
 
 	err := initLogapi()
 	if err != nil {
