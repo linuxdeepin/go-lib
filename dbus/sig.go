@@ -20,7 +20,7 @@ var sigToType = map[byte]reflect.Type{
 	'g': signatureType,
 	'o': objectPathType,
 	'v': variantType,
-	'h': unixFDIndexType,
+	'h': unixFDType, //'h': unixFDIndexType TODO
 }
 
 // Signature represents a correct type signature as specified by the D-Bus
