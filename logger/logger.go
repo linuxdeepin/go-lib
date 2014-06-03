@@ -288,32 +288,32 @@ func (logger *Logger) doLog(level Priority, s string) {
 	switch level {
 	case LEVEL_DEBUG:
 		if logapi != nil {
-			logapi.Debug(logger.id, s)
+			logapi.Debug(logger.id, logger.name, s)
 		}
 		logger.printLocal("[DEBUG]", s)
 	case LEVEL_INFO:
 		if logapi != nil {
-			logapi.Info(logger.id, s)
+			logapi.Info(logger.id, logger.name, s)
 		}
 		logger.printLocal("[INFO]", s)
 	case LEVEL_WARNING:
 		if logapi != nil {
-			logapi.Warning(logger.id, s)
+			logapi.Warning(logger.id, logger.name, s)
 		}
 		logger.printLocal("[WARNING]", s)
 	case LEVEL_ERROR:
 		if logapi != nil {
-			logapi.Error(logger.id, s)
+			logapi.Error(logger.id, logger.name, s)
 		}
 		logger.printLocal("[ERROR]", s)
 	case LEVEL_PANIC:
 		if logapi != nil {
-			logapi.Error(logger.id, s)
+			logapi.Error(logger.id, logger.name, s)
 		}
 		logger.printLocal("[PANIC]", s)
 	case LEVEL_FATAL:
 		if logapi != nil {
-			logapi.Fatal(logger.id, s)
+			logapi.Fatal(logger.id, logger.name, s)
 		}
 		logger.printLocal("[FATAL]", s)
 	}

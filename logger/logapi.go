@@ -34,32 +34,32 @@ type Logapi struct {
 	core *dbus.Object
 }
 
-func (obj Logapi) Debug(arg0 string, arg1 string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.Debug", 0, arg0, arg1).Store()
+func (obj Logapi) Debug(arg0, arg1, arg2 string) (_err error) {
+	_err = obj.core.Call("com.deepin.api.Logger.Debug", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
 		log.Println(_err)
 	}
 	return
 }
 
-func (obj Logapi) Error(arg0 string, arg1 string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.Error", 0, arg0, arg1).Store()
+func (obj Logapi) Error(arg0, arg1, arg2 string) (_err error) {
+	_err = obj.core.Call("com.deepin.api.Logger.Error", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
 		log.Println(_err)
 	}
 	return
 }
 
-func (obj Logapi) Fatal(arg0 string, arg1 string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.Fatal", 0, arg0, arg1).Store()
+func (obj Logapi) Fatal(arg0, arg1, arg2 string) (_err error) {
+	_err = obj.core.Call("com.deepin.api.Logger.Fatal", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
 		log.Println(_err)
 	}
 	return
 }
 
-func (obj Logapi) Info(arg0 string, arg1 string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.Info", 0, arg0, arg1).Store()
+func (obj Logapi) Info(arg0, arg1, arg2 string) (_err error) {
+	_err = obj.core.Call("com.deepin.api.Logger.Info", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
 		log.Println(_err)
 	}
@@ -74,8 +74,8 @@ func (obj Logapi) NewLogger(arg0 string) (arg1 string, _err error) {
 	return
 }
 
-func (obj Logapi) Warning(arg0 string, arg1 string) (_err error) {
-	_err = obj.core.Call("com.deepin.api.Logger.Warning", 0, arg0, arg1).Store()
+func (obj Logapi) Warning(arg0, arg1, arg2 string) (_err error) {
+	_err = obj.core.Call("com.deepin.api.Logger.Warning", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
 		log.Println(_err)
 	}
