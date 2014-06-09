@@ -22,7 +22,7 @@ var _convertQDBus = map[string]string{
 	"o": "QVariant::fromValue(QDBusObjectPath({{.Name}}.value<QString>()))",
 }
 
-func normaliseQDBus(v string) (r string) {
+func normalizeQDBus(v string) (r string) {
 	return //TODO:
 	if result, ok := _convertQDBus[v]; ok {
 		r = result

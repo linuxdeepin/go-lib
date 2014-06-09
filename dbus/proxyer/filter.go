@@ -76,9 +76,9 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 
 	methodKeyword := keyword()
 	for i, _ := range info.Methods {
-		method_name := &info.Methods[i].Name
-		if methodKeyword, hit = keywordFilter(methodKeyword, method_name); hit {
-			log.Printf("Method name(%s.%s) conflict: convert", info.Name, *method_name)
+		methodName := &info.Methods[i].Name
+		if methodKeyword, hit = keywordFilter(methodKeyword, methodName); hit {
+			log.Printf("Method name(%s.%s) conflict: convert", info.Name, *methodName)
 		}
 
 		argKeyword := keyword()
@@ -91,7 +91,7 @@ func filterKeyWord(keyword func() map[string]bool, info *dbus.InterfaceInfo) {
 				*name = "arg" + strconv.Itoa(j)
 			}
 			if argKeyword, hit = keywordFilter(argKeyword, name); hit {
-				log.Printf("The %d arg of (%s.%s:%s) conflict", j, info.Name, *method_name, *name)
+				log.Printf("The %d arg of (%s.%s:%s) conflict", j, info.Name, *methodName, *name)
 			}
 		}
 	}

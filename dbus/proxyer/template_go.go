@@ -76,7 +76,7 @@ func Destroy{{ExportName}}(obj *{{ExportName}}) {
 
 {{$obj_name := .Name}}
 {{range .Methods }}
-func ({{OBJ_NAME}} {{ExportName }}) {{.Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}} {{with GetParamterOuts .Args}},{{end}}_err error) {
+func ({{OBJ_NAME}} {{ExportName }}) {{Normalize .Name}} ({{GetParamterInsProto .Args}}) ({{GetParamterOutsProto .Args}} {{with GetParamterOuts .Args}},{{end}}_err error) {
 	_err = {{OBJ_NAME}}.core.Call("{{$obj_name}}.{{.Name}}", 0{{GetParamterNames .Args}}).Store({{GetParamterOuts .Args}})
 	if _err != nil {
 		fmt.Println(_err)
@@ -202,7 +202,7 @@ var __TEST_TEMPLATE = `/*This file is auto generate by dlib/dbus/proxyer. Don't 
 package {{PkgName}}
 import "testing"
 {{range .Methods}}
-func Test{{ObjName}}Method{{.Name}} (t *testing.T) {
+func Test{{ObjName}}Method{{Normalize .Name}} (t *testing.T) {
 	{{/*
 	rnd := rand.New(rand.NewSource(99))
 	r := Get{{ObjName}}("{{TestPath}}").{{.Name}}({{.Args}})

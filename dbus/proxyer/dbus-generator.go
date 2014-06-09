@@ -33,7 +33,7 @@ func GetInterfaceInfo(ifc _Interface) dbus.InterfaceInfo {
 		decoder.Decode(&obj)
 		for _, ifcInfo := range obj.Interfaces {
 			if ifcInfo.Name == ifc.Interface {
-				return ifcInfo
+				return ifc.handlleBlackList(ifcInfo)
 			}
 		}
 		reader.Close()
@@ -43,7 +43,42 @@ func GetInterfaceInfo(ifc _Interface) dbus.InterfaceInfo {
 
 type _Interface struct {
 	OutFile, XMLFile, Dest, ObjectPath, Interface, ObjectName, TestPath string
+	BlackMethods                                                        []string
+	BlackProperties                                                     []string
+	BlackSignals                                                        []string
 }
+
+func (ifc _Interface) handlleBlackList(data dbus.InterfaceInfo) dbus.InterfaceInfo {
+	for _, name := range ifc.BlackMethods {
+		var methods []dbus.MethodInfo
+		for _, mInfo := range data.Methods {
+			if mInfo.Name != name {
+				methods = append(methods, mInfo)
+			}
+		}
+		data.Methods = methods
+	}
+	for _, name := range ifc.BlackProperties {
+		var properties []dbus.PropertyInfo
+		for _, pInfo := range data.Properties {
+			if pInfo.Name != name {
+				properties = append(properties, pInfo)
+			}
+		}
+		data.Properties = properties
+	}
+	for _, name := range ifc.BlackSignals {
+		var signals []dbus.SignalInfo
+		for _, sInfo := range data.Signals {
+			if sInfo.Name != name {
+				signals = append(signals, sInfo)
+			}
+		}
+		data.Signals = signals
+	}
+	return data
+}
+
 type _Config struct {
 	Target       string
 	NotExportBus bool
