@@ -18,8 +18,8 @@ import "unsafe"
 import "errors"
 
 import (
-	"dlib/gobject-2.0"
 	"dlib/glib-2.0"
+	"dlib/gobject-2.0"
 )
 
 const alot = 999999
@@ -36,8 +36,8 @@ type _GList struct {
 }
 
 type _GError struct {
-	domain uint32
-	code int32
+	domain  uint32
+	code    int32
 	message *C.char
 }
 
@@ -49,7 +49,9 @@ func _GoStringToGString(x string) *C.char {
 }
 
 func _GoBoolToCBool(x bool) C.int {
-	if x { return 1 }
+	if x {
+		return 1
+	}
 	return 0
 }
 
@@ -61,12 +63,10 @@ func _GoInterfaceToCInterface(iface interface{}) *unsafe.Pointer {
 	return (*unsafe.Pointer)(unsafe.Pointer(&iface))
 }
 
-
 //export _Gio_go_callback_cleanup
 func _Gio_go_callback_cleanup(gofunc unsafe.Pointer) {
 	gobject.Holder.Release(gofunc)
 }
-
 
 type ActionLike interface {
 	ImplementsGAction() *C.GAction
@@ -81,8 +81,7 @@ func (*Action) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_action_get_type())
 }
 
-
-type ActionImpl struct {}
+type ActionImpl struct{}
 
 func ToAction(objlike gobject.ObjectLike) *Action {
 	c := objlike.InheritedFromGObject()
@@ -218,14 +217,16 @@ func (this0 *ActionImpl) GetStateType() *glib.VariantType {
 	ret2 = (*glib.VariantType)(unsafe.Pointer(ret1))
 	return ret2
 }
+
 type ActionEntry struct {
-	name0 *C.char
-	Activate unsafe.Pointer
+	name0           *C.char
+	Activate        unsafe.Pointer
 	parameter_type0 *C.char
-	state0 *C.char
-	ChangeState unsafe.Pointer
-	Padding [3]uint64
+	state0          *C.char
+	ChangeState     unsafe.Pointer
+	Padding         [3]uint64
 }
+
 func (this0 *ActionEntry) Name() string {
 	var name1 string
 	name1 = C.GoString(this0.name0)
@@ -241,6 +242,7 @@ func (this0 *ActionEntry) State() string {
 	state1 = C.GoString(this0.state0)
 	return state1
 }
+
 type ActionGroupLike interface {
 	ImplementsGActionGroup() *C.GActionGroup
 }
@@ -254,8 +256,7 @@ func (*ActionGroup) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_action_group_get_type())
 }
 
-
-type ActionGroupImpl struct {}
+type ActionGroupImpl struct{}
 
 func ToActionGroup(objlike gobject.ObjectLike) *ActionGroup {
 	c := objlike.InheritedFromGObject()
@@ -458,6 +459,7 @@ func (this0 *ActionGroupImpl) QueryAction(action_name0 string) (bool, *glib.Vari
 	ret2 = ret1 != 0
 	return enabled2, parameter_type2, state_type2, state_hint2, state2, ret2
 }
+
 // blacklisted: ActionGroupInterface (struct)
 // blacklisted: ActionInterface (struct)
 type ActionMapLike interface {
@@ -473,8 +475,7 @@ func (*ActionMap) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_action_map_get_type())
 }
 
-
-type ActionMapImpl struct {}
+type ActionMapImpl struct{}
 
 func ToActionMap(objlike gobject.ObjectLike) *ActionMap {
 	c := objlike.InheritedFromGObject()
@@ -540,6 +541,7 @@ func (this0 *ActionMapImpl) RemoveAction(action_name0 string) {
 	defer C.free(unsafe.Pointer(action_name1))
 	C.g_action_map_remove_action(this1, action_name1)
 }
+
 // blacklisted: ActionMapInterface (struct)
 type AppInfoLike interface {
 	ImplementsGAppInfo() *C.GAppInfo
@@ -554,8 +556,7 @@ func (*AppInfo) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_app_info_get_type())
 }
 
-
-type AppInfoImpl struct {}
+type AppInfoImpl struct{}
 
 func ToAppInfo(objlike gobject.ObjectLike) *AppInfo {
 	c := objlike.InheritedFromGObject()
@@ -590,6 +591,7 @@ func AppInfoCreateFromCommandline(commandline0 string, application_name0 string,
 	}
 	return ret2, err2
 }
+
 // blacklisted: AppInfo.get_all (method)
 // blacklisted: AppInfo.get_all_for_type (method)
 // blacklisted: AppInfo.get_default_for_type (method)
@@ -917,13 +919,16 @@ func (this0 *AppInfoImpl) SupportsUris() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
+
 type AppInfoCreateFlags C.uint32_t
+
 const (
-	AppInfoCreateFlagsNone AppInfoCreateFlags = 0
-	AppInfoCreateFlagsNeedsTerminal AppInfoCreateFlags = 1
-	AppInfoCreateFlagsSupportsUris AppInfoCreateFlags = 2
+	AppInfoCreateFlagsNone                        AppInfoCreateFlags = 0
+	AppInfoCreateFlagsNeedsTerminal               AppInfoCreateFlags = 1
+	AppInfoCreateFlagsSupportsUris                AppInfoCreateFlags = 2
 	AppInfoCreateFlagsSupportsStartupNotification AppInfoCreateFlags = 4
 )
+
 // blacklisted: AppInfoIface (struct)
 // blacklisted: AppInfoMonitor (object)
 type AppLaunchContextLike interface {
@@ -933,7 +938,6 @@ type AppLaunchContextLike interface {
 
 type AppLaunchContext struct {
 	gobject.Object
-	
 }
 
 func ToAppLaunchContext(objlike gobject.ObjectLike) *AppLaunchContext {
@@ -1064,6 +1068,7 @@ func (this0 *AppLaunchContext) Unsetenv(variable0 string) {
 	defer C.free(unsafe.Pointer(variable1))
 	C.g_app_launch_context_unsetenv(this1, variable1)
 }
+
 // blacklisted: AppLaunchContextClass (struct)
 // blacklisted: AppLaunchContextPrivate (struct)
 // blacklisted: Application (object)
@@ -1072,27 +1077,32 @@ func (this0 *AppLaunchContext) Unsetenv(variable0 string) {
 // blacklisted: ApplicationCommandLineClass (struct)
 // blacklisted: ApplicationCommandLinePrivate (struct)
 type ApplicationFlags C.uint32_t
+
 const (
-	ApplicationFlagsFlagsNone ApplicationFlags = 0
-	ApplicationFlagsIsService ApplicationFlags = 1
-	ApplicationFlagsIsLauncher ApplicationFlags = 2
-	ApplicationFlagsHandlesOpen ApplicationFlags = 4
+	ApplicationFlagsFlagsNone          ApplicationFlags = 0
+	ApplicationFlagsIsService          ApplicationFlags = 1
+	ApplicationFlagsIsLauncher         ApplicationFlags = 2
+	ApplicationFlagsHandlesOpen        ApplicationFlags = 4
 	ApplicationFlagsHandlesCommandLine ApplicationFlags = 8
-	ApplicationFlagsSendEnvironment ApplicationFlags = 16
-	ApplicationFlagsNonUnique ApplicationFlags = 32
+	ApplicationFlagsSendEnvironment    ApplicationFlags = 16
+	ApplicationFlagsNonUnique          ApplicationFlags = 32
 )
+
 // blacklisted: ApplicationPrivate (struct)
 type AskPasswordFlags C.uint32_t
+
 const (
-	AskPasswordFlagsNeedPassword AskPasswordFlags = 1
-	AskPasswordFlagsNeedUsername AskPasswordFlags = 2
-	AskPasswordFlagsNeedDomain AskPasswordFlags = 4
-	AskPasswordFlagsSavingSupported AskPasswordFlags = 8
+	AskPasswordFlagsNeedPassword       AskPasswordFlags = 1
+	AskPasswordFlagsNeedUsername       AskPasswordFlags = 2
+	AskPasswordFlagsNeedDomain         AskPasswordFlags = 4
+	AskPasswordFlagsSavingSupported    AskPasswordFlags = 8
 	AskPasswordFlagsAnonymousSupported AskPasswordFlags = 16
 )
+
 // blacklisted: AsyncInitable (interface)
 // blacklisted: AsyncInitableIface (struct)
 type AsyncReadyCallback func(source_object *gobject.Object, res *AsyncResult)
+
 //export _GAsyncReadyCallback_c_wrapper
 func _GAsyncReadyCallback_c_wrapper(source_object0 unsafe.Pointer, res0 unsafe.Pointer, user_data0 unsafe.Pointer) {
 	var source_object1 *gobject.Object
@@ -1103,11 +1113,13 @@ func _GAsyncReadyCallback_c_wrapper(source_object0 unsafe.Pointer, res0 unsafe.P
 	user_data1 = *(*AsyncReadyCallback)(user_data0)
 	user_data1(source_object1, res1)
 }
+
 //export _GAsyncReadyCallback_c_wrapper_once
 func _GAsyncReadyCallback_c_wrapper_once(source_object0 unsafe.Pointer, res0 unsafe.Pointer, user_data0 unsafe.Pointer) {
 	_GAsyncReadyCallback_c_wrapper(source_object0, res0, user_data0)
 	gobject.Holder.Release(user_data0)
 }
+
 type AsyncResultLike interface {
 	ImplementsGAsyncResult() *C.GAsyncResult
 }
@@ -1121,8 +1133,7 @@ func (*AsyncResult) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_async_result_get_type())
 }
 
-
-type AsyncResultImpl struct {}
+type AsyncResultImpl struct{}
 
 func ToAsyncResult(objlike gobject.ObjectLike) *AsyncResult {
 	c := objlike.InheritedFromGObject()
@@ -1182,6 +1193,7 @@ func (this0 *AsyncResultImpl) LegacyPropagateError() (bool, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: AsyncResultIface (struct)
 // blacklisted: BufferedInputStream (object)
 // blacklisted: BufferedInputStreamClass (struct)
@@ -1194,24 +1206,30 @@ func (this0 *AsyncResultImpl) LegacyPropagateError() (bool, error) {
 // blacklisted: BusNameAppearedCallback (callback)
 // blacklisted: BusNameLostCallback (callback)
 type BusNameOwnerFlags C.uint32_t
+
 const (
-	BusNameOwnerFlagsNone BusNameOwnerFlags = 0
+	BusNameOwnerFlagsNone             BusNameOwnerFlags = 0
 	BusNameOwnerFlagsAllowReplacement BusNameOwnerFlags = 1
-	BusNameOwnerFlagsReplace BusNameOwnerFlags = 2
+	BusNameOwnerFlagsReplace          BusNameOwnerFlags = 2
 )
+
 // blacklisted: BusNameVanishedCallback (callback)
 type BusNameWatcherFlags C.uint32_t
+
 const (
-	BusNameWatcherFlagsNone BusNameWatcherFlags = 0
+	BusNameWatcherFlagsNone      BusNameWatcherFlags = 0
 	BusNameWatcherFlagsAutoStart BusNameWatcherFlags = 1
 )
+
 type BusType C.int32_t
+
 const (
 	BusTypeStarter BusType = -1
-	BusTypeNone BusType = 0
-	BusTypeSystem BusType = 1
+	BusTypeNone    BusType = 0
+	BusTypeSystem  BusType = 1
 	BusTypeSession BusType = 2
 )
+
 // blacklisted: BytesIcon (object)
 type CancellableLike interface {
 	gobject.ObjectLike
@@ -1220,7 +1238,6 @@ type CancellableLike interface {
 
 type Cancellable struct {
 	gobject.Object
-	
 }
 
 func ToCancellable(objlike gobject.ObjectLike) *Cancellable {
@@ -1269,6 +1286,7 @@ func (this0 *Cancellable) Cancel() {
 	}
 	C.g_cancellable_cancel(this1)
 }
+
 // blacklisted: Cancellable.connect (method)
 func (this0 *Cancellable) Disconnect(handler_id0 uint64) {
 	var this1 *C.GCancellable
@@ -1355,6 +1373,7 @@ func (this0 *Cancellable) SetErrorIfCancelled() (bool, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: CancellableClass (struct)
 // blacklisted: CancellablePrivate (struct)
 // blacklisted: CancellableSourceFunc (callback)
@@ -1362,11 +1381,13 @@ func (this0 *Cancellable) SetErrorIfCancelled() (bool, error) {
 // blacklisted: CharsetConverterClass (struct)
 // blacklisted: Converter (interface)
 type ConverterFlags C.uint32_t
+
 const (
-	ConverterFlagsNone ConverterFlags = 0
+	ConverterFlagsNone       ConverterFlags = 0
 	ConverterFlagsInputAtEnd ConverterFlags = 1
-	ConverterFlagsFlush ConverterFlags = 2
+	ConverterFlagsFlush      ConverterFlags = 2
 )
+
 // blacklisted: ConverterIface (struct)
 // blacklisted: ConverterInputStream (object)
 // blacklisted: ConverterInputStreamClass (struct)
@@ -1375,90 +1396,102 @@ const (
 // blacklisted: ConverterOutputStreamClass (struct)
 // blacklisted: ConverterOutputStreamPrivate (struct)
 type ConverterResult C.uint32_t
+
 const (
-	ConverterResultError ConverterResult = 0
+	ConverterResultError     ConverterResult = 0
 	ConverterResultConverted ConverterResult = 1
-	ConverterResultFinished ConverterResult = 2
-	ConverterResultFlushed ConverterResult = 3
+	ConverterResultFinished  ConverterResult = 2
+	ConverterResultFlushed   ConverterResult = 3
 )
+
 // blacklisted: Credentials (object)
 // blacklisted: CredentialsClass (struct)
 type CredentialsType C.uint32_t
+
 const (
-	CredentialsTypeInvalid CredentialsType = 0
-	CredentialsTypeLinuxUcred CredentialsType = 1
-	CredentialsTypeFreebsdCmsgcred CredentialsType = 2
+	CredentialsTypeInvalid             CredentialsType = 0
+	CredentialsTypeLinuxUcred          CredentialsType = 1
+	CredentialsTypeFreebsdCmsgcred     CredentialsType = 2
 	CredentialsTypeOpenbsdSockpeercred CredentialsType = 3
-	CredentialsTypeSolarisUcred CredentialsType = 4
+	CredentialsTypeSolarisUcred        CredentialsType = 4
 )
+
 // blacklisted: DBusActionGroup (object)
 // blacklisted: DBusAnnotationInfo (struct)
 // blacklisted: DBusArgInfo (struct)
 // blacklisted: DBusAuthObserver (object)
 type DBusCallFlags C.uint32_t
+
 const (
-	DBusCallFlagsNone DBusCallFlags = 0
+	DBusCallFlagsNone        DBusCallFlags = 0
 	DBusCallFlagsNoAutoStart DBusCallFlags = 1
 )
+
 type DBusCapabilityFlags C.uint32_t
+
 const (
-	DBusCapabilityFlagsNone DBusCapabilityFlags = 0
+	DBusCapabilityFlagsNone          DBusCapabilityFlags = 0
 	DBusCapabilityFlagsUnixFdPassing DBusCapabilityFlags = 1
 )
+
 // blacklisted: DBusConnection (object)
 type DBusConnectionFlags C.uint32_t
+
 const (
-	DBusConnectionFlagsNone DBusConnectionFlags = 0
-	DBusConnectionFlagsAuthenticationClient DBusConnectionFlags = 1
-	DBusConnectionFlagsAuthenticationServer DBusConnectionFlags = 2
+	DBusConnectionFlagsNone                         DBusConnectionFlags = 0
+	DBusConnectionFlagsAuthenticationClient         DBusConnectionFlags = 1
+	DBusConnectionFlagsAuthenticationServer         DBusConnectionFlags = 2
 	DBusConnectionFlagsAuthenticationAllowAnonymous DBusConnectionFlags = 4
-	DBusConnectionFlagsMessageBusConnection DBusConnectionFlags = 8
-	DBusConnectionFlagsDelayMessageProcessing DBusConnectionFlags = 16
+	DBusConnectionFlagsMessageBusConnection         DBusConnectionFlags = 8
+	DBusConnectionFlagsDelayMessageProcessing       DBusConnectionFlags = 16
 )
+
 type DBusError C.uint32_t
+
 const (
-	DBusErrorFailed DBusError = 0
-	DBusErrorNoMemory DBusError = 1
-	DBusErrorServiceUnknown DBusError = 2
-	DBusErrorNameHasNoOwner DBusError = 3
-	DBusErrorNoReply DBusError = 4
-	DBusErrorIoError DBusError = 5
-	DBusErrorBadAddress DBusError = 6
-	DBusErrorNotSupported DBusError = 7
-	DBusErrorLimitsExceeded DBusError = 8
-	DBusErrorAccessDenied DBusError = 9
-	DBusErrorAuthFailed DBusError = 10
-	DBusErrorNoServer DBusError = 11
-	DBusErrorTimeout DBusError = 12
-	DBusErrorNoNetwork DBusError = 13
-	DBusErrorAddressInUse DBusError = 14
-	DBusErrorDisconnected DBusError = 15
-	DBusErrorInvalidArgs DBusError = 16
-	DBusErrorFileNotFound DBusError = 17
-	DBusErrorFileExists DBusError = 18
-	DBusErrorUnknownMethod DBusError = 19
-	DBusErrorTimedOut DBusError = 20
-	DBusErrorMatchRuleNotFound DBusError = 21
-	DBusErrorMatchRuleInvalid DBusError = 22
-	DBusErrorSpawnExecFailed DBusError = 23
-	DBusErrorSpawnForkFailed DBusError = 24
-	DBusErrorSpawnChildExited DBusError = 25
-	DBusErrorSpawnChildSignaled DBusError = 26
-	DBusErrorSpawnFailed DBusError = 27
-	DBusErrorSpawnSetupFailed DBusError = 28
-	DBusErrorSpawnConfigInvalid DBusError = 29
-	DBusErrorSpawnServiceInvalid DBusError = 30
-	DBusErrorSpawnServiceNotFound DBusError = 31
-	DBusErrorSpawnPermissionsInvalid DBusError = 32
-	DBusErrorSpawnFileInvalid DBusError = 33
-	DBusErrorSpawnNoMemory DBusError = 34
-	DBusErrorUnixProcessIdUnknown DBusError = 35
-	DBusErrorInvalidSignature DBusError = 36
-	DBusErrorInvalidFileContent DBusError = 37
+	DBusErrorFailed                        DBusError = 0
+	DBusErrorNoMemory                      DBusError = 1
+	DBusErrorServiceUnknown                DBusError = 2
+	DBusErrorNameHasNoOwner                DBusError = 3
+	DBusErrorNoReply                       DBusError = 4
+	DBusErrorIoError                       DBusError = 5
+	DBusErrorBadAddress                    DBusError = 6
+	DBusErrorNotSupported                  DBusError = 7
+	DBusErrorLimitsExceeded                DBusError = 8
+	DBusErrorAccessDenied                  DBusError = 9
+	DBusErrorAuthFailed                    DBusError = 10
+	DBusErrorNoServer                      DBusError = 11
+	DBusErrorTimeout                       DBusError = 12
+	DBusErrorNoNetwork                     DBusError = 13
+	DBusErrorAddressInUse                  DBusError = 14
+	DBusErrorDisconnected                  DBusError = 15
+	DBusErrorInvalidArgs                   DBusError = 16
+	DBusErrorFileNotFound                  DBusError = 17
+	DBusErrorFileExists                    DBusError = 18
+	DBusErrorUnknownMethod                 DBusError = 19
+	DBusErrorTimedOut                      DBusError = 20
+	DBusErrorMatchRuleNotFound             DBusError = 21
+	DBusErrorMatchRuleInvalid              DBusError = 22
+	DBusErrorSpawnExecFailed               DBusError = 23
+	DBusErrorSpawnForkFailed               DBusError = 24
+	DBusErrorSpawnChildExited              DBusError = 25
+	DBusErrorSpawnChildSignaled            DBusError = 26
+	DBusErrorSpawnFailed                   DBusError = 27
+	DBusErrorSpawnSetupFailed              DBusError = 28
+	DBusErrorSpawnConfigInvalid            DBusError = 29
+	DBusErrorSpawnServiceInvalid           DBusError = 30
+	DBusErrorSpawnServiceNotFound          DBusError = 31
+	DBusErrorSpawnPermissionsInvalid       DBusError = 32
+	DBusErrorSpawnFileInvalid              DBusError = 33
+	DBusErrorSpawnNoMemory                 DBusError = 34
+	DBusErrorUnixProcessIdUnknown          DBusError = 35
+	DBusErrorInvalidSignature              DBusError = 36
+	DBusErrorInvalidFileContent            DBusError = 37
 	DBusErrorSelinuxSecurityContextUnknown DBusError = 38
-	DBusErrorAdtAuditDataUnknown DBusError = 39
-	DBusErrorObjectPathInUse DBusError = 40
+	DBusErrorAdtAuditDataUnknown           DBusError = 39
+	DBusErrorObjectPathInUse               DBusError = 40
 )
+
 // blacklisted: DBusErrorEntry (struct)
 // blacklisted: DBusInterface (interface)
 // blacklisted: DBusInterfaceGetPropertyFunc (callback)
@@ -1469,47 +1502,57 @@ const (
 // blacklisted: DBusInterfaceSkeleton (object)
 // blacklisted: DBusInterfaceSkeletonClass (struct)
 type DBusInterfaceSkeletonFlags C.uint32_t
+
 const (
-	DBusInterfaceSkeletonFlagsNone DBusInterfaceSkeletonFlags = 0
+	DBusInterfaceSkeletonFlagsNone                            DBusInterfaceSkeletonFlags = 0
 	DBusInterfaceSkeletonFlagsHandleMethodInvocationsInThread DBusInterfaceSkeletonFlags = 1
 )
+
 // blacklisted: DBusInterfaceSkeletonPrivate (struct)
 // blacklisted: DBusInterfaceVTable (struct)
 // blacklisted: DBusMenuModel (object)
 // blacklisted: DBusMessage (object)
 type DBusMessageByteOrder C.uint32_t
+
 const (
-	DBusMessageByteOrderBigEndian DBusMessageByteOrder = 66
+	DBusMessageByteOrderBigEndian    DBusMessageByteOrder = 66
 	DBusMessageByteOrderLittleEndian DBusMessageByteOrder = 108
 )
+
 // blacklisted: DBusMessageFilterFunction (callback)
 type DBusMessageFlags C.uint32_t
+
 const (
-	DBusMessageFlagsNone DBusMessageFlags = 0
+	DBusMessageFlagsNone            DBusMessageFlags = 0
 	DBusMessageFlagsNoReplyExpected DBusMessageFlags = 1
-	DBusMessageFlagsNoAutoStart DBusMessageFlags = 2
+	DBusMessageFlagsNoAutoStart     DBusMessageFlags = 2
 )
+
 type DBusMessageHeaderField C.uint32_t
+
 const (
-	DBusMessageHeaderFieldInvalid DBusMessageHeaderField = 0
-	DBusMessageHeaderFieldPath DBusMessageHeaderField = 1
-	DBusMessageHeaderFieldInterface DBusMessageHeaderField = 2
-	DBusMessageHeaderFieldMember DBusMessageHeaderField = 3
-	DBusMessageHeaderFieldErrorName DBusMessageHeaderField = 4
+	DBusMessageHeaderFieldInvalid     DBusMessageHeaderField = 0
+	DBusMessageHeaderFieldPath        DBusMessageHeaderField = 1
+	DBusMessageHeaderFieldInterface   DBusMessageHeaderField = 2
+	DBusMessageHeaderFieldMember      DBusMessageHeaderField = 3
+	DBusMessageHeaderFieldErrorName   DBusMessageHeaderField = 4
 	DBusMessageHeaderFieldReplySerial DBusMessageHeaderField = 5
 	DBusMessageHeaderFieldDestination DBusMessageHeaderField = 6
-	DBusMessageHeaderFieldSender DBusMessageHeaderField = 7
-	DBusMessageHeaderFieldSignature DBusMessageHeaderField = 8
-	DBusMessageHeaderFieldNumUnixFds DBusMessageHeaderField = 9
+	DBusMessageHeaderFieldSender      DBusMessageHeaderField = 7
+	DBusMessageHeaderFieldSignature   DBusMessageHeaderField = 8
+	DBusMessageHeaderFieldNumUnixFds  DBusMessageHeaderField = 9
 )
+
 type DBusMessageType C.uint32_t
+
 const (
-	DBusMessageTypeInvalid DBusMessageType = 0
-	DBusMessageTypeMethodCall DBusMessageType = 1
+	DBusMessageTypeInvalid      DBusMessageType = 0
+	DBusMessageTypeMethodCall   DBusMessageType = 1
 	DBusMessageTypeMethodReturn DBusMessageType = 2
-	DBusMessageTypeError DBusMessageType = 3
-	DBusMessageTypeSignal DBusMessageType = 4
+	DBusMessageTypeError        DBusMessageType = 3
+	DBusMessageTypeSignal       DBusMessageType = 4
 )
+
 // blacklisted: DBusMethodInfo (struct)
 // blacklisted: DBusMethodInvocation (object)
 // blacklisted: DBusNodeInfo (struct)
@@ -1519,10 +1562,12 @@ const (
 // blacklisted: DBusObjectManagerClient (object)
 // blacklisted: DBusObjectManagerClientClass (struct)
 type DBusObjectManagerClientFlags C.uint32_t
+
 const (
-	DBusObjectManagerClientFlagsNone DBusObjectManagerClientFlags = 0
+	DBusObjectManagerClientFlagsNone           DBusObjectManagerClientFlags = 0
 	DBusObjectManagerClientFlagsDoNotAutoStart DBusObjectManagerClientFlags = 1
 )
+
 // blacklisted: DBusObjectManagerClientPrivate (struct)
 // blacklisted: DBusObjectManagerIface (struct)
 // blacklisted: DBusObjectManagerServer (object)
@@ -1536,54 +1581,67 @@ const (
 // blacklisted: DBusObjectSkeletonPrivate (struct)
 // blacklisted: DBusPropertyInfo (struct)
 type DBusPropertyInfoFlags C.uint32_t
+
 const (
-	DBusPropertyInfoFlagsNone DBusPropertyInfoFlags = 0
+	DBusPropertyInfoFlagsNone     DBusPropertyInfoFlags = 0
 	DBusPropertyInfoFlagsReadable DBusPropertyInfoFlags = 1
 	DBusPropertyInfoFlagsWritable DBusPropertyInfoFlags = 2
 )
+
 // blacklisted: DBusProxy (object)
 // blacklisted: DBusProxyClass (struct)
 type DBusProxyFlags C.uint32_t
+
 const (
-	DBusProxyFlagsNone DBusProxyFlags = 0
-	DBusProxyFlagsDoNotLoadProperties DBusProxyFlags = 1
-	DBusProxyFlagsDoNotConnectSignals DBusProxyFlags = 2
-	DBusProxyFlagsDoNotAutoStart DBusProxyFlags = 4
-	DBusProxyFlagsGetInvalidatedProperties DBusProxyFlags = 8
+	DBusProxyFlagsNone                         DBusProxyFlags = 0
+	DBusProxyFlagsDoNotLoadProperties          DBusProxyFlags = 1
+	DBusProxyFlagsDoNotConnectSignals          DBusProxyFlags = 2
+	DBusProxyFlagsDoNotAutoStart               DBusProxyFlags = 4
+	DBusProxyFlagsGetInvalidatedProperties     DBusProxyFlags = 8
 	DBusProxyFlagsDoNotAutoStartAtConstruction DBusProxyFlags = 16
 )
+
 // blacklisted: DBusProxyPrivate (struct)
 // blacklisted: DBusProxyTypeFunc (callback)
 type DBusSendMessageFlags C.uint32_t
+
 const (
-	DBusSendMessageFlagsNone DBusSendMessageFlags = 0
+	DBusSendMessageFlagsNone           DBusSendMessageFlags = 0
 	DBusSendMessageFlagsPreserveSerial DBusSendMessageFlags = 1
 )
+
 // blacklisted: DBusServer (object)
 type DBusServerFlags C.uint32_t
+
 const (
-	DBusServerFlagsNone DBusServerFlags = 0
-	DBusServerFlagsRunInThread DBusServerFlags = 1
+	DBusServerFlagsNone                         DBusServerFlags = 0
+	DBusServerFlagsRunInThread                  DBusServerFlags = 1
 	DBusServerFlagsAuthenticationAllowAnonymous DBusServerFlags = 2
 )
+
 // blacklisted: DBusSignalCallback (callback)
 type DBusSignalFlags C.uint32_t
+
 const (
-	DBusSignalFlagsNone DBusSignalFlags = 0
-	DBusSignalFlagsNoMatchRule DBusSignalFlags = 1
+	DBusSignalFlagsNone               DBusSignalFlags = 0
+	DBusSignalFlagsNoMatchRule        DBusSignalFlags = 1
 	DBusSignalFlagsMatchArg0Namespace DBusSignalFlags = 2
-	DBusSignalFlagsMatchArg0Path DBusSignalFlags = 4
+	DBusSignalFlagsMatchArg0Path      DBusSignalFlags = 4
 )
+
 // blacklisted: DBusSignalInfo (struct)
 // blacklisted: DBusSubtreeDispatchFunc (callback)
 type DBusSubtreeFlags C.uint32_t
+
 const (
-	DBusSubtreeFlagsNone DBusSubtreeFlags = 0
+	DBusSubtreeFlagsNone                        DBusSubtreeFlags = 0
 	DBusSubtreeFlagsDispatchToUnenumeratedNodes DBusSubtreeFlags = 1
 )
+
 // blacklisted: DBusSubtreeIntrospectFunc (callback)
 // blacklisted: DBusSubtreeVTable (struct)
 const DesktopAppInfoLookupExtensionPointName = "gio-desktop-app-info-lookup"
+
 // blacklisted: DataInputStream (object)
 // blacklisted: DataInputStreamClass (struct)
 // blacklisted: DataInputStreamPrivate (struct)
@@ -1591,18 +1649,22 @@ const DesktopAppInfoLookupExtensionPointName = "gio-desktop-app-info-lookup"
 // blacklisted: DataOutputStreamClass (struct)
 // blacklisted: DataOutputStreamPrivate (struct)
 type DataStreamByteOrder C.uint32_t
+
 const (
-	DataStreamByteOrderBigEndian DataStreamByteOrder = 0
+	DataStreamByteOrderBigEndian    DataStreamByteOrder = 0
 	DataStreamByteOrderLittleEndian DataStreamByteOrder = 1
-	DataStreamByteOrderHostEndian DataStreamByteOrder = 2
+	DataStreamByteOrderHostEndian   DataStreamByteOrder = 2
 )
+
 type DataStreamNewlineType C.uint32_t
+
 const (
-	DataStreamNewlineTypeLf DataStreamNewlineType = 0
-	DataStreamNewlineTypeCr DataStreamNewlineType = 1
+	DataStreamNewlineTypeLf   DataStreamNewlineType = 0
+	DataStreamNewlineTypeCr   DataStreamNewlineType = 1
 	DataStreamNewlineTypeCrLf DataStreamNewlineType = 2
-	DataStreamNewlineTypeAny DataStreamNewlineType = 3
+	DataStreamNewlineTypeAny  DataStreamNewlineType = 3
 )
+
 type DesktopAppInfoLike interface {
 	gobject.ObjectLike
 	InheritedFromGDesktopAppInfo() *C.GDesktopAppInfo
@@ -1841,6 +1903,7 @@ func (this0 *DesktopAppInfo) LaunchAction(action_name0 string, launch_context0 A
 	}
 	C.g_desktop_app_info_launch_action(this1, action_name1, launch_context1)
 }
+
 // blacklisted: DesktopAppInfo.launch_uris_as_manager (method)
 func (this0 *DesktopAppInfo) ListActions() []string {
 	var this1 *C.GDesktopAppInfo
@@ -1855,10 +1918,12 @@ func (this0 *DesktopAppInfo) ListActions() []string {
 	}
 	return ret2
 }
+
 // blacklisted: DesktopAppInfoClass (struct)
 // blacklisted: DesktopAppInfoLookup (interface)
 // blacklisted: DesktopAppInfoLookupIface (struct)
 type DesktopAppLaunchCallback func(appinfo *DesktopAppInfo, pid int)
+
 //export _GDesktopAppLaunchCallback_c_wrapper
 func _GDesktopAppLaunchCallback_c_wrapper(appinfo0 unsafe.Pointer, pid0 int32, user_data0 unsafe.Pointer) {
 	var appinfo1 *DesktopAppInfo
@@ -1869,11 +1934,13 @@ func _GDesktopAppLaunchCallback_c_wrapper(appinfo0 unsafe.Pointer, pid0 int32, u
 	user_data1 = *(*DesktopAppLaunchCallback)(user_data0)
 	user_data1(appinfo1, pid1)
 }
+
 //export _GDesktopAppLaunchCallback_c_wrapper_once
 func _GDesktopAppLaunchCallback_c_wrapper_once(appinfo0 unsafe.Pointer, pid0 int32, user_data0 unsafe.Pointer) {
 	_GDesktopAppLaunchCallback_c_wrapper(appinfo0, pid0, user_data0)
 	gobject.Holder.Release(user_data0)
 }
+
 type DriveLike interface {
 	ImplementsGDrive() *C.GDrive
 }
@@ -1887,8 +1954,7 @@ func (*Drive) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_drive_get_type())
 }
 
-
-type DriveImpl struct {}
+type DriveImpl struct{}
 
 func ToDrive(objlike gobject.ObjectLike) *Drive {
 	c := objlike.InheritedFromGObject()
@@ -1966,7 +2032,8 @@ func (this0 *DriveImpl) Eject(flags0 MountUnmountFlags, cancellable0 Cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_drive_eject(this1, flags1, cancellable1, callback1)
 }
@@ -2007,7 +2074,8 @@ func (this0 *DriveImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_opera
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_drive_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -2175,7 +2243,8 @@ func (this0 *DriveImpl) PollForMedia(cancellable0 CancellableLike, callback0 Asy
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_drive_poll_for_media(this1, cancellable1, callback1)
 }
@@ -2216,7 +2285,8 @@ func (this0 *DriveImpl) Start(flags0 DriveStartFlags, mount_operation0 MountOper
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_drive_start(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -2257,7 +2327,8 @@ func (this0 *DriveImpl) Stop(flags0 MountUnmountFlags, mount_operation0 MountOpe
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_drive_stop(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -2281,19 +2352,24 @@ func (this0 *DriveImpl) StopFinish(result0 AsyncResultLike) (bool, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: DriveIface (struct)
 type DriveStartFlags C.uint32_t
+
 const (
 	DriveStartFlagsNone DriveStartFlags = 0
 )
+
 type DriveStartStopType C.uint32_t
+
 const (
-	DriveStartStopTypeUnknown DriveStartStopType = 0
-	DriveStartStopTypeShutdown DriveStartStopType = 1
-	DriveStartStopTypeNetwork DriveStartStopType = 2
+	DriveStartStopTypeUnknown   DriveStartStopType = 0
+	DriveStartStopTypeShutdown  DriveStartStopType = 1
+	DriveStartStopTypeNetwork   DriveStartStopType = 2
 	DriveStartStopTypeMultidisk DriveStartStopType = 3
-	DriveStartStopTypePassword DriveStartStopType = 4
+	DriveStartStopTypePassword  DriveStartStopType = 4
 )
+
 type EmblemLike interface {
 	gobject.ObjectLike
 	InheritedFromGEmblem() *C.GEmblem
@@ -2373,14 +2449,17 @@ func (this0 *Emblem) GetOrigin() EmblemOrigin {
 	ret2 = EmblemOrigin(ret1)
 	return ret2
 }
+
 // blacklisted: EmblemClass (struct)
 type EmblemOrigin C.uint32_t
+
 const (
-	EmblemOriginUnknown EmblemOrigin = 0
-	EmblemOriginDevice EmblemOrigin = 1
+	EmblemOriginUnknown      EmblemOrigin = 0
+	EmblemOriginDevice       EmblemOrigin = 1
 	EmblemOriginLivemetadata EmblemOrigin = 2
-	EmblemOriginTag EmblemOrigin = 3
+	EmblemOriginTag          EmblemOrigin = 3
 )
+
 type EmblemedIconLike interface {
 	gobject.ObjectLike
 	InheritedFromGEmblemedIcon() *C.GEmblemedIcon
@@ -2474,6 +2553,7 @@ func (this0 *EmblemedIcon) GetIcon() *Icon {
 	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), true))
 	return ret2
 }
+
 // blacklisted: EmblemedIconClass (struct)
 // blacklisted: EmblemedIconPrivate (struct)
 const FileAttributeAccessCanDelete = "access::can-delete"
@@ -2554,6 +2634,7 @@ const FileAttributeUnixMode = "unix::mode"
 const FileAttributeUnixNlink = "unix::nlink"
 const FileAttributeUnixRdev = "unix::rdev"
 const FileAttributeUnixUid = "unix::uid"
+
 type FileLike interface {
 	ImplementsGFile() *C.GFile
 }
@@ -2567,8 +2648,7 @@ func (*File) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_file_get_type())
 }
 
-
-type FileImpl struct {}
+type FileImpl struct{}
 
 func ToFile(objlike gobject.ObjectLike) *File {
 	c := objlike.InheritedFromGObject()
@@ -2583,6 +2663,7 @@ func (this0 *FileImpl) ImplementsGFile() *C.GFile {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GFile)((*gobject.Object)(unsafe.Pointer(obj)).C)
 }
+
 // blacklisted: File.new_for_commandline_arg (method)
 // blacklisted: File.new_for_commandline_arg_and_cwd (method)
 // blacklisted: File.new_for_path (method)
@@ -2626,7 +2707,8 @@ func (this0 *FileImpl) AppendToAsync(flags0 FileCreateFlags, io_priority0 int, c
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_append_to_async(this1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -2668,7 +2750,8 @@ func (this0 *FileImpl) Copy(destination0 FileLike, flags0 FileCopyFlags, cancell
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if progress_callback0 != nil {
-		progress_callback1 = unsafe.Pointer(&progress_callback0)}
+		progress_callback1 = unsafe.Pointer(&progress_callback0)
+	}
 	ret1 := C._g_file_copy(this1, destination1, flags1, cancellable1, progress_callback1, &err1)
 	var ret2 bool
 	var err2 error
@@ -2762,7 +2845,8 @@ func (this0 *FileImpl) CreateAsync(flags0 FileCreateFlags, io_priority0 int, can
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_create_async(this1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -2823,7 +2907,8 @@ func (this0 *FileImpl) CreateReadwriteAsync(flags0 FileCreateFlags, io_priority0
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_create_readwrite_async(this1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -2880,7 +2965,8 @@ func (this0 *FileImpl) DeleteAsync(io_priority0 int, cancellable0 CancellableLik
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_delete_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -2927,7 +3013,8 @@ func (this0 *FileImpl) EjectMountable(flags0 MountUnmountFlags, cancellable0 Can
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_eject_mountable(this1, flags1, cancellable1, callback1)
 }
@@ -2968,7 +3055,8 @@ func (this0 *FileImpl) EjectMountableWithOperation(flags0 MountUnmountFlags, mou
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_eject_mountable_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -3035,7 +3123,8 @@ func (this0 *FileImpl) EnumerateChildrenAsync(attributes0 string, flags0 FileQue
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_enumerate_children_async(this1, attributes1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -3106,7 +3195,8 @@ func (this0 *FileImpl) FindEnclosingMountAsync(io_priority0 int, cancellable0 Ca
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_find_enclosing_mount_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -3345,7 +3435,8 @@ func (this0 *FileImpl) LoadContentsAsync(cancellable0 CancellableLike, callback0
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_load_contents_async(this1, cancellable1, callback1)
 }
@@ -3444,7 +3535,8 @@ func (this0 *FileImpl) MakeDirectoryAsync(io_priority0 int, cancellable0 Cancell
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_make_directory_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -3623,7 +3715,8 @@ func (this0 *FileImpl) MountEnclosingVolume(flags0 MountMountFlags, mount_operat
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_mount_enclosing_volume(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -3664,7 +3757,8 @@ func (this0 *FileImpl) MountMountable(flags0 MountMountFlags, mount_operation0 M
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_mount_mountable(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -3706,7 +3800,8 @@ func (this0 *FileImpl) Move(destination0 FileLike, flags0 FileCopyFlags, cancell
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if progress_callback0 != nil {
-		progress_callback1 = unsafe.Pointer(&progress_callback0)}
+		progress_callback1 = unsafe.Pointer(&progress_callback0)
+	}
 	ret1 := C._g_file_move(this1, destination1, flags1, cancellable1, progress_callback1, &err1)
 	var ret2 bool
 	var err2 error
@@ -3750,7 +3845,8 @@ func (this0 *FileImpl) OpenReadwriteAsync(io_priority0 int, cancellable0 Cancell
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_open_readwrite_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -3785,7 +3881,8 @@ func (this0 *FileImpl) PollMountable(cancellable0 CancellableLike, callback0 Asy
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_poll_mountable(this1, cancellable1, callback1)
 }
@@ -3898,7 +3995,8 @@ func (this0 *FileImpl) QueryFilesystemInfoAsync(attributes0 string, io_priority0
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_query_filesystem_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
 }
@@ -3965,7 +4063,8 @@ func (this0 *FileImpl) QueryInfoAsync(attributes0 string, flags0 FileQueryInfoFl
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_query_info_async(this1, attributes1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -4062,7 +4161,8 @@ func (this0 *FileImpl) ReadAsync(io_priority0 int, cancellable0 CancellableLike,
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_read_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -4133,7 +4233,8 @@ func (this0 *FileImpl) ReplaceAsync(etag0 string, make_backup0 bool, flags0 File
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_replace_async(this1, etag1, make_backup1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -4202,10 +4303,12 @@ func (this0 *FileImpl) ReplaceContentsAsync(contents0 []int, etag0 string, make_
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_replace_contents_async(this1, contents1, length1, etag1, make_backup1, flags1, cancellable1, callback1)
 }
+
 // blacklisted: File.replace_contents_bytes_async (method)
 func (this0 *FileImpl) ReplaceContentsFinish(res0 AsyncResultLike) (string, bool, error) {
 	var this1 *C.GFile
@@ -4298,7 +4401,8 @@ func (this0 *FileImpl) ReplaceReadwriteAsync(etag0 string, make_backup0 bool, fl
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_replace_readwrite_async(this1, etag1, make_backup1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -4547,7 +4651,8 @@ func (this0 *FileImpl) SetAttributesAsync(info0 FileInfoLike, flags0 FileQueryIn
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_set_attributes_async(this1, info1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -4639,7 +4744,8 @@ func (this0 *FileImpl) SetDisplayNameAsync(display_name0 string, io_priority0 in
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_set_display_name_async(this1, display_name1, io_priority1, cancellable1, callback1)
 }
@@ -4680,7 +4786,8 @@ func (this0 *FileImpl) StartMountable(flags0 DriveStartFlags, start_operation0 M
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_start_mountable(this1, flags1, start_operation1, cancellable1, callback1)
 }
@@ -4721,7 +4828,8 @@ func (this0 *FileImpl) StopMountable(flags0 MountUnmountFlags, mount_operation0 
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_stop_mountable(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -4788,7 +4896,8 @@ func (this0 *FileImpl) TrashAsync(io_priority0 int, cancellable0 CancellableLike
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_trash_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -4825,7 +4934,8 @@ func (this0 *FileImpl) UnmountMountable(flags0 MountUnmountFlags, cancellable0 C
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_unmount_mountable(this1, flags1, cancellable1, callback1)
 }
@@ -4866,7 +4976,8 @@ func (this0 *FileImpl) UnmountMountableWithOperation(flags0 MountUnmountFlags, m
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_unmount_mountable_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -4890,27 +5001,33 @@ func (this0 *FileImpl) UnmountMountableWithOperationFinish(result0 AsyncResultLi
 	}
 	return ret2, err2
 }
+
 type FileAttributeInfo struct {
 	name0 *C.char
-	Type FileAttributeType
+	Type  FileAttributeType
 	Flags FileAttributeInfoFlags
 }
+
 func (this0 *FileAttributeInfo) Name() string {
 	var name1 string
 	name1 = C.GoString(this0.name0)
 	return name1
 }
+
 type FileAttributeInfoFlags C.uint32_t
+
 const (
-	FileAttributeInfoFlagsNone FileAttributeInfoFlags = 0
-	FileAttributeInfoFlagsCopyWithFile FileAttributeInfoFlags = 1
+	FileAttributeInfoFlagsNone          FileAttributeInfoFlags = 0
+	FileAttributeInfoFlagsCopyWithFile  FileAttributeInfoFlags = 1
 	FileAttributeInfoFlagsCopyWhenMoved FileAttributeInfoFlags = 2
 )
+
 type FileAttributeInfoList struct {
-	Infos *FileAttributeInfo
+	Infos  *FileAttributeInfo
 	NInfos int32
-	_ [4]byte
+	_      [4]byte
 }
+
 func NewFileAttributeInfoList() *FileAttributeInfoList {
 	ret1 := C.g_file_attribute_info_list_new()
 	var ret2 *FileAttributeInfoList
@@ -4948,7 +5065,9 @@ func (this0 *FileAttributeInfoList) Lookup(name0 string) *FileAttributeInfo {
 	ret2 = (*FileAttributeInfo)(unsafe.Pointer(ret1))
 	return ret2
 }
-type FileAttributeMatcher struct {}
+
+type FileAttributeMatcher struct{}
+
 func NewFileAttributeMatcher(attributes0 string) *FileAttributeMatcher {
 	var attributes1 *C.char
 	attributes1 = _GoStringToGString(attributes0)
@@ -5018,41 +5137,50 @@ func (this0 *FileAttributeMatcher) ToString() string {
 	C.g_free(unsafe.Pointer(ret1))
 	return ret2
 }
+
 type FileAttributeStatus C.uint32_t
+
 const (
-	FileAttributeStatusUnset FileAttributeStatus = 0
-	FileAttributeStatusSet FileAttributeStatus = 1
+	FileAttributeStatusUnset        FileAttributeStatus = 0
+	FileAttributeStatusSet          FileAttributeStatus = 1
 	FileAttributeStatusErrorSetting FileAttributeStatus = 2
 )
+
 type FileAttributeType C.uint32_t
+
 const (
-	FileAttributeTypeInvalid FileAttributeType = 0
-	FileAttributeTypeString FileAttributeType = 1
+	FileAttributeTypeInvalid    FileAttributeType = 0
+	FileAttributeTypeString     FileAttributeType = 1
 	FileAttributeTypeByteString FileAttributeType = 2
-	FileAttributeTypeBoolean FileAttributeType = 3
-	FileAttributeTypeUint32 FileAttributeType = 4
-	FileAttributeTypeInt32 FileAttributeType = 5
-	FileAttributeTypeUint64 FileAttributeType = 6
-	FileAttributeTypeInt64 FileAttributeType = 7
-	FileAttributeTypeObject FileAttributeType = 8
-	FileAttributeTypeStringv FileAttributeType = 9
+	FileAttributeTypeBoolean    FileAttributeType = 3
+	FileAttributeTypeUint32     FileAttributeType = 4
+	FileAttributeTypeInt32      FileAttributeType = 5
+	FileAttributeTypeUint64     FileAttributeType = 6
+	FileAttributeTypeInt64      FileAttributeType = 7
+	FileAttributeTypeObject     FileAttributeType = 8
+	FileAttributeTypeStringv    FileAttributeType = 9
 )
+
 type FileCopyFlags C.uint32_t
+
 const (
-	FileCopyFlagsNone FileCopyFlags = 0
-	FileCopyFlagsOverwrite FileCopyFlags = 1
-	FileCopyFlagsBackup FileCopyFlags = 2
-	FileCopyFlagsNofollowSymlinks FileCopyFlags = 4
-	FileCopyFlagsAllMetadata FileCopyFlags = 8
-	FileCopyFlagsNoFallbackForMove FileCopyFlags = 16
+	FileCopyFlagsNone               FileCopyFlags = 0
+	FileCopyFlagsOverwrite          FileCopyFlags = 1
+	FileCopyFlagsBackup             FileCopyFlags = 2
+	FileCopyFlagsNofollowSymlinks   FileCopyFlags = 4
+	FileCopyFlagsAllMetadata        FileCopyFlags = 8
+	FileCopyFlagsNoFallbackForMove  FileCopyFlags = 16
 	FileCopyFlagsTargetDefaultPerms FileCopyFlags = 32
 )
+
 type FileCreateFlags C.uint32_t
+
 const (
-	FileCreateFlagsNone FileCreateFlags = 0
-	FileCreateFlagsPrivate FileCreateFlags = 1
+	FileCreateFlagsNone               FileCreateFlags = 0
+	FileCreateFlagsPrivate            FileCreateFlags = 1
 	FileCreateFlagsReplaceDestination FileCreateFlags = 2
 )
+
 // blacklisted: FileDescriptorBased (interface)
 // blacklisted: FileDescriptorBasedIface (struct)
 type FileEnumeratorLike interface {
@@ -5062,7 +5190,6 @@ type FileEnumeratorLike interface {
 
 type FileEnumerator struct {
 	gobject.Object
-	
 }
 
 func ToFileEnumerator(objlike gobject.ObjectLike) *FileEnumerator {
@@ -5125,7 +5252,8 @@ func (this0 *FileEnumerator) CloseAsync(io_priority0 int, cancellable0 Cancellab
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_enumerator_close_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -5228,7 +5356,8 @@ func (this0 *FileEnumerator) NextFilesAsync(num_files0 int, io_priority0 int, ca
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_enumerator_next_files_async(this1, num_files1, io_priority1, cancellable1, callback1)
 }
@@ -5265,6 +5394,7 @@ func (this0 *FileEnumerator) SetPending(pending0 bool) {
 	pending1 = _GoBoolToCBool(pending0)
 	C.g_file_enumerator_set_pending(this1, pending1)
 }
+
 // blacklisted: FileEnumeratorClass (struct)
 // blacklisted: FileEnumeratorPrivate (struct)
 type FileIOStreamLike interface {
@@ -5354,7 +5484,8 @@ func (this0 *FileIOStream) QueryInfoAsync(attributes0 string, io_priority0 int, 
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_io_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
 }
@@ -5378,6 +5509,7 @@ func (this0 *FileIOStream) QueryInfoFinish(result0 AsyncResultLike) (*FileInfo, 
 	}
 	return ret2, err2
 }
+
 // blacklisted: FileIOStreamClass (struct)
 // blacklisted: FileIOStreamPrivate (struct)
 // blacklisted: FileIcon (object)
@@ -5390,7 +5522,6 @@ type FileInfoLike interface {
 
 type FileInfo struct {
 	gobject.Object
-	
 }
 
 func ToFileInfo(objlike gobject.ObjectLike) *FileInfo {
@@ -5922,20 +6053,21 @@ func (this0 *FileInfo) SetAttributeMask(mask0 *FileAttributeMatcher) {
 	mask1 = (*C.GFileAttributeMatcher)(unsafe.Pointer(mask0))
 	C.g_file_info_set_attribute_mask(this1, mask1)
 }
-func (this0 *FileInfo) SetAttributeObject(attribute0 string, attr_value0 gobject.ObjectLike) {
-	var this1 *C.GFileInfo
-	var attribute1 *C.char
-	var attr_value1 *C.GObject
-	if this0 != nil {
-		this1 = this0.InheritedFromGFileInfo()
-	}
-	attribute1 = _GoStringToGString(attribute0)
-	defer C.free(unsafe.Pointer(attribute1))
-	if attr_value0 != nil {
-		attr_value1 = attr_value0.InheritedFromGObject()
-	}
-	C.g_file_info_set_attribute_object(this1, attribute1, attr_value1)
-}
+
+//func (this0 *FileInfo) SetAttributeObject(attribute0 string, attr_value0 gobject.ObjectLike) {
+//var this1 *C.GFileInfo
+//var attribute1 *C.char
+//var attr_value1 *C.GObject
+//if this0 != nil {
+//this1 = this0.InheritedFromGFileInfo()
+//}
+//attribute1 = _GoStringToGString(attribute0)
+//defer C.free(unsafe.Pointer(attribute1))
+//if attr_value0 != nil {
+//attr_value1 = attr_value0.InheritedFromGObject()
+//}
+//C.g_file_info_set_attribute_object(this1, attribute1, attr_value1)
+//}
 func (this0 *FileInfo) SetAttributeStatus(attribute0 string, status0 FileAttributeStatus) bool {
 	var this1 *C.GFileInfo
 	var attribute1 *C.char
@@ -6138,6 +6270,7 @@ func (this0 *FileInfo) UnsetAttributeMask() {
 	}
 	C.g_file_info_unset_attribute_mask(this1)
 }
+
 // blacklisted: FileInfoClass (struct)
 type FileInputStreamLike interface {
 	InputStreamLike
@@ -6215,7 +6348,8 @@ func (this0 *FileInputStream) QueryInfoAsync(attributes0 string, io_priority0 in
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_input_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
 }
@@ -6239,15 +6373,18 @@ func (this0 *FileInputStream) QueryInfoFinish(result0 AsyncResultLike) (*FileInf
 	}
 	return ret2, err2
 }
+
 // blacklisted: FileInputStreamClass (struct)
 // blacklisted: FileInputStreamPrivate (struct)
 type FileMeasureFlags C.uint32_t
+
 const (
-	FileMeasureFlagsNone FileMeasureFlags = 0
+	FileMeasureFlagsNone           FileMeasureFlags = 0
 	FileMeasureFlagsReportAnyError FileMeasureFlags = 2
-	FileMeasureFlagsApparentSize FileMeasureFlags = 4
-	FileMeasureFlagsNoXdev FileMeasureFlags = 8
+	FileMeasureFlagsApparentSize   FileMeasureFlags = 4
+	FileMeasureFlagsNoXdev         FileMeasureFlags = 8
 )
+
 // blacklisted: FileMeasureProgressCallback (callback)
 type FileMonitorLike interface {
 	gobject.ObjectLike
@@ -6256,7 +6393,6 @@ type FileMonitorLike interface {
 
 type FileMonitor struct {
 	gobject.Object
-	
 }
 
 func ToFileMonitor(objlike gobject.ObjectLike) *FileMonitor {
@@ -6332,25 +6468,30 @@ func (this0 *FileMonitor) SetRateLimit(limit_msecs0 int) {
 	limit_msecs1 = C.int32_t(limit_msecs0)
 	C.g_file_monitor_set_rate_limit(this1, limit_msecs1)
 }
+
 // blacklisted: FileMonitorClass (struct)
 type FileMonitorEvent C.uint32_t
+
 const (
-	FileMonitorEventChanged FileMonitorEvent = 0
-	FileMonitorEventChangesDoneHint FileMonitorEvent = 1
-	FileMonitorEventDeleted FileMonitorEvent = 2
-	FileMonitorEventCreated FileMonitorEvent = 3
+	FileMonitorEventChanged          FileMonitorEvent = 0
+	FileMonitorEventChangesDoneHint  FileMonitorEvent = 1
+	FileMonitorEventDeleted          FileMonitorEvent = 2
+	FileMonitorEventCreated          FileMonitorEvent = 3
 	FileMonitorEventAttributeChanged FileMonitorEvent = 4
-	FileMonitorEventPreUnmount FileMonitorEvent = 5
-	FileMonitorEventUnmounted FileMonitorEvent = 6
-	FileMonitorEventMoved FileMonitorEvent = 7
+	FileMonitorEventPreUnmount       FileMonitorEvent = 5
+	FileMonitorEventUnmounted        FileMonitorEvent = 6
+	FileMonitorEventMoved            FileMonitorEvent = 7
 )
+
 type FileMonitorFlags C.uint32_t
+
 const (
-	FileMonitorFlagsNone FileMonitorFlags = 0
-	FileMonitorFlagsWatchMounts FileMonitorFlags = 1
-	FileMonitorFlagsSendMoved FileMonitorFlags = 2
+	FileMonitorFlagsNone           FileMonitorFlags = 0
+	FileMonitorFlagsWatchMounts    FileMonitorFlags = 1
+	FileMonitorFlagsSendMoved      FileMonitorFlags = 2
 	FileMonitorFlagsWatchHardLinks FileMonitorFlags = 4
 )
+
 // blacklisted: FileMonitorPrivate (struct)
 type FileOutputStreamLike interface {
 	OutputStreamLike
@@ -6439,7 +6580,8 @@ func (this0 *FileOutputStream) QueryInfoAsync(attributes0 string, io_priority0 i
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_file_output_stream_query_info_async(this1, attributes1, io_priority1, cancellable1, callback1)
 }
@@ -6463,9 +6605,11 @@ func (this0 *FileOutputStream) QueryInfoFinish(result0 AsyncResultLike) (*FileIn
 	}
 	return ret2, err2
 }
+
 // blacklisted: FileOutputStreamClass (struct)
 // blacklisted: FileOutputStreamPrivate (struct)
 type FileProgressCallback func(current_num_bytes int64, total_num_bytes int64)
+
 //export _GFileProgressCallback_c_wrapper
 func _GFileProgressCallback_c_wrapper(current_num_bytes0 int64, total_num_bytes0 int64, user_data0 unsafe.Pointer) {
 	var current_num_bytes1 int64
@@ -6476,97 +6620,109 @@ func _GFileProgressCallback_c_wrapper(current_num_bytes0 int64, total_num_bytes0
 	user_data1 = *(*FileProgressCallback)(user_data0)
 	user_data1(current_num_bytes1, total_num_bytes1)
 }
+
 //export _GFileProgressCallback_c_wrapper_once
 func _GFileProgressCallback_c_wrapper_once(current_num_bytes0 int64, total_num_bytes0 int64, user_data0 unsafe.Pointer) {
 	_GFileProgressCallback_c_wrapper(current_num_bytes0, total_num_bytes0, user_data0)
 	gobject.Holder.Release(user_data0)
 }
+
 type FileQueryInfoFlags C.uint32_t
+
 const (
-	FileQueryInfoFlagsNone FileQueryInfoFlags = 0
+	FileQueryInfoFlagsNone             FileQueryInfoFlags = 0
 	FileQueryInfoFlagsNofollowSymlinks FileQueryInfoFlags = 1
 )
+
 // blacklisted: FileReadMoreCallback (callback)
 type FileType C.uint32_t
+
 const (
-	FileTypeUnknown FileType = 0
-	FileTypeRegular FileType = 1
-	FileTypeDirectory FileType = 2
+	FileTypeUnknown      FileType = 0
+	FileTypeRegular      FileType = 1
+	FileTypeDirectory    FileType = 2
 	FileTypeSymbolicLink FileType = 3
-	FileTypeSpecial FileType = 4
-	FileTypeShortcut FileType = 5
-	FileTypeMountable FileType = 6
+	FileTypeSpecial      FileType = 4
+	FileTypeShortcut     FileType = 5
+	FileTypeMountable    FileType = 6
 )
+
 // blacklisted: FilenameCompleter (object)
 // blacklisted: FilenameCompleterClass (struct)
 type FilesystemPreviewType C.uint32_t
+
 const (
 	FilesystemPreviewTypeIfAlways FilesystemPreviewType = 0
-	FilesystemPreviewTypeIfLocal FilesystemPreviewType = 1
-	FilesystemPreviewTypeNever FilesystemPreviewType = 2
+	FilesystemPreviewTypeIfLocal  FilesystemPreviewType = 1
+	FilesystemPreviewTypeNever    FilesystemPreviewType = 2
 )
+
 // blacklisted: FilterInputStream (object)
 // blacklisted: FilterInputStreamClass (struct)
 // blacklisted: FilterOutputStream (object)
 // blacklisted: FilterOutputStreamClass (struct)
 type IOErrorEnum C.uint32_t
+
 const (
-	IOErrorEnumFailed IOErrorEnum = 0
-	IOErrorEnumNotFound IOErrorEnum = 1
-	IOErrorEnumExists IOErrorEnum = 2
-	IOErrorEnumIsDirectory IOErrorEnum = 3
-	IOErrorEnumNotDirectory IOErrorEnum = 4
-	IOErrorEnumNotEmpty IOErrorEnum = 5
-	IOErrorEnumNotRegularFile IOErrorEnum = 6
-	IOErrorEnumNotSymbolicLink IOErrorEnum = 7
-	IOErrorEnumNotMountableFile IOErrorEnum = 8
-	IOErrorEnumFilenameTooLong IOErrorEnum = 9
-	IOErrorEnumInvalidFilename IOErrorEnum = 10
-	IOErrorEnumTooManyLinks IOErrorEnum = 11
-	IOErrorEnumNoSpace IOErrorEnum = 12
-	IOErrorEnumInvalidArgument IOErrorEnum = 13
-	IOErrorEnumPermissionDenied IOErrorEnum = 14
-	IOErrorEnumNotSupported IOErrorEnum = 15
-	IOErrorEnumNotMounted IOErrorEnum = 16
-	IOErrorEnumAlreadyMounted IOErrorEnum = 17
-	IOErrorEnumClosed IOErrorEnum = 18
-	IOErrorEnumCancelled IOErrorEnum = 19
-	IOErrorEnumPending IOErrorEnum = 20
-	IOErrorEnumReadOnly IOErrorEnum = 21
-	IOErrorEnumCantCreateBackup IOErrorEnum = 22
-	IOErrorEnumWrongEtag IOErrorEnum = 23
-	IOErrorEnumTimedOut IOErrorEnum = 24
-	IOErrorEnumWouldRecurse IOErrorEnum = 25
-	IOErrorEnumBusy IOErrorEnum = 26
-	IOErrorEnumWouldBlock IOErrorEnum = 27
-	IOErrorEnumHostNotFound IOErrorEnum = 28
-	IOErrorEnumWouldMerge IOErrorEnum = 29
-	IOErrorEnumFailedHandled IOErrorEnum = 30
-	IOErrorEnumTooManyOpenFiles IOErrorEnum = 31
-	IOErrorEnumNotInitialized IOErrorEnum = 32
-	IOErrorEnumAddressInUse IOErrorEnum = 33
-	IOErrorEnumPartialInput IOErrorEnum = 34
-	IOErrorEnumInvalidData IOErrorEnum = 35
-	IOErrorEnumDbusError IOErrorEnum = 36
-	IOErrorEnumHostUnreachable IOErrorEnum = 37
+	IOErrorEnumFailed             IOErrorEnum = 0
+	IOErrorEnumNotFound           IOErrorEnum = 1
+	IOErrorEnumExists             IOErrorEnum = 2
+	IOErrorEnumIsDirectory        IOErrorEnum = 3
+	IOErrorEnumNotDirectory       IOErrorEnum = 4
+	IOErrorEnumNotEmpty           IOErrorEnum = 5
+	IOErrorEnumNotRegularFile     IOErrorEnum = 6
+	IOErrorEnumNotSymbolicLink    IOErrorEnum = 7
+	IOErrorEnumNotMountableFile   IOErrorEnum = 8
+	IOErrorEnumFilenameTooLong    IOErrorEnum = 9
+	IOErrorEnumInvalidFilename    IOErrorEnum = 10
+	IOErrorEnumTooManyLinks       IOErrorEnum = 11
+	IOErrorEnumNoSpace            IOErrorEnum = 12
+	IOErrorEnumInvalidArgument    IOErrorEnum = 13
+	IOErrorEnumPermissionDenied   IOErrorEnum = 14
+	IOErrorEnumNotSupported       IOErrorEnum = 15
+	IOErrorEnumNotMounted         IOErrorEnum = 16
+	IOErrorEnumAlreadyMounted     IOErrorEnum = 17
+	IOErrorEnumClosed             IOErrorEnum = 18
+	IOErrorEnumCancelled          IOErrorEnum = 19
+	IOErrorEnumPending            IOErrorEnum = 20
+	IOErrorEnumReadOnly           IOErrorEnum = 21
+	IOErrorEnumCantCreateBackup   IOErrorEnum = 22
+	IOErrorEnumWrongEtag          IOErrorEnum = 23
+	IOErrorEnumTimedOut           IOErrorEnum = 24
+	IOErrorEnumWouldRecurse       IOErrorEnum = 25
+	IOErrorEnumBusy               IOErrorEnum = 26
+	IOErrorEnumWouldBlock         IOErrorEnum = 27
+	IOErrorEnumHostNotFound       IOErrorEnum = 28
+	IOErrorEnumWouldMerge         IOErrorEnum = 29
+	IOErrorEnumFailedHandled      IOErrorEnum = 30
+	IOErrorEnumTooManyOpenFiles   IOErrorEnum = 31
+	IOErrorEnumNotInitialized     IOErrorEnum = 32
+	IOErrorEnumAddressInUse       IOErrorEnum = 33
+	IOErrorEnumPartialInput       IOErrorEnum = 34
+	IOErrorEnumInvalidData        IOErrorEnum = 35
+	IOErrorEnumDbusError          IOErrorEnum = 36
+	IOErrorEnumHostUnreachable    IOErrorEnum = 37
 	IOErrorEnumNetworkUnreachable IOErrorEnum = 38
-	IOErrorEnumConnectionRefused IOErrorEnum = 39
-	IOErrorEnumProxyFailed IOErrorEnum = 40
-	IOErrorEnumProxyAuthFailed IOErrorEnum = 41
-	IOErrorEnumProxyNeedAuth IOErrorEnum = 42
-	IOErrorEnumProxyNotAllowed IOErrorEnum = 43
-	IOErrorEnumBrokenPipe IOErrorEnum = 44
+	IOErrorEnumConnectionRefused  IOErrorEnum = 39
+	IOErrorEnumProxyFailed        IOErrorEnum = 40
+	IOErrorEnumProxyAuthFailed    IOErrorEnum = 41
+	IOErrorEnumProxyNeedAuth      IOErrorEnum = 42
+	IOErrorEnumProxyNotAllowed    IOErrorEnum = 43
+	IOErrorEnumBrokenPipe         IOErrorEnum = 44
 )
+
 // blacklisted: IOExtension (struct)
 // blacklisted: IOExtensionPoint (struct)
 // blacklisted: IOModule (object)
 // blacklisted: IOModuleClass (struct)
 // blacklisted: IOModuleScope (struct)
 type IOModuleScopeFlags C.uint32_t
+
 const (
-	IOModuleScopeFlagsNone IOModuleScopeFlags = 0
+	IOModuleScopeFlagsNone            IOModuleScopeFlags = 0
 	IOModuleScopeFlagsBlockDuplicates IOModuleScopeFlags = 1
 )
+
 // blacklisted: IOSchedulerJob (struct)
 // blacklisted: IOSchedulerJobFunc (callback)
 type IOStreamLike interface {
@@ -6576,7 +6732,6 @@ type IOStreamLike interface {
 
 type IOStream struct {
 	gobject.Object
-	
 }
 
 func ToIOStream(objlike gobject.ObjectLike) *IOStream {
@@ -6662,7 +6817,8 @@ func (this0 *IOStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_io_stream_close_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -6761,20 +6917,24 @@ func (this0 *IOStream) SpliceAsync(stream20 IOStreamLike, flags0 IOStreamSpliceF
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_io_stream_splice_async(this1, stream21, flags1, io_priority1, cancellable1, callback1)
 }
+
 // blacklisted: IOStreamAdapter (struct)
 // blacklisted: IOStreamClass (struct)
 // blacklisted: IOStreamPrivate (struct)
 type IOStreamSpliceFlags C.uint32_t
+
 const (
-	IOStreamSpliceFlagsNone IOStreamSpliceFlags = 0
+	IOStreamSpliceFlagsNone         IOStreamSpliceFlags = 0
 	IOStreamSpliceFlagsCloseStream1 IOStreamSpliceFlags = 1
 	IOStreamSpliceFlagsCloseStream2 IOStreamSpliceFlags = 2
-	IOStreamSpliceFlagsWaitForBoth IOStreamSpliceFlags = 4
+	IOStreamSpliceFlagsWaitForBoth  IOStreamSpliceFlags = 4
 )
+
 type IconLike interface {
 	ImplementsGIcon() *C.GIcon
 }
@@ -6788,8 +6948,7 @@ func (*Icon) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_icon_get_type())
 }
 
-
-type IconImpl struct {}
+type IconImpl struct{}
 
 func ToIcon(objlike gobject.ObjectLike) *Icon {
 	c := objlike.InheritedFromGObject()
@@ -6870,6 +7029,7 @@ func (this0 *IconImpl) ToString() string {
 	C.g_free(unsafe.Pointer(ret1))
 	return ret2
 }
+
 // blacklisted: IconIface (struct)
 // blacklisted: InetAddress (object)
 // blacklisted: InetAddressClass (struct)
@@ -6889,7 +7049,6 @@ type InputStreamLike interface {
 
 type InputStream struct {
 	gobject.Object
-	
 }
 
 func ToInputStream(objlike gobject.ObjectLike) *InputStream {
@@ -6959,7 +7118,8 @@ func (this0 *InputStream) CloseAsync(io_priority0 int, cancellable0 CancellableL
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_input_stream_close_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -7083,7 +7243,8 @@ func (this0 *InputStream) ReadAsync(buffer0 []int, io_priority0 int, cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_input_stream_read_async(this1, buffer1, count1, io_priority1, cancellable1, callback1)
 }
@@ -7124,7 +7285,8 @@ func (this0 *InputStream) ReadBytesAsync(count0 uint64, io_priority0 int, cancel
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_input_stream_read_bytes_async(this1, count1, io_priority1, cancellable1, callback1)
 }
@@ -7221,7 +7383,8 @@ func (this0 *InputStream) SkipAsync(count0 uint64, io_priority0 int, cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_input_stream_skip_async(this1, count1, io_priority1, cancellable1, callback1)
 }
@@ -7245,6 +7408,7 @@ func (this0 *InputStream) SkipFinish(result0 AsyncResultLike) (int64, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: InputStreamClass (struct)
 // blacklisted: InputStreamPrivate (struct)
 // blacklisted: InputVector (struct)
@@ -7257,6 +7421,7 @@ const MenuAttributeLabel = "label"
 const MenuAttributeTarget = "target"
 const MenuLinkSection = "section"
 const MenuLinkSubmenu = "submenu"
+
 // blacklisted: MemoryInputStream (object)
 // blacklisted: MemoryInputStreamClass (struct)
 // blacklisted: MemoryInputStreamPrivate (struct)
@@ -7271,7 +7436,6 @@ type MenuAttributeIterLike interface {
 
 type MenuAttributeIter struct {
 	gobject.Object
-	
 }
 
 func ToMenuAttributeIter(objlike gobject.ObjectLike) *MenuAttributeIter {
@@ -7347,6 +7511,7 @@ func (this0 *MenuAttributeIter) Next() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
+
 // blacklisted: MenuAttributeIterClass (struct)
 // blacklisted: MenuAttributeIterPrivate (struct)
 // blacklisted: MenuItem (object)
@@ -7357,7 +7522,6 @@ type MenuLinkIterLike interface {
 
 type MenuLinkIter struct {
 	gobject.Object
-	
 }
 
 func ToMenuLinkIter(objlike gobject.ObjectLike) *MenuLinkIter {
@@ -7433,6 +7597,7 @@ func (this0 *MenuLinkIter) Next() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
+
 // blacklisted: MenuLinkIterClass (struct)
 // blacklisted: MenuLinkIterPrivate (struct)
 type MenuModelLike interface {
@@ -7442,7 +7607,6 @@ type MenuModelLike interface {
 
 type MenuModel struct {
 	gobject.Object
-	
 }
 
 func ToMenuModel(objlike gobject.ObjectLike) *MenuModel {
@@ -7561,6 +7725,7 @@ func (this0 *MenuModel) IterateItemLinks(item_index0 int) *MenuLinkIter {
 	ret2 = (*MenuLinkIter)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
+
 // blacklisted: MenuModelClass (struct)
 // blacklisted: MenuModelPrivate (struct)
 type MountLike interface {
@@ -7576,8 +7741,7 @@ func (*Mount) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_mount_get_type())
 }
 
-
-type MountImpl struct {}
+type MountImpl struct{}
 
 func ToMount(objlike gobject.ObjectLike) *Mount {
 	c := objlike.InheritedFromGObject()
@@ -7625,7 +7789,8 @@ func (this0 *MountImpl) Eject(flags0 MountUnmountFlags, cancellable0 Cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_eject(this1, flags1, cancellable1, callback1)
 }
@@ -7666,7 +7831,8 @@ func (this0 *MountImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_opera
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -7795,7 +7961,8 @@ func (this0 *MountImpl) GuessContentType(force_rescan0 bool, cancellable0 Cancel
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_guess_content_type(this1, force_rescan1, cancellable1, callback1)
 }
@@ -7876,7 +8043,8 @@ func (this0 *MountImpl) Remount(flags0 MountMountFlags, mount_operation0 MountOp
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_remount(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -7920,7 +8088,8 @@ func (this0 *MountImpl) Unmount(flags0 MountUnmountFlags, cancellable0 Cancellab
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_unmount(this1, flags1, cancellable1, callback1)
 }
@@ -7961,7 +8130,8 @@ func (this0 *MountImpl) UnmountWithOperation(flags0 MountUnmountFlags, mount_ope
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_mount_unmount_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -7992,10 +8162,13 @@ func (this0 *MountImpl) Unshadow() {
 	}
 	C.g_mount_unshadow(this1)
 }
+
 type MountMountFlags C.uint32_t
+
 const (
 	MountMountFlagsNone MountMountFlags = 0
 )
+
 type MountOperationLike interface {
 	gobject.ObjectLike
 	InheritedFromGMountOperation() *C.GMountOperation
@@ -8003,7 +8176,6 @@ type MountOperationLike interface {
 
 type MountOperation struct {
 	gobject.Object
-	
 }
 
 func ToMountOperation(objlike gobject.ObjectLike) *MountOperation {
@@ -8165,21 +8337,26 @@ func (this0 *MountOperation) SetUsername(username0 string) {
 	defer C.free(unsafe.Pointer(username1))
 	C.g_mount_operation_set_username(this1, username1)
 }
+
 // blacklisted: MountOperationClass (struct)
 // blacklisted: MountOperationPrivate (struct)
 type MountOperationResult C.uint32_t
+
 const (
-	MountOperationResultHandled MountOperationResult = 0
-	MountOperationResultAborted MountOperationResult = 1
+	MountOperationResultHandled   MountOperationResult = 0
+	MountOperationResultAborted   MountOperationResult = 1
 	MountOperationResultUnhandled MountOperationResult = 2
 )
+
 type MountUnmountFlags C.uint32_t
+
 const (
-	MountUnmountFlagsNone MountUnmountFlags = 0
+	MountUnmountFlagsNone  MountUnmountFlags = 0
 	MountUnmountFlagsForce MountUnmountFlags = 1
 )
 const NativeVolumeMonitorExtensionPointName = "gio-native-volume-monitor"
 const NetworkMonitorExtensionPointName = "gio-network-monitor"
+
 // blacklisted: NativeVolumeMonitor (object)
 // blacklisted: NativeVolumeMonitorClass (struct)
 // blacklisted: NetworkAddress (object)
@@ -8198,7 +8375,6 @@ type OutputStreamLike interface {
 
 type OutputStream struct {
 	gobject.Object
-	
 }
 
 func ToOutputStream(objlike gobject.ObjectLike) *OutputStream {
@@ -8268,7 +8444,8 @@ func (this0 *OutputStream) CloseAsync(io_priority0 int, cancellable0 Cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_output_stream_close_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -8325,7 +8502,8 @@ func (this0 *OutputStream) FlushAsync(io_priority0 int, cancellable0 Cancellable
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_output_stream_flush_async(this1, io_priority1, cancellable1, callback1)
 }
@@ -8440,7 +8618,8 @@ func (this0 *OutputStream) SpliceAsync(source0 InputStreamLike, flags0 OutputStr
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_output_stream_splice_async(this1, source1, flags1, io_priority1, cancellable1, callback1)
 }
@@ -8544,7 +8723,8 @@ func (this0 *OutputStream) WriteAsync(buffer0 []int, io_priority0 int, cancellab
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_output_stream_write_async(this1, buffer1, count1, io_priority1, cancellable1, callback1)
 }
@@ -8585,7 +8765,8 @@ func (this0 *OutputStream) WriteBytesAsync(bytes0 *glib.Bytes, io_priority0 int,
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_output_stream_write_bytes_async(this1, bytes1, io_priority1, cancellable1, callback1)
 }
@@ -8629,23 +8810,29 @@ func (this0 *OutputStream) WriteFinish(result0 AsyncResultLike) (int64, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: OutputStreamClass (struct)
 // blacklisted: OutputStreamPrivate (struct)
 type OutputStreamSpliceFlags C.uint32_t
+
 const (
-	OutputStreamSpliceFlagsNone OutputStreamSpliceFlags = 0
+	OutputStreamSpliceFlagsNone        OutputStreamSpliceFlags = 0
 	OutputStreamSpliceFlagsCloseSource OutputStreamSpliceFlags = 1
 	OutputStreamSpliceFlagsCloseTarget OutputStreamSpliceFlags = 2
 )
+
 // blacklisted: OutputVector (struct)
 const ProxyExtensionPointName = "gio-proxy"
 const ProxyResolverExtensionPointName = "gio-proxy-resolver"
+
 type PasswordSave C.uint32_t
+
 const (
-	PasswordSaveNever PasswordSave = 0
-	PasswordSaveForSession PasswordSave = 1
+	PasswordSaveNever       PasswordSave = 0
+	PasswordSaveForSession  PasswordSave = 1
 	PasswordSavePermanently PasswordSave = 2
 )
+
 type PermissionLike interface {
 	gobject.ObjectLike
 	InheritedFromGPermission() *C.GPermission
@@ -8653,7 +8840,6 @@ type PermissionLike interface {
 
 type Permission struct {
 	gobject.Object
-	
 }
 
 func ToPermission(objlike gobject.ObjectLike) *Permission {
@@ -8714,7 +8900,8 @@ func (this0 *Permission) AcquireAsync(cancellable0 CancellableLike, callback0 As
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_permission_acquire_async(this1, cancellable1, callback1)
 }
@@ -8812,7 +8999,8 @@ func (this0 *Permission) ReleaseAsync(cancellable0 CancellableLike, callback0 As
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_permission_release_async(this1, cancellable1, callback1)
 }
@@ -8836,6 +9024,7 @@ func (this0 *Permission) ReleaseFinish(result0 AsyncResultLike) (bool, error) {
 	}
 	return ret2, err2
 }
+
 // blacklisted: PermissionClass (struct)
 // blacklisted: PermissionPrivate (struct)
 // blacklisted: PollableInputStream (interface)
@@ -8859,35 +9048,45 @@ func (this0 *Permission) ReleaseFinish(result0 AsyncResultLike) (bool, error) {
 // blacklisted: Resolver (object)
 // blacklisted: ResolverClass (struct)
 type ResolverError C.uint32_t
+
 const (
-	ResolverErrorNotFound ResolverError = 0
+	ResolverErrorNotFound         ResolverError = 0
 	ResolverErrorTemporaryFailure ResolverError = 1
-	ResolverErrorInternal ResolverError = 2
+	ResolverErrorInternal         ResolverError = 2
 )
+
 // blacklisted: ResolverPrivate (struct)
 type ResolverRecordType C.uint32_t
+
 const (
 	ResolverRecordTypeSrv ResolverRecordType = 1
-	ResolverRecordTypeMx ResolverRecordType = 2
+	ResolverRecordTypeMx  ResolverRecordType = 2
 	ResolverRecordTypeTxt ResolverRecordType = 3
 	ResolverRecordTypeSoa ResolverRecordType = 4
-	ResolverRecordTypeNs ResolverRecordType = 5
+	ResolverRecordTypeNs  ResolverRecordType = 5
 )
+
 // blacklisted: Resource (struct)
 type ResourceError C.uint32_t
+
 const (
 	ResourceErrorNotFound ResourceError = 0
 	ResourceErrorInternal ResourceError = 1
 )
+
 type ResourceFlags C.uint32_t
+
 const (
-	ResourceFlagsNone ResourceFlags = 0
+	ResourceFlagsNone       ResourceFlags = 0
 	ResourceFlagsCompressed ResourceFlags = 1
 )
+
 type ResourceLookupFlags C.uint32_t
+
 const (
 	ResourceLookupFlagsNone ResourceLookupFlags = 0
 )
+
 type SeekableLike interface {
 	ImplementsGSeekable() *C.GSeekable
 }
@@ -8901,8 +9100,7 @@ func (*Seekable) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_seekable_get_type())
 }
 
-
-type SeekableImpl struct {}
+type SeekableImpl struct{}
 
 func ToSeekable(objlike gobject.ObjectLike) *Seekable {
 	c := objlike.InheritedFromGObject()
@@ -8993,6 +9191,7 @@ func (this0 *SeekableImpl) Truncate(offset0 int64, cancellable0 CancellableLike)
 	}
 	return ret2, err2
 }
+
 // blacklisted: SeekableIface (struct)
 type SettingsLike interface {
 	gobject.ObjectLike
@@ -9001,7 +9200,6 @@ type SettingsLike interface {
 
 type Settings struct {
 	gobject.Object
-	
 }
 
 func ToSettings(objlike gobject.ObjectLike) *Settings {
@@ -9040,6 +9238,7 @@ func NewSettings(schema_id0 string) *Settings {
 	ret2 = (*Settings)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
+
 // blacklisted: Settings.new_full (method)
 func NewSettingsWithBackend(schema_id0 string, backend0 *SettingsBackend) *Settings {
 	var schema_id1 *C.char
@@ -9114,44 +9313,45 @@ func (this0 *Settings) Apply() {
 	}
 	C.g_settings_apply(this1)
 }
-func (this0 *Settings) Bind(key0 string, object0 gobject.ObjectLike, property0 string, flags0 SettingsBindFlags) {
-	var this1 *C.GSettings
-	var key1 *C.char
-	var object1 *C.GObject
-	var property1 *C.char
-	var flags1 C.GSettingsBindFlags
-	if this0 != nil {
-		this1 = this0.InheritedFromGSettings()
-	}
-	key1 = _GoStringToGString(key0)
-	defer C.free(unsafe.Pointer(key1))
-	if object0 != nil {
-		object1 = object0.InheritedFromGObject()
-	}
-	property1 = _GoStringToGString(property0)
-	defer C.free(unsafe.Pointer(property1))
-	flags1 = C.GSettingsBindFlags(flags0)
-	C.g_settings_bind(this1, key1, object1, property1, flags1)
-}
-func (this0 *Settings) BindWritable(key0 string, object0 gobject.ObjectLike, property0 string, inverted0 bool) {
-	var this1 *C.GSettings
-	var key1 *C.char
-	var object1 *C.GObject
-	var property1 *C.char
-	var inverted1 C.int
-	if this0 != nil {
-		this1 = this0.InheritedFromGSettings()
-	}
-	key1 = _GoStringToGString(key0)
-	defer C.free(unsafe.Pointer(key1))
-	if object0 != nil {
-		object1 = object0.InheritedFromGObject()
-	}
-	property1 = _GoStringToGString(property0)
-	defer C.free(unsafe.Pointer(property1))
-	inverted1 = _GoBoolToCBool(inverted0)
-	C.g_settings_bind_writable(this1, key1, object1, property1, inverted1)
-}
+
+//func (this0 *Settings) Bind(key0 string, object0 gobject.ObjectLike, property0 string, flags0 SettingsBindFlags) {
+//var this1 *C.GSettings
+//var key1 *C.char
+//var object1 *C.GObject
+//var property1 *C.char
+//var flags1 C.GSettingsBindFlags
+//if this0 != nil {
+//this1 = this0.InheritedFromGSettings()
+//}
+//key1 = _GoStringToGString(key0)
+//defer C.free(unsafe.Pointer(key1))
+//if object0 != nil {
+//object1 = object0.InheritedFromGObject()
+//}
+//property1 = _GoStringToGString(property0)
+//defer C.free(unsafe.Pointer(property1))
+//flags1 = C.GSettingsBindFlags(flags0)
+//C.g_settings_bind(this1, key1, object1, property1, flags1)
+//}
+//func (this0 *Settings) BindWritable(key0 string, object0 gobject.ObjectLike, property0 string, inverted0 bool) {
+//var this1 *C.GSettings
+//var key1 *C.char
+//var object1 *C.GObject
+//var property1 *C.char
+//var inverted1 C.int
+//if this0 != nil {
+//this1 = this0.InheritedFromGSettings()
+//}
+//key1 = _GoStringToGString(key0)
+//defer C.free(unsafe.Pointer(key1))
+//if object0 != nil {
+//object1 = object0.InheritedFromGObject()
+//}
+//property1 = _GoStringToGString(property0)
+//defer C.free(unsafe.Pointer(property1))
+//inverted1 = _GoBoolToCBool(inverted0)
+//C.g_settings_bind_writable(this1, key1, object1, property1, inverted1)
+//}
 func (this0 *Settings) CreateAction(key0 string) *Action {
 	var this1 *C.GSettings
 	var key1 *C.char
@@ -9273,6 +9473,7 @@ func (this0 *Settings) GetInt(key0 string) int {
 	ret2 = int(ret1)
 	return ret2
 }
+
 // blacklisted: Settings.get_mapped (method)
 func (this0 *Settings) GetRange(key0 string) *glib.Variant {
 	var this1 *C.GSettings
@@ -9572,16 +9773,19 @@ func (this0 *Settings) SetValue(key0 string, value0 *glib.Variant) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-type SettingsBackend struct {}
+
+type SettingsBackend struct{}
 type SettingsBindFlags C.uint32_t
+
 const (
-	SettingsBindFlagsDefault SettingsBindFlags = 0
-	SettingsBindFlagsGet SettingsBindFlags = 1
-	SettingsBindFlagsSet SettingsBindFlags = 2
+	SettingsBindFlagsDefault       SettingsBindFlags = 0
+	SettingsBindFlagsGet           SettingsBindFlags = 1
+	SettingsBindFlagsSet           SettingsBindFlags = 2
 	SettingsBindFlagsNoSensitivity SettingsBindFlags = 4
-	SettingsBindFlagsGetNoChanges SettingsBindFlags = 8
+	SettingsBindFlagsGetNoChanges  SettingsBindFlags = 8
 	SettingsBindFlagsInvertBoolean SettingsBindFlags = 16
 )
+
 // blacklisted: SettingsBindGetMapping (callback)
 // blacklisted: SettingsBindSetMapping (callback)
 // blacklisted: SettingsClass (struct)
@@ -9610,17 +9814,19 @@ const (
 // blacklisted: SocketClient (object)
 // blacklisted: SocketClientClass (struct)
 type SocketClientEvent C.uint32_t
+
 const (
-	SocketClientEventResolving SocketClientEvent = 0
-	SocketClientEventResolved SocketClientEvent = 1
-	SocketClientEventConnecting SocketClientEvent = 2
-	SocketClientEventConnected SocketClientEvent = 3
+	SocketClientEventResolving        SocketClientEvent = 0
+	SocketClientEventResolved         SocketClientEvent = 1
+	SocketClientEventConnecting       SocketClientEvent = 2
+	SocketClientEventConnected        SocketClientEvent = 3
 	SocketClientEventProxyNegotiating SocketClientEvent = 4
-	SocketClientEventProxyNegotiated SocketClientEvent = 5
-	SocketClientEventTlsHandshaking SocketClientEvent = 6
-	SocketClientEventTlsHandshaked SocketClientEvent = 7
-	SocketClientEventComplete SocketClientEvent = 8
+	SocketClientEventProxyNegotiated  SocketClientEvent = 5
+	SocketClientEventTlsHandshaking   SocketClientEvent = 6
+	SocketClientEventTlsHandshaked    SocketClientEvent = 7
+	SocketClientEventComplete         SocketClientEvent = 8
 )
+
 // blacklisted: SocketClientPrivate (struct)
 // blacklisted: SocketConnectable (interface)
 // blacklisted: SocketConnectableIface (struct)
@@ -9631,61 +9837,72 @@ const (
 // blacklisted: SocketControlMessageClass (struct)
 // blacklisted: SocketControlMessagePrivate (struct)
 type SocketFamily C.uint32_t
+
 const (
 	SocketFamilyInvalid SocketFamily = 0
-	SocketFamilyUnix SocketFamily = 1
-	SocketFamilyIpv4 SocketFamily = 2
-	SocketFamilyIpv6 SocketFamily = 10
+	SocketFamilyUnix    SocketFamily = 1
+	SocketFamilyIpv4    SocketFamily = 2
+	SocketFamilyIpv6    SocketFamily = 10
 )
+
 // blacklisted: SocketListener (object)
 // blacklisted: SocketListenerClass (struct)
 // blacklisted: SocketListenerPrivate (struct)
 type SocketMsgFlags C.uint32_t
+
 const (
-	SocketMsgFlagsNone SocketMsgFlags = 0
-	SocketMsgFlagsOob SocketMsgFlags = 1
-	SocketMsgFlagsPeek SocketMsgFlags = 2
+	SocketMsgFlagsNone      SocketMsgFlags = 0
+	SocketMsgFlagsOob       SocketMsgFlags = 1
+	SocketMsgFlagsPeek      SocketMsgFlags = 2
 	SocketMsgFlagsDontroute SocketMsgFlags = 4
 )
+
 // blacklisted: SocketPrivate (struct)
 type SocketProtocol C.int32_t
+
 const (
 	SocketProtocolUnknown SocketProtocol = -1
 	SocketProtocolDefault SocketProtocol = 0
-	SocketProtocolTcp SocketProtocol = 6
-	SocketProtocolUdp SocketProtocol = 17
-	SocketProtocolSctp SocketProtocol = 132
+	SocketProtocolTcp     SocketProtocol = 6
+	SocketProtocolUdp     SocketProtocol = 17
+	SocketProtocolSctp    SocketProtocol = 132
 )
+
 // blacklisted: SocketService (object)
 // blacklisted: SocketServiceClass (struct)
 // blacklisted: SocketServicePrivate (struct)
 // blacklisted: SocketSourceFunc (callback)
 type SocketType C.uint32_t
+
 const (
-	SocketTypeInvalid SocketType = 0
-	SocketTypeStream SocketType = 1
-	SocketTypeDatagram SocketType = 2
+	SocketTypeInvalid   SocketType = 0
+	SocketTypeStream    SocketType = 1
+	SocketTypeDatagram  SocketType = 2
 	SocketTypeSeqpacket SocketType = 3
 )
+
 // blacklisted: SrvTarget (struct)
 // blacklisted: StaticResource (struct)
 // blacklisted: Subprocess (object)
 type SubprocessFlags C.uint32_t
+
 const (
-	SubprocessFlagsNone SubprocessFlags = 0
-	SubprocessFlagsStdinPipe SubprocessFlags = 1
-	SubprocessFlagsStdinInherit SubprocessFlags = 2
-	SubprocessFlagsStdoutPipe SubprocessFlags = 4
+	SubprocessFlagsNone          SubprocessFlags = 0
+	SubprocessFlagsStdinPipe     SubprocessFlags = 1
+	SubprocessFlagsStdinInherit  SubprocessFlags = 2
+	SubprocessFlagsStdoutPipe    SubprocessFlags = 4
 	SubprocessFlagsStdoutSilence SubprocessFlags = 8
-	SubprocessFlagsStderrPipe SubprocessFlags = 16
+	SubprocessFlagsStderrPipe    SubprocessFlags = 16
 	SubprocessFlagsStderrSilence SubprocessFlags = 32
-	SubprocessFlagsStderrMerge SubprocessFlags = 64
-	SubprocessFlagsInheritFds SubprocessFlags = 128
+	SubprocessFlagsStderrMerge   SubprocessFlags = 64
+	SubprocessFlagsInheritFds    SubprocessFlags = 128
 )
+
 // blacklisted: SubprocessLauncher (object)
 const TlsBackendExtensionPointName = "gio-tls-backend"
 const TlsDatabasePurposeAuthenticateClient = "1.3.6.1.5.5.7.3.2"
 const TlsDatabasePurposeAuthenticateServer = "1.3.6.1.5.5.7.3.1"
+
 // blacklisted: Task (object)
 // blacklisted: TaskClass (struct)
 // blacklisted: TaskThreadFunc (callback)
@@ -9697,40 +9914,48 @@ const TlsDatabasePurposeAuthenticateServer = "1.3.6.1.5.5.7.3.1"
 // blacklisted: TcpWrapperConnectionPrivate (struct)
 // blacklisted: TestDBus (object)
 type TestDBusFlags C.uint32_t
+
 const (
 	TestDBusFlagsNone TestDBusFlags = 0
 )
+
 // blacklisted: ThemedIcon (object)
 // blacklisted: ThemedIconClass (struct)
 // blacklisted: ThreadedSocketService (object)
 // blacklisted: ThreadedSocketServiceClass (struct)
 // blacklisted: ThreadedSocketServicePrivate (struct)
 type TlsAuthenticationMode C.uint32_t
+
 const (
-	TlsAuthenticationModeNone TlsAuthenticationMode = 0
+	TlsAuthenticationModeNone      TlsAuthenticationMode = 0
 	TlsAuthenticationModeRequested TlsAuthenticationMode = 1
-	TlsAuthenticationModeRequired TlsAuthenticationMode = 2
+	TlsAuthenticationModeRequired  TlsAuthenticationMode = 2
 )
+
 // blacklisted: TlsBackend (interface)
 // blacklisted: TlsBackendInterface (struct)
 // blacklisted: TlsCertificate (object)
 // blacklisted: TlsCertificateClass (struct)
 type TlsCertificateFlags C.uint32_t
+
 const (
-	TlsCertificateFlagsUnknownCa TlsCertificateFlags = 1
-	TlsCertificateFlagsBadIdentity TlsCertificateFlags = 2
+	TlsCertificateFlagsUnknownCa    TlsCertificateFlags = 1
+	TlsCertificateFlagsBadIdentity  TlsCertificateFlags = 2
 	TlsCertificateFlagsNotActivated TlsCertificateFlags = 4
-	TlsCertificateFlagsExpired TlsCertificateFlags = 8
-	TlsCertificateFlagsRevoked TlsCertificateFlags = 16
-	TlsCertificateFlagsInsecure TlsCertificateFlags = 32
+	TlsCertificateFlagsExpired      TlsCertificateFlags = 8
+	TlsCertificateFlagsRevoked      TlsCertificateFlags = 16
+	TlsCertificateFlagsInsecure     TlsCertificateFlags = 32
 	TlsCertificateFlagsGenericError TlsCertificateFlags = 64
-	TlsCertificateFlagsValidateAll TlsCertificateFlags = 127
+	TlsCertificateFlagsValidateAll  TlsCertificateFlags = 127
 )
+
 // blacklisted: TlsCertificatePrivate (struct)
 type TlsCertificateRequestFlags C.uint32_t
+
 const (
 	TlsCertificateRequestFlagsNone TlsCertificateRequestFlags = 0
 )
+
 // blacklisted: TlsClientConnection (interface)
 // blacklisted: TlsClientConnectionInterface (struct)
 // blacklisted: TlsConnection (object)
@@ -9739,52 +9964,64 @@ const (
 // blacklisted: TlsDatabase (object)
 // blacklisted: TlsDatabaseClass (struct)
 type TlsDatabaseLookupFlags C.uint32_t
+
 const (
-	TlsDatabaseLookupFlagsNone TlsDatabaseLookupFlags = 0
+	TlsDatabaseLookupFlagsNone    TlsDatabaseLookupFlags = 0
 	TlsDatabaseLookupFlagsKeypair TlsDatabaseLookupFlags = 1
 )
+
 // blacklisted: TlsDatabasePrivate (struct)
 type TlsDatabaseVerifyFlags C.uint32_t
+
 const (
 	TlsDatabaseVerifyFlagsNone TlsDatabaseVerifyFlags = 0
 )
+
 type TlsError C.uint32_t
+
 const (
-	TlsErrorUnavailable TlsError = 0
-	TlsErrorMisc TlsError = 1
-	TlsErrorBadCertificate TlsError = 2
-	TlsErrorNotTls TlsError = 3
-	TlsErrorHandshake TlsError = 4
+	TlsErrorUnavailable         TlsError = 0
+	TlsErrorMisc                TlsError = 1
+	TlsErrorBadCertificate      TlsError = 2
+	TlsErrorNotTls              TlsError = 3
+	TlsErrorHandshake           TlsError = 4
 	TlsErrorCertificateRequired TlsError = 5
-	TlsErrorEof TlsError = 6
+	TlsErrorEof                 TlsError = 6
 )
+
 // blacklisted: TlsFileDatabase (interface)
 // blacklisted: TlsFileDatabaseInterface (struct)
 // blacklisted: TlsInteraction (object)
 // blacklisted: TlsInteractionClass (struct)
 // blacklisted: TlsInteractionPrivate (struct)
 type TlsInteractionResult C.uint32_t
+
 const (
 	TlsInteractionResultUnhandled TlsInteractionResult = 0
-	TlsInteractionResultHandled TlsInteractionResult = 1
-	TlsInteractionResultFailed TlsInteractionResult = 2
+	TlsInteractionResultHandled   TlsInteractionResult = 1
+	TlsInteractionResultFailed    TlsInteractionResult = 2
 )
+
 // blacklisted: TlsPassword (object)
 // blacklisted: TlsPasswordClass (struct)
 type TlsPasswordFlags C.uint32_t
+
 const (
-	TlsPasswordFlagsNone TlsPasswordFlags = 0
-	TlsPasswordFlagsRetry TlsPasswordFlags = 2
+	TlsPasswordFlagsNone      TlsPasswordFlags = 0
+	TlsPasswordFlagsRetry     TlsPasswordFlags = 2
 	TlsPasswordFlagsManyTries TlsPasswordFlags = 4
-	TlsPasswordFlagsFinalTry TlsPasswordFlags = 8
+	TlsPasswordFlagsFinalTry  TlsPasswordFlags = 8
 )
+
 // blacklisted: TlsPasswordPrivate (struct)
 type TlsRehandshakeMode C.uint32_t
+
 const (
-	TlsRehandshakeModeNever TlsRehandshakeMode = 0
-	TlsRehandshakeModeSafely TlsRehandshakeMode = 1
+	TlsRehandshakeModeNever    TlsRehandshakeMode = 0
+	TlsRehandshakeModeSafely   TlsRehandshakeMode = 1
 	TlsRehandshakeModeUnsafely TlsRehandshakeMode = 2
 )
+
 // blacklisted: TlsServerConnection (interface)
 // blacklisted: TlsServerConnectionInterface (struct)
 // blacklisted: UnixConnection (object)
@@ -9813,11 +10050,12 @@ const (
 // blacklisted: UnixSocketAddressClass (struct)
 // blacklisted: UnixSocketAddressPrivate (struct)
 type UnixSocketAddressType C.uint32_t
+
 const (
-	UnixSocketAddressTypeInvalid UnixSocketAddressType = 0
-	UnixSocketAddressTypeAnonymous UnixSocketAddressType = 1
-	UnixSocketAddressTypePath UnixSocketAddressType = 2
-	UnixSocketAddressTypeAbstract UnixSocketAddressType = 3
+	UnixSocketAddressTypeInvalid        UnixSocketAddressType = 0
+	UnixSocketAddressTypeAnonymous      UnixSocketAddressType = 1
+	UnixSocketAddressTypePath           UnixSocketAddressType = 2
+	UnixSocketAddressTypeAbstract       UnixSocketAddressType = 3
 	UnixSocketAddressTypeAbstractPadded UnixSocketAddressType = 4
 )
 const VfsExtensionPointName = "gio-vfs"
@@ -9828,6 +10066,7 @@ const VolumeIdentifierKindNfsMount = "nfs-mount"
 const VolumeIdentifierKindUnixDevice = "unix-device"
 const VolumeIdentifierKindUuid = "uuid"
 const VolumeMonitorExtensionPointName = "gio-volume-monitor"
+
 // blacklisted: Vfs (object)
 // blacklisted: VfsClass (struct)
 type VolumeLike interface {
@@ -9843,8 +10082,7 @@ func (*Volume) GetStaticType() gobject.Type {
 	return gobject.Type(C.g_volume_get_type())
 }
 
-
-type VolumeImpl struct {}
+type VolumeImpl struct{}
 
 func ToVolume(objlike gobject.ObjectLike) *Volume {
 	c := objlike.InheritedFromGObject()
@@ -9892,7 +10130,8 @@ func (this0 *VolumeImpl) Eject(flags0 MountUnmountFlags, cancellable0 Cancellabl
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_volume_eject(this1, flags1, cancellable1, callback1)
 }
@@ -9933,7 +10172,8 @@ func (this0 *VolumeImpl) EjectWithOperation(flags0 MountUnmountFlags, mount_oper
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_volume_eject_with_operation(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -10084,7 +10324,8 @@ func (this0 *VolumeImpl) Mount(flags0 MountMountFlags, mount_operation0 MountOpe
 		cancellable1 = cancellable0.InheritedFromGCancellable()
 	}
 	if callback0 != nil {
-		callback1 = unsafe.Pointer(&callback0)}
+		callback1 = unsafe.Pointer(&callback0)
+	}
 	gobject.Holder.Grab(callback1)
 	C._g_volume_mount(this1, flags1, mount_operation1, cancellable1, callback1)
 }
@@ -10118,6 +10359,7 @@ func (this0 *VolumeImpl) ShouldAutomount() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
+
 // blacklisted: VolumeIface (struct)
 type VolumeMonitorLike interface {
 	gobject.ObjectLike
@@ -10126,7 +10368,6 @@ type VolumeMonitorLike interface {
 
 type VolumeMonitor struct {
 	gobject.Object
-	
 }
 
 func ToVolumeMonitor(objlike gobject.ObjectLike) *VolumeMonitor {
@@ -10240,15 +10481,18 @@ func (this0 *VolumeMonitor) GetVolumes() []*Volume {
 	}
 	return ret2
 }
+
 // blacklisted: VolumeMonitorClass (struct)
 // blacklisted: ZlibCompressor (object)
 // blacklisted: ZlibCompressorClass (struct)
 type ZlibCompressorFormat C.uint32_t
+
 const (
 	ZlibCompressorFormatZlib ZlibCompressorFormat = 0
 	ZlibCompressorFormatGzip ZlibCompressorFormat = 1
-	ZlibCompressorFormatRaw ZlibCompressorFormat = 2
+	ZlibCompressorFormatRaw  ZlibCompressorFormat = 2
 )
+
 // blacklisted: ZlibDecompressor (object)
 // blacklisted: ZlibDecompressorClass (struct)
 // blacklisted: action_name_is_valid (function)
@@ -10349,6 +10593,7 @@ func AppInfoResetTypeAssociations(content_type0 string) {
 	defer C.free(unsafe.Pointer(content_type1))
 	C.g_app_info_reset_type_associations(content_type1)
 }
+
 // blacklisted: async_initable_newv_async (function)
 // blacklisted: bus_get (function)
 // blacklisted: bus_get_finish (function)
@@ -10463,6 +10708,7 @@ func FileParseName(parse_name0 string) *File {
 	ret2 = (*File)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
+
 // blacklisted: icon_deserialize (function)
 // blacklisted: icon_hash (function)
 // blacklisted: icon_new_for_string (function)
