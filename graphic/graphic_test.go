@@ -249,8 +249,8 @@ func (g *Graphic) TestHSV(c *C) {
 		for g := 0; g < 255; g += 5 {
 			for b := 0; b < 255; b += 3 {
 				r0, g0, b0 := uint8(r), uint8(g), uint8(b)
-				h, s, v := RGB2HSV(r0, g0, b0)
-				r1, g1, b1 := HSV2RGB(h, s, v)
+				h, s, v := Rgb2Hsv(r0, g0, b0)
+				r1, g1, b1 := Hsv2Rgb(h, s, v)
 				if delta(float64(r0), float64(r1)) > 1 || delta(float64(g0), float64(g1)) > 1 || delta(float64(b0), float64(b1)) > 1 {
 					c.Fatalf("r0, g0, b0 = %d, %d, %d   r1, g1, b1 = %d, %d, %d", r0, g0, b0, r1, g1, b1)
 				}

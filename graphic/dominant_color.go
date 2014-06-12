@@ -56,6 +56,6 @@ func doGetDominantColorOfImage(img image.Image) (h, s, v float64, err error) {
 		}
 	}
 
-	h, s, v = RGB2HSV(uint8(sumR/count), uint8(sumG/count), uint8(sumB/count))
+	h, s, v = Rgb2Hsv(uint8(sumR/count), uint8(sumG/count), uint8(sumB/count))
 	return
 }
