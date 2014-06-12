@@ -26,15 +26,14 @@ import (
 	"image"
 )
 
-// TODO
 // ResizeImage returns a new image file with the given width and
 // height created by resizing the given image.
-func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (err error) {
+func ResizeImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
+	dstimg := doResizeNearestNeighbor(srcimg, newWidth, newHeight)
 	err = SaveImage(dstfile, dstimg, f)
 	dstimg.Pix = nil
 	return
@@ -42,7 +41,7 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (
 
 // ResizeImageCache resize any recognized format image and save to cache
 // directory, if already exists, just return it.
-func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstfile string, useCache bool, err error) {
+func ResizeImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = GenerateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
@@ -53,27 +52,27 @@ func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstf
 }
 
 // ThumbnailImage scale target image with limited maximum width and height.
-func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight uint, f Format) (err error) {
+func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight int, f Format) (err error) {
 	// get new width and heigh
-	var newWidth, newHeight uint
+	var newWidth, newHeight int
 	w, h, err := GetImageSize(srcfile)
 	if err != nil {
 		return
 	}
 	scale := float32(w) / float32(h)
 	newWidth = maxWidth
-	newHeight = uint(float32(newWidth) / scale)
+	newHeight = int(float32(newWidth) / scale)
 	if newHeight > maxHeight {
 		newHeight = maxHeight
-		newWidth = uint(float32(newHeight) * scale)
+		newWidth = int(float32(newHeight) * scale)
 	}
-	return ResizeImage(srcfile, dstfile, int32(newWidth), int32(newHeight), f)
+	return ResizeImage(srcfile, dstfile, newWidth, newHeight, f)
 }
 
 // ThumbnailImageCache scale target image with limited maximum width
 // and height, and save to cache directory, if already exists, just
 // return it.
-func ThumbnailImageCache(srcfile string, maxWidth, maxHeight uint, f Format) (dstfile string, useCache bool, err error) {
+func ThumbnailImageCache(srcfile string, maxWidth, maxHeight int, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = GenerateCacheFilePath(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true

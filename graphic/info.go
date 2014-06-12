@@ -27,14 +27,14 @@ import (
 )
 
 // GetImageSize return a image's width and height.
-func GetImageSize(imgfile string) (w, h int32, err error) {
+func GetImageSize(imgfile string) (w, h int, err error) {
 	f, err := os.Open(imgfile)
 	if err != nil {
 		return
 	}
 	defer f.Close()
 	config, _, err := image.DecodeConfig(f)
-	return int32(config.Width), int32(config.Height), err
+	return config.Width, config.Height, err
 }
 
 func doGetImageSize(img image.Image) (w, h int) {

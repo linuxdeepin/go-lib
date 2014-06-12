@@ -39,12 +39,12 @@ const (
 
 // FillImage generate a new image in target width and height through
 // source image, there are many fill sytles to choice from.
-func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f Format) (err error) {
+func FillImage(srcfile, dstfile string, width, height int, style FillStyle, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg, err := ImplFillImage(srcimg, int(width), int(height), style)
+	dstimg, err := ImplFillImage(srcimg, width, height, style)
 	if err != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f 
 // FillImageCache generate a new image in target width and height through
 // source image, and save it to cache directory, if already exists,
 // just return it.
-func FillImageCache(srcfile string, width, height int32, style FillStyle, f Format) (dstfile string, useCache bool, err error) {
+func FillImageCache(srcfile string, width, height int, style FillStyle, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = GenerateCacheFilePath(fmt.Sprintf("FillImageCache%s%d%d%s%s", srcfile, width, height, style, f))
 	if isFileExists(dstfile) {
 		// return cache file
@@ -85,7 +85,7 @@ func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dsti
 }
 
 func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
-	dstimg = image.NewRGBA(image.Rect(0, 0, width, height))
+	dstimg = image.NewRGBA(image.Rect(0, 0, int(width), int(height)))
 	iw, ih := doGetImageSize(srcimg)
 
 	endx := width - 1
@@ -100,7 +100,7 @@ func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillSty
 }
 
 func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
-	dstimg = image.NewRGBA(image.Rect(0, 0, width, height))
+	dstimg = image.NewRGBA(image.Rect(0, 0, int(width), int(height)))
 	iw, ih := doGetImageSize(srcimg)
 
 	var srcX, srcY, dstX, dstY, clipWidth, clipHeight int

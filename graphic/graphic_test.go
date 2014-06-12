@@ -301,7 +301,7 @@ func (g *Graphic) TestResizeImageCache(c *C) {
 func (g *Graphic) TestThumbnailImage(c *C) {
 	resultFile := "testdata/test_thumbnail.png"
 	maxWidth, maxHeight := 200, 200
-	err := ThumbnailImage(originTestImage, resultFile, uint(maxWidth), uint(maxHeight), PNG)
+	err := ThumbnailImage(originTestImage, resultFile, maxWidth, maxHeight, PNG)
 	if err != nil {
 		c.Error(err)
 	}
