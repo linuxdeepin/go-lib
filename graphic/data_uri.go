@@ -36,7 +36,7 @@ func ConvertImageToDataUri(imgfile string) (dataUri string, err error) {
 	if err != nil {
 		return
 	}
-	f, err := getImageFormat(imgfile)
+	f, err := GetImageFormat(imgfile)
 	if err != nil {
 		return
 	}

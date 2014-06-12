@@ -43,13 +43,14 @@ func doGetImageSize(img image.Image) (w, h int) {
 	return
 }
 
-// GetImageFormat return image format, such as "png" or "jpeg".
-func GetImageFormat(imgfile string) (format string, err error) {
+// GetImageFormat return image format, such as "png", "jpeg".
+func GetImageFormat(imgfile string) (format Format, err error) {
 	f, err := os.Open(imgfile)
 	if err != nil {
 		return
 	}
 	defer f.Close()
-	_, format, err = image.DecodeConfig(f)
+	_, name, err := image.DecodeConfig(f)
+	format = Format(name)
 	return
 }
