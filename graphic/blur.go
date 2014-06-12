@@ -28,7 +28,6 @@ package graphic
 import "C"
 import "unsafe"
 import "fmt"
-import "path"
 
 // BlurImage generate blur effect to an image.
 // TODO Format always is PNG
@@ -44,13 +43,12 @@ func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err 
 // BlurImageCache generate and save the blurred image to cache
 // directory, if target file already exists, just return it.
 func BlurImageCache(srcfile string, sigma, numsteps float64, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("BlurImageCache%s%f%f%s", srcfile, sigma, numsteps, f)))
+	dstfile = GenerateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcfile, sigma, numsteps, f))
 	if isFileExists(dstfile) {
 		// return cache file
 		useCache = true
 		return
 	}
-	ensureDirExists(path.Dir(dstfile))
 	err = BlurImage(srcfile, dstfile, sigma, numsteps, f)
 	return
 }

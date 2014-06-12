@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"image"
 	"image/draw"
-	"path"
 )
 
 // ResizeImage returns a new image file with the given width and
@@ -42,12 +41,11 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (
 // ResizeImageCache resize any recognized format image and save to cache
 // directory, if already exists, just return it.
 func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f)))
+	dstfile = GenerateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
 	}
-	ensureDirExists(path.Dir(dstfile))
 	err = ResizeImage(srcfile, dstfile, newWidth, newHeight, f)
 	return
 }
@@ -75,12 +73,11 @@ func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight uint, f Format)
 // and height, and save to cache directory, if already exists, just
 // return it.
 func ThumbnailImageCache(srcfile string, maxWidth, maxHeight uint, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f)))
+	dstfile = GenerateCacheFilePath(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
 	}
-	ensureDirExists(path.Dir(dstfile))
 	err = ThumbnailImage(srcfile, dstfile, maxWidth, maxHeight, f)
 	return
 }

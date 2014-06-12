@@ -30,6 +30,7 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"path"
 )
 
 // LoadImage load image file and return image.Image object.
@@ -62,6 +63,13 @@ func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 	default:
 		err = png.Encode(w, m)
 	}
+	return
+}
+
+func GenerateCacheFilePath(keyword string) (dstfile string) {
+	graphicCacheFormat := os.Getenv("HOME") + "/.cache/dde/graphic/%s"
+	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(keyword))
+	ensureDirExists(path.Dir(dstfile))
 	return
 }
 

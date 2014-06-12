@@ -21,10 +21,6 @@
 
 package graphic
 
-import (
-	"os"
-)
-
 // Format defines the type of image format.
 type Format string
 
@@ -33,5 +29,3 @@ const (
 	PNG  Format = "png"
 	JPEG        = "jpeg"
 )
-
-var graphicCacheFormat = os.Getenv("HOME") + "/.cache/dde/graphic_%s"
