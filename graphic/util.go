@@ -44,7 +44,7 @@ func LoadImage(imgfile string) (img image.Image, err error) {
 	return
 }
 
-// SaveImage save image.Image object to target filie.
+// SaveImage save image.Image object to target file.
 func SaveImage(dstfile string, m image.Image, f Format) (err error) {
 	df, err := openFileOrCreate(dstfile)
 	if err != nil {
