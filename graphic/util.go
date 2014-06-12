@@ -103,14 +103,3 @@ func convertToRGBA(img image.Image) (rgba *image.RGBA) {
 	draw.Draw(rgba, rgba.Bounds(), img, b.Min, draw.Src)
 	return
 }
-
-func getImageFormat(imgfile string) (format Format, err error) {
-	f, err := os.Open(imgfile)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	_, name, err := image.DecodeConfig(f)
-	format = Format(name)
-	return
-}

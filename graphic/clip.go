@@ -27,6 +27,7 @@ import (
 	"image/draw"
 )
 
+// TODO
 // ClipImage clip any recognized format image and save to target format image.
 func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
@@ -34,9 +35,12 @@ func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int32, f Format) (err err
 		return
 	}
 	dstimg := ImplClipImage(srcimg, int(x0), int(y0), int(x1-x0), int(y1-y0))
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
+// TODO
 // ClipImageCache clip any recognized format image and save to cache
 // directory, if already exists, just return it.
 func ClipImageCache(srcfile string, x0, y0, x1, y1 int32, f Format) (dstfile string, useCache bool, err error) {
@@ -49,8 +53,8 @@ func ClipImageCache(srcfile string, x0, y0, x1, y1 int32, f Format) (dstfile str
 	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func ImplClipImage(srcimg image.Image, x, y, w, h int) (dstimg draw.Image) {
+// TODO
+func ImplClipImage(srcimg image.Image, x, y, w, h int) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 	draw.Draw(dstimg, dstimg.Bounds(), srcimg, image.Point{x, y}, draw.Src)
 	return

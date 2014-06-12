@@ -48,7 +48,9 @@ func FillImage(srcfile, dstfile string, width, height int32, style FillStyle, f 
 	if err != nil {
 		return
 	}
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // FillImageCache generate a new image in target width and height through
@@ -65,8 +67,7 @@ func FillImageCache(srcfile string, width, height int32, style FillStyle, f Form
 	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
+func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
 	switch style {
 	case FillTile:
 		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
@@ -83,7 +84,7 @@ func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dsti
 	return
 }
 
-func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, width, height))
 	iw, ih := doGetImageSize(srcimg)
 
@@ -98,7 +99,7 @@ func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillSty
 	return
 }
 
-func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, width, height))
 	iw, ih := doGetImageSize(srcimg)
 
@@ -126,12 +127,12 @@ func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillS
 	return
 }
 
-func doFillImageInScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image) {
+func doFillImageInScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
 	dstimg = doResizeNearestNeighbor(srcimg, width, height)
 	return
 }
 
-func doFillImageInProportionCenterScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg draw.Image, err error) {
+func doFillImageInProportionCenterScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
 	iw, ih := doGetImageSize(srcimg)
 	x, y, w, h, err := GetProportionCenterScaleRect(width, height, iw, ih)
 	if err != nil {

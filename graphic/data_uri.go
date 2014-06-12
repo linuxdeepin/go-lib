@@ -55,6 +55,7 @@ func ConvertImageObjectToDataUri(img image.Image, f Format) (dataUri string, err
 	data := byteBuf.Bytes()
 	contentType := imageFormatToDataUriContentType(f)
 	dataUri = fmt.Sprintf("data:%s;base64,%s", contentType, base64.StdEncoding.EncodeToString(data))
+	byteBuf.Reset()
 	return
 }
 

@@ -23,7 +23,6 @@ package graphic
 
 import (
 	"image"
-	"image/draw"
 )
 
 // RotateImageLeft rotate image to left side.
@@ -33,7 +32,9 @@ func RotateImageLeft(srcfile, dstfile string, f Format) (err error) {
 		return err
 	}
 	dstimg := doRotateImageLeft(srcimg)
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // RotateImageLeft rotate image to right side.
@@ -43,11 +44,12 @@ func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
 		return err
 	}
 	dstimg := doRotateImageRight(srcimg)
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func doRotateImageLeft(srcimg image.Image) (dstimg draw.Image) {
+func doRotateImageLeft(srcimg image.Image) (dstimg *image.RGBA) {
 	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
 
@@ -60,8 +62,7 @@ func doRotateImageLeft(srcimg image.Image) (dstimg draw.Image) {
 	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func doRotateImageRight(srcimg image.Image) (dstimg draw.Image) {
+func doRotateImageRight(srcimg image.Image) (dstimg *image.RGBA) {
 	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
 

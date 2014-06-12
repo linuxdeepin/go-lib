@@ -273,7 +273,7 @@ func (g *Graphic) TestGetImageFormat(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(format, Equals, "jpeg")
+	c.Check(format, DeepEquals, JPEG)
 }
 
 func (g *Graphic) TestResizeImage(c *C) {

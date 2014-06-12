@@ -23,7 +23,6 @@ package graphic
 
 import (
 	"image"
-	"image/draw"
 )
 
 // FlipImageHorizontal flip image in horizontal direction, and save as
@@ -34,7 +33,9 @@ func FlipImageHorizontal(srcfile, dstfile string, f Format) (err error) {
 		return err
 	}
 	dstimg := doFlipImageHorizontal(srcimg)
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // FlipImageVertical  flip image  in vertical  direction, and  save as
@@ -45,11 +46,12 @@ func FlipImageVertical(srcfile, dstfile string, f Format) (err error) {
 		return err
 	}
 	dstimg := doFlipImageVertical(srcimg)
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func doFlipImageHorizontal(srcimg image.Image) (dstimg draw.Image) {
+func doFlipImageHorizontal(srcimg image.Image) (dstimg *image.RGBA) {
 	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 
@@ -62,8 +64,7 @@ func doFlipImageHorizontal(srcimg image.Image) (dstimg draw.Image) {
 	return
 }
 
-// FIXME return draw.Image or *image.RGBA
-func doFlipImageVertical(srcimg image.Image) (dstimg draw.Image) {
+func doFlipImageVertical(srcimg image.Image) (dstimg *image.RGBA) {
 	w, h := doGetImageSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 

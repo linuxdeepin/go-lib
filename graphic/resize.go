@@ -24,9 +24,9 @@ package graphic
 import (
 	"fmt"
 	"image"
-	"image/draw"
 )
 
+// TODO
 // ResizeImage returns a new image file with the given width and
 // height created by resizing the given image.
 func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (err error) {
@@ -35,7 +35,9 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int32, f Format) (
 		return
 	}
 	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // ResizeImageCache resize any recognized format image and save to cache
@@ -52,11 +54,12 @@ func ResizeImageCache(srcfile string, newWidth, newHeight int32, f Format) (dstf
 
 // ThumbnailImage scale target image with limited maximum width and height.
 func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight uint, f Format) (err error) {
-	srcimg, err := LoadImage(srcfile)
-
 	// get new width and heigh
 	var newWidth, newHeight uint
-	w, h := doGetImageSize(srcimg)
+	w, h, err := GetImageSize(srcfile)
+	if err != nil {
+		return
+	}
 	scale := float32(w) / float32(h)
 	newWidth = maxWidth
 	newHeight = uint(float32(newWidth) / scale)
@@ -64,9 +67,7 @@ func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight uint, f Format)
 		newHeight = maxHeight
 		newWidth = uint(float32(newHeight) * scale)
 	}
-
-	dstimg := doResizeNearestNeighbor(srcimg, int(newWidth), int(newHeight))
-	return SaveImage(dstfile, dstimg, f)
+	return ResizeImage(srcfile, dstfile, int32(newWidth), int32(newHeight), f)
 }
 
 // ThumbnailImageCache scale target image with limited maximum width
@@ -85,7 +86,7 @@ func ThumbnailImageCache(srcfile string, maxWidth, maxHeight uint, f Format) (ds
 // TODO doResizeNearestNeighbor returns a new RGBA image with the given width and
 // height created by resizing the given image using the nearest neighbor
 // algorithm.
-func doResizeNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg draw.Image) {
+func doResizeNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg *image.RGBA) {
 	w := img.Bounds().Max.X
 	h := img.Bounds().Max.Y
 	newimg = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))

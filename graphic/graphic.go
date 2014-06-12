@@ -27,5 +27,5 @@ type Format string
 // Registered image format.
 const (
 	PNG  Format = "png"
-	JPEG        = "jpeg"
+	JPEG Format = "jpeg"
 )

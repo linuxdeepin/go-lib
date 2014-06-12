@@ -25,6 +25,7 @@ import (
 	"math"
 )
 
+// TODO
 // RGB2HSV convert color format from RGB(r, g, b=[0..255]) to HSV(h=[0..360), s,v=[0..1]).
 func RGB2HSV(r, g, b uint8) (h, s, v float64) {
 	fr := float64(r) / 255

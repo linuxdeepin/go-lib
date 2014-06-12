@@ -55,7 +55,9 @@ func CompositeImageSet(srcfile string, compinfos []CompositeInfo, dstfile string
 		}
 		ImplCompositeImage(dstimg, compimg, compinfo.X, compinfo.Y)
 	}
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // CompositeImage composite two images.
@@ -70,7 +72,9 @@ func CompositeImage(srcfile, compfile, dstfile string, x, y int, f Format) (err 
 	}
 	dstimg := convertToRGBA(srcimg)
 	ImplCompositeImage(dstimg, compimg, x, y)
-	return SaveImage(dstfile, dstimg, f)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 // CompositeImageUri composite two images which format in data uri.
@@ -85,7 +89,9 @@ func CompositeImageUri(srcDatauri, compDataUri string, x, y int, f Format) (dstD
 	}
 	dstimg := convertToRGBA(srcimg)
 	ImplCompositeImage(dstimg, compimg, x, y)
-	return ConvertImageObjectToDataUri(dstimg, f)
+	dstDataUri, err = ConvertImageObjectToDataUri(dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
 func ImplCompositeImage(dstimg draw.Image, compimg image.Image, x, y int) {
