@@ -268,6 +268,14 @@ func (g *Graphic) TestGetImageSize(c *C) {
 	c.Check(int(h), Equals, originHeight)
 }
 
+func (g *Graphic) TestGetImageFormat(c *C) {
+	format, err := GetImageFormat(originTestImage)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(format, Equals, "jpeg")
+}
+
 func (g *Graphic) TestResizeImage(c *C) {
 	resultFile := "testdata/test_resizeimage_500x600.png"
 	err := ResizeImage(originTestImage, resultFile, 500, 600, PNG)
