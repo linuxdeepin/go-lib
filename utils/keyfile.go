@@ -22,257 +22,226 @@
 package utils
 
 import (
-        "dlib/glib-2.0"
-        "os"
-        "sync"
+	"dlib/glib-2.0"
+	"os"
+	"sync"
 )
 
 var (
-        rwMutex = new(sync.RWMutex)
+	rwMutex = new(sync.RWMutex)
 )
 
 func (op *Manager) ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}, bool) {
-        if len(filename) <= 0 || !op.IsFileExist(filename) {
-                return nil, false
-        }
-        rwMutex.Lock()
-        defer rwMutex.Unlock()
+	if len(filename) <= 0 || !op.IsFileExist(filename) {
+		return nil, false
+	}
+	rwMutex.Lock()
+	defer rwMutex.Unlock()
 
-        keyFile := glib.NewKeyFile()
-        defer keyFile.Free()
-        _, err := keyFile.LoadFromFile(filename,
-                glib.KeyFileFlagsKeepComments)
-        if err != nil {
-                logger.Warningf("LoadFile '%s' failed: %v", filename, err)
-                return nil, false
-        }
+	keyFile := glib.NewKeyFile()
+	defer keyFile.Free()
+	_, err := keyFile.LoadFromFile(filename,
+		glib.KeyFileFlagsKeepComments)
+	if err != nil {
+		return nil, false
+	}
 
-        switch t.(type) {
-        case bool:
-                value, err := keyFile.GetBoolean(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return value, true
-        case []bool:
-                _, value, err := keyFile.GetBooleanList(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return value, true
-        case int, int32, uint32:
-                value, err := keyFile.GetInteger(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return int32(value), true
-        case int64:
-                value, err := keyFile.GetInt64(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return int64(value), true
-        case uint64:
-                value, err := keyFile.GetUint64(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return uint64(value), true
-        case []int, []int32, []uint32, []int64, []uint64:
-                _, value, err := keyFile.GetIntegerList(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                list := []int32{}
-                for _, v := range value {
-                        list = append(list, int32(v))
-                }
-                return list, true
-        case float32, float64:
-                value, err := keyFile.GetDouble(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return float64(value), true
-        case []float32, []float64:
-                _, value, err := keyFile.GetDoubleList(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                list := []float64{}
-                for _, v := range value {
-                        list = append(list, float64(v))
-                }
-                return list, true
-        case string:
-                value, err := keyFile.GetString(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return value, true
-        case []string:
-                _, value, err := keyFile.GetStringList(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return value, true
-        default:
-                value, err := keyFile.GetValue(group, key)
-                if err != nil {
-                        logger.Warningf("Get '%s' '%s' '%s' failed: %v",
-                                filename, group, key, err)
-                        return nil, false
-                }
-                return value, true
-        }
+	switch t.(type) {
+	case bool:
+		value, err := keyFile.GetBoolean(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return value, true
+	case []bool:
+		_, value, err := keyFile.GetBooleanList(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return value, true
+	case int, int32, uint32:
+		value, err := keyFile.GetInteger(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return int32(value), true
+	case int64:
+		value, err := keyFile.GetInt64(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return int64(value), true
+	case uint64:
+		value, err := keyFile.GetUint64(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return uint64(value), true
+	case []int, []int32, []uint32, []int64, []uint64:
+		_, value, err := keyFile.GetIntegerList(group, key)
+		if err != nil {
+			return nil, false
+		}
+		list := []int32{}
+		for _, v := range value {
+			list = append(list, int32(v))
+		}
+		return list, true
+	case float32, float64:
+		value, err := keyFile.GetDouble(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return float64(value), true
+	case []float32, []float64:
+		_, value, err := keyFile.GetDoubleList(group, key)
+		if err != nil {
+			return nil, false
+		}
+		list := []float64{}
+		for _, v := range value {
+			list = append(list, float64(v))
+		}
+		return list, true
+	case string:
+		value, err := keyFile.GetString(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return value, true
+	case []string:
+		_, value, err := keyFile.GetStringList(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return value, true
+	default:
+		value, err := keyFile.GetValue(group, key)
+		if err != nil {
+			return nil, false
+		}
+		return value, true
+	}
 
-        return nil, false
+	return nil, false
 }
 
 func (op *Manager) WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
-        if len(filename) <= 0 {
-                return false
-        }
-        rwMutex.Lock()
-        defer rwMutex.Unlock()
+	if len(filename) <= 0 {
+		return false
+	}
+	rwMutex.Lock()
+	defer rwMutex.Unlock()
 
-        if !op.IsFileExist(filename) {
-                f, err := os.Create(filename)
-                if err != nil {
-                        logger.Warningf("Create '%s' failed: %v",
-                                filename, err)
-                        return false
-                }
-                f.Close()
-        }
+	if !op.IsFileExist(filename) {
+		f, err := os.Create(filename)
+		if err != nil {
+			return false
+		}
+		f.Close()
+	}
 
-        keyFile := glib.NewKeyFile()
-        defer keyFile.Free()
-        _, err := keyFile.LoadFromFile(filename,
-                glib.KeyFileFlagsKeepComments)
-        if err != nil {
-                logger.Warningf("LoadFile '%s' failed: %v", filename, err)
-                return false
-        }
+	keyFile := glib.NewKeyFile()
+	defer keyFile.Free()
+	_, err := keyFile.LoadFromFile(filename,
+		glib.KeyFileFlagsKeepComments)
+	if err != nil {
+		return false
+	}
 
-        switch value.(type) {
-        case bool:
-                keyFile.SetBoolean(group, key, value.(bool))
-        case []bool:
-                keyFile.SetBooleanList(group, key, value.([]bool))
-        case int:
-                keyFile.SetInteger(group, key, value.(int))
-        case int32:
-                keyFile.SetInteger(group, key, int(value.(int32)))
-        case uint32:
-                keyFile.SetInteger(group, key, int(value.(uint32)))
-        case []int:
-                keyFile.SetIntegerList(group, key, value.([]int))
-        case []int32:
-                list := value.([]int32)
-                tmp := []int{}
-                for _, l := range list {
-                        tmp = append(tmp, int(l))
-                }
-                keyFile.SetIntegerList(group, key, tmp)
-        case []uint32:
-                list := value.([]uint32)
-                tmp := []int{}
-                for _, l := range list {
-                        tmp = append(tmp, int(l))
-                }
-                keyFile.SetIntegerList(group, key, tmp)
-        case []int64:
-                list := value.([]int64)
-                tmp := []int{}
-                for _, l := range list {
-                        tmp = append(tmp, int(l))
-                }
-                keyFile.SetIntegerList(group, key, tmp)
-        case []uint64:
-                list := value.([]uint64)
-                tmp := []int{}
-                for _, l := range list {
-                        tmp = append(tmp, int(l))
-                }
-                keyFile.SetIntegerList(group, key, tmp)
-        case int64:
-                keyFile.SetInt64(group, key, value.(int64))
-        case uint64:
-                keyFile.SetUint64(group, key, value.(uint64))
-        case float32:
-                keyFile.SetDouble(group, key, float64(value.(float32)))
-        case float64:
-                keyFile.SetDouble(group, key, value.(float64))
-        case []float32:
-                list := value.([]float32)
-                tmp := []float64{}
-                for _, l := range list {
-                        tmp = append(tmp, float64(l))
-                }
-                keyFile.SetDoubleList(group, key, tmp)
-        case []float64:
-                keyFile.SetDoubleList(group, key, value.([]float64))
-        case string:
-                keyFile.SetString(group, key, value.(string))
-        case []string:
-                keyFile.SetStringList(group, key, value.([]string))
-        }
+	switch value.(type) {
+	case bool:
+		keyFile.SetBoolean(group, key, value.(bool))
+	case []bool:
+		keyFile.SetBooleanList(group, key, value.([]bool))
+	case int:
+		keyFile.SetInteger(group, key, value.(int))
+	case int32:
+		keyFile.SetInteger(group, key, int(value.(int32)))
+	case uint32:
+		keyFile.SetInteger(group, key, int(value.(uint32)))
+	case []int:
+		keyFile.SetIntegerList(group, key, value.([]int))
+	case []int32:
+		list := value.([]int32)
+		tmp := []int{}
+		for _, l := range list {
+			tmp = append(tmp, int(l))
+		}
+		keyFile.SetIntegerList(group, key, tmp)
+	case []uint32:
+		list := value.([]uint32)
+		tmp := []int{}
+		for _, l := range list {
+			tmp = append(tmp, int(l))
+		}
+		keyFile.SetIntegerList(group, key, tmp)
+	case []int64:
+		list := value.([]int64)
+		tmp := []int{}
+		for _, l := range list {
+			tmp = append(tmp, int(l))
+		}
+		keyFile.SetIntegerList(group, key, tmp)
+	case []uint64:
+		list := value.([]uint64)
+		tmp := []int{}
+		for _, l := range list {
+			tmp = append(tmp, int(l))
+		}
+		keyFile.SetIntegerList(group, key, tmp)
+	case int64:
+		keyFile.SetInt64(group, key, value.(int64))
+	case uint64:
+		keyFile.SetUint64(group, key, value.(uint64))
+	case float32:
+		keyFile.SetDouble(group, key, float64(value.(float32)))
+	case float64:
+		keyFile.SetDouble(group, key, value.(float64))
+	case []float32:
+		list := value.([]float32)
+		tmp := []float64{}
+		for _, l := range list {
+			tmp = append(tmp, float64(l))
+		}
+		keyFile.SetDoubleList(group, key, tmp)
+	case []float64:
+		keyFile.SetDoubleList(group, key, value.([]float64))
+	case string:
+		keyFile.SetString(group, key, value.(string))
+	case []string:
+		keyFile.SetStringList(group, key, value.([]string))
+	}
 
-        _, contents, err1 := keyFile.ToData()
-        if err1 != nil {
-                logger.Warningf("KeyFile ToData Failed: %v", err1)
-                return false
-        }
+	_, contents, err1 := keyFile.ToData()
+	if err1 != nil {
+		return false
+	}
 
-        ok := writeStringToKeyFile(filename, string(contents))
-        if !ok {
-                return false
-        }
+	ok := writeStringToKeyFile(filename, string(contents))
+	if !ok {
+		return false
+	}
 
-        return true
+	return true
 }
 
 func writeStringToKeyFile(filename, contents string) bool {
-        if len(filename) <= 0 {
-                return false
-        }
+	if len(filename) <= 0 {
+		return false
+	}
 
-        f, err := os.Create(filename + "~")
-        if err != nil {
-                logger.Warningf("OpenFile '%s' failed: %v",
-                        filename+"~", err)
-                return false
-        }
-        defer f.Close()
+	f, err := os.Create(filename + "~")
+	if err != nil {
+		return false
+	}
+	defer f.Close()
 
-        if _, err = f.WriteString(contents); err != nil {
-                logger.Warningf("WriteString '%s' failed: %v",
-                        filename, err)
-                return false
-        }
-        f.Sync()
-        os.Rename(filename+"~", filename)
+	if _, err = f.WriteString(contents); err != nil {
+		return false
+	}
+	f.Sync()
+	os.Rename(filename+"~", filename)
 
-        return true
+	return true
 }
