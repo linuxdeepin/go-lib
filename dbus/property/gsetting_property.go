@@ -3,6 +3,8 @@ package property
 import "dlib/gio-2.0"
 import "reflect"
 import "dlib/dbus"
+import "fmt"
+import "unicode"
 
 type _GSettingsProperty struct {
 	*BaseObserver
@@ -101,6 +103,9 @@ func (prop *GSettingsStrvProperty) Set(v []string) {
 }
 
 func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *gio.Settings, keyName string) *_GSettingsProperty {
+	if !unicode.IsUpper(rune(propName[0])) {
+		panic(fmt.Sprintf("Can't bind an unexport field(%s) to %s", propName, keyName))
+	}
 	real_type := s.GetValue(keyName).GetTypeString()
 	if real_type == "s" && sig == "e" {
 		// note: "e" is not matched with glib type system
