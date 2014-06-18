@@ -28,11 +28,12 @@ import (
 )
 
 const (
-	envAutoProxy  = "auto_proxy"
-	envHttpProxy  = "http_proxy"
-	envHttpsProxy = "https_proxy"
-	envFtpProxy   = "ftp_proxy"
-	envSocksProxy = "socks_proxy"
+	envAutoProxy    = "auto_proxy"
+	envHttpProxy    = "http_proxy"
+	envHttpsProxy   = "https_proxy"
+	envFtpProxy     = "ftp_proxy"
+	envSocksProxy   = "SOCKS_SERVER"
+	envSocksVersion = "SOCKS_VERSION"
 
 	gsettingsIdProxy = "com.deepin.dde.proxy"
 	gkeyProxyMethod  = "proxy-method"
@@ -71,6 +72,7 @@ func updateProxyEnvs() {
 	utils.UnsetEnv(envHttpsProxy)
 	utils.UnsetEnv(envFtpProxy)
 	utils.UnsetEnv(envSocksProxy)
+	utils.UnsetEnv(envSocksVersion)
 	proxyMethod := proxySettings.GetString(gkeyProxyMethod)
 	switch proxyMethod {
 	case proxyMethodNone:
@@ -98,6 +100,7 @@ func updateProxyEnvs() {
 		socksProxy := proxySettings.GetString(gkeySocksProxy)
 		if len(socksProxy) > 0 {
 			os.Setenv(envSocksProxy, socksProxy)
+			os.Setenv(envSocksVersion, "5")
 		}
 	}
 }
