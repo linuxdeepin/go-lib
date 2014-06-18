@@ -23,6 +23,7 @@ package proxy
 
 import (
 	"dlib/gio-2.0"
+	liblogger "dlib/logger"
 	"dlib/utils"
 	"os"
 )
@@ -52,6 +53,7 @@ const (
 
 var (
 	proxySettings = gio.NewSettings(gsettingsIdProxy)
+	logger        = liblogger.NewLogger("com.deepin.dlib.proxy")
 )
 
 // SetupProxy setup system proxy, need followed with glib.StartLoop().
@@ -62,8 +64,27 @@ func SetupProxy() {
 
 func listenProxyGsettings() {
 	proxySettings.Connect("changed", func(s *gio.Settings, key string) {
+		logger.Debug("proxy keys in gsettings changed", key, proxySettings.GetString(key))
 		updateProxyEnvs()
+		showEnvs()
 	})
+}
+
+func showEnvs() {
+	showEnv(envAutoProxy)
+	showEnv(envHttpProxy)
+	showEnv(envHttpsProxy)
+	showEnv(envFtpProxy)
+	showEnv(envSocksProxy)
+	showEnv(envSocksVersion)
+}
+
+func showEnv(envName string) {
+	if utils.IsEnvExists(envName) {
+		logger.Debug(envName, os.Getenv(envName))
+	} else {
+		logger.Debug(envName, "<not exists>")
+	}
 }
 
 func updateProxyEnvs() {
