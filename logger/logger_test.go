@@ -48,7 +48,6 @@ func (*TestWrapper) TestDebugFile(c *C) {
 
 func (*TestWrapper) TestDebugEnv(c *C) {
 	os.Clearenv()
-	os.Setenv("DDE_DEBUG", "")
 	logger := NewLogger("test_env")
 	c.Check(logger.level, Equals, LEVEL_INFO)
 

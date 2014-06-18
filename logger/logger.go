@@ -21,6 +21,7 @@
 package logger
 
 import (
+	"dlib/utils"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -172,8 +173,8 @@ func NewLogger(name string) (logger *Logger) {
 	level := LEVEL_INFO
 	var customLevel Priority
 	// level := defaultLevel
-	if isEnvExists(DebugLevelEnv) {
-		switch getEnv(DebugLevelEnv) {
+	if utils.IsEnvExists(DebugLevelEnv) {
+		switch os.Getenv(DebugLevelEnv) {
 		case "debug":
 			customLevel = LEVEL_DEBUG
 		case "info":
@@ -187,15 +188,15 @@ func NewLogger(name string) (logger *Logger) {
 		}
 		level = customLevel
 	}
-	if isEnvExists(DebugEnv) || isFileExists(DebugFile) {
-		if !isEnvExists(DebugLevelEnv) {
+	if utils.IsEnvExists(DebugEnv) || isFileExists(DebugFile) {
+		if !utils.IsEnvExists(DebugLevelEnv) {
 			level = LEVEL_DEBUG
 		}
 	}
-	if isEnvExists(DebugMatchEnv) {
+	if utils.IsEnvExists(DebugMatchEnv) {
 		if strings.Contains(strings.ToLower(name),
-			strings.ToLower(getEnv(DebugMatchEnv))) {
-			if !isEnvExists(DebugLevelEnv) {
+			strings.ToLower(os.Getenv(DebugMatchEnv))) {
+			if !utils.IsEnvExists(DebugLevelEnv) {
 				level = LEVEL_DEBUG
 			}
 		} else {
