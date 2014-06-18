@@ -22,30 +22,55 @@
 package utils
 
 import (
+	"net/url"
 	"regexp"
 	"strings"
 )
 
 const (
-	URI_SCHEME_FILE  = "file://"
-	URI_SCHEME_FTP   = "ftp://"
-	URI_SCHEME_HTTP  = "http://"
-	URI_SCHEME_HTTPS = "https://"
-	URI_SCHEME_SMB   = "smb://"
+	SCHEME_FILE  = "file://"
+	SCHEME_FTP   = "ftp://"
+	SCHEME_HTTP  = "http://"
+	SCHEME_HTTPS = "https://"
+	SCHEME_SMB   = "smb://"
 )
+
+func EncodeURI(uri, scheme string) string {
+	if len(uri) < 1 {
+		return ""
+	}
+
+	filepath := URIToPath(uri)
+	u := url.URL{}
+	u.Path = filepath
+	return scheme + u.String()
+}
+
+func DecodeURI(uri string) string {
+	if len(uri) < 1 {
+		return ""
+	}
+
+	u, err := url.Parse(uri)
+	if err != nil {
+		return ""
+	}
+
+	return u.Scheme + "://" + u.Path
+}
 
 func URIToPath(uri string) string {
 	filepath := deleteStartSpace(uri)
 
-	if isBeginWithStr(filepath, URI_SCHEME_FILE) {
+	if isBeginWithStr(filepath, SCHEME_FILE) {
 		return filepath[7:]
-	} else if isBeginWithStr(filepath, URI_SCHEME_FTP) {
+	} else if isBeginWithStr(filepath, SCHEME_FTP) {
 		return filepath[6:]
-	} else if isBeginWithStr(filepath, URI_SCHEME_HTTP) {
+	} else if isBeginWithStr(filepath, SCHEME_HTTP) {
 		return filepath[7:]
-	} else if isBeginWithStr(filepath, URI_SCHEME_HTTPS) {
+	} else if isBeginWithStr(filepath, SCHEME_HTTPS) {
 		return filepath[8:]
-	} else if isBeginWithStr(filepath, URI_SCHEME_SMB) {
+	} else if isBeginWithStr(filepath, SCHEME_SMB) {
 		return filepath[6:]
 	} else if isBeginWithStr(filepath, "/") {
 		return filepath
@@ -60,15 +85,15 @@ func PathToURI(filepath, scheme string) string {
 	}
 
 	switch scheme {
-	case URI_SCHEME_FILE:
+	case SCHEME_FILE:
 		return pathToFileURI(filepath)
-	case URI_SCHEME_FTP:
+	case SCHEME_FTP:
 		return pathToFtpURI(filepath)
-	case URI_SCHEME_HTTP:
+	case SCHEME_HTTP:
 		return pathToHttpURI(filepath)
-	case URI_SCHEME_HTTPS:
+	case SCHEME_HTTPS:
 		return pathToHttpsURI(filepath)
-	case URI_SCHEME_SMB:
+	case SCHEME_SMB:
 		return pathToSmbURI(filepath)
 	}
 
@@ -79,8 +104,8 @@ func pathToFileURI(filepath string) string {
 	filepath = deleteStartSpace(filepath)
 
 	if isBeginWithStr(filepath, "/") {
-		return URI_SCHEME_FILE + filepath
-	} else if isBeginWithStr(filepath, URI_SCHEME_FILE) {
+		return SCHEME_FILE + filepath
+	} else if isBeginWithStr(filepath, SCHEME_FILE) {
 		return filepath
 	}
 
@@ -91,8 +116,8 @@ func pathToFtpURI(filepath string) string {
 	filepath = deleteStartSpace(filepath)
 
 	if isBeginWithStr(filepath, "/") {
-		return URI_SCHEME_FTP + filepath
-	} else if isBeginWithStr(filepath, URI_SCHEME_FTP) {
+		return SCHEME_FTP + filepath
+	} else if isBeginWithStr(filepath, SCHEME_FTP) {
 		return filepath
 	}
 
@@ -103,8 +128,8 @@ func pathToHttpURI(filepath string) string {
 	filepath = deleteStartSpace(filepath)
 
 	if isBeginWithStr(filepath, "/") {
-		return URI_SCHEME_HTTP + filepath
-	} else if isBeginWithStr(filepath, URI_SCHEME_HTTP) {
+		return SCHEME_HTTP + filepath
+	} else if isBeginWithStr(filepath, SCHEME_HTTP) {
 		return filepath
 	}
 
@@ -115,8 +140,8 @@ func pathToHttpsURI(filepath string) string {
 	filepath = deleteStartSpace(filepath)
 
 	if isBeginWithStr(filepath, "/") {
-		return URI_SCHEME_HTTPS + filepath
-	} else if isBeginWithStr(filepath, URI_SCHEME_HTTPS) {
+		return SCHEME_HTTPS + filepath
+	} else if isBeginWithStr(filepath, SCHEME_HTTPS) {
 		return filepath
 	}
 
@@ -127,8 +152,8 @@ func pathToSmbURI(filepath string) string {
 	filepath = deleteStartSpace(filepath)
 
 	if isBeginWithStr(filepath, "/") {
-		return URI_SCHEME_SMB + filepath
-	} else if isBeginWithStr(filepath, URI_SCHEME_SMB) {
+		return SCHEME_SMB + filepath
+	} else if isBeginWithStr(filepath, SCHEME_SMB) {
 		return filepath
 	}
 
