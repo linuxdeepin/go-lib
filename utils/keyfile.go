@@ -27,14 +27,11 @@ import (
 	"sync"
 )
 
-var (
-	rwMutex = new(sync.RWMutex)
-)
-
-func (op *Manager) ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}, bool) {
-	if len(filename) <= 0 || !op.IsFileExist(filename) {
+func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}, bool) {
+	if len(filename) <= 0 || !IsFileExist(filename) {
 		return nil, false
 	}
+	rwMutex := new(sync.RWMutex)
 	rwMutex.Lock()
 	defer rwMutex.Unlock()
 
@@ -126,14 +123,15 @@ func (op *Manager) ReadKeyFromKeyFile(filename, group, key string, t interface{}
 	return nil, false
 }
 
-func (op *Manager) WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
+func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	if len(filename) <= 0 {
 		return false
 	}
+	rwMutex := new(sync.RWMutex)
 	rwMutex.Lock()
 	defer rwMutex.Unlock()
 
-	if !op.IsFileExist(filename) {
+	if !IsFileExist(filename) {
 		f, err := os.Create(filename)
 		if err != nil {
 			return false

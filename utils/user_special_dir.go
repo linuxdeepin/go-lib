@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2011 ~ 2013 Deepin, Inc.
- *               2011 ~ 2013 jouyouyun
+ * Copyright (c) 2011 ~ 2014 Deepin, Inc.
+ *               2013 ~ 2014 jouyouyun
  *
  * Author:      jouyouyun <jouyouwen717@gmail.com>
  * Maintainer:  jouyouyun <jouyouwen717@gmail.com>
@@ -22,20 +22,29 @@
 package utils
 
 import (
-        liblogger "dlib/logger"
+	"os/user"
+	"path"
 )
 
-type Manager struct{}
+func GetHomeDir() string {
+	info, err := user.Current()
+	if err != nil {
+		return ""
+	}
 
-var logger = liblogger.NewLogger("dlib/utils")
+	return info.HomeDir
+}
 
-func NewUtils() *Manager {
-        defer func() {
-                if err := recover(); err != nil {
-                        logger.Fatalf("Recover Error: %v", err)
-                }
-        }()
+func GetConfigDir() string {
+	if homeDir := GetHomeDir(); len(homeDir) > 0 {
+		return path.Join(homeDir, ".config")
+	}
+	return ""
+}
 
-        m := &Manager{}
-        return m
+func GetCacheDir() string {
+	if homeDir := GetHomeDir(); len(homeDir) > 0 {
+		return path.Join(homeDir, ".cache")
+	}
+	return ""
 }

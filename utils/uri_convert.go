@@ -21,90 +21,132 @@
 
 package utils
 
-const (
-        URI_STRING_FILE  = "file://"
-        URI_STRING_FTP   = "ftp://"
-        URI_STRING_HTTP  = "http://"
-        URI_STRING_HTTPS = "https://"
-        URI_STRING_SMB   = "smb://"
+import (
+	"regexp"
+	"strings"
 )
 
-func (op *Manager) URIToPath(uri string) (string, bool) {
-        tmp := deleteStartSpace(uri)
+const (
+	URI_SCHEME_FILE  = "file://"
+	URI_SCHEME_FTP   = "ftp://"
+	URI_SCHEME_HTTP  = "http://"
+	URI_SCHEME_HTTPS = "https://"
+	URI_SCHEME_SMB   = "smb://"
+)
 
-        if op.IsContainFromStart(tmp, URI_STRING_FILE) {
-                return tmp[7:], true
-        } else if op.IsContainFromStart(tmp, URI_STRING_FTP) {
-                return tmp[6:], true
-        } else if op.IsContainFromStart(tmp, URI_STRING_HTTP) {
-                return tmp[7:], true
-        } else if op.IsContainFromStart(tmp, URI_STRING_HTTPS) {
-                return tmp[8:], true
-        } else if op.IsContainFromStart(tmp, URI_STRING_SMB) {
-                return tmp[6:], true
-        } else if op.IsContainFromStart(tmp, "/") {
-                return tmp, true
-        }
+func URIToPath(uri string) string {
+	filepath := deleteStartSpace(uri)
 
-        return "", false
+	if isBeginWithStr(filepath, URI_SCHEME_FILE) {
+		return filepath[7:]
+	} else if isBeginWithStr(filepath, URI_SCHEME_FTP) {
+		return filepath[6:]
+	} else if isBeginWithStr(filepath, URI_SCHEME_HTTP) {
+		return filepath[7:]
+	} else if isBeginWithStr(filepath, URI_SCHEME_HTTPS) {
+		return filepath[8:]
+	} else if isBeginWithStr(filepath, URI_SCHEME_SMB) {
+		return filepath[6:]
+	} else if isBeginWithStr(filepath, "/") {
+		return filepath
+	}
+
+	return ""
 }
 
-func (op *Manager) PathToFileURI(path string) (string, bool) {
-        tmp := deleteStartSpace(path)
+func PathToURI(filepath, scheme string) string {
+	if len(filepath) < 1 || len(scheme) < 1 {
+		return ""
+	}
 
-        if op.IsContainFromStart(tmp, "/") {
-                return URI_STRING_FILE + path, true
-        } else if op.IsContainFromStart(tmp, URI_STRING_FILE) {
-                return tmp, true
-        }
+	switch scheme {
+	case URI_SCHEME_FILE:
+		return pathToFileURI(filepath)
+	case URI_SCHEME_FTP:
+		return pathToFtpURI(filepath)
+	case URI_SCHEME_HTTP:
+		return pathToHttpURI(filepath)
+	case URI_SCHEME_HTTPS:
+		return pathToHttpsURI(filepath)
+	case URI_SCHEME_SMB:
+		return pathToSmbURI(filepath)
+	}
 
-        return "", false
+	return ""
 }
 
-func (op *Manager) PathToFtpURI(path string) (string, bool) {
-        tmp := deleteStartSpace(path)
+func pathToFileURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-        if op.IsContainFromStart(tmp, "/") {
-                return URI_STRING_FTP + path, true
-        } else if op.IsContainFromStart(tmp, URI_STRING_FTP) {
-                return tmp, true
-        }
+	if isBeginWithStr(filepath, "/") {
+		return URI_SCHEME_FILE + filepath
+	} else if isBeginWithStr(filepath, URI_SCHEME_FILE) {
+		return filepath
+	}
 
-        return "", false
+	return ""
 }
 
-func (op *Manager) PathToHttpURI(path string) (string, bool) {
-        tmp := deleteStartSpace(path)
+func pathToFtpURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-        if op.IsContainFromStart(tmp, "/") {
-                return URI_STRING_HTTP + path, true
-        } else if op.IsContainFromStart(tmp, URI_STRING_HTTP) {
-                return tmp, true
-        }
+	if isBeginWithStr(filepath, "/") {
+		return URI_SCHEME_FTP + filepath
+	} else if isBeginWithStr(filepath, URI_SCHEME_FTP) {
+		return filepath
+	}
 
-        return "", false
+	return ""
 }
 
-func (op *Manager) PathToHttpsURI(path string) (string, bool) {
-        tmp := deleteStartSpace(path)
+func pathToHttpURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-        if op.IsContainFromStart(tmp, "/") {
-                return URI_STRING_HTTPS + path, true
-        } else if op.IsContainFromStart(tmp, URI_STRING_HTTPS) {
-                return tmp, true
-        }
+	if isBeginWithStr(filepath, "/") {
+		return URI_SCHEME_HTTP + filepath
+	} else if isBeginWithStr(filepath, URI_SCHEME_HTTP) {
+		return filepath
+	}
 
-        return "", false
+	return ""
 }
 
-func (op *Manager) PathToSmbURI(path string) (string, bool) {
-        tmp := deleteStartSpace(path)
+func pathToHttpsURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-        if op.IsContainFromStart(tmp, "/") {
-                return URI_STRING_SMB + path, true
-        } else if op.IsContainFromStart(tmp, URI_STRING_SMB) {
-                return tmp, true
-        }
+	if isBeginWithStr(filepath, "/") {
+		return URI_SCHEME_HTTPS + filepath
+	} else if isBeginWithStr(filepath, URI_SCHEME_HTTPS) {
+		return filepath
+	}
 
-        return "", false
+	return ""
+}
+
+func pathToSmbURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
+
+	if isBeginWithStr(filepath, "/") {
+		return URI_SCHEME_SMB + filepath
+	} else if isBeginWithStr(filepath, URI_SCHEME_SMB) {
+		return filepath
+	}
+
+	return ""
+}
+
+func deleteStartSpace(str string) string {
+	if len(str) <= 0 {
+		return ""
+	}
+
+	tmp := strings.TrimLeft(str, " ")
+
+	return tmp
+}
+
+func isBeginWithStr(str, substr string) bool {
+	ok, _ := regexp.MatchString("^"+substr, str)
+
+	return ok
 }
