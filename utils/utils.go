@@ -373,6 +373,10 @@ func UnsetEnv(envName string) {
 	}
 }
 
+func ClearEnvC() {
+	C.clearenv()
+}
+
 func UnsetEnvC(envName string) {
 	cenvName := C.CString(envName)
 	defer C.free(unsafe.Pointer(cenvName))

@@ -46,3 +46,8 @@ func (*UtilsTest) TestUnsetEnvC(c *C) {
 	c.Check(false, Equals, IsEnvExists(testEnvName))
 	c.Check(len(os.Environ()), Equals, envCount-1)
 }
+
+func (*UtilsTest) TestClearEnvC(c *C) {
+	ClearEnvC()
+	c.Check(len(os.Environ()), Equals, 0)
+}
