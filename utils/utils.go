@@ -21,6 +21,12 @@
 
 package utils
 
+// #cgo pkg-config: glib-2.0
+// #cgo LDFLAGS: -lm
+// #include <stdlib.h>
+import "C"
+import "unsafe"
+
 import (
 	"io/ioutil"
 	"os"
@@ -365,4 +371,10 @@ func UnsetEnv(envName string) {
 			logger.Info(e, v, err)
 		}
 	}
+}
+
+func UnsetEnvC(envName string) {
+	cenvName := C.CString(envName)
+	defer C.free(unsafe.Pointer(cenvName))
+	C.unsetenv(cenvName)
 }
