@@ -331,7 +331,17 @@ func (op *Manager) GetCacheDir() (string, bool) {
 	return "", false
 }
 
-func (op *Manager) UnsetEnv(envName string) {
+func IsEnvExists(envName string) (ok bool) {
+	for _, e := range os.Environ() {
+		if strings.HasPrefix(e, envName+"=") {
+			ok = true
+			break
+		}
+	}
+	return
+}
+
+func UnsetEnv(envName string) {
 	envs := os.Environ()
 	newEnvsData := make(map[string]string)
 	for _, e := range envs {

@@ -6,15 +6,25 @@ import (
 	"testing"
 )
 
+type UtilsTest struct{}
+
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
 
 func init() {
-	Suite(&Manager{})
+	Suite(&UtilsTest{})
 }
 
-func (u *Manager) TestUnsetEnv(c *C) {
-	testEnvName := "test_env"
+func (*UtilsTest) TestIsEnvExists(c *C) {
+	testEnvName := "test_is_env_exists"
+	testEnvValue := "test_env_value"
+	c.Check(false, Equals, IsEnvExists(testEnvName))
+	os.Setenv(testEnvName, testEnvValue)
+	c.Check(true, Equals, IsEnvExists(testEnvName))
+}
+
+func (*UtilsTest) TestUnsetEnv(c *C) {
+	testEnvName := "test_unset_env"
 	testEnvValue := "test_env_value"
 
 	c.Check("", Equals, os.Getenv(testEnvName))
@@ -22,15 +32,8 @@ func (u *Manager) TestUnsetEnv(c *C) {
 	c.Check(os.Getenv(testEnvName), Equals, testEnvValue)
 
 	envCount := len(os.Environ())
-	u.UnsetEnv(testEnvName)
+	UnsetEnv(testEnvName)
 	c.Check(os.Getenv(testEnvName), Equals, "")
 	c.Check(len(os.Environ()), Equals, envCount-1)
-	foundEnv := false
-	for _, e := range os.Environ() {
-		if e == testEnvName {
-			foundEnv = true
-			break
-		}
-	}
-	c.Check(false, Equals, foundEnv)
+	c.Check(false, Equals, IsEnvExists(testEnvName))
 }
