@@ -66,7 +66,6 @@ func listenProxyGsettings() {
 	proxySettings.Connect("changed", func(s *gio.Settings, key string) {
 		logger.Debug("proxy keys in gsettings changed", key, proxySettings.GetString(key))
 		updateProxyEnvs()
-		showEnvs()
 	})
 }
 
@@ -124,4 +123,5 @@ func updateProxyEnvs() {
 			os.Setenv(envSocksVersion, "5")
 		}
 	}
+	showEnvs()
 }
