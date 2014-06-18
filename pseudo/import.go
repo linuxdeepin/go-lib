@@ -9,6 +9,7 @@ import "dlib/glib-2.0"
 import "dlib/logger"
 import "dlib/graphic"
 import "dlib/pulse"
+import "dlib/proxy"
 import "dlib/utils"
 
 func nothing() {
@@ -21,5 +22,6 @@ func nothing() {
 	_ = dlib.SessionBus
 	_ = dbus.NewConn
 	_ = utils.NewUtils
+	_ = proxy.SetupProxy
 	_ = pulse.GetContext
 }
