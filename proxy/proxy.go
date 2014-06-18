@@ -54,7 +54,7 @@ var (
 	proxySettings = gio.NewSettings(gsettingsIdProxy)
 )
 
-// SetupProxy setup system proxy.
+// SetupProxy setup system proxy, need followed with glib.StartLoop().
 func SetupProxy() {
 	updateProxyEnvs()
 	listenProxyGsettings()
