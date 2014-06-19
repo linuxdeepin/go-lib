@@ -11,6 +11,7 @@ import "dlib/graphic"
 import "dlib/pulse"
 import "dlib/proxy"
 import "dlib/utils"
+import "dlib/pinyin"
 
 func nothing() {
 	_ = graphic.GetDominantColorOfImage
@@ -22,6 +23,7 @@ func nothing() {
 	_ = dlib.SessionBus
 	_ = dbus.NewConn
 	_ = utils.UnsetEnv
+	_ = pinyin.HansToPinyin
 	_ = proxy.SetupProxy
 	_ = pulse.GetContext
 }
