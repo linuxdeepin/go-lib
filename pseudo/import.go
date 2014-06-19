@@ -21,7 +21,7 @@ func nothing() {
 	_ = gobject.NilString
 	_ = dlib.SessionBus
 	_ = dbus.NewConn
-	_ = utils.NewUtils
+	_ = utils.UnsetEnv
 	_ = proxy.SetupProxy
 	_ = pulse.GetContext
 }
