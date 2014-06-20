@@ -21,11 +21,15 @@
 
 package utils
 
+// #include <stdlib.h>
+import "C"
+
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	"unsafe"
 )
 
 func CopyFile(src, dest string) bool {
@@ -80,28 +84,9 @@ func IsEnvExists(envName string) (ok bool) {
 	return
 }
 
-func UnsetEnv(envName string) {
-	envs := os.Environ()
-	newEnvsData := make(map[string]string)
-	for _, e := range envs {
-		a := strings.SplitN(e, "=", 2)
-		var name, value string
-		if len(a) == 2 {
-			name = a[0]
-			value = a[1]
-		} else {
-			name = a[0]
-			value = ""
-		}
-		if name != envName {
-			newEnvsData[name] = value
-		}
-	}
-	os.Clearenv()
-	for e, v := range newEnvsData {
-		err := os.Setenv(e, v)
-		if err != nil {
-			fmt.Println(e, v, err)
-		}
-	}
+func UnsetEnv(_name string) {
+	name := C.CString(_name)
+	defer C.free(unsafe.Pointer(name))
+	C.unsetenv(name)
+	fmt.Println("unset env", name)
 }
