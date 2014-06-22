@@ -28,8 +28,40 @@ import "unsafe"
 import (
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 )
+
+func IsElementEqual(e1, e2 interface{}) bool {
+	if e1 == nil && e2 == nil {
+		return true
+	}
+
+	return reflect.DeepEqual(e1, e2)
+}
+
+func IsElementInList(e interface{}, list interface{}) bool {
+	if list == nil {
+		return false
+	}
+
+	v := reflect.ValueOf(list)
+	if !v.IsValid() {
+		return false
+	}
+
+	if v.Type().Kind() == reflect.Slice ||
+		v.Type().Kind() == reflect.Array {
+		l := v.Len()
+		for i := 0; i < l; i++ {
+			if IsElementEqual(e, v.Index(i).Interface()) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
 
 func CopyFile(src, dest string) bool {
 	if ok := IsFileExist(src); !ok && len(dest) < 1 {
