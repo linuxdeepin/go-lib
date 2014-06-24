@@ -14,8 +14,8 @@ import "unsafe"
 import "errors"
 
 import (
-	"dlib/gobject-2.0"
-	"dlib/glib-2.0"
+	"pkg.linuxdeepin.com/lib/gobject-2.0"
+	"pkg.linuxdeepin.com/lib/glib-2.0"
 )
 
 [<.go_utils>]

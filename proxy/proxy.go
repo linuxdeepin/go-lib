@@ -22,10 +22,10 @@
 package proxy
 
 import (
-	"dlib/gio-2.0"
-	liblogger "dlib/logger"
-	"dlib/utils"
 	"os"
+	"pkg.linuxdeepin.com/lib/gio-2.0"
+	liblogger "pkg.linuxdeepin.com/lib/logger"
+	"pkg.linuxdeepin.com/lib/utils"
 )
 
 const (

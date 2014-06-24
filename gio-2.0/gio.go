@@ -18,8 +18,8 @@ import "unsafe"
 import "errors"
 
 import (
-	"dlib/glib-2.0"
-	"dlib/gobject-2.0"
+	"pkg.linuxdeepin.com/lib/glib-2.0"
+	"pkg.linuxdeepin.com/lib/gobject-2.0"
 )
 
 const alot = 999999

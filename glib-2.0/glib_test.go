@@ -1,4 +1,4 @@
-package dlib
+package glib
 
 import "fmt"
 import "testing"

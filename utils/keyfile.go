@@ -22,8 +22,8 @@
 package utils
 
 import (
-	"dlib/glib-2.0"
 	"os"
+	"pkg.linuxdeepin.com/lib/glib-2.0"
 	"sync"
 )
 

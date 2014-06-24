@@ -1,10 +1,10 @@
-package dlib
+package gio
 
 import "fmt"
 import "testing"
 
-import "dlib/glib-2.0"
-import "dlib/gio-2.0"
+import "pkg.linuxdeepin.com/lib/glib-2.0"
+import "pkg.linuxdeepin.com/lib/gio-2.0"
 
 func TestAppInfo(t *testing.T) {
 	apps := gio.AppInfoGetAll()

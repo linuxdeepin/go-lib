@@ -21,13 +21,13 @@
 package logger
 
 import (
-	"dlib/utils"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"pkg.linuxdeepin.com/lib/utils"
 	"runtime"
 	"strings"
 )

@@ -1,8 +1,8 @@
-/*This file is auto generate by dlib/dbus/proxyer. Don't edit it*/
+/*This file is auto generate by pkg.linuxdeepin.com/dbus-generator. Don't edit it*/
 package logger
 
-import "dlib/dbus"
-import "dlib/dbus/property"
+import "pkg.linuxdeepin.com/lib/dbus"
+import "pkg.linuxdeepin.com/lib/dbus/property"
 import "reflect"
 import "sync"
 import "runtime"

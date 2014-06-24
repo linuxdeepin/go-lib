@@ -1,7 +1,7 @@
 package property
 
 import "reflect"
-import "dlib/dbus"
+import "pkg.linuxdeepin.com/lib/dbus"
 import "log"
 
 type NormalProperty struct {

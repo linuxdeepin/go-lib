@@ -1,8 +1,8 @@
 package property
 
-import "dlib/gio-2.0"
+import "pkg.linuxdeepin.com/lib/gio-2.0"
+import "pkg.linuxdeepin.com/lib/dbus"
 import "reflect"
-import "dlib/dbus"
 import "fmt"
 import "unicode"
 

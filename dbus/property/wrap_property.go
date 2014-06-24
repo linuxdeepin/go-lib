@@ -1,7 +1,7 @@
 package property
 
 import "reflect"
-import "dlib/dbus"
+import "pkg.linuxdeepin.com/lib/dbus"
 
 type BaseObserver struct {
 	cbs []func()

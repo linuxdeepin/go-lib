@@ -1,6 +1,6 @@
-package dlib
+package lib
 
-import "dlib/dbus"
+import "pkg.linuxdeepin.com/lib/dbus"
 
 const (
 	SystemBus  = 1
