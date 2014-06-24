@@ -244,7 +244,7 @@ func (g *Graphic) TestGetDominantColor(c *C) {
 
 // Test that a subset of RGB space can be converted to HSV and back to within
 // 1/256 tolerance.
-func (g *Graphic) TestHSV(c *C) {
+func (g *Graphic) TestHsv(c *C) {
 	for r := 0; r < 255; r += 7 {
 		for g := 0; g < 255; g += 5 {
 			for b := 0; b < 255; b += 3 {
@@ -274,6 +274,12 @@ func (g *Graphic) TestGetImageFormat(c *C) {
 		c.Error(err)
 	}
 	c.Check(format, DeepEquals, JPEG)
+}
+
+func (g *Graphic) TestIsSupportedImage(c *C) {
+	c.Check(IsSupportedImage(originTestImage), Equals, true)
+	c.Check(IsSupportedImage("<file not exists>"), Equals, false)
+	c.Check(IsSupportedImage("/usr/bin/vim"), Equals, false)
 }
 
 func (g *Graphic) TestResizeImage(c *C) {

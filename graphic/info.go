@@ -54,3 +54,17 @@ func GetImageFormat(imgfile string) (format Format, err error) {
 	format = Format(name)
 	return
 }
+
+// IsSupportedImage check a image file if is supported.
+func IsSupportedImage(imgfile string) bool {
+	f, err := os.Open(imgfile)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	_, _, err = image.DecodeConfig(f)
+	if err != nil {
+		return false
+	}
+	return true
+}
