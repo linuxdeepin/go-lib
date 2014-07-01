@@ -216,7 +216,7 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 		return false
 	}
 
-	ok := writeStringToKeyFile(filename, string(contents))
+	ok := WriteStringToKeyFile(filename, string(contents))
 	if !ok {
 		return false
 	}
@@ -224,7 +224,7 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	return true
 }
 
-func writeStringToKeyFile(filename, contents string) bool {
+func WriteStringToKeyFile(filename, contents string) bool {
 	if len(filename) <= 0 {
 		return false
 	}

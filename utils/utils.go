@@ -28,6 +28,7 @@ import "unsafe"
 import (
 	"io/ioutil"
 	"os"
+	"os/user"
 	"reflect"
 	"strings"
 )
@@ -147,4 +148,13 @@ func doUnsetEnvC(envName string) {
 	cname := C.CString(envName)
 	defer C.free(unsafe.Pointer(cname))
 	C.unsetenv(cname)
+}
+
+func GetUserName() string {
+	info, err := user.Current()
+	if err != nil {
+		return ""
+	}
+
+	return info.Username
 }
