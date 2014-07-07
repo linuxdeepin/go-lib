@@ -42,14 +42,11 @@ func getPinyinFromKey(key string) []string {
 			}
 			rets = rangeArray(rets, array)
 		} else {
-			if (c >= 'a' && c <= 'z') ||
-				(c >= 'A' && c <= 'Z') {
-				array := []string{string(c)}
-				if len(rets) == 0 {
-					rets = array
-				} else {
-					rets = rangeArray(rets, array)
-				}
+			array := []string{string(c)}
+			if len(rets) == 0 {
+				rets = array
+			} else {
+				rets = rangeArray(rets, array)
 			}
 		}
 	}
