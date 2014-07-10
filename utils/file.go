@@ -22,36 +22,58 @@
 package utils
 
 import (
-	"reflect"
+	"io/ioutil"
+	"os"
 )
 
-func IsElementEqual(e1, e2 interface{}) bool {
-	if e1 == nil && e2 == nil {
-		return true
+func CopyFile(src, dest string) bool {
+	if ok := IsFileExist(src); !ok && len(dest) < 1 {
+		return false
 	}
 
-	return reflect.DeepEqual(e1, e2)
+	contents, err := ioutil.ReadFile(src)
+	if err != nil {
+		return false
+	}
+
+	f, err1 := os.Create(dest + "~")
+	if err1 != nil {
+		return false
+	}
+	defer f.Close()
+
+	if _, err := f.Write(contents); err != nil {
+		return false
+	}
+	f.Sync()
+
+	if err := os.Rename(dest+"~", dest); err != nil {
+		return false
+	}
+
+	return true
 }
 
-func IsElementInList(e interface{}, list interface{}) bool {
-	if list == nil {
+func IsFileExist(filename string) bool {
+	if len(filename) < 1 {
 		return false
 	}
 
-	v := reflect.ValueOf(list)
-	if !v.IsValid() {
+	path := URIToPath(filename)
+	if len(path) < 1 {
 		return false
 	}
+	_, err := os.Stat(path)
 
-	if v.Type().Kind() == reflect.Slice ||
-		v.Type().Kind() == reflect.Array {
-		l := v.Len()
-		for i := 0; i < l; i++ {
-			if IsElementEqual(e, v.Index(i).Interface()) {
-				return true
-			}
-		}
+	return err == nil || os.IsExist(err)
+}
+
+func EnsureDirExists(dir string, perm ...os.FileMode) error {
+	var p os.FileMode
+	if len(perm) > 0 {
+		p = perm[0]
+	} else {
+		p = 0755
 	}
-
-	return false
+	return os.MkdirAll(dir, p)
 }
