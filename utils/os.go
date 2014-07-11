@@ -26,9 +26,13 @@ import "C"
 import "unsafe"
 
 import (
+	"bytes"
+	"fmt"
 	"os"
+	"os/exec"
 	"os/user"
 	"strings"
+	"time"
 )
 
 func IsEnvExists(envName string) (ok bool) {
@@ -82,4 +86,37 @@ func GetUserName() string {
 	}
 
 	return info.Username
+}
+
+func ExecAndWait(timeout int, name string, arg ...string) (stdout, stderr string, err error) {
+	cmd := exec.Command(name, arg...)
+	var bufStdout, bufStderr bytes.Buffer
+	cmd.Stdout = &bufStdout
+	cmd.Stderr = &bufStderr
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+
+	// wait for process finished
+	done := make(chan error)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	select {
+	case <-time.After(time.Duration(timeout) * time.Second):
+		if err = cmd.Process.Kill(); err != nil {
+			return
+		}
+		<-done
+		err = fmt.Errorf("time out and process was killed")
+	case err = <-done:
+		stdout = bufStdout.String()
+		stderr = bufStderr.String()
+		if err != nil {
+			return
+		}
+	}
+	return
 }
