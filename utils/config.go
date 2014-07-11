@@ -29,6 +29,12 @@ import (
 	"sync"
 )
 
+var (
+	DefaultHomeConfigPrefix   = os.Getenv("HOME") + "/.config/deepin/"
+	DefaultSystemConfigPrefix = "/var/cache/deepin/"
+	DefaultConfigExt          = ".json"
+)
+
 type Config struct {
 	configFile string
 	saveLock   sync.Mutex
@@ -43,11 +49,15 @@ func (c *Config) GetConfigFile() string {
 }
 
 func (c *Config) SetConfigName(name string) {
-	c.SetConfigFile(os.Getenv("HOME") + "/.config/deepin/" + name + ".json")
+	c.SetConfigFile(DefaultHomeConfigPrefix + name + DefaultConfigExt)
 }
 
 func (c *Config) SetSystemConfigName(name string) {
-	c.SetConfigFile("/var/cache/deepin/" + name + ".json")
+	c.SetConfigFile(DefaultSystemConfigPrefix + name + DefaultConfigExt)
+}
+
+func (c *Config) IsConfigFileExists() bool {
+	return IsFileExist(c.configFile)
 }
 
 func (c *Config) RemoveConfigFile() error {
@@ -73,10 +83,15 @@ func (c *Config) Save(v interface{}) (err error) {
 	defer c.saveLock.Unlock()
 	EnsureDirExists(path.Dir(c.configFile))
 	var fileContent []byte
-	fileContent, err = json.Marshal(v)
+	fileContent, err = c.GetFileContentToSave(v)
 	if err != nil {
 		return
 	}
 	err = ioutil.WriteFile(c.configFile, fileContent, 0644)
+	return
+}
+
+func (c *Config) GetFileContentToSave(v interface{}) (fileContent []byte, err error) {
+	fileContent, err = json.Marshal(v)
 	return
 }
