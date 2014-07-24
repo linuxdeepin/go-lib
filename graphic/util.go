@@ -56,9 +56,9 @@ func SaveImage(dstfile string, m image.Image, f Format) (err error) {
 
 func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 	switch f {
-	case PNG:
+	case FormatPng:
 		err = png.Encode(w, m)
-	case JPEG:
+	case FormatJpeg:
 		err = jpeg.Encode(w, m, nil)
 	default:
 		err = png.Encode(w, m)

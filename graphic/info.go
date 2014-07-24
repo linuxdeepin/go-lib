@@ -26,7 +26,7 @@ import (
 	"os"
 )
 
-// GetImageSize return a image's width and height.
+// GetImageSize return image's width and height.
 func GetImageSize(imgfile string) (w, h int, err error) {
 	f, err := os.Open(imgfile)
 	if err != nil {
@@ -55,7 +55,7 @@ func GetImageFormat(imgfile string) (format Format, err error) {
 	return
 }
 
-// IsSupportedImage check a image file if is supported.
+// IsSupportedImage check if image file is supported.
 func IsSupportedImage(imgfile string) bool {
 	f, err := os.Open(imgfile)
 	if err != nil {

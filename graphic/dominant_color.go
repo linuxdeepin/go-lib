@@ -26,7 +26,7 @@ import (
 	"image"
 )
 
-// GetDominantColorOfImage return the dominant hsv color of a image.
+// GetDominantColorOfImage return the dominant hsv color of an image.
 func GetDominantColorOfImage(imgfile string) (h, s, v float64, err error) {
 	img, err := LoadImage(imgfile)
 	if err != nil {

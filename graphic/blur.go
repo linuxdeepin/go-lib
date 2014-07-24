@@ -30,7 +30,7 @@ import "unsafe"
 import "fmt"
 
 // BlurImage generate blur effect to an image.
-// TODO Format always is PNG
+// TODO Format always is FormatPng
 func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err error) {
 	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
 	if !ok {

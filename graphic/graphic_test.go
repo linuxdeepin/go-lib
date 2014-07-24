@@ -45,14 +45,14 @@ func (g *Graphic) TestLoadImage(c *C) {
 
 func (g *Graphic) TestBlurImage(c *C) {
 	resultFile := "testdata/test_blurimage.png"
-	err := BlurImage(originTestImage, resultFile, 50, 1, PNG)
+	err := BlurImage(originTestImage, resultFile, 50, 1, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 }
 
 func (g *Graphic) TestBlurImageCache(c *C) {
-	resultFile, useCache, err := BlurImageCache(originTestImage, 50, 1, PNG)
+	resultFile, useCache, err := BlurImageCache(originTestImage, 50, 1, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -61,11 +61,11 @@ func (g *Graphic) TestBlurImageCache(c *C) {
 
 func (g *Graphic) TestCompositeImage(c *C) {
 	resultFile := "testdata/test_compositeimage.png"
-	err := CompositeImage(originTestImageSmall, originTestImageIcon1, resultFile, 0, 0, PNG)
+	err := CompositeImage(originTestImageSmall, originTestImageIcon1, resultFile, 0, 0, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	err = CompositeImage(resultFile, originTestImageIcon2, resultFile, 24, 24, PNG)
+	err = CompositeImage(resultFile, originTestImageIcon2, resultFile, 24, 24, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -77,7 +77,7 @@ func (g *Graphic) TestCompositeImageSet(c *C) {
 		{originTestImageIcon1, 0, 0, 10},
 		{originTestImageIcon2, 24, 24, 0},
 	}
-	err := CompositeImageSet(originTestImageSmall, compInfos, resultFile, PNG)
+	err := CompositeImageSet(originTestImageSmall, compInfos, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -88,9 +88,9 @@ func (g *Graphic) TestCompositeImageUri(c *C) {
 	srcImageUri, _ := ConvertImageToDataUri(originTestImageSmall)
 	compImageUri1, _ := ConvertImageToDataUri(originTestImageIcon1)
 	compImageUri2, _ := ConvertImageToDataUri(originTestImageIcon2)
-	resultDataUri, _ := CompositeImageUri(srcImageUri, compImageUri1, 0, 0, PNG)
-	resultDataUri, _ = CompositeImageUri(resultDataUri, compImageUri2, 24, 24, PNG)
-	err := ConvertDataUriToImage(resultDataUri, resultFile, PNG)
+	resultDataUri, _ := CompositeImageUri(srcImageUri, compImageUri1, 0, 0, FormatPng)
+	resultDataUri, _ = CompositeImageUri(resultDataUri, compImageUri2, 24, 24, FormatPng)
+	err := ConvertDataUriToImage(resultDataUri, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -98,7 +98,7 @@ func (g *Graphic) TestCompositeImageUri(c *C) {
 
 func (g *Graphic) TestClipImage(c *C) {
 	resultFile := "testdata/test_clipimage_100x200.png"
-	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, PNG)
+	err := ClipImage(originTestImage, resultFile, 0, 0, 100, 200, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -110,7 +110,7 @@ func (g *Graphic) TestClipImage(c *C) {
 	c.Check(int(h), Equals, 200)
 
 	resultFile = "testdata/test_clipimage_160x160.png"
-	err = ClipImage(originTestImage, resultFile, 40, 40, 200, 200, PNG)
+	err = ClipImage(originTestImage, resultFile, 40, 40, 200, 200, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -124,7 +124,7 @@ func (g *Graphic) TestClipImage(c *C) {
 
 func (g *Graphic) TestConvertImage(c *C) {
 	resultFile := "testdata/test_convertimage.png"
-	err := ConvertImage(originTestImage, resultFile, PNG)
+	err := ConvertImage(originTestImage, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -140,7 +140,7 @@ func (g *Graphic) TestConvertImageToDataUri(c *C) {
 
 func (g *Graphic) TestConvertDataUriToImage(c *C) {
 	resultFile := "testdata/test_convertdatauri.png"
-	err := ConvertDataUriToImage(testDataUri, resultFile, PNG)
+	err := ConvertDataUriToImage(testDataUri, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -158,7 +158,7 @@ func (g *Graphic) TestLoadImageFromDataUri(c *C) {
 
 func (g *Graphic) TestFlipImageHorizontal(c *C) {
 	resultFile := "testdata/test_flipimagehorizontal.png"
-	err := FlipImageHorizontal(originTestImage, resultFile, PNG)
+	err := FlipImageHorizontal(originTestImage, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -166,56 +166,56 @@ func (g *Graphic) TestFlipImageHorizontal(c *C) {
 
 func (g *Graphic) TestFillImage(c *C) {
 	resultFile := "testdata/test_flllimage_tile_200x200.png"
-	err := FillImage(originTestImage, resultFile, 200, 200, FillTile, PNG)
+	err := FillImage(originTestImage, resultFile, 200, 200, FillTile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_tile_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillTile, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillTile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_center_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillCenter, PNG)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillCenter, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_center_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillCenter, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillCenter, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_stretch_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillScale, PNG)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_stretch_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillScale, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillProportionCenterScale, PNG)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillProportionCenterScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillProportionCenterScale, PNG)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillProportionCenterScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 }
 
 func (g *Graphic) TestFillImageCache(c *C) {
-	resultFile, useCache, err := FillImageCache(originTestImage, 1024, 768, FillTile, PNG)
+	resultFile, useCache, err := FillImageCache(originTestImage, 1024, 768, FillTile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -224,7 +224,7 @@ func (g *Graphic) TestFillImageCache(c *C) {
 
 func (g *Graphic) TestFlipImageVertical(c *C) {
 	resultFile := "testdata/test_flipimagevertical.png"
-	err := FlipImageVertical(originTestImage, resultFile, PNG)
+	err := FlipImageVertical(originTestImage, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -273,7 +273,7 @@ func (g *Graphic) TestGetImageFormat(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(format, DeepEquals, JPEG)
+	c.Check(format, DeepEquals, FormatJpeg)
 }
 
 func (g *Graphic) TestIsSupportedImage(c *C) {
@@ -284,7 +284,7 @@ func (g *Graphic) TestIsSupportedImage(c *C) {
 
 func (g *Graphic) TestResizeImage(c *C) {
 	resultFile := "testdata/test_resizeimage_500x600.png"
-	err := ResizeImage(originTestImage, resultFile, 500, 600, PNG)
+	err := ResizeImage(originTestImage, resultFile, 500, 600, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -297,7 +297,7 @@ func (g *Graphic) TestResizeImage(c *C) {
 }
 
 func (g *Graphic) TestResizeImageCache(c *C) {
-	resultFile, useCache, err := ResizeImageCache(originTestImage, 200, 200, PNG)
+	resultFile, useCache, err := ResizeImageCache(originTestImage, 200, 200, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -307,7 +307,7 @@ func (g *Graphic) TestResizeImageCache(c *C) {
 func (g *Graphic) TestThumbnailImage(c *C) {
 	resultFile := "testdata/test_thumbnail.png"
 	maxWidth, maxHeight := 200, 200
-	err := ThumbnailImage(originTestImage, resultFile, maxWidth, maxHeight, PNG)
+	err := ThumbnailImage(originTestImage, resultFile, maxWidth, maxHeight, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -317,7 +317,7 @@ func (g *Graphic) TestThumbnailImage(c *C) {
 }
 
 func (g *Graphic) TestThumbnailImageCache(c *C) {
-	resultFile, useCache, err := ThumbnailImageCache(originTestImage, 200, 200, PNG)
+	resultFile, useCache, err := ThumbnailImageCache(originTestImage, 200, 200, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -326,7 +326,7 @@ func (g *Graphic) TestThumbnailImageCache(c *C) {
 
 func (g *Graphic) TestRotateImageLeft(c *C) {
 	resultFile := "testdata/test_rotateimageleft.png"
-	err := RotateImageLeft(originTestImage, resultFile, PNG)
+	err := RotateImageLeft(originTestImage, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -334,7 +334,7 @@ func (g *Graphic) TestRotateImageLeft(c *C) {
 
 func (g *Graphic) TestRotateImageRight(c *C) {
 	resultFile := "testdata/test_rotateimageright.png"
-	err := RotateImageRight(originTestImage, resultFile, PNG)
+	err := RotateImageRight(originTestImage, resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
