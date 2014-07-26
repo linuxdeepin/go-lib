@@ -98,7 +98,7 @@ func (g *Graphic) TestClipImage(c *C) {
 	c.Check(int(h), Equals, 200)
 
 	resultFile = "testdata/test_clipimage_160x160.png"
-	err = ClipImage(originImg, resultFile, 40, 40, 200, 200, FormatPng)
+	err = ClipImage(originImg, resultFile, 40, 40, 160, 160, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}

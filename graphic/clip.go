@@ -28,12 +28,12 @@ import (
 )
 
 // ClipImage clip image file that format is recognized and save it with target format.
-func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int, f Format) (err error) {
+func ClipImage(srcfile, dstfile string, x, y, w, h int, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg := Clip(srcimg, x0, y0, x1-x0, y1-y0)
+	dstimg := Clip(srcimg, x, y, w, h)
 	err = SaveImage(dstfile, dstimg, f)
 	dstimg.Pix = nil
 	return
@@ -41,13 +41,13 @@ func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int, f Format) (err error
 
 // ClipImageCache clip any recognized format image and save to cache
 // directory, if already exists, just return it.
-func ClipImageCache(srcfile string, x0, y0, x1, y1 int, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = generateCacheFilePath(fmt.Sprintf("ClipImageCache%s%d%d%d%d%s", srcfile, x0, y0, x1, y1, f))
+func ClipImageCache(srcfile string, x, y, w, h int, f Format) (dstfile string, useCache bool, err error) {
+	dstfile = generateCacheFilePath(fmt.Sprintf("ClipImageCache%s%d%d%d%d%s", srcfile, x, y, w, h, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
 	}
-	err = ClipImage(srcfile, dstfile, x0, y0, x1, y1, f)
+	err = ClipImage(srcfile, dstfile, x, y, w, h, f)
 	return
 }
 
