@@ -171,8 +171,7 @@ func deleteStartSpace(str string) string {
 }
 
 func isBeginWithStr(str, substr string) bool {
-	// TODO could use strings.HasPrefix(), :-)
+	// TODO refactor code, could use strings.HasPrefix()
 	ok, _ := regexp.MatchString("^"+substr, str)
-
 	return ok
 }

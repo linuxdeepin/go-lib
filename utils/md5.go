@@ -23,9 +23,18 @@ package utils
 
 import (
 	"crypto/md5"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"strconv"
 )
+
+// TODO refactor code, use doSumStrMd5 instead of SumStrMd5
+func doSumStrMd5(s string) string {
+	h := md5.New()
+	io.WriteString(h, s)
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
 
 func md5ByteToStr(bytes [16]byte) string {
 	str := ""
