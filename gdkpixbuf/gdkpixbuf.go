@@ -199,6 +199,17 @@ func ConvertImage(srcFile, destFile string, f Format) (err error) {
 	return
 }
 
+// ConvertImageToXpixmap convert image file to x pixmap.
+func ConvertImageToXpixmap(srcFile, destFile string, f Format) (xpixmap xproto.Pixmap, err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	xpixmap, err = ConvertPixbufToXpixmap(srcPixbuf)
+	return
+}
+
 func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err error) {
 	defaultError := fmt.Errorf("convert pixbuf to xpixmap failed, %v", pixbuf)
 	xpixmap = xproto.Pixmap(C.convert_pixbuf_to_xpixmap(pixbuf))
@@ -214,22 +225,6 @@ func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C
 	pixbuf = C.convert_xpixmap_to_pixbuf(C.Pixmap(xpixmap), C.int(width), C.int(heigth))
 	if pixbuf == nil {
 		err = defaultError
-		return
-	}
-	return
-}
-
-// ConvertImageToXpixmap convert image file to x pixmap.
-func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
-	// new gdk pixbuf from file
-	pixbuf, err := NewPixbufFromFile(imgFile)
-	defer FreePixbuf(pixbuf)
-	if err != nil {
-		return
-	}
-	// convert pixbuf to xpixmap
-	xpixmap, err = ConvertPixbufToXpixmap(pixbuf)
-	if err != nil {
 		return
 	}
 	return
