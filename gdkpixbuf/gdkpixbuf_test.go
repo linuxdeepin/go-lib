@@ -244,6 +244,44 @@ func (*gdkpixbufTester) TestThumbnailImage(c *C) {
 	c.Check(int(h) <= maxHeight, Equals, true)
 }
 
+func (*gdkpixbufTester) TestScaleImageCache(c *C) {
+	resultFile, useCache, err := ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	resultFile, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(useCache, Equals, true)
+	os.Remove(resultFile)
+	resultFile, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(useCache, Equals, false)
+	fmt.Println("TestScaleImageCache:", useCache, resultFile)
+}
+
+func (*gdkpixbufTester) TestScaleImagePreferCache(c *C) {
+	resultFile, useCache, err := ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	resultFile, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(useCache, Equals, true)
+	os.Remove(resultFile)
+	resultFile, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(useCache, Equals, false)
+	fmt.Println("TestScaleImagePreferCache:", useCache, resultFile)
+}
+
 func (*gdkpixbufTester) TestRotateImageLeft(c *C) {
 	resultFile := "testdata/test_rotateimageleft.png"
 	err := RotateImageLeft(originImg, resultFile, FormatPng)

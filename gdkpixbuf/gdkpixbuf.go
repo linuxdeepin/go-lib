@@ -31,6 +31,7 @@ import "unsafe"
 import (
 	"fmt"
 	"github.com/BurntSushi/xgb/xproto"
+	"pkg.linuxdeepin.com/lib/utils"
 )
 
 // Format defines the type of image format.
@@ -322,6 +323,28 @@ func ThumbnailImage(srcFile, destFile string, maxWidth, maxHeight int, interpTyp
 		return
 	}
 	err = Save(destPixbuf, destFile, f)
+	return
+}
+
+func ScaleImageCache(srcFile string, newWidth, newHeght int, interpType GdkInterpType, f Format) (destFile string, useCache bool, err error) {
+	destFile = generateCacheFilePath(fmt.Sprintf("ScaleImageCache%s%d%d%d%s", srcFile, newWidth, newHeght, interpType, f))
+	if utils.IsFileExist(destFile) {
+		// return cache file
+		useCache = true
+		return
+	}
+	err = ScaleImage(srcFile, destFile, newWidth, newHeght, interpType, f)
+	return
+}
+
+func ScaleImagePreferCache(srcFile string, newWidth, newHeght int, interpType GdkInterpType, f Format) (destFile string, useCache bool, err error) {
+	destFile = generateCacheFilePath(fmt.Sprintf("ScaleImageCache%s%d%d%d%s", srcFile, newWidth, newHeght, interpType, f))
+	if utils.IsFileExist(destFile) {
+		// return cache file
+		useCache = true
+		return
+	}
+	err = ScaleImagePrefer(srcFile, destFile, newWidth, newHeght, interpType, f)
 	return
 }
 
