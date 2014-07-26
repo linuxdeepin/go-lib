@@ -93,7 +93,7 @@ func NewPixbufFromFile(imgFile string) (pixbuf *C.GdkPixbuf, err error) {
 
 // Info
 
-// GetImageSize return image's width and height.
+// GetImageSize return image file's width and height.
 func GetImageSize(imgFile string) (w, h int, err error) {
 	defaultError := fmt.Errorf("get image size failed, %s", imgFile)
 	cImgFile := C.CString(imgFile)
@@ -109,8 +109,8 @@ func GetImageSize(imgFile string) (w, h int, err error) {
 	return
 }
 
-// GetImageSize return image's width and height.
-func GetPixbufSize(pixbuf *C.GdkPixbuf) (w, h int, err error) {
+// GetSize return pixbuf's width and height.
+func GetSize(pixbuf *C.GdkPixbuf) (w, h int, err error) {
 	defaultError := fmt.Errorf("get GdkPixbuf size failed, %v", pixbuf)
 	if pixbuf == nil {
 		err = defaultError
@@ -121,7 +121,7 @@ func GetPixbufSize(pixbuf *C.GdkPixbuf) (w, h int, err error) {
 	return
 }
 
-// GetImageFormat return image format, such as "png", "jpeg".
+// GetImageFormat return image file's format, such as "png", "jpeg".
 func GetImageFormat(imgFile string) (f Format, err error) {
 	defaultError := fmt.Errorf("get image format failed, %s", imgFile)
 	cImgFile := C.CString(imgFile)
@@ -192,7 +192,8 @@ func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C
 	return
 }
 
-func ConvertImgToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
+// ConvertImageToXpixmap convert image file to x pixmap.
+func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
 	// new gdk pixbuf from file
 	pixbuf, err := NewPixbufFromFile(imgFile)
 	defer FreePixbuf(pixbuf)
