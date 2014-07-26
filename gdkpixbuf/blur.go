@@ -21,7 +21,7 @@
 
 package gdkpixbuf
 
-// #cgo pkg-config: glib-2.0 gdk-pixbuf-2.0
+// #cgo pkg-config: gdk-pixbuf-2.0
 // #cgo LDFLAGS: -lm
 // #include <stdlib.h>
 // #include "blur.h"
@@ -32,23 +32,14 @@ import (
 	"pkg.linuxdeepin.com/lib/utils"
 )
 
-func Blur(pixbuf *C.GdkPixbuf, sigma, numsteps float64) (err error) {
-	defaultError := fmt.Errorf("blur gdkpixbuf failed, pixbuf=%v, sigma=%v, numsteps=%v", pixbuf, sigma, numsteps)
-	ret := C.blur(pixbuf, C.double(sigma), C.double(numsteps))
-	if ret == 0 {
-		err = defaultError
-		return
-	}
-	return
-}
-
-// BlurImage generate blur effect to an image.
-func BlurImage(srcFile, dstFile string, sigma, numsteps float64, f Format) (err error) {
+// BlurImage generate blur effect to an image file.
+func BlurImage(srcFile, dstFile string, sigma, numSteps float64, f Format) (err error) {
 	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
 	if err != nil {
 		return
 	}
-	err = Blur(srcPixbuf, sigma, numsteps)
+	err = Blur(srcPixbuf, sigma, numSteps)
 	if err != nil {
 		return
 	}
@@ -56,15 +47,26 @@ func BlurImage(srcFile, dstFile string, sigma, numsteps float64, f Format) (err 
 	return
 }
 
-// BlurImageCache generate and save the blurred image to cache
+// BlurImageCache generate and save the blurred image file to cache
 // directory, if target file already exists, just return it.
-func BlurImageCache(srcFile string, sigma, numsteps float64, f Format) (dstFile string, useCache bool, err error) {
-	dstFile = generateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcFile, sigma, numsteps, f))
+func BlurImageCache(srcFile string, sigma, numSteps float64, f Format) (dstFile string, useCache bool, err error) {
+	dstFile = generateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcFile, sigma, numSteps, f))
 	if utils.IsFileExist(dstFile) {
 		// return cache file
 		useCache = true
 		return
 	}
-	err = BlurImage(srcFile, dstFile, sigma, numsteps, f)
+	err = BlurImage(srcFile, dstFile, sigma, numSteps, f)
+	return
+}
+
+// Blur generate blur effect to pixbuf object.
+func Blur(pixbuf *C.GdkPixbuf, sigma, numSteps float64) (err error) {
+	defaultError := fmt.Errorf("blur gdkpixbuf failed, pixbuf=%v, sigma=%v, numSteps=%v", pixbuf, sigma, numSteps)
+	ret := C.blur(pixbuf, C.double(sigma), C.double(numSteps))
+	if ret == 0 {
+		err = defaultError
+		return
+	}
 	return
 }

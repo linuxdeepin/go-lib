@@ -25,7 +25,6 @@ import (
 	"pkg.linuxdeepin.com/lib/utils"
 )
 
-func generateCacheFilePath(keyword string) (dstfile string) {
-	dstfile = utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
-	return
+func generateCacheFilePath(keyword string) string {
+	return utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
 }

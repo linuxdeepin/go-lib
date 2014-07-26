@@ -34,4 +34,5 @@ int blur(GdkPixbuf *pixbuf, double sigma, double numsteps) {
     guchar *image_data = gdk_pixbuf_get_pixels(pixbuf);
     gaussianiir2d_pixbuf_c(image_data, width, height,
                            rowstride, n_channels, sigma, numsteps);
+    return TRUE;
 }
