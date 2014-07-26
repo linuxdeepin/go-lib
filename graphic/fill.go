@@ -31,10 +31,10 @@ import (
 type FillStyle string
 
 const (
-	FillTile                  FillStyle = "tile"                    // 平铺
-	FillCenter                          = "center"                  // 居中
-	FillScale                           = "scale"                   // 拉伸
-	FillProportionCenterScale           = "proportion-center-scale" // 等比居中拉伸
+	FillTile        FillStyle = "tile"         // 平铺
+	FillCenter                = "center"       // 居中
+	FillScale                 = "scale"        // 拉伸
+	FillPreferScale           = "prefer-scale" // 等比居中拉伸
 )
 
 // FillImage generate a new image in target width and height through
@@ -70,23 +70,23 @@ func FillImageCache(srcfile string, width, height int, style FillStyle, f Format
 func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
 	switch style {
 	case FillTile:
-		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
+		dstimg = doFillImageInTileStyle(srcimg, width, height)
 	case FillCenter:
-		dstimg = doFillImageInCenterStyle(srcimg, width, height, style)
+		dstimg = doFillImageInCenterStyle(srcimg, width, height)
 	case FillScale:
-		dstimg = doFillImageInScaleStyle(srcimg, width, height, style)
-	case FillProportionCenterScale:
-		dstimg, err = doFillImageInProportionCenterScaleStyle(srcimg, width, height, style)
+		dstimg = doFillImageInScaleStyle(srcimg, width, height)
+	case FillPreferScale:
+		dstimg, err = doFillImagePreferScaleStyle(srcimg, width, height)
 	default:
-		// default to use FilleTile style
-		dstimg = doFillImageInTileStyle(srcimg, width, height, style)
+		err = fmt.Errorf("unknown fill style", style)
+		return
 	}
 	return
 }
 
-func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
+func doFillImageInTileStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, int(width), int(height)))
-	iw, ih := doGetImageSize(srcimg)
+	iw, ih := GetSize(srcimg)
 
 	endx := width - 1
 	endy := height - 1
@@ -99,9 +99,9 @@ func doFillImageInTileStyle(srcimg image.Image, width, height int, style FillSty
 	return
 }
 
-func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
+func doFillImageInCenterStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, int(width), int(height)))
-	iw, ih := doGetImageSize(srcimg)
+	iw, ih := GetSize(srcimg)
 
 	var srcX, srcY, dstX, dstY, clipWidth, clipHeight int
 	if width > iw {
@@ -127,43 +127,11 @@ func doFillImageInCenterStyle(srcimg image.Image, width, height int, style FillS
 	return
 }
 
-func doFillImageInScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA) {
+func doFillImageInScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA) {
 	dstimg = doResizeNearestNeighbor(srcimg, width, height)
 	return
 }
 
-func doFillImageInProportionCenterScaleStyle(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
-	iw, ih := doGetImageSize(srcimg)
-	x, y, w, h, err := GetProportionCenterScaleRect(width, height, iw, ih)
-	if err != nil {
-		return
-	}
-	dstimg = ImplClipImage(srcimg, x, y, w, h)
-	dstimg = doResizeNearestNeighbor(dstimg, width, height)
-	return
-}
-
-// GetProportionCenterScaleRect get rectangle in image which with the same
-// scale to reference width/heigh, and the rectangle will placed in
-// center.
-func GetProportionCenterScaleRect(refWidth, refHeight, imgWidth, imgHeight int) (x, y, w, h int, err error) {
-	if refWidth*refHeight == 0 || imgWidth*imgHeight == 0 {
-		err = fmt.Errorf("argument is invalid: ", refWidth, refHeight, imgWidth, imgHeight)
-		return
-	}
-	scale := float32(refWidth) / float32(refHeight)
-	w = imgWidth
-	h = int(float32(w) / scale)
-	if h < imgHeight {
-		offsetY := (imgHeight - h) / 2
-		x = 0
-		y = 0 + offsetY
-	} else {
-		h = imgHeight
-		w = int(float32(h) * scale)
-		offsetX := (imgWidth - w) / 2
-		x = 0 + offsetX
-		y = 0
-	}
-	return
+func doFillImagePreferScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA, err error) {
+	return ResizePrefer(srcimg, width, height)
 }

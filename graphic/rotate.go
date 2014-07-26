@@ -50,7 +50,7 @@ func RotateImageRight(srcfile, dstfile string, f Format) (err error) {
 }
 
 func doRotateImageLeft(srcimg image.Image) (dstimg *image.RGBA) {
-	w, h := doGetImageSize(srcimg)
+	w, h := GetSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
 
 	for x := 0; x < w; x++ {
@@ -63,7 +63,7 @@ func doRotateImageLeft(srcimg image.Image) (dstimg *image.RGBA) {
 }
 
 func doRotateImageRight(srcimg image.Image) (dstimg *image.RGBA) {
-	w, h := doGetImageSize(srcimg)
+	w, h := GetSize(srcimg)
 	dstimg = image.NewRGBA(image.Rect(0, 0, h, w))
 
 	for x := 0; x < w; x++ {

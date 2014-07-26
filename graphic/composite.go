@@ -95,7 +95,7 @@ func CompositeImageUri(srcDatauri, compDataUri string, x, y int, f Format) (dstD
 }
 
 func ImplCompositeImage(dstimg draw.Image, compimg image.Image, x, y int) {
-	w, h := doGetImageSize(compimg)
+	w, h := GetSize(compimg)
 	r := image.Rect(x, y, x+w, y+h)
 	draw.Draw(dstimg, r, compimg, image.Point{0, 0}, draw.Over)
 	return

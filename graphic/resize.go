@@ -33,13 +33,13 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (er
 	if err != nil {
 		return
 	}
-	dstimg := doResizeNearestNeighbor(srcimg, newWidth, newHeight)
+	dstimg := Resize(srcimg, newWidth, newHeight)
 	err = SaveImage(dstfile, dstimg, f)
 	dstimg.Pix = nil
 	return
 }
 
-// ResizeImageCache resize any recognized format image and save to cache
+// ResizeImageCache resize any recognized format image file and save to cache
 // directory, if already exists, just return it.
 func ResizeImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
 	dstfile = generateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
@@ -51,25 +51,19 @@ func ResizeImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfil
 	return
 }
 
-// ThumbnailImage scale target image with limited maximum width and height.
+// ThumbnailImage resize target image file with limited maximum width and height.
 func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight int, f Format) (err error) {
-	// get new width and heigh
-	var newWidth, newHeight int
-	w, h, err := GetImageSize(srcfile)
+	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	scale := float32(w) / float32(h)
-	newWidth = maxWidth
-	newHeight = int(float32(newWidth) / scale)
-	if newHeight > maxHeight {
-		newHeight = maxHeight
-		newWidth = int(float32(newHeight) * scale)
-	}
-	return ResizeImage(srcfile, dstfile, newWidth, newHeight, f)
+	dstimg := Thumbnail(srcimg, maxWidth, maxHeight)
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
 }
 
-// ThumbnailImageCache scale target image with limited maximum width
+// ThumbnailImageCache resize target image file with limited maximum width
 // and height, and save to cache directory, if already exists, just
 // return it.
 func ThumbnailImageCache(srcfile string, maxWidth, maxHeight int, f Format) (dstfile string, useCache bool, err error) {
@@ -79,6 +73,40 @@ func ThumbnailImageCache(srcfile string, maxWidth, maxHeight int, f Format) (dst
 		return
 	}
 	err = ThumbnailImage(srcfile, dstfile, maxWidth, maxHeight, f)
+	return
+}
+
+// Resize resize image object to new width and height.
+func Resize(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA) {
+	dstimg = doResizeNearestNeighbor(srcimg, newWidth, newHeight)
+	return
+}
+
+// Thumbnail resize image object with limited maximum width and height.
+func Thumbnail(srcimg image.Image, maxWidth, maxHeight int) (dstimg *image.RGBA) {
+	// get new width and heigh
+	var newWidth, newHeight int
+	w, h := GetSize(srcimg)
+	scale := float32(w) / float32(h)
+	newWidth = maxWidth
+	newHeight = int(float32(newWidth) / scale)
+	if newHeight > maxHeight {
+		newHeight = maxHeight
+		newWidth = int(float32(newHeight) * scale)
+	}
+	return Resize(srcimg, newWidth, newHeight)
+}
+
+// ResizePrefer resize image object to new width and heigh, and
+// maintain the original proportions unchanged.
+func ResizePrefer(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA, err error) {
+	iw, ih := GetSize(srcimg)
+	x, y, w, h, err := GetPreferScaleClipRect(newWidth, newHeight, iw, ih)
+	if err != nil {
+		return
+	}
+	dstimg = ImplClipImage(srcimg, x, y, w, h)
+	dstimg = Resize(dstimg, newWidth, newHeight)
 	return
 }
 
@@ -104,4 +132,28 @@ func doResizeNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg *
 		}
 	}
 	return newimg
+}
+
+// GetPreferScaleClipRect get the maximum rectangle in center of
+// image which with the same scale to reference width/heigh.
+func GetPreferScaleClipRect(refWidth, refHeight, imgWidth, imgHeight int) (x, y, w, h int, err error) {
+	if refWidth*refHeight == 0 || imgWidth*imgHeight == 0 {
+		err = fmt.Errorf("argument is invalid: ", refWidth, refHeight, imgWidth, imgHeight)
+		return
+	}
+	scale := float32(refWidth) / float32(refHeight)
+	w = imgWidth
+	h = int(float32(w) / scale)
+	if h < imgHeight {
+		offsetY := (imgHeight - h) / 2
+		x = 0
+		y = 0 + offsetY
+	} else {
+		h = imgHeight
+		w = int(float32(h) * scale)
+		offsetX := (imgWidth - w) / 2
+		x = 0 + offsetX
+		y = 0
+	}
+	return
 }

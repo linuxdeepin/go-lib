@@ -37,7 +37,7 @@ func GetImageSize(imgfile string) (w, h int, err error) {
 	return config.Width, config.Height, err
 }
 
-func doGetImageSize(img image.Image) (w, h int) {
+func GetSize(img image.Image) (w, h int) {
 	w = img.Bounds().Dx()
 	h = img.Bounds().Dy()
 	return

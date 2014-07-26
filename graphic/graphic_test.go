@@ -151,7 +151,7 @@ func (g *Graphic) TestLoadImageFromDataUri(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-	w, h := doGetImageSize(img)
+	w, h := GetSize(img)
 	c.Check(w, Equals, originIconWidth)
 	c.Check(h, Equals, originIconHeight)
 }
