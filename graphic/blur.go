@@ -43,7 +43,7 @@ func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err 
 // BlurImageCache generate and save the blurred image to cache
 // directory, if target file already exists, just return it.
 func BlurImageCache(srcfile string, sigma, numsteps float64, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcfile, sigma, numsteps, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcfile, sigma, numsteps, f))
 	if isFileExists(dstfile) {
 		// return cache file
 		useCache = true

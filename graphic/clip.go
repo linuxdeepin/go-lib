@@ -42,7 +42,7 @@ func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int, f Format) (err error
 // ClipImageCache clip any recognized format image and save to cache
 // directory, if already exists, just return it.
 func ClipImageCache(srcfile string, x0, y0, x1, y1 int, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("ClipImageCache%s%d%d%d%d%s", srcfile, x0, y0, x1, y1, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("ClipImageCache%s%d%d%d%d%s", srcfile, x0, y0, x1, y1, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return

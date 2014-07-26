@@ -22,19 +22,14 @@
 package graphic
 
 import (
-	"crypto/md5"
-	"fmt"
 	"image"
 	"image/draw"
-	"io"
 	"os"
-	"path"
+	"pkg.linuxdeepin.com/lib/utils"
 )
 
-func GenerateCacheFilePath(keyword string) (dstfile string) {
-	graphicCacheFormat := os.Getenv("HOME") + "/.cache/dde/graphic/%s"
-	dstfile = fmt.Sprintf(graphicCacheFormat, encodeMD5Str(keyword))
-	ensureDirExists(path.Dir(dstfile))
+func generateCacheFilePath(keyword string) (dstfile string) {
+	utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
 	return
 }
 
@@ -52,12 +47,6 @@ func isFileExists(file string) bool {
 
 func ensureDirExists(dir string) {
 	os.MkdirAll(dir, 0755)
-}
-
-func encodeMD5Str(s string) string {
-	h := md5.New()
-	io.WriteString(h, s)
-	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // convert image.Image to *image.RGBA

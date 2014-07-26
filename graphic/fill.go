@@ -57,7 +57,7 @@ func FillImage(srcfile, dstfile string, width, height int, style FillStyle, f Fo
 // source image, and save it to cache directory, if already exists,
 // just return it.
 func FillImageCache(srcfile string, width, height int, style FillStyle, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("FillImageCache%s%d%d%s%s", srcfile, width, height, style, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("FillImageCache%s%d%d%s%s", srcfile, width, height, style, f))
 	if isFileExists(dstfile) {
 		// return cache file
 		useCache = true

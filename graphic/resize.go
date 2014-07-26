@@ -42,7 +42,7 @@ func ResizeImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (er
 // ResizeImageCache resize any recognized format image and save to cache
 // directory, if already exists, just return it.
 func ResizeImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
@@ -73,7 +73,7 @@ func ThumbnailImage(srcfile, dstfile string, maxWidth, maxHeight int, f Format) 
 // and height, and save to cache directory, if already exists, just
 // return it.
 func ThumbnailImageCache(srcfile string, maxWidth, maxHeight int, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("ThumbnailImageCache%s%d%d%s", srcfile, maxWidth, maxHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return

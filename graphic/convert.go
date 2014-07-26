@@ -37,7 +37,7 @@ func ConvertImage(srcfile, dstfile string, f Format) (err error) {
 // ConvertImageCache converts from any recognized format to cache
 // directory, if already exists, just return it.
 func ConvertImageCache(srcfile string, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = GenerateCacheFilePath(fmt.Sprintf("ConvertImageCache%s%s", srcfile, f))
+	dstfile = generateCacheFilePath(fmt.Sprintf("ConvertImageCache%s%s", srcfile, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
