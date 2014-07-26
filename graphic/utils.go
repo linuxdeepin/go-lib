@@ -29,8 +29,7 @@ import (
 )
 
 func generateCacheFilePath(keyword string) (dstfile string) {
-	utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
-	return
+	return utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
 }
 
 func openFileOrCreate(file string) (*os.File, error) {

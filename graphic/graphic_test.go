@@ -43,22 +43,6 @@ func (g *Graphic) TestLoadImage(c *C) {
 	LoadImage(originTestImage)
 }
 
-func (g *Graphic) TestBlurImage(c *C) {
-	resultFile := "testdata/test_blurimage.png"
-	err := BlurImage(originTestImage, resultFile, 50, 1, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-}
-
-func (g *Graphic) TestBlurImageCache(c *C) {
-	resultFile, useCache, err := BlurImageCache(originTestImage, 50, 1, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-	fmt.Println("TestBlurImageCache:", useCache, resultFile)
-}
-
 func (g *Graphic) TestCompositeImage(c *C) {
 	resultFile := "testdata/test_compositeimage.png"
 	err := CompositeImage(originTestImageSmall, originTestImageIcon1, resultFile, 0, 0, FormatPng)
@@ -202,13 +186,13 @@ func (g *Graphic) TestFillImage(c *C) {
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_400x400.png"
-	err = FillImage(originTestImage, resultFile, 400, 400, FillProportionCenterScale, FormatPng)
+	err = FillImage(originTestImage, resultFile, 400, 400, FillPreferScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
 
 	resultFile = "testdata/test_flllimage_scalestretch_1600x1000.png"
-	err = FillImage(originTestImage, resultFile, 1600, 1000, FillProportionCenterScale, FormatPng)
+	err = FillImage(originTestImage, resultFile, 1600, 1000, FillPreferScale, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
