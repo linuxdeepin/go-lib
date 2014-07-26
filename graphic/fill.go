@@ -37,14 +37,14 @@ const (
 	FillPreferScale           = "prefer-scale" // 等比居中拉伸
 )
 
-// FillImage generate a new image in target width and height through
-// source image, there are many fill sytles to choice from.
+// FillImage generate a new image file in target width and height through
+// source image file, there are many fill sytles to choice from.
 func FillImage(srcfile, dstfile string, width, height int, style FillStyle, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg, err := ImplFillImage(srcimg, width, height, style)
+	dstimg, err := Fill(srcimg, width, height, style)
 	if err != nil {
 		return
 	}
@@ -67,7 +67,9 @@ func FillImageCache(srcfile string, width, height int, style FillStyle, f Format
 	return
 }
 
-func ImplFillImage(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
+// FillImage generate a new image in target width and height through
+// source image, there are many fill sytles to choice from.
+func Fill(srcimg image.Image, width, height int, style FillStyle) (dstimg *image.RGBA, err error) {
 	switch style {
 	case FillTile:
 		dstimg = doFillImageInTileStyle(srcimg, width, height)

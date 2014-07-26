@@ -105,7 +105,7 @@ func ResizePrefer(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RG
 	if err != nil {
 		return
 	}
-	dstimg = ImplClipImage(srcimg, x, y, w, h)
+	dstimg = Clip(srcimg, x, y, w, h)
 	dstimg = Resize(dstimg, newWidth, newHeight)
 	return
 }

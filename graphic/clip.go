@@ -27,13 +27,13 @@ import (
 	"image/draw"
 )
 
-// ClipImage clip any recognized format image and save to target format image.
+// ClipImage clip image file that format is recognized and save it with target format.
 func ClipImage(srcfile, dstfile string, x0, y0, x1, y1 int, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg := ImplClipImage(srcimg, x0, y0, x1-x0, y1-y0)
+	dstimg := Clip(srcimg, x0, y0, x1-x0, y1-y0)
 	err = SaveImage(dstfile, dstimg, f)
 	dstimg.Pix = nil
 	return
@@ -51,7 +51,8 @@ func ClipImageCache(srcfile string, x0, y0, x1, y1 int, f Format) (dstfile strin
 	return
 }
 
-func ImplClipImage(srcimg image.Image, x, y, w, h int) (dstimg *image.RGBA) {
+// ClipImage clip image object.
+func Clip(srcimg image.Image, x, y, w, h int) (dstimg *image.RGBA) {
 	dstimg = image.NewRGBA(image.Rect(0, 0, w, h))
 	draw.Draw(dstimg, dstimg.Bounds(), srcimg, image.Point{x, y}, draw.Src)
 	return
