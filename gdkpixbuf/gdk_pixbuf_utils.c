@@ -22,7 +22,6 @@
  **/
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>

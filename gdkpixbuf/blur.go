@@ -24,46 +24,47 @@ package gdkpixbuf
 // #cgo pkg-config: glib-2.0 gdk-pixbuf-2.0
 // #cgo LDFLAGS: -lm
 // #include <stdlib.h>
-// #include "blur_pict.h"
+// #include "blur.h"
 import "C"
-import "unsafe"
-import "fmt"
-import "pkg.linuxdeepin.com/lib/utils"
-import "pkg.linuxdeepin.com/lib/graphic"
+
+import (
+	"fmt"
+	"pkg.linuxdeepin.com/lib/utils"
+)
+
+func Blur(pixbuf *C.GdkPixbuf, sigma, numsteps float64) (err error) {
+	defaultError := fmt.Errorf("blur gdkpixbuf failed, pixbuf=%v, sigma=%v, numsteps=%v", pixbuf, sigma, numsteps)
+	ret := C.blur(pixbuf, C.double(sigma), C.double(numsteps))
+	if ret == 0 {
+		err = defaultError
+		return
+	}
+	return
+}
 
 // BlurImage generate blur effect to an image.
-// TODO Format always is FormatPng
-func BlurImage(srcfile, dstfile string, sigma, numsteps float64, f Format) (err error) {
-	ok := generateBlurPict(srcfile, dstfile, sigma, numsteps)
-	if !ok {
-		err = fmt.Errorf("generate blur pict failed, srcfile=%s, dstfile=%s, sigma=%d, numsteps=%d, format=%v",
-			srcfile, dstfile, sigma, numsteps, f)
+func BlurImage(srcFile, dstFile string, sigma, numsteps float64, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	if err != nil {
+		return
 	}
+	err = Blur(srcPixbuf, sigma, numsteps)
+	if err != nil {
+		return
+	}
+	err = Save(srcPixbuf, dstFile, f)
 	return
 }
 
 // BlurImageCache generate and save the blurred image to cache
 // directory, if target file already exists, just return it.
-func BlurImageCache(srcfile string, sigma, numsteps float64, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = graphic.GenerateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcfile, sigma, numsteps, f))
-	if utils.IsFileExist(dstfile) {
+func BlurImageCache(srcFile string, sigma, numsteps float64, f Format) (dstFile string, useCache bool, err error) {
+	dstFile = generateCacheFilePath(fmt.Sprintf("BlurImageCache%s%f%f%s", srcFile, sigma, numsteps, f))
+	if utils.IsFileExist(dstFile) {
 		// return cache file
 		useCache = true
 		return
 	}
-	err = BlurImage(srcfile, dstfile, sigma, numsteps, f)
+	err = BlurImage(srcFile, dstFile, sigma, numsteps, f)
 	return
-}
-
-func generateBlurPict(srcfile, dstfile string, sigma, numsteps float64) bool {
-	src := C.CString(srcfile)
-	defer C.free(unsafe.Pointer(src))
-	dest := C.CString(dstfile)
-	defer C.free(unsafe.Pointer(dest))
-
-	ok := C.generate_blur_pict(src, dest, C.double(sigma), C.double(numsteps))
-	if ok == 0 {
-		return false
-	}
-	return true
 }

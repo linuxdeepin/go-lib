@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2011 ~ 2013 Deepin, Inc.
- *               2011 ~ 2013 jouyouyun
+ * Copyright (c) 2013 ~ 2014 Deepin, Inc.
+ *               2013 ~ 2014 Xu FaSheng
  *
- * Author:      jouyouyun <jouyouwen717@gmail.com>
- * Maintainer:  jouyouyun <jouyouwen717@gmail.com>
+ * Author:      Xu FaSheng <fasheng.xu@gmail.com>
+ * Maintainer:  Xu FaSheng <fasheng.xu@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef __BLUR_PICT_H__
-#define __BLUR_PICT_H__
+package gdkpixbuf
 
-int generate_blur_pict (const char *src_path, const char *dest_path,
-        double sigma, double numsteps);
-int blur_pict_is_valid (const char *src_path, const char *dest_path);
+import (
+	"pkg.linuxdeepin.com/lib/utils"
+)
 
-#endif
+func generateCacheFilePath(keyword string) (dstfile string) {
+	dstfile = utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
+	return
+}
