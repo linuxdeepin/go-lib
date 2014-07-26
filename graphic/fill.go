@@ -27,6 +27,8 @@ import (
 	"image/draw"
 )
 
+// TODO: is FillXXX() still necessary?
+
 // FillStyle define the type to fill image.
 type FillStyle string
 

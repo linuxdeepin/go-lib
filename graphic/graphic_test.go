@@ -284,6 +284,20 @@ func (g *Graphic) TestScaleImage(c *C) {
 	c.Check(int(h), Equals, 600)
 }
 
+func (g *Graphic) TestScaleImagePrefer(c *C) {
+	resultFile := "testdata/test_scaleimageprefer_500x600.png"
+	err := ScaleImagePrefer(originImg, resultFile, 500, 600, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	w, h, err := GetImageSize(resultFile)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(int(w), Equals, 500)
+	c.Check(int(h), Equals, 600)
+}
+
 func (g *Graphic) TestScaleImageCache(c *C) {
 	resultFile, useCache, err := ScaleImageCache(originImg, 200, 200, FormatPng)
 	if err != nil {

@@ -39,6 +39,22 @@ func ScaleImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (err
 	return
 }
 
+// ScaleImagePrefer resize image file to new width and heigh, and
+// maintain the original proportions unchanged.
+func ScaleImagePrefer(srcfile, dstfile string, newWidth, newHeight int, f Format) (err error) {
+	srcimg, err := LoadImage(srcfile)
+	if err != nil {
+		return
+	}
+	dstimg, err := ScalePrefer(srcimg, newWidth, newHeight)
+	if err != nil {
+		return
+	}
+	err = SaveImage(dstfile, dstimg, f)
+	dstimg.Pix = nil
+	return
+}
+
 // ScaleImageCache resize any recognized format image file and save to cache
 // directory, if already exists, just return it.
 func ScaleImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
