@@ -168,30 +168,6 @@ func (g *Graphic) TestFillImage(c *C) {
 	if err != nil {
 		c.Error(err)
 	}
-
-	resultFile = "testdata/test_flllimage_stretch_400x400.png"
-	err = FillImage(originImg, resultFile, 400, 400, FillScale, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-
-	resultFile = "testdata/test_flllimage_stretch_1600x1000.png"
-	err = FillImage(originImg, resultFile, 1600, 1000, FillScale, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-
-	resultFile = "testdata/test_flllimage_scalestretch_400x400.png"
-	err = FillImage(originImg, resultFile, 400, 400, FillPreferScale, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-
-	resultFile = "testdata/test_flllimage_scalestretch_1600x1000.png"
-	err = FillImage(originImg, resultFile, 1600, 1000, FillPreferScale, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
 }
 
 func (g *Graphic) TestFillImageCache(c *C) {

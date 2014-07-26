@@ -33,10 +33,8 @@ import (
 type FillStyle string
 
 const (
-	FillTile        FillStyle = "tile"         // 平铺
-	FillCenter                = "center"       // 居中
-	FillScale                 = "scale"        // 拉伸
-	FillPreferScale           = "prefer-scale" // 等比居中拉伸
+	FillTile   FillStyle = "tile"   // 平铺
+	FillCenter           = "center" // 居中
 )
 
 // FillImage generate a new image file in target width and height through
@@ -77,10 +75,6 @@ func Fill(srcimg image.Image, width, height int, style FillStyle) (dstimg *image
 		dstimg = doFillImageInTileStyle(srcimg, width, height)
 	case FillCenter:
 		dstimg = doFillImageInCenterStyle(srcimg, width, height)
-	case FillScale:
-		dstimg = doFillImageInScaleStyle(srcimg, width, height)
-	case FillPreferScale:
-		dstimg, err = doFillImagePreferScaleStyle(srcimg, width, height)
 	default:
 		err = fmt.Errorf("unknown fill style", style)
 		return
@@ -129,13 +123,4 @@ func doFillImageInCenterStyle(srcimg image.Image, width, height int) (dstimg *im
 
 	draw.Draw(dstimg, image.Rect(dstX, dstY, dstX+clipWidth, dstY+clipHeight), srcimg, image.Point{srcX, srcY}, draw.Src)
 	return
-}
-
-func doFillImageInScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA) {
-	dstimg = doScaleNearestNeighbor(srcimg, width, height)
-	return
-}
-
-func doFillImagePreferScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA, err error) {
-	return ScalePrefer(srcimg, width, height)
 }
