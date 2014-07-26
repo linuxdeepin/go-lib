@@ -31,7 +31,6 @@ import "unsafe"
 import (
 	"fmt"
 	"github.com/BurntSushi/xgb/xproto"
-	"pkg.linuxdeepin.com/lib/graphic"
 )
 
 // Format defines the type of image format.
@@ -343,7 +342,7 @@ func ScalePrefer(srcPixbuf *C.GdkPixbuf, newWidth, newHeight int, interpType Gdk
 	if err != nil {
 		return
 	}
-	x, y, w, h, err := graphic.GetPreferScaleClipRect(newWidth, newHeight, iw, ih)
+	x, y, w, h, err := GetPreferScaleClipRect(newWidth, newHeight, iw, ih)
 	if err != nil {
 		return
 	}

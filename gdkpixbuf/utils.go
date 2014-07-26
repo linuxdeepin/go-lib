@@ -22,9 +22,17 @@
 package gdkpixbuf
 
 import (
+	"pkg.linuxdeepin.com/lib/graphic"
 	"pkg.linuxdeepin.com/lib/utils"
 )
 
 func generateCacheFilePath(keyword string) string {
 	return utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
+}
+
+// GetPreferScaleClipRect get the maximum rectangle in center of
+// image which with the same scale to reference width/heigh.
+func GetPreferScaleClipRect(refWidth, refHeight, imgWidth, imgHeight int) (x, y, w, h int, err error) {
+	x, y, w, h, err = graphic.GetPreferScaleClipRect(refWidth, refHeight, imgWidth, imgHeight)
+	return
 }
