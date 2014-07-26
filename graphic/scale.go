@@ -26,28 +26,28 @@ import (
 	"image"
 )
 
-// ResizeImage returns a new image file with the given width and
+// ScaleImage returns a new image file with the given width and
 // height created by resizing the given image.
-func ResizeImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (err error) {
+func ScaleImage(srcfile, dstfile string, newWidth, newHeight int, f Format) (err error) {
 	srcimg, err := LoadImage(srcfile)
 	if err != nil {
 		return
 	}
-	dstimg := Resize(srcimg, newWidth, newHeight)
+	dstimg := Scale(srcimg, newWidth, newHeight)
 	err = SaveImage(dstfile, dstimg, f)
 	dstimg.Pix = nil
 	return
 }
 
-// ResizeImageCache resize any recognized format image file and save to cache
+// ScaleImageCache resize any recognized format image file and save to cache
 // directory, if already exists, just return it.
-func ResizeImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
-	dstfile = generateCacheFilePath(fmt.Sprintf("ResizeImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
+func ScaleImageCache(srcfile string, newWidth, newHeight int, f Format) (dstfile string, useCache bool, err error) {
+	dstfile = generateCacheFilePath(fmt.Sprintf("ScaleImageCache%s%d%d%s", srcfile, newWidth, newHeight, f))
 	if isFileExists(dstfile) {
 		useCache = true
 		return
 	}
-	err = ResizeImage(srcfile, dstfile, newWidth, newHeight, f)
+	err = ScaleImage(srcfile, dstfile, newWidth, newHeight, f)
 	return
 }
 
@@ -76,9 +76,9 @@ func ThumbnailImageCache(srcfile string, maxWidth, maxHeight int, f Format) (dst
 	return
 }
 
-// Resize resize image object to new width and height.
-func Resize(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA) {
-	dstimg = doResizeNearestNeighbor(srcimg, newWidth, newHeight)
+// Scale resize image object to new width and height.
+func Scale(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA) {
+	dstimg = doScaleNearestNeighbor(srcimg, newWidth, newHeight)
 	return
 }
 
@@ -94,26 +94,26 @@ func Thumbnail(srcimg image.Image, maxWidth, maxHeight int) (dstimg *image.RGBA)
 		newHeight = maxHeight
 		newWidth = int(float32(newHeight) * scale)
 	}
-	return Resize(srcimg, newWidth, newHeight)
+	return Scale(srcimg, newWidth, newHeight)
 }
 
-// ResizePrefer resize image object to new width and heigh, and
+// ScalePrefer resize image object to new width and heigh, and
 // maintain the original proportions unchanged.
-func ResizePrefer(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA, err error) {
+func ScalePrefer(srcimg image.Image, newWidth, newHeight int) (dstimg *image.RGBA, err error) {
 	iw, ih := GetSize(srcimg)
 	x, y, w, h, err := GetPreferScaleClipRect(newWidth, newHeight, iw, ih)
 	if err != nil {
 		return
 	}
 	dstimg = Clip(srcimg, x, y, w, h)
-	dstimg = Resize(dstimg, newWidth, newHeight)
+	dstimg = Scale(dstimg, newWidth, newHeight)
 	return
 }
 
-// TODO doResizeNearestNeighbor returns a new RGBA image with the given width and
+// TODO doScaleNearestNeighbor returns a new RGBA image with the given width and
 // height created by resizing the given image using the nearest neighbor
 // algorithm.
-func doResizeNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg *image.RGBA) {
+func doScaleNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg *image.RGBA) {
 	w := img.Bounds().Max.X
 	h := img.Bounds().Max.Y
 	newimg = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))

@@ -130,10 +130,10 @@ func doFillImageInCenterStyle(srcimg image.Image, width, height int) (dstimg *im
 }
 
 func doFillImageInScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA) {
-	dstimg = doResizeNearestNeighbor(srcimg, width, height)
+	dstimg = doScaleNearestNeighbor(srcimg, width, height)
 	return
 }
 
 func doFillImagePreferScaleStyle(srcimg image.Image, width, height int) (dstimg *image.RGBA, err error) {
-	return ResizePrefer(srcimg, width, height)
+	return ScalePrefer(srcimg, width, height)
 }

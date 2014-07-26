@@ -144,14 +144,6 @@ func (g *Graphic) TestLoadImageFromDataUri(c *C) {
 	c.Check(h, Equals, originIconHeight)
 }
 
-func (g *Graphic) TestFlipImageHorizontal(c *C) {
-	resultFile := "testdata/test_flipimagehorizontal.png"
-	err := FlipImageHorizontal(originImg, resultFile, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
-}
-
 func (g *Graphic) TestFillImage(c *C) {
 	resultFile := "testdata/test_flllimage_tile_200x200.png"
 	err := FillImage(originImg, resultFile, 200, 200, FillTile, FormatPng)
@@ -208,6 +200,14 @@ func (g *Graphic) TestFillImageCache(c *C) {
 		c.Error(err)
 	}
 	fmt.Println("TestFillImageCache:", useCache, resultFile)
+}
+
+func (g *Graphic) TestFlipImageHorizontal(c *C) {
+	resultFile := "testdata/test_flipimagehorizontal.png"
+	err := FlipImageHorizontal(originImg, resultFile, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
 }
 
 func (g *Graphic) TestFlipImageVertical(c *C) {
@@ -270,9 +270,9 @@ func (g *Graphic) TestIsSupportedImage(c *C) {
 	c.Check(IsSupportedImage("/usr/bin/vim"), Equals, false)
 }
 
-func (g *Graphic) TestResizeImage(c *C) {
-	resultFile := "testdata/test_resizeimage_500x600.png"
-	err := ResizeImage(originImg, resultFile, 500, 600, FormatPng)
+func (g *Graphic) TestScaleImage(c *C) {
+	resultFile := "testdata/test_scaleimage_500x600.png"
+	err := ScaleImage(originImg, resultFile, 500, 600, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -284,12 +284,12 @@ func (g *Graphic) TestResizeImage(c *C) {
 	c.Check(int(h), Equals, 600)
 }
 
-func (g *Graphic) TestResizeImageCache(c *C) {
-	resultFile, useCache, err := ResizeImageCache(originImg, 200, 200, FormatPng)
+func (g *Graphic) TestScaleImageCache(c *C) {
+	resultFile, useCache, err := ScaleImageCache(originImg, 200, 200, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	fmt.Println("TestResizeImageCache:", useCache, resultFile)
+	fmt.Println("TestScaleImageCache:", useCache, resultFile)
 }
 
 func (g *Graphic) TestThumbnailImage(c *C) {
