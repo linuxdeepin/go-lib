@@ -31,6 +31,7 @@ import "unsafe"
 import (
 	"fmt"
 	"github.com/BurntSushi/xgb/xproto"
+	"pkg.linuxdeepin.com/lib/graphic"
 )
 
 // Format defines the type of image format.
@@ -42,9 +43,10 @@ const (
 	FormatJpeg Format = "jpeg"
 	FormatBmp  Format = "bmp"
 	FormatIco  Format = "ico"
-	FormatGif  Format = "gif"
 	FormatTiff Format = "tiff"
-	FormatXpm  Format = "xpm"
+	// TODO
+	// FormatGif  Format = "gif"
+	// FormatXpm  Format = "xpm"
 )
 
 func InitGdkXlib() (err error) {
@@ -146,6 +148,21 @@ func IsSupportedImage(imgFile string) bool {
 
 // Clip
 
+func ClipImage(srcFile, destFile string, srcX, srcY, width, height int, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := CopyAreaSimple(srcPixbuf, srcX, srcY, width, height)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
+
 func CopyArea(srcPixbuf, destPixbuf *C.GdkPixbuf, srcX, srcY, width, height, destX, destY int) (err error) {
 	defaultError := fmt.Errorf("copy pixbuf area failed, %v, %v", srcPixbuf, destPixbuf)
 	if srcPixbuf == nil || destPixbuf == nil {
@@ -171,6 +188,16 @@ func CopyAreaSimple(srcPixbuf *C.GdkPixbuf, srcX, srcY, width, height int) (dest
 }
 
 // Convert
+
+func ConvertImage(srcFile, destFile string, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(srcPixbuf, destFile, f)
+	return
+}
 
 func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err error) {
 	defaultError := fmt.Errorf("convert pixbuf to xpixmap failed, %v", pixbuf)
@@ -210,6 +237,29 @@ func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
 
 // Flip
 
+func FlipImageHorizontal(srcFile, destFile string, f Format) (err error) {
+	return doFlipImage(srcFile, destFile, true, f)
+}
+
+func FlipImageVertical(srcFile, destFile string, f Format) (err error) {
+	return doFlipImage(srcFile, destFile, false, f)
+}
+
+func doFlipImage(srcFile, destFile string, horizontal bool, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := Flip(srcPixbuf, horizontal)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
+
 func Flip(srcPixbuf *C.GdkPixbuf, horizontal bool) (destPixbuf *C.GdkPixbuf, err error) {
 	defaultError := fmt.Errorf("flip pixbuf failed, %v, %v", srcPixbuf, horizontal)
 	if horizontal {
@@ -224,11 +274,61 @@ func Flip(srcPixbuf *C.GdkPixbuf, horizontal bool) (destPixbuf *C.GdkPixbuf, err
 	return
 }
 
-// Resize
+// Scale and thumbnail
 
-func ScaleSimple(srcPixbuf *C.GdkPixbuf, destWidth, destHeght int, interpType GdkInterpType) (destPixbuf *C.GdkPixbuf, err error) {
-	defaultError := fmt.Errorf("scale pixbuf failed, %v, %v, %v, %v", srcPixbuf, destWidth, destHeght, interpType)
-	destPixbuf = C.gdk_pixbuf_scale_simple(srcPixbuf, C.int(destWidth), C.int(destHeght), C.GdkInterpType(interpType))
+// ScaleImage returns a new image file with the given width and
+// height created by resizing the given image.
+func ScaleImage(srcFile, destFile string, newWidth, newHeght int, interpType GdkInterpType, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := ScaleSimple(srcPixbuf, newWidth, newHeght, interpType)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
+
+// ScaleImagePrefer resize image file to new width and heigh, and
+// maintain the original proportions unchanged.
+func ScaleImagePrefer(srcFile, destFile string, newWidth, newHeght int, interpType GdkInterpType, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := ScalePrefer(srcPixbuf, newWidth, newHeght, interpType)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
+
+// ThumbnailImage resize target image file with limited maximum width and height.
+func ThumbnailImage(srcFile, destFile string, maxWidth, maxHeight int, interpType GdkInterpType, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := Thumbnail(srcPixbuf, maxWidth, maxHeight, interpType)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
+
+func ScaleSimple(srcPixbuf *C.GdkPixbuf, newWidth, newHeght int, interpType GdkInterpType) (destPixbuf *C.GdkPixbuf, err error) {
+	defaultError := fmt.Errorf("scale pixbuf failed, %v, %v, %v, %v", srcPixbuf, newWidth, newHeght, interpType)
+	destPixbuf = C.gdk_pixbuf_scale_simple(srcPixbuf, C.int(newWidth), C.int(newHeght), C.GdkInterpType(interpType))
 	if destPixbuf == nil {
 		err = defaultError
 		return
@@ -236,7 +336,75 @@ func ScaleSimple(srcPixbuf *C.GdkPixbuf, destWidth, destHeght int, interpType Gd
 	return
 }
 
+// ScalePrefer resize pixbuf to new width and heigh, and maintain the
+// original proportions unchanged.
+func ScalePrefer(srcPixbuf *C.GdkPixbuf, newWidth, newHeight int, interpType GdkInterpType) (destPixbuf *C.GdkPixbuf, err error) {
+	iw, ih, err := GetSize(srcPixbuf)
+	if err != nil {
+		return
+	}
+	x, y, w, h, err := graphic.GetPreferScaleClipRect(newWidth, newHeight, iw, ih)
+	if err != nil {
+		return
+	}
+	clipPixbuf, err := CopyAreaSimple(srcPixbuf, x, y, w, h)
+	defer FreePixbuf(clipPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err = ScaleSimple(clipPixbuf, newWidth, newHeight, interpType)
+	return
+}
+
+// Thumbnail resize pixbuf with limited maximum width and height.
+func Thumbnail(srcPixbuf *C.GdkPixbuf, maxWidth, maxHeight int, interpType GdkInterpType) (destPixbuf *C.GdkPixbuf, err error) {
+	// get new width and heigh
+	var newWidth, newHeight int
+	w, h, err := GetSize(srcPixbuf)
+	if err != nil {
+		return
+	}
+	scale := float32(w) / float32(h)
+	newWidth = maxWidth
+	newHeight = int(float32(newWidth) / scale)
+	if newHeight > maxHeight {
+		newHeight = maxHeight
+		newWidth = int(float32(newHeight) * scale)
+	}
+	return ScaleSimple(srcPixbuf, newWidth, newHeight, interpType)
+}
+
 // Rotate
+
+func RotateImageLeft(srcFile, destFile string, f Format) (err error) {
+	err = doRotateImage(srcFile, destFile, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE, f)
+	return
+}
+
+func RotateImageRight(srcFile, destFile string, f Format) (err error) {
+	err = doRotateImage(srcFile, destFile, GDK_PIXBUF_ROTATE_CLOCKWISE, f)
+	return
+}
+
+func RotateImageUpsizedown(srcFile, destFile string, f Format) (err error) {
+	err = doRotateImage(srcFile, destFile, GDK_PIXBUF_ROTATE_UPSIDEDOWN, f)
+	return
+}
+
+func doRotateImage(srcFile, destFile string, angle GdkPixbufRotation, f Format) (err error) {
+	srcPixbuf, err := NewPixbufFromFile(srcFile)
+	defer FreePixbuf(srcPixbuf)
+	if err != nil {
+		return
+	}
+	destPixbuf, err := RotateSimple(srcPixbuf, angle)
+	defer FreePixbuf(destPixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(destPixbuf, destFile, f)
+	return
+}
 
 func RotateSimple(srcPixbuf *C.GdkPixbuf, angle GdkPixbufRotation) (destPixbuf *C.GdkPixbuf, err error) {
 	defaultError := fmt.Errorf("rotate pixbuf failed, %v, %v", srcPixbuf, angle)
