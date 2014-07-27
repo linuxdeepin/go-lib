@@ -38,18 +38,19 @@ type gdkpixbufTester struct{}
 var _ = Suite(&gdkpixbufTester{})
 
 const (
-	originImg               = "testdata/origin_1920x1080.jpg"
-	originImgWidth          = 1920
-	originImgHeight         = 1080
-	originImgDominantColorH = 205
-	originImgDominantColorS = 0.69
-	originImgDominantColorV = 0.42
+	originImg       = "testdata/origin_1920x1080.jpg"
+	originImgWidth  = 1920
+	originImgHeight = 1080
 
 	originImgIconBmp = "testdata/origin_icon_48x48.bmp"
 	originImgIconGif = "testdata/origin_icon_48x48.gif"
 	originImgIconTxt = "testdata/origin_icon_48x48.txt"
 
-	originImgJpgClear       = "testdata/origin_1920x1080_clear.jpg"
+	originImgJpgClear               = "testdata/origin_1920x1080_clear.jpg"
+	originImgJpgClearDominantColorH = 205
+	originImgJpgClearDominantColorS = 0.69
+	originImgJpgClearDominantColorV = 0.42
+
 	originImgJpgMix         = "testdata/origin_1920x1080_mix.jpg"
 	originImgPngSmall       = "testdata/origin_small_200x200.png"
 	originImgPngSmallWidth  = 200
@@ -84,6 +85,24 @@ func (*gdkpixbufTester) TestIsSupportedImage(c *C) {
 	c.Check(IsSupportedImage(originImgIconBmp), Equals, true)
 	c.Check(IsSupportedImage(originImgIconGif), Equals, true)
 	c.Check(IsSupportedImage(originImgIconTxt), Equals, false)
+}
+
+func (*gdkpixbufTester) TestGetDominantColor(c *C) {
+	h, s, v, err := GetDominantColorOfImage(originImgJpgClear)
+	if err != nil {
+		c.Error(err)
+	}
+	if delta(h, originImgJpgClearDominantColorH) > 1 ||
+		delta(s, originImgJpgClearDominantColorS) > 0.1 ||
+		delta(v, originImgJpgClearDominantColorV) > 0.1 {
+		c.Error("h, s, v = ", h, s, v)
+	}
+}
+func delta(x, y float64) float64 {
+	if x >= y {
+		return x - y
+	}
+	return y - x
 }
 
 func (*gdkpixbufTester) TestBlurImage(c *C) {

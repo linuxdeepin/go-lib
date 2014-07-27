@@ -187,6 +187,30 @@ func CopyAreaSimple(srcPixbuf *C.GdkPixbuf, srcX, srcY, width, height int) (dest
 	return
 }
 
+// dominant color
+
+// GetDominantColorOfImage return the dominant hsv color of an image.
+func GetDominantColorOfImage(imgFile string) (h, s, v float64, err error) {
+	pixbuf, err := NewPixbufFromFile(imgFile)
+	defer FreePixbuf(pixbuf)
+	if err != nil {
+		return
+	}
+	return GetDominantColor(pixbuf)
+}
+
+func GetDominantColor(pixbuf *C.GdkPixbuf) (h, s, v float64, err error) {
+	defaultError := fmt.Errorf("get dominant color of pixbuf failed,", pixbuf)
+	var r, g, b float64
+	ret := C.get_dominant_color(pixbuf, (*C.double)(&r), (*C.double)(&g), (*C.double)(&b))
+	if ret == 0 {
+		err = defaultError
+		return
+	}
+	h, s, v = Rgb2Hsv(uint8(r), uint8(g), uint8(b))
+	return
+}
+
 // Convert
 
 func ConvertImage(srcFile, destFile string, f Format) (err error) {

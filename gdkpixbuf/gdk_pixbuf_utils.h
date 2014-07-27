@@ -31,6 +31,7 @@
 int init_gdk_xlib();
 const char *get_image_format(const char *img_file);
 int get_image_size(const char *img_file, int *width, int *height);
+int get_dominant_color(const GdkPixbuf *pixbuf, double *r, double *g, double *b);
 int save(GdkPixbuf *pixbuf, const char *dest_file, const char *format);
 GdkPixbuf *new_pixbuf_from_file(const char *img_file);
 Pixmap convert_pixbuf_to_xpixmap(GdkPixbuf *pixbuf);

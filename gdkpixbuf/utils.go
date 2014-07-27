@@ -26,8 +26,20 @@ import (
 	"pkg.linuxdeepin.com/lib/utils"
 )
 
+// function links to lib/graphic
+
 func generateCacheFilePath(keyword string) string {
 	return utils.GenerateCacheFilePathWithPrefix("graphic", keyword)
+}
+
+// Rgb2Hsv convert color format from RGB(r, g, b=[0..255]) to HSV(h=[0..360), s,v=[0..1]).
+func Rgb2Hsv(r, g, b uint8) (h, s, v float64) {
+	return graphic.Rgb2Hsv(r, g, b)
+}
+
+// Hsv2Rgb convert color format from HSV(h=[0..360), s,v=[0..1]) to RGB(r, g, b=[0..255]).
+func Hsv2Rgb(h, s, v float64) (r, g, b uint8) {
+	return graphic.Hsv2Rgb(h, s, v)
 }
 
 // GetPreferScaleClipRect get the maximum rectangle in center of

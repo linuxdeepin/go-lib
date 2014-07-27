@@ -52,6 +52,44 @@ int get_image_size(const char *img_file, int *width, int *height) {
         return FALSE;
 }
 
+int get_dominant_color(const GdkPixbuf *pixbuf, double *r, double *g, double *b) {
+        if (pixbuf == NULL) {
+                g_warning("pixbuf is NULL\n");
+                return FALSE;
+        }
+        guint length = 0;
+        guchar *pixels = gdk_pixbuf_get_pixels_with_length(pixbuf, &length);
+        if (length == 0) {
+                g_warning("zero length of pixbuf\n");
+                return FALSE;
+        }
+
+        // calculate dominant color of pixbuf
+        long long sum_r = 0;
+        long long sum_g = 0;
+        long long sum_b = 0;
+        long count = 0;
+        int skip = gdk_pixbuf_get_n_channels(pixbuf);
+        guint i = 0;
+        for (i=0; i<length; i += skip) {
+                if (skip == 4 && pixels[i+3] < 125) {
+                        continue;
+                }
+                sum_r += pixels[i];
+                sum_g += pixels[i+1];
+                sum_b += pixels[i+2];
+                count++;
+        }
+        if (count == 0) {
+                g_warning("count is zero when calculating dominant color of pixbuf\n");
+                return FALSE;
+        }
+        *r = sum_r / count;
+        *g = sum_g / count;
+        *b = sum_b / count;
+        return TRUE;
+}
+
 int save(GdkPixbuf *pixbuf, const char *dest_file, const char *format) {
         GError *err = NULL;
         gdk_pixbuf_save (pixbuf, dest_file, format, &err, NULL);
