@@ -187,7 +187,7 @@ func CopyAreaSimple(srcPixbuf *C.GdkPixbuf, srcX, srcY, width, height int) (dest
 	return
 }
 
-// dominant color
+// Dominant color
 
 // GetDominantColorOfImage return the dominant hsv color of an image.
 func GetDominantColorOfImage(imgFile string) (h, s, v float64, err error) {
@@ -220,37 +220,6 @@ func ConvertImage(srcFile, destFile string, f Format) (err error) {
 		return
 	}
 	err = Save(srcPixbuf, destFile, f)
-	return
-}
-
-// ConvertImageToXpixmap convert image file to x pixmap.
-func ConvertImageToXpixmap(srcFile string) (xpixmap xproto.Pixmap, err error) {
-	srcPixbuf, err := NewPixbufFromFile(srcFile)
-	defer FreePixbuf(srcPixbuf)
-	if err != nil {
-		return
-	}
-	xpixmap, err = ConvertPixbufToXpixmap(srcPixbuf)
-	return
-}
-
-func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err error) {
-	defaultError := fmt.Errorf("convert pixbuf to xpixmap failed, %v", pixbuf)
-	xpixmap = xproto.Pixmap(C.convert_pixbuf_to_xpixmap(pixbuf))
-	if xpixmap == 0 {
-		err = defaultError
-		return
-	}
-	return
-}
-
-func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C.GdkPixbuf, err error) {
-	defaultError := fmt.Errorf("convert xpixmap to pixbuf failed, %v", xpixmap)
-	pixbuf = C.convert_xpixmap_to_pixbuf(C.Pixmap(xpixmap), C.int(width), C.int(heigth))
-	if pixbuf == nil {
-		err = defaultError
-		return
-	}
 	return
 }
 
@@ -293,7 +262,7 @@ func Flip(srcPixbuf *C.GdkPixbuf, horizontal bool) (destPixbuf *C.GdkPixbuf, err
 	return
 }
 
-// Scale and thumbnail
+// Scale and Thumbnail
 
 // ScaleImage returns a new image file with the given width and
 // height created by resizing the given image.
@@ -456,3 +425,40 @@ func RotateSimple(srcPixbuf *C.GdkPixbuf, angle GdkPixbufRotation) (destPixbuf *
 	}
 	return
 }
+
+// XLib
+
+// ConvertImageToXpixmap convert image file to x pixmap.
+func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
+	pixbuf, err := NewPixbufFromFile(imgFile)
+	defer FreePixbuf(pixbuf)
+	if err != nil {
+		return
+	}
+	xpixmap, err = ConvertPixbufToXpixmap(pixbuf)
+	return
+}
+
+func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err error) {
+	defaultError := fmt.Errorf("convert pixbuf to xpixmap failed, %v", pixbuf)
+	xpixmap = xproto.Pixmap(C.convert_pixbuf_to_xpixmap(pixbuf))
+	if xpixmap == 0 {
+		err = defaultError
+		return
+	}
+	return
+}
+
+func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C.GdkPixbuf, err error) {
+	defaultError := fmt.Errorf("convert xpixmap to pixbuf failed, %v", xpixmap)
+	pixbuf = C.convert_xpixmap_to_pixbuf(C.Pixmap(xpixmap), C.int(width), C.int(heigth))
+	if pixbuf == nil {
+		err = defaultError
+		return
+	}
+	return
+}
+
+// TODO
+// func XPutImage(drawable uint32) {
+// }
