@@ -224,7 +224,7 @@ func ConvertImage(srcFile, destFile string, f Format) (err error) {
 }
 
 // ConvertImageToXpixmap convert image file to x pixmap.
-func ConvertImageToXpixmap(srcFile, destFile string) (xpixmap xproto.Pixmap, err error) {
+func ConvertImageToXpixmap(srcFile string) (xpixmap xproto.Pixmap, err error) {
 	srcPixbuf, err := NewPixbufFromFile(srcFile)
 	defer FreePixbuf(srcPixbuf)
 	if err != nil {
