@@ -18,13 +18,13 @@
  * You should have received a copy of the GNU General Public License
  **/
 
-package logger
+package log
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
+	golog "log"
 	"os"
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/utils"
@@ -157,12 +157,12 @@ type Logger struct {
 // stores in variable "DebugEnv", the default log level will be
 // "LEVEL_DEBUG" or is "LEVEL_INFO".
 func NewLogger(name string) (logger *Logger) {
-	log.SetFlags(log.Llongfile)
+	golog.SetFlags(golog.Llongfile)
 
 	// ignore panic
 	defer func() {
 		if err := recover(); err != nil {
-			log.Println("[INFO] dbus unavailable,", err)
+			golog.Println("[INFO] dbus unavailable,", err)
 		}
 	}()
 
@@ -207,12 +207,12 @@ func NewLogger(name string) (logger *Logger) {
 
 	err := initLogapi()
 	if err != nil {
-		log.Printf("init logger dbus api failed: %v\n", err)
+		golog.Printf("init logger dbus api failed: %v\n", err)
 		return
 	}
 	logger.id, err = logapi.NewLogger(name)
 	if err != nil {
-		log.Printf("create logger api object failed: %v\n", err)
+		golog.Printf("create logger api object failed: %v\n", err)
 		return
 	}
 	return

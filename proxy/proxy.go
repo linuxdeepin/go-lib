@@ -24,7 +24,7 @@ package proxy
 import (
 	"os"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
-	liblogger "pkg.linuxdeepin.com/lib/logger"
+	"pkg.linuxdeepin.com/lib/log"
 	"pkg.linuxdeepin.com/lib/utils"
 )
 
@@ -52,7 +52,7 @@ const (
 
 var (
 	proxySettings = gio.NewSettings(gsettingsIdProxy)
-	logger        = liblogger.NewLogger("com.deepin.dlib.proxy")
+	logger        = log.NewLogger("com.deepin.dlib.proxy")
 )
 
 // SetupProxy setup system proxy, need followed with glib.StartLoop().

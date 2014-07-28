@@ -1,5 +1,5 @@
 /*This file is auto generate by pkg.linuxdeepin.com/dbus-generator. Don't edit it*/
-package logger
+package log
 
 import "pkg.linuxdeepin.com/lib/dbus"
 import "pkg.linuxdeepin.com/lib/dbus/property"
@@ -8,7 +8,7 @@ import "sync"
 import "runtime"
 import "errors"
 import "strings"
-import "log"
+import golog "log"
 
 /*prevent compile error*/
 var _ = runtime.SetFinalizer
@@ -23,7 +23,7 @@ func getBus() *dbus.Conn {
 		var err error
 		__conn, err = dbus.SystemBus()
 		if err != nil {
-			log.Println("[INFO] dbus unavailable,", err)
+			golog.Println("[INFO] dbus unavailable,", err)
 		}
 	}
 	return __conn
@@ -37,7 +37,7 @@ type Logapi struct {
 func (obj Logapi) Debug(arg0, arg1, arg2 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Debug", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -45,7 +45,7 @@ func (obj Logapi) Debug(arg0, arg1, arg2 string) (_err error) {
 func (obj Logapi) Error(arg0, arg1, arg2 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Error", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -53,7 +53,7 @@ func (obj Logapi) Error(arg0, arg1, arg2 string) (_err error) {
 func (obj Logapi) Fatal(arg0, arg1, arg2 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Fatal", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -61,7 +61,7 @@ func (obj Logapi) Fatal(arg0, arg1, arg2 string) (_err error) {
 func (obj Logapi) Info(arg0, arg1, arg2 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Info", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -69,7 +69,7 @@ func (obj Logapi) Info(arg0, arg1, arg2 string) (_err error) {
 func (obj Logapi) NewLogger(arg0 string) (arg1 string, _err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.NewLogger", 0, arg0).Store(&arg1)
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -77,7 +77,7 @@ func (obj Logapi) NewLogger(arg0 string) (arg1 string, _err error) {
 func (obj Logapi) Warning(arg0, arg1, arg2 string) (_err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.Warning", 0, arg0, arg1, arg2).Store()
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
@@ -85,7 +85,7 @@ func (obj Logapi) Warning(arg0, arg1, arg2 string) (_err error) {
 func (obj Logapi) GetLog(arg0 string) (arg1 string, _err error) {
 	_err = obj.core.Call("com.deepin.api.Logger.GetLog", 0, arg0).Store(&arg1)
 	if _err != nil {
-		log.Println(_err)
+		golog.Println(_err)
 	}
 	return
 }
