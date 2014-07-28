@@ -615,16 +615,20 @@ func init() {
 }
 
 func DealWithUnhandledMessage() {
-	if conn, err := SessionBus(); err == nil {
-		for _, msg := range conn.unhandledMsgs {
-			go conn.handleCall(msg)
+	switch os.Getenv("DBUS_STARTER_BUS_TYPE") {
+	case "session":
+		if conn, err := SessionBus(); err == nil {
+			for _, msg := range conn.unhandledMsgs {
+				go conn.handleCall(msg)
+			}
+			conn.unhandledMsgs = nil
 		}
-		conn.unhandledMsgs = nil
-	}
-	if conn, err := SystemBus(); err == nil {
-		for _, msg := range conn.unhandledMsgs {
-			go conn.handleCall(msg)
+	case "system":
+		if conn, err := SystemBus(); err == nil {
+			for _, msg := range conn.unhandledMsgs {
+				go conn.handleCall(msg)
+			}
+			conn.unhandledMsgs = nil
 		}
-		conn.unhandledMsgs = nil
 	}
 }
