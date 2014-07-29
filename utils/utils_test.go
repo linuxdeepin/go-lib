@@ -15,6 +15,111 @@ func init() {
 	Suite(&UtilsTest{})
 }
 
+func (*UtilsTest) TestIsURI(c *C) {
+	var data = []struct {
+		value  string
+		result bool
+	}{
+		{"", false},
+		{":", false},
+		{"://", false},
+		{"file:/", false},
+		{"file://", true},
+		{"file:///", true},
+		{"file:///usr/share", true},
+		{"unknown:///usr/share", true},
+	}
+	for _, d := range data {
+		c.Check(IsURI(d.value), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestGetURIScheme(c *C) {
+	var data = []struct {
+		value, result string
+	}{
+		{"", ""},
+		{":", ""},
+		{"://", ""},
+		{"file:/", ""},
+		{"file://", "file"},
+		{"file:///", "file"},
+		{"file:///usr/share", "file"},
+		{"unknown:///usr/share", "unknown"},
+	}
+	for _, d := range data {
+		c.Check(GetURIScheme(d.value), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestEncodeURI(c *C) {
+	var data = []struct {
+		value, scheme, result string
+	}{
+		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
+		{"", SCHEME_FILE, ""},
+		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+	}
+	for _, d := range data {
+		c.Check(EncodeURI(d.value, d.scheme), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestDecodeURI(c *C) {
+	var data = []struct {
+		value, result string
+	}{
+		{"file:///usr/lib/share/test", "file:///usr/lib/share/test"},
+		{"ftp:///usr/lib/share/test", "ftp:///usr/lib/share/test"},
+		{"http:///usr/lib/share/test", "http:///usr/lib/share/test"},
+		{"https:///usr/lib/share/test", "https:///usr/lib/share/test"},
+		{"smb:///usr/lib/share/test", "smb:///usr/lib/share/test"},
+		{"", ""},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "file:///usr/lib/share/中文路径/1 2 3"},
+	}
+	for _, d := range data {
+		c.Check(DecodeURI(d.value), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestURIToPath(c *C) {
+	var data = []struct {
+		value, result string
+	}{
+		{"file:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"ftp:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"", ""},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+	}
+	for _, d := range data {
+		c.Check(URIToPath(d.value), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestPathToURI(c *C) {
+	var data = []struct {
+		value, scheme, result string
+	}{
+		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
+		{"", SCHEME_FILE, ""},
+		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+	}
+	for _, d := range data {
+		c.Check(PathToURI(d.value, d.scheme), Equals, d.result)
+	}
+}
+
 func (*UtilsTest) TestIsEnvExists(c *C) {
 	testEnvName := "test_is_env_exists"
 	testEnvValue := "test_env_value"

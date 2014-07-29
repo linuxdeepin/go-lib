@@ -23,7 +23,6 @@ package utils
 
 import (
 	"net/url"
-	"regexp"
 	"strings"
 )
 
@@ -34,6 +33,22 @@ const (
 	SCHEME_HTTPS = "https://"
 	SCHEME_SMB   = "smb://"
 )
+
+func IsURI(s string) (ok bool) {
+	scheme := GetURIScheme(s)
+	if len(scheme) > 0 {
+		ok = true
+	}
+	return
+}
+
+func GetURIScheme(uri string) (scheme string) {
+	i := strings.Index(uri, "://")
+	if i >= 0 {
+		scheme = uri[0:i]
+	}
+	return
+}
 
 func EncodeURI(uri, scheme string) string {
 	if len(uri) < 1 {
@@ -161,6 +176,7 @@ func pathToSmbURI(filepath string) string {
 }
 
 func deleteStartSpace(str string) string {
+	// TODO
 	if len(str) <= 0 {
 		return ""
 	}
@@ -171,7 +187,5 @@ func deleteStartSpace(str string) string {
 }
 
 func isBeginWithStr(str, substr string) bool {
-	// TODO refactor code, could use strings.HasPrefix()
-	ok, _ := regexp.MatchString("^"+substr, str)
-	return ok
+	return strings.HasPrefix(str, substr)
 }
