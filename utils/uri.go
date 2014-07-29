@@ -83,128 +83,122 @@ func DecodeURI(uri string) (content string) {
 }
 
 func URIToPath(uri string) string {
-	return DecodeURI(uri)
-
 	// TODO
-	// if IsURI(uri) {
-	// 	return GetURIContent(uri)
-	// } else {
-	// 	return uri
-	// }
+	// return DecodeURI(uri)
 
-	// if isBeginWithStr(filepath, SCHEME_FILE) {
-	// 	return filepath[7:]
-	// } else if isBeginWithStr(filepath, SCHEME_FTP) {
-	// 	return filepath[6:]
-	// } else if isBeginWithStr(filepath, SCHEME_HTTP) {
-	// 	return filepath[7:]
-	// } else if isBeginWithStr(filepath, SCHEME_HTTPS) {
-	// 	return filepath[8:]
-	// } else if isBeginWithStr(filepath, SCHEME_SMB) {
-	// 	return filepath[6:]
-	// } else if isBeginWithStr(filepath, "/") {
-	// 	return filepath
-	// }
+	if isBeginWithStr(uri, SCHEME_FILE) {
+		return uri[7:]
+	} else if isBeginWithStr(uri, SCHEME_FTP) {
+		return uri[6:]
+	} else if isBeginWithStr(uri, SCHEME_HTTP) {
+		return uri[7:]
+	} else if isBeginWithStr(uri, SCHEME_HTTPS) {
+		return uri[8:]
+	} else if isBeginWithStr(uri, SCHEME_SMB) {
+		return uri[6:]
+	} else if isBeginWithStr(uri, "/") {
+		return uri
+	}
 
-	// return ""
+	return ""
 }
 
 func PathToURI(filepath, scheme string) string {
-	return EncodeURI(filepath, scheme)
-
 	// TODO
-	// if len(filepath) < 1 || len(scheme) < 1 {
-	// 	return ""
-	// }
+	// return EncodeURI(filepath, scheme)
 
-	// switch scheme {
-	// case SCHEME_FILE:
-	// 	return pathToFileURI(filepath)
-	// case SCHEME_FTP:
-	// 	return pathToFtpURI(filepath)
-	// case SCHEME_HTTP:
-	// 	return pathToHttpURI(filepath)
-	// case SCHEME_HTTPS:
-	// 	return pathToHttpsURI(filepath)
-	// case SCHEME_SMB:
-	// 	return pathToSmbURI(filepath)
-	// }
+	if len(filepath) < 1 || len(scheme) < 1 {
+		return ""
+	}
 
-	// return ""
+	switch scheme {
+	case SCHEME_FILE:
+		return pathToFileURI(filepath)
+	case SCHEME_FTP:
+		return pathToFtpURI(filepath)
+	case SCHEME_HTTP:
+		return pathToHttpURI(filepath)
+	case SCHEME_HTTPS:
+		return pathToHttpsURI(filepath)
+	case SCHEME_SMB:
+		return pathToSmbURI(filepath)
+	}
+
+	return ""
 }
 
 // TODO
-// func pathToFileURI(filepath string) string {
-// 	filepath = deleteStartSpace(filepath)
+func pathToFileURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-// 	if isBeginWithStr(filepath, "/") {
-// 		return SCHEME_FILE + filepath
-// 	} else if isBeginWithStr(filepath, SCHEME_FILE) {
-// 		return filepath
-// 	}
+	if isBeginWithStr(filepath, "/") {
+		return SCHEME_FILE + filepath
+	} else if isBeginWithStr(filepath, SCHEME_FILE) {
+		return filepath
+	}
 
-// 	return ""
-// }
+	return ""
+}
 
-// func pathToFtpURI(filepath string) string {
-// 	filepath = deleteStartSpace(filepath)
+func pathToFtpURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-// 	if isBeginWithStr(filepath, "/") {
-// 		return SCHEME_FTP + filepath
-// 	} else if isBeginWithStr(filepath, SCHEME_FTP) {
-// 		return filepath
-// 	}
+	if isBeginWithStr(filepath, "/") {
+		return SCHEME_FTP + filepath
+	} else if isBeginWithStr(filepath, SCHEME_FTP) {
+		return filepath
+	}
 
-// 	return ""
-// }
+	return ""
+}
 
-// func pathToHttpURI(filepath string) string {
-// 	filepath = deleteStartSpace(filepath)
+func pathToHttpURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-// 	if isBeginWithStr(filepath, "/") {
-// 		return SCHEME_HTTP + filepath
-// 	} else if isBeginWithStr(filepath, SCHEME_HTTP) {
-// 		return filepath
-// 	}
+	if isBeginWithStr(filepath, "/") {
+		return SCHEME_HTTP + filepath
+	} else if isBeginWithStr(filepath, SCHEME_HTTP) {
+		return filepath
+	}
 
-// 	return ""
-// }
+	return ""
+}
 
-// func pathToHttpsURI(filepath string) string {
-// 	filepath = deleteStartSpace(filepath)
+func pathToHttpsURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-// 	if isBeginWithStr(filepath, "/") {
-// 		return SCHEME_HTTPS + filepath
-// 	} else if isBeginWithStr(filepath, SCHEME_HTTPS) {
-// 		return filepath
-// 	}
+	if isBeginWithStr(filepath, "/") {
+		return SCHEME_HTTPS + filepath
+	} else if isBeginWithStr(filepath, SCHEME_HTTPS) {
+		return filepath
+	}
 
-// 	return ""
-// }
+	return ""
+}
 
-// func pathToSmbURI(filepath string) string {
-// 	filepath = deleteStartSpace(filepath)
+func pathToSmbURI(filepath string) string {
+	filepath = deleteStartSpace(filepath)
 
-// 	if isBeginWithStr(filepath, "/") {
-// 		return SCHEME_SMB + filepath
-// 	} else if isBeginWithStr(filepath, SCHEME_SMB) {
-// 		return filepath
-// 	}
+	if isBeginWithStr(filepath, "/") {
+		return SCHEME_SMB + filepath
+	} else if isBeginWithStr(filepath, SCHEME_SMB) {
+		return filepath
+	}
 
-// 	return ""
-// }
+	return ""
+}
 
-// func deleteStartSpace(str string) string {
-// 	// TODO
-// 	if len(str) <= 0 {
-// 		return ""
-// 	}
+func deleteStartSpace(str string) string {
+	// TODO
+	if len(str) <= 0 {
+		return ""
+	}
 
-// 	tmp := strings.TrimLeft(str, " ")
+	tmp := strings.TrimLeft(str, " ")
 
-// 	return tmp
-// }
+	return tmp
+}
 
-// func isBeginWithStr(str, substr string) bool {
-// 	return strings.HasPrefix(str, substr)
-// }
+func isBeginWithStr(str, substr string) bool {
+	return strings.HasPrefix(str, substr)
+}

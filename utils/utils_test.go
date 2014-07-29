@@ -87,6 +87,10 @@ func (*UtilsTest) TestEncodeURI(c *C) {
 		{"file:///usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
 		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
 		{"file:///usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"/home/fsh/Wallpapers/中文 name with %.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
 		c.Check(EncodeURI(d.value, d.scheme), Equals, d.result)
@@ -105,9 +109,34 @@ func (*UtilsTest) TestDecodeURI(c *C) {
 		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
 		{"file:///usr/lib/share/中文路径/1 2 3", "/usr/lib/share/中文路径/1 2 3"},
+		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", "/home/fsh/Wallpapers/中文 name with %.jpg"},
+		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
 		c.Check(DecodeURI(d.value), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestPathToURI(c *C) {
+	var data = []struct {
+		value, scheme, result string
+	}{
+		{"", SCHEME_FILE, ""},
+		// {"", SCHEME_FILE, "file://"},
+		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
+		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
+		// TODO
+		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		// {"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		// {"/home/fsh/Wallpapers/中文 name with %.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		// {"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		// {"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+	}
+	for _, d := range data {
+		c.Check(PathToURI(d.value, d.scheme), Equals, d.result)
 	}
 }
 
@@ -121,36 +150,14 @@ func (*UtilsTest) TestURIToPath(c *C) {
 		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
-		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
 		// TODO
-		// {"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", "/home/fsh/Wallpapers/中文 name with %.jpg"},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		// {"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
+		// {"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", "/home/fsh/Wallpapers/中文 name with %.jpg"},
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
 		c.Check(URIToPath(d.value), Equals, d.result)
-	}
-}
-
-func (*UtilsTest) TestPathToURI(c *C) {
-	var data = []struct {
-		value, scheme, result string
-	}{
-		{"", SCHEME_FILE, "file://"},
-		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
-		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
-		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
-		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
-		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
-		// TODO
-		// {"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		{"/home/fsh/Wallpapers/中文 name with %.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
-		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
-		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
-	}
-	for _, d := range data {
-		c.Check(PathToURI(d.value, d.scheme), Equals, d.result)
 	}
 }
 
@@ -169,7 +176,7 @@ func (*UtilsTest) TestIsFileExist(c *C) {
 		ioutil.WriteFile(d.path, nil, 0644)
 		c.Check(IsFileExist(d.path), Equals, true)
 		c.Check(IsFileExist(d.uri), Equals, true)
-		// os.Remove(d.path)
+		os.Remove(d.path)
 	}
 }
 
