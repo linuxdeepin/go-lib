@@ -70,11 +70,15 @@ func EncodeURI(content, scheme string) (uri string) {
 }
 
 func DecodeURI(uri string) (content string) {
-	u, err := url.Parse(uri)
-	if err != nil {
-		return
+	if IsURI(uri) {
+		u, err := url.Parse(uri)
+		if err != nil {
+			return
+		}
+		content = u.Path
+	} else {
+		content = uri
 	}
-	content = u.Path
 	return
 }
 

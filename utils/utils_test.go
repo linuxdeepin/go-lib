@@ -124,6 +124,7 @@ func (*UtilsTest) TestURIToPath(c *C) {
 		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
 		// TODO
 		// {"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", "/home/fsh/Wallpapers/中文 name with %.jpg"},
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
@@ -144,6 +145,8 @@ func (*UtilsTest) TestPathToURI(c *C) {
 		// TODO
 		// {"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
 		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"/home/fsh/Wallpapers/中文 name with %.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		{"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
 		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
@@ -155,9 +158,10 @@ func (*UtilsTest) TestIsFileExist(c *C) {
 	var data = []struct {
 		path, uri string
 	}{
-		{"/tmp/deepin_go_lib_test_file", "file:///tmp/deepin_go_lib_test_file"},
-		{"/tmp/deepin_go_lib_test_file 中文路径", "file:///tmp/deepin_go_lib_test_file%20%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84"},
-		{"/tmp/deepin_go_lib_test_file 中文路径", "file:///tmp/deepin_go_lib_test_file 中文路径"},
+		{"/tmp/deepin_test_file", "file:///tmp/deepin_test_file"},
+		{"/tmp/deepin_test_中文 name with %.jpg", "file:///tmp/deepin_test_%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
+		{"/tmp/deepin_test_file 中文路径", "file:///tmp/deepin_test_file%20%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84"},
+		{"/tmp/deepin_test_file 中文路径", "file:///tmp/deepin_test_file 中文路径"},
 	}
 	for _, d := range data {
 		os.Remove(d.path)
@@ -165,12 +169,12 @@ func (*UtilsTest) TestIsFileExist(c *C) {
 		ioutil.WriteFile(d.path, nil, 0644)
 		c.Check(IsFileExist(d.path), Equals, true)
 		c.Check(IsFileExist(d.uri), Equals, true)
-		os.Remove(d.path)
+		// os.Remove(d.path)
 	}
 }
 
 func (*UtilsTest) TestIsDir(c *C) {
-	testDir := "/tmp/deepin_go_lib_test_dir"
+	testDir := "/tmp/deepin_test_dir"
 	os.RemoveAll(testDir)
 	c.Check(IsDir(testDir), Equals, false)
 	os.MkdirAll(testDir, 0644)
@@ -179,8 +183,8 @@ func (*UtilsTest) TestIsDir(c *C) {
 }
 
 func (*UtilsTest) TestIsSymlink(c *C) {
-	testFile := "/tmp/deepin_go_lib_test_file"
-	testSymlink := "/tmp/deepin_go_lib_test_symlink"
+	testFile := "/tmp/deepin_test_file"
+	testSymlink := "/tmp/deepin_test_symlink"
 	os.Remove(testSymlink)
 	c.Check(IsSymlink(testSymlink), Equals, false)
 	ioutil.WriteFile(testFile, nil, 0644)
