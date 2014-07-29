@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"io/ioutil"
 	. "launchpad.net/gocheck"
 	"os"
@@ -207,4 +208,16 @@ func (*UtilsTest) TestUnsetEnv(c *C) {
 	UnsetEnv(testEnvName)
 	c.Check(false, Equals, IsEnvExists(testEnvName))
 	c.Check(len(os.Environ()), Equals, envCount-1)
+}
+
+func (*UtilsTest) TestGenUuid(c *C) {
+	for i := 0; i < 5; i++ {
+		fmt.Println("GenUuid:", GenUuid())
+	}
+}
+
+func (*UtilsTest) TestRandString(c *C) {
+	for i := 0; i < 5; i++ {
+		fmt.Println("RandString:", RandString(10))
+	}
 }
