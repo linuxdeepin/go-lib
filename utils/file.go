@@ -54,18 +54,13 @@ func CopyFile(src, dest string) bool {
 	return true
 }
 
-func IsFileExist(filename string) bool {
-	if len(filename) < 1 {
-		return false
-	}
-
-	// ensure uri path decoded
-	path := URIToPath(filename)
+func IsFileExist(path string) bool {
+	// if is uri path, ensure it decoded
+	path = DecodeURI(path)
 	if len(path) < 1 {
 		return false
 	}
 	_, err := os.Stat(path)
-
 	return err == nil || os.IsExist(err)
 }
 
