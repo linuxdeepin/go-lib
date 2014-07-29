@@ -168,6 +168,27 @@ func (*UtilsTest) TestIsFileExist(c *C) {
 	}
 }
 
+func (*UtilsTest) TestIsDir(c *C) {
+	testDir := "/tmp/deepin_go_lib_test_dir"
+	os.RemoveAll(testDir)
+	c.Check(IsDir(testDir), Equals, false)
+	os.MkdirAll(testDir, 0644)
+	c.Check(IsDir(testDir), Equals, true)
+	os.RemoveAll(testDir)
+}
+
+func (*UtilsTest) TestIsSymlink(c *C) {
+	testFile := "/tmp/deepin_go_lib_test_file"
+	testSymlink := "/tmp/deepin_go_lib_test_symlink"
+	os.Remove(testSymlink)
+	c.Check(IsSymlink(testSymlink), Equals, false)
+	ioutil.WriteFile(testFile, nil, 0644)
+	os.Symlink(testFile, testSymlink)
+	c.Check(IsSymlink(testSymlink), Equals, true)
+	os.Remove(testSymlink)
+	os.Remove(testFile)
+}
+
 func (*UtilsTest) TestIsEnvExists(c *C) {
 	testEnvName := "test_is_env_exists"
 	testEnvValue := "test_env_value"

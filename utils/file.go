@@ -57,18 +57,38 @@ func CopyFile(src, dest string) bool {
 func IsFileExist(path string) bool {
 	// if is uri path, ensure it decoded
 	path = DecodeURI(path)
-	if len(path) < 1 {
-		return false
-	}
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
 }
 
-func EnsureDirExist(dir string) error {
-	return os.MkdirAll(dir, 0755)
+func IsDir(path string) bool {
+	// if is uri path, ensure it decoded
+	path = DecodeURI(path)
+	f, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return f.IsDir()
 }
 
-func EnsureDirExistWithPerm(dir string, perm os.FileMode) error {
-	// TODO if dir exists with wrong perm, fix it
-	return os.MkdirAll(dir, perm)
+func IsSymlink(path string) bool {
+	// if is uri path, ensure it decoded
+	path = DecodeURI(path)
+	f, err := os.Lstat(path)
+	if err != nil {
+		return false
+	}
+	if f.Mode()&os.ModeSymlink == os.ModeSymlink {
+		return true
+	}
+	return false
+}
+
+func EnsureDirExist(path string) error {
+	return os.MkdirAll(path, 0755)
+}
+
+func EnsureDirExistWithPerm(path string, perm os.FileMode) error {
+	// TODO if path exists with wrong perm, fix it
+	return os.MkdirAll(path, perm)
 }
