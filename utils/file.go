@@ -64,12 +64,11 @@ func IsFileExist(path string) bool {
 	return err == nil || os.IsExist(err)
 }
 
-// TODO refactor code, exist or exists
-func EnsureDirExists(dir string) error {
+func EnsureDirExist(dir string) error {
 	return os.MkdirAll(dir, 0755)
 }
 
-func EnsureDirExistsWithPerm(dir string, perm os.FileMode) error {
+func EnsureDirExistWithPerm(dir string, perm os.FileMode) error {
 	// TODO if dir exists with wrong perm, fix it
 	return os.MkdirAll(dir, perm)
 }

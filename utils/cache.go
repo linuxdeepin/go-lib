@@ -32,13 +32,13 @@ var DefaultCachePrefix = os.Getenv("HOME") + "/.cache/deepin"
 func GenerateCacheFilePath(keyword string) (dstfile string) {
 	cachePathFormat := DefaultCachePrefix + "/%s"
 	dstfile = fmt.Sprintf(cachePathFormat, doSumStrMd5(keyword))
-	EnsureDirExists(path.Dir(dstfile))
+	EnsureDirExist(path.Dir(dstfile))
 	return
 }
 
 func GenerateCacheFilePathWithPrefix(prefix, keyword string) (dstfile string) {
 	graphicCacheFormat := DefaultCachePrefix + "/%s/%s"
 	dstfile = fmt.Sprintf(graphicCacheFormat, prefix, doSumStrMd5(keyword))
-	EnsureDirExists(path.Dir(dstfile))
+	EnsureDirExist(path.Dir(dstfile))
 	return
 }
