@@ -22,36 +22,30 @@
 package utils
 
 import (
-	"io/ioutil"
+	"fmt"
+	"io"
 	"os"
 )
 
-func CopyFile(src, dest string) bool {
-	if ok := IsFileExist(src); !ok && len(dest) < 1 {
-		return false
+func CopyFile(src, dest string) (err error) {
+	if dest == src {
+		return fmt.Errorf("source and destination are same file")
 	}
 
-	contents, err := ioutil.ReadFile(src)
+	sf, err := os.Open(src)
 	if err != nil {
-		return false
+		return
 	}
+	defer sf.Close()
 
-	f, err1 := os.Create(dest + "~")
-	if err1 != nil {
-		return false
+	df, err := os.Create(dest)
+	if err != nil {
+		return
 	}
-	defer f.Close()
+	defer df.Close()
 
-	if _, err := f.Write(contents); err != nil {
-		return false
-	}
-	f.Sync()
-
-	if err := os.Rename(dest+"~", dest); err != nil {
-		return false
-	}
-
-	return true
+	_, err = io.Copy(df, sf)
+	return
 }
 
 func IsFileExist(path string) bool {
