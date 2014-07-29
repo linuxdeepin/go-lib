@@ -120,7 +120,9 @@ func (*UtilsTest) TestURIToPath(c *C) {
 		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
-		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
+		// TODO
+		// {"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
@@ -132,13 +134,15 @@ func (*UtilsTest) TestPathToURI(c *C) {
 	var data = []struct {
 		value, scheme, result string
 	}{
-		{"", SCHEME_FILE, ""},
+		{"", SCHEME_FILE, "file://"},
 		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
-		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		// TODO
+		// {"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
 		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
