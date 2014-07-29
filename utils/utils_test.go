@@ -221,3 +221,11 @@ func (*UtilsTest) TestRandString(c *C) {
 		fmt.Println("RandString:", RandString(10))
 	}
 }
+
+func (*UtilsTest) TestIsInterfaceNil(c *C) {
+	c.Check(IsInterfaceNil(1), Equals, false)
+	c.Check(IsInterfaceNil(true), Equals, false)
+	c.Check(IsInterfaceNil(nil), Equals, true)
+	var a []int = nil
+	c.Check(IsInterfaceNil(a), Equals, true)
+}

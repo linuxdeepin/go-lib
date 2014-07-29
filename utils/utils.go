@@ -81,3 +81,8 @@ func RandString(n int) string {
 	}
 	return string(bytes)
 }
+
+func IsInterfaceNil(v interface{}) bool {
+	defer func() { recover() }()
+	return v == nil || reflect.ValueOf(v).IsNil()
+}
