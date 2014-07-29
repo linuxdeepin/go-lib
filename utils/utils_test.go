@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"io/ioutil"
 	. "launchpad.net/gocheck"
 	"os"
 	"testing"
@@ -52,6 +53,24 @@ func (*UtilsTest) TestGetURIScheme(c *C) {
 	}
 }
 
+func (*UtilsTest) TestGetURIContent(c *C) {
+	var data = []struct {
+		value, result string
+	}{
+		{"", ""},
+		{":", ""},
+		{"://", ""},
+		{"file:/", ""},
+		{"file://", ""},
+		{"file:///", "/"},
+		{"file:///usr/share", "/usr/share"},
+		{"unknown:///usr/share", "/usr/share"},
+	}
+	for _, d := range data {
+		c.Check(GetURIContent(d.value), Equals, d.result)
+	}
+}
+
 func (*UtilsTest) TestEncodeURI(c *C) {
 	var data = []struct {
 		value, scheme, result string
@@ -61,8 +80,12 @@ func (*UtilsTest) TestEncodeURI(c *C) {
 		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
-		{"", SCHEME_FILE, ""},
 		{"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+		{"file:///usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"file:///usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"", SCHEME_FILE, "file://"},
 	}
 	for _, d := range data {
 		c.Check(EncodeURI(d.value, d.scheme), Equals, d.result)
@@ -73,13 +96,13 @@ func (*UtilsTest) TestDecodeURI(c *C) {
 	var data = []struct {
 		value, result string
 	}{
-		{"file:///usr/lib/share/test", "file:///usr/lib/share/test"},
-		{"ftp:///usr/lib/share/test", "ftp:///usr/lib/share/test"},
-		{"http:///usr/lib/share/test", "http:///usr/lib/share/test"},
-		{"https:///usr/lib/share/test", "https:///usr/lib/share/test"},
-		{"smb:///usr/lib/share/test", "smb:///usr/lib/share/test"},
+		{"file:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"ftp:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
+		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
 		{"", ""},
-		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "file:///usr/lib/share/中文路径/1 2 3"},
 	}
 	for _, d := range data {
 		c.Check(DecodeURI(d.value), Equals, d.result)
@@ -95,8 +118,9 @@ func (*UtilsTest) TestURIToPath(c *C) {
 		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
-		{"", ""},
 		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"/usr/lib/share/test", "/usr/lib/share/test"},
+		{"", ""},
 	}
 	for _, d := range data {
 		c.Check(URIToPath(d.value), Equals, d.result)
@@ -112,11 +136,31 @@ func (*UtilsTest) TestPathToURI(c *C) {
 		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
-		{"", SCHEME_FILE, ""},
 		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
+		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
+		{"", SCHEME_FILE, ""},
 	}
 	for _, d := range data {
 		c.Check(PathToURI(d.value, d.scheme), Equals, d.result)
+	}
+}
+
+func (*UtilsTest) TestIsFileExist(c *C) {
+	// TODO
+	var data = []struct {
+		path, uri string
+	}{
+		{"/tmp/deepin_go_lib_test_file", "file:///tmp/deepin_go_lib_test_file"},
+		{"/tmp/deepin_go_lib_test_file 中文路径", "file:///tmp/deepin_go_lib_test_file%20%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84"},
+		{"/tmp/deepin_go_lib_test_file 中文路径", "file:///tmp/deepin_go_lib_test_file 中文路径"},
+	}
+	for _, d := range data {
+		os.Remove(d.path)
+		c.Check(IsFileExist(d.path), Equals, false)
+		ioutil.WriteFile(d.path, nil, 0644)
+		c.Check(IsFileExist(d.path), Equals, true)
+		c.Check(IsFileExist(d.uri), Equals, true)
+		os.Remove(d.path)
 	}
 }
 

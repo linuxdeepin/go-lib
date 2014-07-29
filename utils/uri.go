@@ -50,33 +50,38 @@ func GetURIScheme(uri string) (scheme string) {
 	return
 }
 
-func EncodeURI(uri, scheme string) string {
-	if len(uri) < 1 {
-		return ""
+func GetURIContent(uri string) (content string) {
+	i := strings.Index(uri, "://")
+	if i >= 0 {
+		content = uri[i+3:]
 	}
-
-	filepath := URIToPath(uri)
-	u := url.URL{}
-	u.Path = filepath
-	return scheme + u.String()
+	return
 }
 
-func DecodeURI(uri string) string {
-	if len(uri) < 1 {
-		return ""
+func EncodeURI(s, scheme string) (uri string) {
+	u := url.URL{}
+	if IsURI(s) {
+		u.Path = DecodeURI(s)
+	} else {
+		u.Path = s
 	}
+	uri = scheme + u.String()
+	return
+}
 
+func DecodeURI(uri string) (s string) {
 	u, err := url.Parse(uri)
 	if err != nil {
-		return ""
+		return
 	}
-
-	return u.Scheme + "://" + u.Path
+	s = u.Path
+	return
 }
 
 func URIToPath(uri string) string {
 	filepath := deleteStartSpace(uri)
 
+	// TODO
 	if isBeginWithStr(filepath, SCHEME_FILE) {
 		return filepath[7:]
 	} else if isBeginWithStr(filepath, SCHEME_FTP) {

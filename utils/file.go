@@ -59,6 +59,7 @@ func IsFileExist(filename string) bool {
 		return false
 	}
 
+	// ensure uri path decoded
 	path := URIToPath(filename)
 	if len(path) < 1 {
 		return false
