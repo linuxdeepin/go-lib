@@ -1,0 +1,1643 @@
+go-dlib (0.0.4+20140729232220~b3a86186ab) trusty; urgency=low
+
+  * Build from git b3a86186abe4f6ab93f7d1af440d7fc877c547fe
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 29 Jul 2014 23:22:20 +0800
+
+go-dlib (0.0.4+20140729213522~0fb7e5e5f7) trusty; urgency=low
+
+  * Build from git 0fb7e5e5f751872dc48e8523b940903ef15be5f0
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 29 Jul 2014 21:35:23 +0800
+
+go-dlib (0.0.4+20140728163245~57c6fac221) trusty; urgency=low
+
+  * Build from git 57c6fac2213afa920bafa74c750d26d9bd7bd16d
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Mon, 28 Jul 2014 16:32:46 +0800
+
+go-dlib (0.0.4+20140728120554~d9e7752fc2) trusty; urgency=low
+
+  * Build from git d9e7752fc22e9db83f4c3cc97262fd0d623d5b1d
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Mon, 28 Jul 2014 12:05:55 +0800
+
+go-dlib (0.0.4+20140727225632~4b3c27c204) trusty; urgency=low
+
+  * Build from git 4b3c27c204d4b5e64d456e88e5520c9a9d3822f3
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 22:56:33 +0800
+
+go-dlib (0.0.4+20140727162459~5ab6f0d87a) trusty; urgency=low
+
+  * Build from git 5ab6f0d87aa635fa45596056b4874267066048d8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 16:24:59 +0800
+
+go-dlib (0.0.4+20140727161825~8ac5677bdc) trusty; urgency=low
+
+  * Build from git 8ac5677bdc28245f5a4c8128f909fb6521d596f6
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 16:18:26 +0800
+
+go-dlib (0.0.4+20140727161520~f5acbb4b14) trusty; urgency=low
+
+  * Build from git f5acbb4b14726935e77f45347181367016829ac1
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 16:15:21 +0800
+
+go-dlib (0.0.4+20140727011043~aadeda21d8) trusty; urgency=low
+
+  * Build from git aadeda21d813dfbcbd8ab369504e99658e07ef32
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 01:10:43 +0800
+
+go-dlib (0.0.4+20140727005444~79d7e93ae6) trusty; urgency=low
+
+  * Build from git 79d7e93ae65aad0ffeb7bbdaccc910db21b83170
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 00:54:45 +0800
+
+go-dlib (0.0.4+20140727004741~6728670193) trusty; urgency=low
+
+  * Build from git 67286701933a310943cd555926549fddf7937309
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 00:47:42 +0800
+
+go-dlib (0.0.4+20140727002947~7c65003f74) trusty; urgency=low
+
+  * Build from git 7c65003f747c6ec99ce45c7e897200bc967bab49
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 27 Jul 2014 00:29:47 +0800
+
+go-dlib (0.0.4+20140725105830~c39ab0daf9) trusty; urgency=low
+
+  * Build from git c39ab0daf934f6c0744dd81a26fca63b378b868a
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 25 Jul 2014 10:58:31 +0800
+
+go-dlib (0.0.4+20140725103720~c39ab0daf9) trusty; urgency=low
+
+  * Build from git c39ab0daf934f6c0744dd81a26fca63b378b868a
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 25 Jul 2014 10:37:20 +0800
+
+go-dlib (0.0.4+20140725103416~c39ab0daf9) trusty; urgency=low
+
+  * Build from git c39ab0daf934f6c0744dd81a26fca63b378b868a
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 25 Jul 2014 10:34:16 +0800
+
+go-dlib (0.0.4+20140725093226~c39ab0daf9) trusty; urgency=low
+
+  * Build from git c39ab0daf934f6c0744dd81a26fca63b378b868a
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 25 Jul 2014 09:32:26 +0800
+
+go-dlib (0.0.4+20140713171929~6570f66e9c) trusty; urgency=low
+
+  * Build from git 6570f66e9ca39a561f7a34636180bf90ec5d7700
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Sun, 13 Jul 2014 17:19:30 +0800
+
+go-dlib (0.0.4+20140710171217~6c6f1e50a3) trusty; urgency=low
+
+  * Build from git 6c6f1e50a380e94c685bc67478338fb1517a907b
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 10 Jul 2014 17:12:17 +0800
+
+go-dlib (0.0.4+20140709141814~9f4e1873fe) trusty; urgency=low
+
+  * Build from git 9f4e1873fec49ec9631a9381287984badf6ddb37
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Wed, 09 Jul 2014 14:18:15 +0800
+
+go-dlib (0.0.4+20140709003405~9f4e1873fe) trusty; urgency=low
+
+  * Build from git 9f4e1873fec49ec9631a9381287984badf6ddb37
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Wed, 09 Jul 2014 00:34:05 +0800
+
+go-dlib (0.0.4+20140703163153~bc4ed33d53) trusty; urgency=low
+
+  * Build from git bc4ed33d5366bd2e8adce220e5cb4965871371c8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 03 Jul 2014 16:31:53 +0800
+
+go-dlib (0.0.4+20140703153242~bc4ed33d53) trusty; urgency=low
+
+  * Build from git bc4ed33d5366bd2e8adce220e5cb4965871371c8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 03 Jul 2014 15:32:42 +0800
+
+go-dlib (0.0.4-20140701164957~bc4ed33d53) trusty; urgency=low
+
+  * Build from git bc4ed33d5366bd2e8adce220e5cb4965871371c8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 16:49:58 +0800
+
+go-dlib (0.0.4-20140626092507~b163f70dff) trusty; urgency=low
+
+  * Build from git b163f70dff62cee34880c4f837cdfc7fe4f26b6e
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 26 Jun 2014 09:25:08 +0800
+
+go-dlib (0.0.3-20140626090643~b163f70dff) trusty; urgency=low
+
+  * Build from git b163f70dff62cee34880c4f837cdfc7fe4f26b6e
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 26 Jun 2014 09:06:44 +0800
+
+go-dlib (0.0.3-20140624132313~11e94acfa5) trusty; urgency=low
+
+  * fix repo. 
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 24 Jun 2014 15:28:14 +0800
+
+go-dlib (0.0.3-git20140624102313~11e94acfa5) trusty; urgency=low
+
+  * fix.
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 24 Jun 2014 10:15:13 +0800
+
+go-dlib (0.0.3-git20140624102313~11e94acfa4) trusty; urgency=low
+
+  * Upstream update.
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 24 Jun 2014 09:54:55 +0800
+
+go-dlib (0.0.1-1+git20140509132313~11e94acfa4) trusty; urgency=low
+
+  * Build from git revision 11e94acfa46123b63434ecfa71f03f43aec8d172
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 09 May 2014 13:23:13 +0800
+
+go-dlib (0.0.1-1+git20140509131554~b9161bd11e) trusty; urgency=low
+
+  * Build from git revision b9161bd11ef09e1882f0d222a19ee78129affa6a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 09 May 2014 13:15:54 +0800
+
+go-dlib (0.0.1-1+git20140509131341~b9161bd11e) trusty; urgency=low
+
+  * Build from git revision b9161bd11ef09e1882f0d222a19ee78129affa6a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 09 May 2014 13:13:42 +0800
+
+go-dlib (0.0.1-1+git20140509131258~cfcb541964) trusty; urgency=low
+
+  * Build from git revision cfcb54196400b8cede5cb8ac4f13ac0ccd2294a4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 09 May 2014 13:12:58 +0800
+
+go-dlib (0.0.1-1+git20140507121045~0054ae4439) trusty; urgency=low
+
+  * Build from git revision 0054ae4439a5c5fa63f0d67c8c148c1e2863ced6
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 07 May 2014 12:10:45 +0800
+
+go-dlib (0.0.1-1+git20140507114734~0054ae4439) trusty; urgency=low
+
+  * Build from git revision 0054ae4439a5c5fa63f0d67c8c148c1e2863ced6
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 07 May 2014 11:47:34 +0800
+
+go-dlib (0.0.1-1+git20140507114536~0054ae4439) trusty; urgency=low
+
+  * Build from git revision 0054ae4439a5c5fa63f0d67c8c148c1e2863ced6
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 07 May 2014 11:45:36 +0800
+
+go-dlib (0.0.1-1+git20140430161006~2a6ae344dd) trusty; urgency=low
+
+  * Build from git revision 2a6ae344dd7a0a8ebc221c171dbb40ee99f02cbb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 30 Apr 2014 16:10:06 +0800
+
+go-dlib (0.0.1-1+git20140429010324~2a6ae344dd) trusty; urgency=low
+
+  * Build from git revision 2a6ae344dd7a0a8ebc221c171dbb40ee99f02cbb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 29 Apr 2014 01:03:24 +0800
+
+go-dlib (0.0.1-1+git20140428172924~2a6ae344dd) trusty; urgency=low
+
+  * Build from git revision 2a6ae344dd7a0a8ebc221c171dbb40ee99f02cbb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 28 Apr 2014 17:29:25 +0800
+
+go-dlib (0.0.1-1+git20140428172457~2a6ae344dd) trusty; urgency=low
+
+  * Build from git revision 2a6ae344dd7a0a8ebc221c171dbb40ee99f02cbb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 28 Apr 2014 17:24:57 +0800
+
+go-dlib (0.0.1-1+git20140428152012~08f9a78460) trusty; urgency=low
+
+  * Build from git revision 08f9a78460bdecccebb774c12a712acab2f62d34
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 28 Apr 2014 15:20:12 +0800
+
+go-dlib (0.0.1-1+git20140428082342~08f9a78460) trusty; urgency=low
+
+  * Build from git revision 08f9a78460bdecccebb774c12a712acab2f62d34
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 28 Apr 2014 08:23:42 +0800
+
+go-dlib (0.0.1-1+git20140425124140~08f9a78460) trusty; urgency=low
+
+  * Build from git revision 08f9a78460bdecccebb774c12a712acab2f62d34
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 12:41:41 +0800
+
+go-dlib (0.0.1-1+git20140425123642~b4b049f0d7) trusty; urgency=low
+
+  * Build from git revision b4b049f0d75ac2c32bcb56594e5da057b9458b78
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 12:36:42 +0800
+
+go-dlib (0.0.1-1+git20140425122850~b4b049f0d7) trusty; urgency=low
+
+  * Build from git revision b4b049f0d75ac2c32bcb56594e5da057b9458b78
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 12:28:51 +0800
+
+go-dlib (0.0.1-1+git20140425122059~b4b049f0d7) trusty; urgency=low
+
+  * Build from git revision b4b049f0d75ac2c32bcb56594e5da057b9458b78
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 12:20:59 +0800
+
+go-dlib (0.0.1-1+git20140425113405~b4b049f0d7) trusty; urgency=low
+
+  * Build from git revision b4b049f0d75ac2c32bcb56594e5da057b9458b78
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 11:34:05 +0800
+
+go-dlib (0.0.1-1+git20140422114232~31ec3c5c9a) trusty; urgency=low
+
+  * Build from git revision 31ec3c5c9a1ba4e44d775abb02ae22e8cc3d0321
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 11:42:32 +0800
+
+go-dlib (0.0.1-1+git20140422112119~e07190c6b4) trusty; urgency=low
+
+  * Build from git revision e07190c6b4b99daea32f8bb6aa96005339a3a7ea
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 11:21:20 +0800
+
+go-dlib (0.0.1-1+git20140421142223~e196328e69) trusty; urgency=low
+
+  * Build from git revision e196328e69658af6c742632e482574f427c74768
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 21 Apr 2014 14:22:24 +0800
+
+go-dlib (0.0.1-1+git20140421135635~a9c49d1337) trusty; urgency=low
+
+  * Build from git revision a9c49d133746799255fd93c4858545fe88aa4386
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 21 Apr 2014 13:56:36 +0800
+
+go-dlib (0.0.1-1+git20140421120118~00592abd47) trusty; urgency=low
+
+  * Build from git revision 00592abd47660e983c995d85a1224c4f71c4d4df
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 21 Apr 2014 12:01:18 +0800
+
+go-dlib (0.0.1-1+git20140421101709~e9ea8aaf3d) trusty; urgency=low
+
+  * Build from git revision e9ea8aaf3d756c0823c70e0ca2f30f61bcd9d317
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 21 Apr 2014 10:17:10 +0800
+
+go-dlib (0.0.1-1+git20140416233643~96a5d27be1) trusty; urgency=low
+
+  * Build from git revision 96a5d27be10489b20b2eee9774ad561344853439
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 16 Apr 2014 23:36:44 +0800
+
+go-dlib (0.0.1-1+git20140416214416~85bf41e896) trusty; urgency=low
+
+  * Build from git revision 85bf41e89640297991f420bbd376cf8f2efbaecd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 16 Apr 2014 21:44:17 +0800
+
+go-dlib (0.0.1-1+git20140414182333~920c32942f) trusty; urgency=low
+
+  * Build from git revision 920c32942f1ab3f7c4e69def635430732634ea69
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 14 Apr 2014 18:23:34 +0800
+
+go-dlib (0.0.1-1+git20140413210046~8c465955c7) trusty; urgency=low
+
+  * Build from git revision 8c465955c73b5f49bdc435194945b5805ccaf071
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 13 Apr 2014 21:00:47 +0800
+
+go-dlib (0.0.1-1+git20140413191452~8c465955c7) trusty; urgency=low
+
+  * Build from git revision 8c465955c73b5f49bdc435194945b5805ccaf071
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 13 Apr 2014 19:14:53 +0800
+
+go-dlib (0.0.1-1+git20140411085709~57094406be) trusty; urgency=low
+
+  * Build from git revision 57094406bef9b59a5fd1f797eb1d7217b79415ee
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 11 Apr 2014 08:57:10 +0800
+
+go-dlib (0.0.1-1+git20140411010139~57094406be) trusty; urgency=low
+
+  * Build from git revision 57094406bef9b59a5fd1f797eb1d7217b79415ee
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 11 Apr 2014 01:01:39 +0800
+
+go-dlib (0.0.1-1+git20140410212058~8dc9e449d1) trusty; urgency=low
+
+  * Build from git revision 8dc9e449d135f2014cf97bc0187871eaa6aa6911
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 10 Apr 2014 21:20:59 +0800
+
+go-dlib (0.0.1-1+git20140410163450~7f266af946) trusty; urgency=low
+
+  * Build from git revision 7f266af94628684d11829ec307e485a363cf6c0f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 10 Apr 2014 16:34:50 +0800
+
+go-dlib (0.0.1-1+git20140408210850~633044c8a6) trusty; urgency=low
+
+  * Build from git revision 633044c8a600da231ce1ae6bdf9e7e56f0bc47de
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 08 Apr 2014 21:08:50 +0800
+
+go-dlib (0.0.1-1+git20140408142150~db12b7e5f2) trusty; urgency=low
+
+  * Build from git revision db12b7e5f2f748138fa8a6695a5ee01ad9e8ff9e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 08 Apr 2014 14:21:51 +0800
+
+go-dlib (0.0.1-1+git20140408121748~e9a13bc679) trusty; urgency=low
+
+  * Build from git revision e9a13bc679a287af648d958fee5e0c07c907a33e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 08 Apr 2014 12:17:48 +0800
+
+go-dlib (0.0.1-1+git20140408114356~cd48e3aace) trusty; urgency=low
+
+  * Build from git revision cd48e3aacededd56fd09fa03d80ddb4728912c2e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 08 Apr 2014 11:43:56 +0800
+
+go-dlib (0.0.1-1+git20140407115652~0474796b17) trusty; urgency=low
+
+  * Build from git revision 0474796b17534f603cad633d750a9a78e61167bd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 07 Apr 2014 11:56:52 +0800
+
+go-dlib (0.0.1-1+git20140406210906~e10fb64b44) trusty; urgency=low
+
+  * Build from git revision e10fb64b447513e0e6a3d35a03514aa33d7a3320
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 06 Apr 2014 21:09:07 +0800
+
+go-dlib (0.0.1-1+git20140403105146~a77fd2e3b3) trusty; urgency=low
+
+  * Build from git revision a77fd2e3b3db646de48bae08779b563c82390364
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 03 Apr 2014 10:51:47 +0800
+
+go-dlib (0.0.1-1+git20140402200459~0b5dfca03a) trusty; urgency=low
+
+  * Build from git revision 0b5dfca03aedf05ddbab91e62fb6b823823970d5
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 02 Apr 2014 20:04:59 +0800
+
+go-dlib (0.0.1-1+git20140402192959~d1713423b8) trusty; urgency=low
+
+  * Build from git revision d1713423b8cf8da1257afef37ed151153e580f8d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 02 Apr 2014 19:30:00 +0800
+
+go-dlib (0.0.1-1+git20140328161140~a63aab2a0f) trusty; urgency=low
+
+  * Build from git revision a63aab2a0ffa36d01286ba824457f8b438c06244
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 28 Mar 2014 16:11:40 +0800
+
+go-dlib (0.0.1-1+git20140328110308~f58c936dd6) trusty; urgency=low
+
+  * Build from git revision f58c936dd6be1b94337244d1892271c571405a44
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 28 Mar 2014 11:03:09 +0800
+
+go-dlib (0.0.1-1+git20140327204101~30bd4394fa) trusty; urgency=low
+
+  * Build from git revision 30bd4394fa627189c36649462b738b9cf42a946d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 27 Mar 2014 20:41:01 +0800
+
+go-dlib (0.0.1-1+git20140326205353~4a0565e617) trusty; urgency=low
+
+  * Build from git revision 4a0565e61731e5a89edd4ddd9cdf1fd3ad93995e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 20:53:53 +0800
+
+go-dlib (0.0.1-1+git20140324202156~f9bb43789c) trusty; urgency=low
+
+  * Build from git revision f9bb43789c5570bc6402572dbd468248bbf31472
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 24 Mar 2014 20:21:56 +0800
+
+go-dlib (0.0.1-1+git20140324201225~7f3b4f4837) trusty; urgency=low
+
+  * Build from git revision 7f3b4f4837e18bdfe69b1679c975c8305b04b675
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 24 Mar 2014 20:12:25 +0800
+
+go-dlib (0.0.1-1+git20140324165318~744bd0a4e4) trusty; urgency=low
+
+  * Build from git revision 744bd0a4e496c5d75451d0cb8267debb99f5ea4c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 24 Mar 2014 16:53:18 +0800
+
+go-dlib (0.0.1-1+git20140324090402~1d81938a26) trusty; urgency=low
+
+  * Build from git revision 1d81938a26e890a38c34666d8ad5ac3578a249a1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 24 Mar 2014 09:04:02 +0800
+
+go-dlib (0.0.1-1+git20140323212729~028db0febc) trusty; urgency=low
+
+  * Build from git revision 028db0febc17f659d8e0e428cff107a8fdc269a8
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 23 Mar 2014 21:27:29 +0800
+
+go-dlib (0.0.1-1+git20140323144454~5a3528c25a) trusty; urgency=low
+
+  * Build from git revision 5a3528c25a9f04f1ea8467c2f7d2c18f46a221d0
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 23 Mar 2014 14:44:54 +0800
+
+go-dlib (0.0.1-1+git20140321232118~42d8862961) trusty; urgency=low
+
+  * Build from git revision 42d88629615aacabfcfc88028920efdb24653f78
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 21 Mar 2014 23:21:18 +0800
+
+go-dlib (0.0.1-1+git20140321171137~18b8cc3def) trusty; urgency=low
+
+  * Build from git revision 18b8cc3def054219d652170487d19b87b9e9d383
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 21 Mar 2014 17:11:37 +0800
+
+go-dlib (0.0.1-1+git20140321164006~4cd6377802) trusty; urgency=low
+
+  * Build from git revision 4cd637780287a0a4bf7feac83a0807e9f54af471
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 21 Mar 2014 16:40:06 +0800
+
+go-dlib (0.0.1-1+git20140320162958~7f7d802fd5) trusty; urgency=low
+
+  * Build from git revision 7f7d802fd583de0732610045a87fe34b25c4aafb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 20 Mar 2014 16:29:58 +0800
+
+go-dlib (0.0.1-1+git20140320144103~7dfe089e5f) trusty; urgency=low
+
+  * Build from git revision 7dfe089e5f155c6c4c259a9b3d8a76d148b8709e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 20 Mar 2014 14:41:04 +0800
+
+go-dlib (0.0.1-1+git20140319212958~3afe06712b) trusty; urgency=low
+
+  * Build from git revision 3afe06712b68105db4b1f481ec9f5836fe2f27ae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 21:29:59 +0800
+
+go-dlib (0.0.1-1+git20140319212741~3afe06712b) trusty; urgency=low
+
+  * Build from git revision 3afe06712b68105db4b1f481ec9f5836fe2f27ae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 21:27:41 +0800
+
+go-dlib (0.0.1-1+git20140319212702~3afe06712b) trusty; urgency=low
+
+  * Build from git revision 3afe06712b68105db4b1f481ec9f5836fe2f27ae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 21:27:02 +0800
+
+go-dlib (0.0.1-1+git20140319212331~3afe06712b) trusty; urgency=low
+
+  * Build from git revision 3afe06712b68105db4b1f481ec9f5836fe2f27ae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 21:23:31 +0800
+
+go-dlib (0.0.1-1+git20140319212135~3afe06712b) trusty; urgency=low
+
+  * Build from git revision 3afe06712b68105db4b1f481ec9f5836fe2f27ae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 21:21:35 +0800
+
+go-dlib (0.0.1-1+git20140319134158~a12455931e) trusty; urgency=low
+
+  * Build from git revision a12455931e8a0648635fd37b4b5a709f8030ce81
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Mar 2014 13:41:59 +0800
+
+go-dlib (0.0.1-1+git20140318103436~66179efc46) trusty; urgency=low
+
+  * Build from git revision 66179efc462e515baaf0c86754d48b8ae6df0f55
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 18 Mar 2014 10:34:36 +0800
+
+go-dlib (0.0.1-1+git20140316095602~3578e3301f) trusty; urgency=low
+
+  * Build from git revision 3578e3301fb1c801bb3c5fc812b1b6809f27432d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 16 Mar 2014 09:56:02 +0800
+
+go-dlib (0.0.1-1+git20140314152954~a553c79338) trusty; urgency=low
+
+  * Build from git revision a553c793385c22746ebbe47507d0fde219ffabd4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 14 Mar 2014 15:29:54 +0800
+
+go-dlib (0.0.1-1+git20140313230212~95144c2da8) trusty; urgency=low
+
+  * Build from git revision 95144c2da83ab7a0f7d5170f32beafa888ff67bc
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 13 Mar 2014 23:02:12 +0800
+
+go-dlib (0.0.1-1+git20140313174823~67fa3975b0) trusty; urgency=low
+
+  * Build from git revision 67fa3975b081e12c4a8533d324b630bab9e37ddd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 13 Mar 2014 17:48:23 +0800
+
+go-dlib (0.0.1-1+git20140313160432~05f326826e) trusty; urgency=low
+
+  * Build from git revision 05f326826e259b7cfce07e35e679f26fc81074dd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 13 Mar 2014 16:04:32 +0800
+
+go-dlib (0.0.1-1+git20140312225543~73c4953cdc) trusty; urgency=low
+
+  * Build from git revision 73c4953cdc1e24fb354d17e8aca20cf121eb7830
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 12 Mar 2014 22:55:44 +0800
+
+go-dlib (0.0.1-1+git20140312224851~73c4953cdc) trusty; urgency=low
+
+  * Build from git revision 73c4953cdc1e24fb354d17e8aca20cf121eb7830
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 12 Mar 2014 22:48:51 +0800
+
+go-dlib (0.0.1-1+git20140311090939~d8a9c8a804) trusty; urgency=low
+
+  * Build from git revision d8a9c8a8041ff94d2852eeb67791a509a17aefaf
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 11 Mar 2014 09:09:39 +0800
+
+go-dlib (0.0.1-1+git20140310155829~d8a9c8a804) trusty; urgency=low
+
+  * Build from git revision d8a9c8a8041ff94d2852eeb67791a509a17aefaf
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 10 Mar 2014 15:58:29 +0800
+
+go-dlib (0.0.1-1+git20140310105802~907e852d91) saucy; urgency=low
+
+  * Build from git revision 907e852d91d297eca87cadfff0662859166eea92
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 10 Mar 2014 10:58:02 +0800
+
+go-dlib (0.0.1-1+git20140310105308~907e852d91) saucy; urgency=low
+
+  * Build from git revision 907e852d91d297eca87cadfff0662859166eea92
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 10 Mar 2014 10:53:09 +0800
+
+go-dlib (0.0.1-1+git20140310104138~907e852d91) saucy; urgency=low
+
+  * Build from git revision 907e852d91d297eca87cadfff0662859166eea92
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 10 Mar 2014 10:41:38 +0800
+
+go-dlib (0.0.1-1+git20140310085634~732b703d56) saucy; urgency=low
+
+  * Build from git revision 732b703d563c6c1c7a2e653cb054c4d13c5afc26
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 10 Mar 2014 08:56:34 +0800
+
+go-dlib (0.0.1-1+git20140307222815~732b703d56) trusty; urgency=low
+
+  * Build from git revision 732b703d563c6c1c7a2e653cb054c4d13c5afc26
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 07 Mar 2014 22:28:15 +0800
+
+go-dlib (0.0.1-1+git20140307134609~c4acddc96c) trusty; urgency=low
+
+  * Build from git revision c4acddc96c70ce4b26d5ebf6369044c578c7a8af
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 07 Mar 2014 13:46:10 +0800
+
+go-dlib (0.0.1-1+git20140307133855~c4acddc96c) trusty; urgency=low
+
+  * Build from git revision c4acddc96c70ce4b26d5ebf6369044c578c7a8af
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 07 Mar 2014 13:38:55 +0800
+
+go-dlib (0.0.1-1+git20140305205850~c4acddc96c) saucy; urgency=low
+
+  * Build from git revision c4acddc96c70ce4b26d5ebf6369044c578c7a8af
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 05 Mar 2014 20:58:51 +0800
+
+go-dlib (0.0.1-1+git20140305204843~c4acddc96c) saucy; urgency=low
+
+  * Build from git revision c4acddc96c70ce4b26d5ebf6369044c578c7a8af
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 20:48:44 +0800
+
+go-dlib (0.0.1-1+git20140305173134~952553530c) saucy; urgency=low
+
+  * Build from git revision 952553530c4e93582b86c45af5f01a1247fb2ebd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 17:31:35 +0800
+
+go-dlib (0.0.1-1+git20140305172313~fce35c0596) saucy; urgency=low
+
+  * Build from git revision fce35c05965682db4dd6c65babe1070735daf343
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 17:23:14 +0800
+
+go-dlib (0.0.1-1+git20140305171907~c3f105bc51) saucy; urgency=low
+
+  * Build from git revision c3f105bc51ac9dffdfc0f56d62deaed79e6ac2d9
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 17:19:07 +0800
+
+go-dlib (0.0.1-1+git20140305171803~c3f105bc51) saucy; urgency=low
+
+  * Build from git revision c3f105bc51ac9dffdfc0f56d62deaed79e6ac2d9
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 17:18:03 +0800
+
+go-dlib (0.0.1-1+git20140305170515~c3f105bc51) saucy; urgency=low
+
+  * Build from git revision c3f105bc51ac9dffdfc0f56d62deaed79e6ac2d9
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 17:05:15 +0800
+
+go-dlib (0.0.1-1+git20140305094542~2e33da1b8a) saucy; urgency=low
+
+  * Build from git revision 2e33da1b8ae4289285f058543f39351f0b12ae0d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 05 Mar 2014 09:45:42 +0800
+
+go-dlib (0.0.1-1+git20140304173939~5697d2952c) saucy; urgency=low
+
+  * Build from git revision 5697d2952c45f5609960ba7b1fd48dfaa44feae4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 17:39:39 +0800
+
+go-dlib (0.0.1-1+git20140304164256~5fcc4ab8f3) saucy; urgency=low
+
+  * Build from git revision 5fcc4ab8f37d67d0d15a3ecd0fb7a80dabf91953
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 16:42:56 +0800
+
+go-dlib (0.0.1-1+git20140304155137~2ecdad04a5) saucy; urgency=low
+
+  * Build from git revision 2ecdad04a56032027e2326a612a67a69903c248a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 15:51:37 +0800
+
+go-dlib (0.0.1-1+git20140304154702~2ecdad04a5) saucy; urgency=low
+
+  * Build from git revision 2ecdad04a56032027e2326a612a67a69903c248a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 15:47:02 +0800
+
+go-dlib (0.0.1-1+git20140304154539~2ecdad04a5) saucy; urgency=low
+
+  * Build from git revision 2ecdad04a56032027e2326a612a67a69903c248a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 15:45:40 +0800
+
+go-dlib (0.0.1-1+git20140304105132~9aacef9a6d) saucy; urgency=low
+
+  * Build from git revision 9aacef9a6d1465165e097f0c505d00950774f2aa
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 10:51:33 +0800
+
+go-dlib (0.0.1-1+git20140304093201~5daf51e1ed) saucy; urgency=low
+
+  * Build from git revision 5daf51e1ed6536fc3a16b176c5578a5b569fb64a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 04 Mar 2014 09:32:01 +0800
+
+go-dlib (0.0.1-1+git20140303185424~a70eecff1f) saucy; urgency=low
+
+  * Build from git revision a70eecff1f1170637db8652195903551dbc0ed0d
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 03 Mar 2014 18:54:24 +0800
+
+go-dlib (0.0.1-1+git20140303172855~a70eecff1f) saucy; urgency=low
+
+  * Build from git revision a70eecff1f1170637db8652195903551dbc0ed0d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 03 Mar 2014 17:28:56 +0800
+
+go-dlib (0.0.1-1+git20140226174758~4d23d1b0ce) saucy; urgency=low
+
+  * Build from git revision 4d23d1b0cee3b7d50003607d2ccfe83a00970c53
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Feb 2014 17:47:58 +0800
+
+go-dlib (0.0.1-1+git20140226173947~4d23d1b0ce) saucy; urgency=low
+
+  * Build from git revision 4d23d1b0cee3b7d50003607d2ccfe83a00970c53
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 26 Feb 2014 17:39:48 +0800
+
+go-dlib (0.0.1-1+git20140226171835~4d23d1b0ce) saucy; urgency=low
+
+  * Build from git revision 4d23d1b0cee3b7d50003607d2ccfe83a00970c53
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Feb 2014 17:18:35 +0800
+
+go-dlib (0.0.1-1+git20140226171250~4d23d1b0ce) saucy; urgency=low
+
+  * Build from git revision 4d23d1b0cee3b7d50003607d2ccfe83a00970c53
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Feb 2014 17:12:51 +0800
+
+go-dlib (0.0.1-1+git20140226161439~a85b8e13d4) saucy; urgency=low
+
+  * Build from git revision a85b8e13d4e204adb13b5abaeda1bd6b1a14cab5
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Feb 2014 16:14:39 +0800
+
+go-dlib (0.0.1-1+git20140225102613~040d409213) saucy; urgency=low
+
+  * Build from git revision 040d4092131951bd79213db6b9d659740b43e343
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 25 Feb 2014 10:26:13 +0800
+
+go-dlib (0.0.1-1+git20140221171131~c2c14c8cda) saucy; urgency=low
+
+  * Build from git revision c2c14c8cdae9e271bd8b4bd9af250648bd5d3551
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 21 Feb 2014 17:11:32 +0800
+
+go-dlib (0.0.1-1+git20140221143657~1bf8b2a6d7) saucy; urgency=low
+
+  * Build from git revision 1bf8b2a6d73dd9b59ab8e6a1aacfaf2f8a70c812
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 21 Feb 2014 14:36:57 +0800
+
+go-dlib (0.0.1-1+git20140219173410~c97ae5c1a5) saucy; urgency=low
+
+  * Build from git revision c97ae5c1a529d34d1dbd3075de7b69e97ffb6050
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 19 Feb 2014 17:34:10 +0800
+
+go-dlib (0.0.1-1+git20140121140022~985fb3797a) saucy; urgency=low
+
+  * Build from git revision 985fb3797a954f9b5014f7e5dbc949854f1430a2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 21 Jan 2014 14:00:23 +0800
+
+go-dlib (0.0.1-1+git20140121100927~2dfeb52560) saucy; urgency=low
+
+  * Build from git revision 2dfeb525605f25903f00cfbd0229170e568e2ab2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 21 Jan 2014 10:09:27 +0800
+
+go-dlib (0.0.1-1+git20140116153632~2cef9165c6) saucy; urgency=low
+
+  * Build from git revision 2cef9165c68f1e433704d836a2c848fb4f0df139
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 16 Jan 2014 15:36:32 +0800
+
+go-dlib (0.0.1-1+git20140114164800~ca448b54be) saucy; urgency=low
+
+  * Build from git revision ca448b54be423d04e64822d7d81873110c779e33
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 14 Jan 2014 16:48:00 +0800
+
+go-dlib (0.0.1-1+git20140114141227~5330fa9f3d) saucy; urgency=low
+
+  * Build from git revision 5330fa9f3d075ead5f945221d7a3723c50fd9193
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 14 Jan 2014 14:12:27 +0800
+
+go-dlib (0.0.1-1+git20140114104515~7083b62846) saucy; urgency=low
+
+  * Build from git revision 7083b628463da126327314b5d8e737643cf4a096
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 14 Jan 2014 10:45:15 +0800
+
+go-dlib (0.0.1-1+git20140114104326~7083b62846) saucy; urgency=low
+
+  * Build from git revision 7083b628463da126327314b5d8e737643cf4a096
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 14 Jan 2014 10:43:26 +0800
+
+go-dlib (0.0.1-1+git20140114103859~7083b62846) saucy; urgency=low
+
+  * Build from git revision 7083b628463da126327314b5d8e737643cf4a096
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Tue, 14 Jan 2014 10:38:59 +0800
+
+go-dlib (0.0.1-1+git20140114103504~7083b62846) saucy; urgency=low
+
+  * Build from git revision 7083b628463da126327314b5d8e737643cf4a096
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 14 Jan 2014 10:35:04 +0800
+
+go-dlib (0.0.1-1+git20140103110149~fa99e99a7c) saucy; urgency=low
+
+  * Build from git revision fa99e99a7cba19a17aba2698de076027915f779c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 03 Jan 2014 11:01:49 +0800
+
+go-dlib (0.0.1-1+git20140101193049~fa99e99a7c) saucy; urgency=low
+
+  * Build from git revision fa99e99a7cba19a17aba2698de076027915f779c
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 01 Jan 2014 19:30:50 +0800
+
+go-dlib (0.0.1-1+git20131230180931~5ad44da104) saucy; urgency=low
+
+  * Build from git revision 5ad44da1047ec21afd62d7b6bb5c108cd74f9d6e
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 30 Dec 2013 18:09:31 +0800
+
+go-dlib (0.0.1-1+git20131230180406~1f58ff42b8) saucy; urgency=low
+
+  * Build from git revision 1f58ff42b8665f2d836411cacb65c3e71ffae0c0
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 30 Dec 2013 18:04:07 +0800
+
+go-dlib (0.0.1-1+git20131230175400~ecc40b2dcd) saucy; urgency=low
+
+  * Build from git revision ecc40b2dcde5d3446f4e0d7b54f9dc3301752bbc
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 30 Dec 2013 17:54:00 +0800
+
+go-dlib (0.0.1-1+git20131230155630~b87c0fa036) saucy; urgency=low
+
+  * Build from git revision b87c0fa0360daa5d633c8fbe8cccd7e19a5980bb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 30 Dec 2013 15:56:31 +0800
+
+go-dlib (0.0.1-1+git20131227151432~9ce75c59bc) saucy; urgency=low
+
+  * Build from git revision 9ce75c59bc069361b376cb15a153db5c3a4338a2
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Fri, 27 Dec 2013 15:14:33 +0800
+
+go-dlib (0.0.1-1+git20131227125405~61f673545c) saucy; urgency=low
+
+  * Build from git revision 61f673545c8cd3236923c93824b616c29e8d41f3
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Fri, 27 Dec 2013 12:54:05 +0800
+
+go-dlib (0.0.1-1+git20131227124053~c74f926edf) saucy; urgency=low
+
+  * Build from git revision c74f926edf65fa09af5ad9d2c8bf3d4436e3103f
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Fri, 27 Dec 2013 12:40:53 +0800
+
+go-dlib (0.0.1-1+git20131227091045~cb1759b184) saucy; urgency=low
+
+  * Build from git revision cb1759b184a4bf8ac10ce75fcc6c897214a3c569
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 27 Dec 2013 09:10:45 +0800
+
+go-dlib (0.0.1-1+git20131226193730~cb1759b184) saucy; urgency=low
+
+  * Build from git revision cb1759b184a4bf8ac10ce75fcc6c897214a3c569
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Thu, 26 Dec 2013 19:37:30 +0800
+
+go-dlib (0.0.1-1+git20131226165007~951ead006a) saucy; urgency=low
+
+  * Build from git revision 951ead006a10e0e2a233d8fb03645ded9cb1d40f
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Thu, 26 Dec 2013 16:50:07 +0800
+
+go-dlib (0.0.1-1+git20131226120657~c1c1021895) saucy; urgency=low
+
+  * Build from git revision c1c1021895e99b130d4dc217f21023f968559bad
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Thu, 26 Dec 2013 12:06:58 +0800
+
+go-dlib (0.0.1-1+git20131225220011~c1c1021895) saucy; urgency=low
+
+  * Build from git revision c1c1021895e99b130d4dc217f21023f968559bad
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 25 Dec 2013 22:00:12 +0800
+
+go-dlib (0.0.1-1+git20131225201924~f8336fc7bd) saucy; urgency=low
+
+  * Build from git revision f8336fc7bd6a294d1f0911350350d447527f6bf3
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 25 Dec 2013 20:19:25 +0800
+
+go-dlib (0.0.1-1+git20131225183428~f8336fc7bd) saucy; urgency=low
+
+  * Build from git revision f8336fc7bd6a294d1f0911350350d447527f6bf3
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 25 Dec 2013 18:34:28 +0800
+
+go-dlib (0.0.1-1+git20131225183043~f8336fc7bd) saucy; urgency=low
+
+  * Build from git revision f8336fc7bd6a294d1f0911350350d447527f6bf3
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 25 Dec 2013 18:30:43 +0800
+
+go-dlib (0.0.1-1+git20131225173531~f8336fc7bd) saucy; urgency=low
+
+  * Build from git revision f8336fc7bd6a294d1f0911350350d447527f6bf3
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 25 Dec 2013 17:35:31 +0800
+
+go-dlib (0.0.1-1+git20131225173501~f8336fc7bd) saucy; urgency=low
+
+  * Build from git revision f8336fc7bd6a294d1f0911350350d447527f6bf3
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 25 Dec 2013 17:35:01 +0800
+
+go-dlib (0.0.1-1+git20131225131824~f56164cf77) saucy; urgency=low
+
+  * Build from git revision f56164cf777a11d1144b4468e4b0ad0e58b3d873
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 25 Dec 2013 13:18:25 +0800
+
+go-dlib (0.0.1-1+git20131225122814~f56164cf77) saucy; urgency=low
+
+  * Build from git revision f56164cf777a11d1144b4468e4b0ad0e58b3d873
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 25 Dec 2013 12:28:15 +0800
+
+go-dlib (0.0.1-1+git20131221225245~6dfb32573b) raring; urgency=low
+
+  * Build from git revision 6dfb32573b24ebb228dd9595da91f096c9552f0b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sat, 21 Dec 2013 22:52:45 +0800
+
+go-dlib (0.0.1-1+git20131220152431~4c7391b10e) raring; urgency=low
+
+  * Build from git revision 4c7391b10e6a424b4c99cf4856a7271462338882
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 20 Dec 2013 15:24:31 +0800
+
+go-dlib (0.0.1-1+git20131220000448~c8a67e99ad) raring; urgency=low
+
+  * Build from git revision c8a67e99ad73dac64c0756e586921f713d1a7e89
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 20 Dec 2013 00:04:49 +0800
+
+go-dlib (0.0.1-1+git20131219155708~d824ae8cd4) raring; urgency=low
+
+  * Build from git revision d824ae8cd48b783ff0d1b549254fe8a1f9ae3ae9
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 19 Dec 2013 15:57:08 +0800
+
+go-dlib (0.0.1-1+git20131218162024~3f3f8bf957) raring; urgency=low
+
+  * Build from git revision 3f3f8bf9574c6df9cd4f74d009210cf84d8dd5ad
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 18 Dec 2013 16:20:24 +0800
+
+go-dlib (0.0.1-1+git20131217162103~68aec76a43) raring; urgency=low
+
+  * Build from git revision 68aec76a43a080bbd9a93deea2bc6d333662b80f
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Tue, 17 Dec 2013 16:21:03 +0800
+
+go-dlib (0.0.1-1+git20131217120639~8f4e9a1c0e) raring; urgency=low
+
+  * Build from git revision 8f4e9a1c0e5280e4d76c99e2500cd4aece1ea31b
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Tue, 17 Dec 2013 12:06:39 +0800
+
+go-dlib (0.0.1-1+git20131217111540~8f4e9a1c0e) raring; urgency=low
+
+  * Build from git revision 8f4e9a1c0e5280e4d76c99e2500cd4aece1ea31b
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Tue, 17 Dec 2013 11:15:40 +0800
+
+go-dlib (0.0.1-1+git20131217084607~6db86a252b) raring; urgency=low
+
+  * Build from git revision 6db86a252b84ec21a33b6c9a7593fb4ef0219bae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 17 Dec 2013 08:46:07 +0800
+
+go-dlib (0.0.1-1+git20131216230623~6db86a252b) raring; urgency=low
+
+  * Build from git revision 6db86a252b84ec21a33b6c9a7593fb4ef0219bae
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 16 Dec 2013 23:06:23 +0800
+
+go-dlib (0.0.1-1+git20131216214326~2714688c4d) raring; urgency=low
+
+  * Build from git revision 2714688c4d197cd80d184742c2aa08897407cdfa
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Mon, 16 Dec 2013 21:43:27 +0800
+
+go-dlib (0.0.1-1+git20131216144512~3937470c5c) raring; urgency=low
+
+  * Build from git revision 3937470c5c3172c46e0d530a4f7077dbf7647ecc
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 16 Dec 2013 14:45:12 +0800
+
+go-dlib (0.0.1-1+git20131214164119~3937470c5c) raring; urgency=low
+
+  * Build from git revision 3937470c5c3172c46e0d530a4f7077dbf7647ecc
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sat, 14 Dec 2013 16:41:19 +0800
+
+go-dlib (0.0.1-1+git20131211185721~04ef4c1599) raring; urgency=low
+
+  * Build from git revision 04ef4c1599d63929d2dd6d19e09f1970eefb4cba
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 11 Dec 2013 18:57:21 +0800
+
+go-dlib (0.0.1-1+git20131211184417~307f722b4e) raring; urgency=low
+
+  * Build from git revision 307f722b4eb5ffbb2026ca9f179e3d77c0fb0310
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 11 Dec 2013 18:44:18 +0800
+
+go-dlib (0.0.1-1+git20131211154736~f46e5cf710) raring; urgency=low
+
+  * Build from git revision f46e5cf710fdbc40aad601f2db5df0bc07ee5bde
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 11 Dec 2013 15:47:36 +0800
+
+go-dlib (0.0.1-1+git20131211112332~93d1babecb) raring; urgency=low
+
+  * Build from git revision 93d1babecb55882a98fd18cc96cc78869e92fcc1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 11 Dec 2013 11:23:32 +0800
+
+go-dlib (0.0.1-1+git20131211004249~aee23c93e1) raring; urgency=low
+
+  * Build from git revision aee23c93e17b881847e41c9059081c421fa0630f
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Wed, 11 Dec 2013 00:42:50 +0800
+
+go-dlib (0.0.1-1+git20131210173926~e04dee0813) raring; urgency=low
+
+  * Build from git revision e04dee0813a8c27a29bfbe43d40840bb5fa7a7d1
+
+ -- deepin <deepin@repo.corp.linuxdeepin.com>  Tue, 10 Dec 2013 17:39:27 +0800
+
+go-dlib (0.0.1-1+git20131210110332~e04dee0813) raring; urgency=low
+
+  * Build from git revision e04dee0813a8c27a29bfbe43d40840bb5fa7a7d1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 10 Dec 2013 11:03:32 +0800
+
+go-dlib (0.0.1-1+git20131209205224~e04dee0813) raring; urgency=low
+
+  * Build from git revision e04dee0813a8c27a29bfbe43d40840bb5fa7a7d1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 20:52:24 +0800
+
+go-dlib (0.0.1-1+git20131209202845~b9bdcd56da) raring; urgency=low
+
+  * Build from git revision b9bdcd56da369d52eebf8fab03afcc54323bbf38
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 20:28:45 +0800
+
+go-dlib (0.0.1-1+git20131209122007~4976ec2a15) raring; urgency=low
+
+  * Build from git revision 4976ec2a1513ebbe5655d1bda3e945a805e82a91
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 12:20:08 +0800
+
+go-dlib (0.0.1-1+git20131209090806~ec133a3be9) raring; urgency=low
+
+  * Build from git revision ec133a3be9a833e214062ddc4cc4f206b23e58c0
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 09:08:06 +0800
+
+go-dlib (0.0.1-1+git20131209090411~999dc8ea30) raring; urgency=low
+
+  * Build from git revision 999dc8ea3001c7caae1393306f1ca1ca730f83e8
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 09:04:12 +0800
+
+go-dlib (0.0.1-1+git20131209090309~07471f5c2b) raring; urgency=low
+
+  * Build from git revision 07471f5c2b003c69e3b74271f02cb78c64920a75
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 09 Dec 2013 09:03:09 +0800
+
+go-dlib (0.0.1-1+git20131207221800~228a27448f) raring; urgency=low
+
+  * Build from git revision 228a27448f55409687d9494fe7d590134c2db063
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sat, 07 Dec 2013 22:18:01 +0800
+
+go-dlib (0.0.1-1+git20131206154817~bacbf47d47) raring; urgency=low
+
+  * Build from git revision bacbf47d471b26a82f15fe8b787d19bdc8cf3980
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 15:48:17 +0800
+
+go-dlib (0.0.1-1+git20131206154318~bacbf47d47) raring; urgency=low
+
+  * Build from git revision bacbf47d471b26a82f15fe8b787d19bdc8cf3980
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 15:43:18 +0800
+
+go-dlib (0.0.1-1+git20131206154234~bacbf47d47) raring; urgency=low
+
+  * Build from git revision bacbf47d471b26a82f15fe8b787d19bdc8cf3980
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 15:42:35 +0800
+
+go-dlib (0.0.1-1+git20131206141836~69399d85a2) raring; urgency=low
+
+  * Build from git revision 69399d85a2bf36f8dc2d9aa9278aedaacf1d558b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 14:18:36 +0800
+
+go-dlib (0.0.1-1+git20131206135136~a4622827bd) raring; urgency=low
+
+  * Build from git revision a4622827bd805d73a09c22e0c8aa63117ef34de3
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 13:51:36 +0800
+
+go-dlib (0.0.1-1+git20131206112108~cc8d1e2905) raring; urgency=low
+
+  * Build from git revision cc8d1e2905fe325afa9556dc4b99a2b7053fee5e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 11:21:08 +0800
+
+go-dlib (0.0.1-1+git20131206093128~a9e25a15fe) raring; urgency=low
+
+  * Build from git revision a9e25a15fe533fa34014e5704cfd76c8e5eb3cfb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 06 Dec 2013 09:31:29 +0800
+
+go-dlib (0.0.1-1+git20131205232207~fd855efcc2) raring; urgency=low
+
+  * Build from git revision fd855efcc2cbf7fac74698cae01e934563f022f4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 23:22:07 +0800
+
+go-dlib (0.0.1-1+git20131205215031~e526fac7bd) raring; urgency=low
+
+  * Build from git revision e526fac7bd9b859f4eae4fd84b1f425f2c767d5b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 21:50:31 +0800
+
+go-dlib (0.0.1-1+git20131205211456~0bbfc3a8b0) raring; urgency=low
+
+  * Build from git revision 0bbfc3a8b0d85ecbb582a37c2cebb6ad05e1e6fe
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 21:14:56 +0800
+
+go-dlib (0.0.1-1+git20131205152150~996bce72b4) raring; urgency=low
+
+  * Build from git revision 996bce72b427a725dc87e1bb78e369b6b02e6b45
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 15:21:50 +0800
+
+go-dlib (0.0.1-1+git20131205125021~314ca7bfa1) raring; urgency=low
+
+  * Build from git revision 314ca7bfa1657c8b3a8a432129cb191223b9248b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 12:50:21 +0800
+
+go-dlib (0.0.1-1+git20131205123027~fabb1b72a6) raring; urgency=low
+
+  * Build from git revision fabb1b72a6457f4b245c37861044b4a8ae0bc9e2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 12:30:27 +0800
+
+go-dlib (0.0.1-1+git20131205122752~17cad7a50f) raring; urgency=low
+
+  * Build from git revision 17cad7a50fe592ef55eea164fe87f843cbea2712
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 12:27:53 +0800
+
+go-dlib (0.0.1-1+git20131205122342~17cad7a50f) raring; urgency=low
+
+  * Build from git revision 17cad7a50fe592ef55eea164fe87f843cbea2712
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 05 Dec 2013 12:23:42 +0800
+
+go-dlib (0.0.1-1+git20131204201034~2ca9883adb) raring; urgency=low
+
+  * Build from git revision 2ca9883adb8f4395f93be38c077afd2d016f9ee1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 04 Dec 2013 20:10:34 +0800
+
+go-dlib (0.0.1-1+git20131204150330~5ada9e8ff6) raring; urgency=low
+
+  * Build from git revision 5ada9e8ff61cfba60012ddfaa8ae4d2d3d705145
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 04 Dec 2013 15:03:30 +0800
+
+go-dlib (0.0.1-1+git20131204150157~5ada9e8ff6) raring; urgency=low
+
+  * Build from git revision 5ada9e8ff61cfba60012ddfaa8ae4d2d3d705145
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 04 Dec 2013 15:01:57 +0800
+
+go-dlib (0.0.1-1+git20131204104023~ae5ad2685b) raring; urgency=low
+
+  * Build from git revision ae5ad2685b2e9bf3006cde0b44c57fbba6e9790d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 04 Dec 2013 10:40:23 +0800
+
+go-dlib (0.0.1-1+git20131203163340~007dcff223) raring; urgency=low
+
+  * Build from git revision 007dcff223523ef4a5dfdfb869c1d263dc358be6
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 03 Dec 2013 16:33:41 +0800
+
+go-dlib (0.0.1-1+git20131203155535~7658505a30) raring; urgency=low
+
+  * Build from git revision 7658505a302acdf319f454f198062dbf21b6bf64
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 03 Dec 2013 15:55:35 +0800
+
+go-dlib (0.0.1-1+git20131203110613~62265e0acd) raring; urgency=low
+
+  * Build from git revision 62265e0acd4faa4215e48c3d8f281009531e1e84
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 03 Dec 2013 11:06:13 +0800
+
+go-dlib (0.0.1-1+git20131202154107~7f9a2a2ba6) raring; urgency=low
+
+  * Build from git revision 7f9a2a2ba695d1983db91bb3cb7b3bd08ed2194a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 02 Dec 2013 15:41:07 +0800
+
+go-dlib (0.0.1-1+git20131202114458~64eb76f073) raring; urgency=low
+
+  * Build from git revision 64eb76f07370a691964a06346f89cfc92b79fafb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 02 Dec 2013 11:44:58 +0800
+
+go-dlib (0.0.1-1+git20131202104223~514c14fad3) raring; urgency=low
+
+  * Build from git revision 514c14fad3d315379105fb6fe5af439bbf64c9b4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 02 Dec 2013 10:42:23 +0800
+
+go-dlib (0.0.1-1+git20131202103544~514c14fad3) raring; urgency=low
+
+  * Build from git revision 514c14fad3d315379105fb6fe5af439bbf64c9b4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 02 Dec 2013 10:35:44 +0800
+
+go-dlib (0.0.1-1+git20131129155317~514c14fad3) raring; urgency=low
+
+  * Build from git revision 514c14fad3d315379105fb6fe5af439bbf64c9b4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 29 Nov 2013 15:53:17 +0800
+
+go-dlib (0.0.1-1+git20131129102734~514c14fad3) raring; urgency=low
+
+  * Build from git revision 514c14fad3d315379105fb6fe5af439bbf64c9b4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 29 Nov 2013 10:27:35 +0800
+
+go-dlib (0.0.1-1+git20131127143233~715680edbc) raring; urgency=low
+
+  * Build from git revision 715680edbca329b131316b30d7bbd7596dddf820
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 27 Nov 2013 14:32:33 +0800
+
+go-dlib (0.0.1-1+git20131126232632~ff4668c9f1) raring; urgency=low
+
+  * Build from git revision ff4668c9f175032a5ab8e37ac4b855a14c146bd1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 26 Nov 2013 23:26:33 +0800
+
+go-dlib (0.0.1-1+git20131125153827~9ee45c7d5d) raring; urgency=low
+
+  * Build from git revision 9ee45c7d5d8a58e5b2b5d8bffba822c1fd4bff3b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 25 Nov 2013 15:38:27 +0800
+
+go-dlib (0.0.1-1+git20131125153614~6c43531b21) raring; urgency=low
+
+  * Build from git revision 6c43531b212735e639ce5762fff2b6fbdbc3bd97
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 25 Nov 2013 15:36:15 +0800
+
+go-dlib (0.0.1-1+git20131125151427~6c43531b21) raring; urgency=low
+
+  * Build from git revision 6c43531b212735e639ce5762fff2b6fbdbc3bd97
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 25 Nov 2013 15:14:27 +0800
+
+go-dlib (0.0.1-1+git20131124192808~c0a3454748) raring; urgency=low
+
+  * Build from git revision c0a3454748fee4b6c41f921ce7196ca28284e829
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 24 Nov 2013 19:28:08 +0800
+
+go-dlib (0.0.1-1+git20131124191616~0ef632001b) raring; urgency=low
+
+  * Build from git revision 0ef632001bd8338130c7578c113608c15d2f38e0
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 24 Nov 2013 19:16:17 +0800
+
+go-dlib (0.0.1-1+git20131124191304~8ce514f086) raring; urgency=low
+
+  * Build from git revision 8ce514f086875e15e552f57c71c4f7a7d6408fa2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 24 Nov 2013 19:13:04 +0800
+
+go-dlib (0.0.1-1+git20131124185332~8ce514f086) raring; urgency=low
+
+  * Build from git revision 8ce514f086875e15e552f57c71c4f7a7d6408fa2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 24 Nov 2013 18:53:32 +0800
+
+go-dlib (0.0.1-1+git20131121105744~f8f64971ff) raring; urgency=low
+
+  * Build from git revision f8f64971ff35de8339a0559a57ffed32801f518d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 21 Nov 2013 10:57:45 +0800
+
+go-dlib (0.0.1-1+git20131121104751~4660826a09) raring; urgency=low
+
+  * Build from git revision 4660826a09a0691a10041966d942433e60766e67
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 21 Nov 2013 10:47:51 +0800
+
+go-dlib (0.0.1-1+git20131121101347~99a046219f) raring; urgency=low
+
+  * Build from git revision 99a046219f7d5b5d61fdb8e04c5153e1a9ef3e68
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 21 Nov 2013 10:13:48 +0800
+
+go-dlib (0.0.1-1+git20131119143646~3706f6dc84) raring; urgency=low
+
+  * Build from git revision 3706f6dc84ac926232c7394e8919077522e7c7a1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 14:36:46 +0800
+
+go-dlib (0.0.1-1+git20131119142230~87636dcd1e) raring; urgency=low
+
+  * Build from git revision 87636dcd1e0a1345dec377f28d992ba6fc581417
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 14:22:31 +0800
+
+go-dlib (0.0.1-1+git20131119140254~a8597ba242) raring; urgency=low
+
+  * Build from git revision a8597ba242ebe8514a3de794c2dd598a2447070d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 14:02:54 +0800
+
+go-dlib (0.0.1-1+git20131119131617~9db222a3ba) raring; urgency=low
+
+  * Build from git revision 9db222a3baf4300214bd8601e86fd1369036acb4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 13:16:17 +0800
+
+go-dlib (0.0.1-1+git20131119121438~60ff2be472) raring; urgency=low
+
+  * Build from git revision 60ff2be4722891123d0a00d0d1ed5549d02463ec
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 12:14:38 +0800
+
+go-dlib (0.0.1-1+git20131119121420~60ff2be472) raring; urgency=low
+
+  * Build from git revision 60ff2be4722891123d0a00d0d1ed5549d02463ec
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 12:14:20 +0800
+
+go-dlib (0.0.1-1+git20131119111121~c9c6f6c243) raring; urgency=low
+
+  * Build from git revision c9c6f6c2439c5f9f9cd5e54cfae908b8c07d3ec7
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 11:11:21 +0800
+
+go-dlib (0.0.1-1+git20131119092756~3a794c60fb) raring; urgency=low
+
+  * Build from git revision 3a794c60fb2c00649fb0a14150165ba36926968c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 19 Nov 2013 09:27:56 +0800
+
+go-dlib (0.0.1-1+git20131118165220~214ac4caa6) raring; urgency=low
+
+  * Build from git revision 214ac4caa6857823d10c05ffa1f7a8718238ab74
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 18 Nov 2013 16:52:20 +0800
+
+go-dlib (0.0.1-1+git20131115161205~fc9124a929) raring; urgency=low
+
+  * Build from git revision fc9124a92907a974bb3bb5bf69e4cadc0605248d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 15 Nov 2013 16:12:06 +0800
+
+go-dlib (0.0.1-1+git20131115115505~ba59ac93fa) raring; urgency=low
+
+  * Build from git revision ba59ac93fa78aeb5385b1e5ec227e64ae7fb04bb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 15 Nov 2013 11:55:05 +0800
+
+go-dlib (0.0.1-1+git20131115104517~ba59ac93fa) raring; urgency=low
+
+  * Build from git revision ba59ac93fa78aeb5385b1e5ec227e64ae7fb04bb
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 15 Nov 2013 10:45:17 +0800
+
+go-dlib (0.0.1-1+git20131114165013~776e202987) raring; urgency=low
+
+  * Build from git revision 776e2029874f03121093bf96d6c55fe090b508a7
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 14 Nov 2013 16:50:13 +0800
+
+go-dlib (0.0.1-1+git20131114163013~4534edbf56) raring; urgency=low
+
+  * Build from git revision 4534edbf568836539f148e2fb247fda3302b3c66
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 14 Nov 2013 16:30:13 +0800
+
+go-dlib (0.0.1-1+git20131114152251~6509e8951c) raring; urgency=low
+
+  * Build from git revision 6509e8951cdea9937baf85351f81cfc43a1885e1
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 14 Nov 2013 15:22:51 +0800
+
+go-dlib (0.0.1-1+git20131114110525~cff6237f6c) raring; urgency=low
+
+  * Build from git revision cff6237f6ce346571df039198ce8f40401798108
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 14 Nov 2013 11:05:26 +0800
+
+go-dlib (0.0.1-1+git20131113231317~6800afd157) raring; urgency=low
+
+  * Build from git revision 6800afd157790c61fd66940592f484a51c21aa22
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 13 Nov 2013 23:13:17 +0800
+
+go-dlib (0.0.1-1+git20131113182437~3e27127948) raring; urgency=low
+
+  * Build from git revision 3e2712794819f950d7db882c882ff5d106ace80c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 13 Nov 2013 18:24:38 +0800
+
+go-dlib (0.0.1-1+git20131113152143~0c12a70128) raring; urgency=low
+
+  * Build from git revision 0c12a7012873e8df0832e1fa37ae0139aee881a8
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 13 Nov 2013 15:21:43 +0800
+
+go-dlib (0.0.1-1+git20131113104333~c37f5201b6) raring; urgency=low
+
+  * Build from git revision c37f5201b6c06afef52d61da6f122db45180936a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 13 Nov 2013 10:43:33 +0800
+
+go-dlib (0.0.1-1+git20131113095544~c37f5201b6) raring; urgency=low
+
+  * Build from git revision c37f5201b6c06afef52d61da6f122db45180936a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 13 Nov 2013 09:55:44 +0800
+
+go-dlib (0.0.1-1+git20131112214326~c13db9746d) raring; urgency=low
+
+  * Build from git revision c13db9746d6c716f1e6b676b4041f52815ed54e8
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 12 Nov 2013 21:43:26 +0800
+
+go-dlib (0.0.1-1+git20131112162644~f5e5ddee04) raring; urgency=low
+
+  * Build from git revision f5e5ddee04bd51e2718b7b57f889c3ec2d5476a3
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 12 Nov 2013 16:26:44 +0800
+
+go-dlib (0.0.1-1+git20131112161238~e4a6f3a6b0) raring; urgency=low
+
+  * Build from git revision e4a6f3a6b0d562efa8e7e93a09e8b6d9b2b481bd
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 12 Nov 2013 16:12:39 +0800
+
+go-dlib (0.0.1-1+git20131111173922~ea4865be4d) raring; urgency=low
+
+  * Build from git revision ea4865be4ddc5d1fe9ad6dbc554d2c2541c1bd1d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 11 Nov 2013 17:39:22 +0800
+
+go-dlib (0.0.1-1+git20131108155130~2b634287e3) raring; urgency=low
+
+  * Build from git revision 2b634287e36dab9b072eeaa96449786ab6a04d3f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 08 Nov 2013 15:51:30 +0800
+
+go-dlib (0.0.1-1+git20131108122031~31d1be4b17) raring; urgency=low
+
+  * Build from git revision 31d1be4b17042c93086b31d4d9f10f60207513b7
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 08 Nov 2013 12:20:31 +0800
+
+go-dlib (0.0.1-1+git20131108122017~31d1be4b17) raring; urgency=low
+
+  * Build from git revision 31d1be4b17042c93086b31d4d9f10f60207513b7
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 08 Nov 2013 12:20:17 +0800
+
+go-dlib (0.0.1-1+git20131107223326~31d1be4b17) raring; urgency=low
+
+  * Build from git revision 31d1be4b17042c93086b31d4d9f10f60207513b7
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 07 Nov 2013 22:33:27 +0800
+
+go-dlib (0.0.1-1+git20131106173724~215c5d7bf3) raring; urgency=low
+
+  * Build from git revision 215c5d7bf321c305a9c60ef00c0de85d09c28980
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 17:37:24 +0800
+
+go-dlib (0.0.1-1+git20131106160113~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 16:01:14 +0800
+
+go-dlib (0.0.1-1+git20131106155420~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:54:20 +0800
+
+go-dlib (0.0.1-1+git20131106155043~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:50:43 +0800
+
+go-dlib (0.0.1-1+git20131106154907~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:49:07 +0800
+
+go-dlib (0.0.1-1+git20131106153928~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:39:28 +0800
+
+go-dlib (0.0.1-1+git20131106153402~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:34:03 +0800
+
+go-dlib (0.0.1-1+git20131106153147~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:31:47 +0800
+
+go-dlib (0.0.1-1+git20131106153015~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:30:15 +0800
+
+go-dlib (0.0.1-1+git20131106152851~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 15:28:52 +0800
+
+go-dlib (0.0.1-1+git20131106145905~1ca81addba) raring; urgency=low
+
+  * Build from git revision 1ca81addba312a307cd9f41d2d236c13417a4ce2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 06 Nov 2013 14:59:05 +0800
+
+go-dlib (0.0.1-1+git20131105165520~b9c71f43e6) raring; urgency=low
+
+  * Build from git revision b9c71f43e64a748bcd9df98ba61349b7f39aed71
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 05 Nov 2013 16:55:20 +0800
+
+go-dlib (0.0.1-1+git20131105165308~b9c71f43e6) raring; urgency=low
+
+  * Build from git revision b9c71f43e64a748bcd9df98ba61349b7f39aed71
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 05 Nov 2013 16:53:08 +0800
+
+go-dlib (0.0.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 05 Nov 2013 16:16:07 +0800

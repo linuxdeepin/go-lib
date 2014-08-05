@@ -1,0 +1,21 @@
+Source: go-dlib
+Section: devel
+Priority: extra
+Maintainer: Deepin Packages Builder <packages@linuxdeepin.com>
+Build-Depends: debhelper (>= 8.0.0),
+ golang,
+ libglib2.0-dev,
+ golang-gocheck-dev,
+ libgdk-pixbuf2.0-dev,
+ libpulse-dev,
+ libgtk-3-dev,
+ go-xgb,
+ pkg-config,
+Standards-Version: 3.9.4
+Homepage: http://www.linuxdeepin.com
+
+Package: go-dlib
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libglib2.0-0 
+Description: Go-lang bingdings for dlib
+ Go-lang bindings for dlib
