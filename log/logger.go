@@ -225,6 +225,11 @@ func (logger *Logger) SetLogLevel(level Priority) *Logger {
 	return logger
 }
 
+// GetLogLevel return the log level.
+func (logger *Logger) GetLogLevel() Priority {
+	return logger.level
+}
+
 // SetRestartCommand reset the command and argument when restart after fatal.
 func (logger *Logger) SetRestartCommand(exefile string, args ...string) {
 	logger.config.RestartCommand = append([]string{exefile}, args...)
