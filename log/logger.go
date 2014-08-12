@@ -37,30 +37,31 @@ const (
 	defaultDebugLelveEnv = "DDE_DEBUG_LEVEL"
 	defaultDebugMatchEnv = "DDE_DEBUG_MATCH"
 	defaultDebugFile     = "/var/cache/dde_debug"
-	crashReporterExe     = "/usr/bin/deepin-crash-reporter"
+	crashReporterExe     = "/usr/bin/deepin-crash-reporter" // TODO
 )
 
+// TODO
 var crashReporterArgs = []string{crashReporterExe, "--remove-config", "--config"}
 
 type Priority int
 
-// Definition of log levels, the larger of the value, the higher of
+// Definitions of log level, the larger of the value, the higher of
 // the priority.
 const (
-	LEVEL_DEBUG Priority = iota
-	LEVEL_INFO
-	LEVEL_WARNING
-	LEVEL_ERROR
-	LEVEL_PANIC
-	LEVEL_FATAL
-	LEVEL_DISABLE
+	LevelDebug Priority = iota
+	LevelInfo
+	LevelWarning
+	LevelError
+	LevelPanic
+	LevelFatal
+	LevelDisable
 )
 
 var (
 	logapi *Logapi
 
 	// DebugEnv is the name of environment variable to enable debug
-	// mode , if exists the default log level will be "LEVEL_DEBUG".
+	// mode , if exists the default log level will be "LevelDebug".
 	DebugEnv = defaultDebugEnv
 
 	// DebugLevelEnv is the name of environment variable to control
@@ -73,7 +74,7 @@ var (
 	DebugMatchEnv = defaultDebugMatchEnv
 
 	// DebugFile if the file name that if exist the default log level
-	// will be "LEVEL_DEBUG".
+	// will be "LevelDebug".
 	DebugFile = defaultDebugFile
 )
 
@@ -155,7 +156,7 @@ type Logger struct {
 // NewLogger create a Logger object, it need a string as name to register
 // Logger dbus service, if the environment variable exists which name
 // stores in variable "DebugEnv", the default log level will be
-// "LEVEL_DEBUG" or is "LEVEL_INFO".
+// "LevelDebug" or is "LevelInfo".
 func NewLogger(name string) (logger *Logger) {
 	golog.SetFlags(golog.Llongfile)
 
@@ -170,37 +171,37 @@ func NewLogger(name string) (logger *Logger) {
 	logger.config = newRestartConfig(name)
 
 	// dispatch environment variables to set default log level
-	level := LEVEL_INFO
+	level := LevelInfo
 	var customLevel Priority
 	// level := defaultLevel
 	if utils.IsEnvExists(DebugLevelEnv) {
 		switch os.Getenv(DebugLevelEnv) {
 		case "debug":
-			customLevel = LEVEL_DEBUG
+			customLevel = LevelDebug
 		case "info":
-			customLevel = LEVEL_INFO
+			customLevel = LevelInfo
 		case "warning":
-			customLevel = LEVEL_WARNING
+			customLevel = LevelWarning
 		case "error":
-			customLevel = LEVEL_ERROR
+			customLevel = LevelError
 		case "fatal":
-			customLevel = LEVEL_FATAL
+			customLevel = LevelFatal
 		}
 		level = customLevel
 	}
 	if utils.IsEnvExists(DebugEnv) || isFileExists(DebugFile) {
 		if !utils.IsEnvExists(DebugLevelEnv) {
-			level = LEVEL_DEBUG
+			level = LevelDebug
 		}
 	}
 	if utils.IsEnvExists(DebugMatchEnv) {
 		if strings.Contains(strings.ToLower(name),
 			strings.ToLower(os.Getenv(DebugMatchEnv))) {
 			if !utils.IsEnvExists(DebugLevelEnv) {
-				level = LEVEL_DEBUG
+				level = LevelDebug
 			}
 		} else {
-			level = LEVEL_DISABLE
+			level = LevelDisable
 		}
 	}
 	logger.level = level
@@ -264,7 +265,7 @@ func (logger *Logger) log(level Priority, v ...interface{}) {
 		return
 	}
 	var s string
-	if level >= LEVEL_ERROR {
+	if level >= LevelError {
 		s = buildMsg(3, true, v...)
 	} else {
 		s = buildMsg(3, false, v...)
@@ -277,7 +278,7 @@ func (logger *Logger) logf(level Priority, format string, v ...interface{}) {
 		return
 	}
 	var s string
-	if level >= LEVEL_ERROR {
+	if level >= LevelError {
 		s = buildFormatMsg(3, true, format, v...)
 	} else {
 		s = buildFormatMsg(3, false, format, v...)
@@ -287,32 +288,32 @@ func (logger *Logger) logf(level Priority, format string, v ...interface{}) {
 
 func (logger *Logger) doLog(level Priority, s string) {
 	switch level {
-	case LEVEL_DEBUG:
+	case LevelDebug:
 		if logapi != nil {
 			logapi.Debug(logger.id, logger.name, s)
 		}
 		logger.printLocal("[DEBUG]", s)
-	case LEVEL_INFO:
+	case LevelInfo:
 		if logapi != nil {
 			logapi.Info(logger.id, logger.name, s)
 		}
 		logger.printLocal("[INFO]", s)
-	case LEVEL_WARNING:
+	case LevelWarning:
 		if logapi != nil {
 			logapi.Warning(logger.id, logger.name, s)
 		}
 		logger.printLocal("[WARNING]", s)
-	case LEVEL_ERROR:
+	case LevelError:
 		if logapi != nil {
 			logapi.Error(logger.id, logger.name, s)
 		}
 		logger.printLocal("[ERROR]", s)
-	case LEVEL_PANIC:
+	case LevelPanic:
 		if logapi != nil {
 			logapi.Error(logger.id, logger.name, s)
 		}
 		logger.printLocal("[PANIC]", s)
-	case LEVEL_FATAL:
+	case LevelFatal:
 		if logapi != nil {
 			logapi.Fatal(logger.id, logger.name, s)
 		}
@@ -328,49 +329,49 @@ func (logger *Logger) printLocal(prefix, msg string) {
 
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Debug(v ...interface{}) {
-	logger.log(LEVEL_DEBUG, v...)
+	logger.log(LevelDebug, v...)
 }
 
 func (logger *Logger) Debugf(format string, v ...interface{}) {
-	logger.logf(LEVEL_DEBUG, format, v...)
+	logger.logf(LevelDebug, format, v...)
 }
 
 // Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Info(v ...interface{}) {
-	logger.log(LEVEL_INFO, v...)
+	logger.log(LevelInfo, v...)
 }
 
 func (logger *Logger) Infof(format string, v ...interface{}) {
-	logger.logf(LEVEL_INFO, format, v...)
+	logger.logf(LevelInfo, format, v...)
 }
 
 // Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Warning(v ...interface{}) {
-	logger.log(LEVEL_WARNING, v...)
+	logger.log(LevelWarning, v...)
 }
 
 func (logger *Logger) Warningf(format string, v ...interface{}) {
-	logger.logf(LEVEL_WARNING, format, v...)
+	logger.logf(LevelWarning, format, v...)
 }
 
 // Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
 func (logger *Logger) Error(v ...interface{}) {
-	logger.log(LEVEL_ERROR, v...)
+	logger.log(LevelError, v...)
 }
 
 func (logger *Logger) Errorf(format string, v ...interface{}) {
-	logger.logf(LEVEL_ERROR, format, v...)
+	logger.logf(LevelError, format, v...)
 }
 
 // Panic is equivalent to Error() followed by a call to panic().
 func (logger *Logger) Panic(v ...interface{}) {
-	logger.log(LEVEL_PANIC, v...)
+	logger.log(LevelPanic, v...)
 	s := buildMsg(2, true, v...)
 	panic(s)
 }
 
 func (logger *Logger) Panicf(format string, v ...interface{}) {
-	logger.logf(LEVEL_PANIC, format, v...)
+	logger.logf(LevelPanic, format, v...)
 	s := buildFormatMsg(2, true, format, v...)
 	panic(s)
 }
@@ -378,13 +379,13 @@ func (logger *Logger) Panicf(format string, v ...interface{}) {
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
 func (logger *Logger) Fatal(v ...interface{}) {
-	logger.log(LEVEL_FATAL, v...)
-	logger.launchCrashReporter()
+	logger.log(LevelFatal, v...)
+	logger.launchCrashReporter() // TODO
 	os.Exit(1)
 }
 
 func (logger *Logger) Fatalf(format string, v ...interface{}) {
-	logger.logf(LEVEL_FATAL, format, v...)
+	logger.logf(LevelFatal, format, v...)
 	logger.launchCrashReporter()
 	os.Exit(1)
 }
@@ -399,18 +400,18 @@ func (logger *Logger) launchCrashReporter() {
 		logger.config.LogDetail, _ = logapi.GetLog(logger.id)
 		fileContent, err := json.Marshal(logger.config)
 		if err != nil {
-			logger.Error("%v", err)
+			logger.Error(err)
 		}
 
 		// create temporary json file and it will be removed by deepin-crash-reporter
 		f, err := ioutil.TempFile("", "deepin_crash_reporter_config_")
 		defer f.Close()
 		if err != nil {
-			logger.Error("%v", err)
+			logger.Error(err)
 		}
 		_, err = f.Write(fileContent)
 		if err != nil {
-			logger.Error("%v", err)
+			logger.Error(err)
 		}
 
 		// launch crash reporter
@@ -418,7 +419,7 @@ func (logger *Logger) launchCrashReporter() {
 		_, err = os.StartProcess(crashReporterExe, append(crashReporterArgs, f.Name()),
 			&os.ProcAttr{Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}})
 		if err != nil {
-			logger.Error("launch deepin-crash-reporter failed: %v", err)
+			logger.Error("launch deepin-crash-reporter failed:", err)
 		}
 	}
 }

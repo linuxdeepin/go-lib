@@ -9,17 +9,17 @@ import (
 
 func Test(t *testing.T) { TestingT(t) }
 
-type TestWrapper struct{}
+type tester struct{}
 
 var testDebugFile = "./dde_debug"
 
 func init() {
 	DebugFile = testDebugFile
-	testWrapper := &TestWrapper{}
+	testWrapper := &tester{}
 	Suite(testWrapper)
 }
 
-func (*TestWrapper) TestFunc(c *C) {
+func (*tester) TestFunc(c *C) {
 	logger := NewLogger("logger_test")
 	logger.BeginTracing()
 	defer logger.EndTracing()
@@ -32,10 +32,9 @@ func (*TestWrapper) TestFunc(c *C) {
 	logger.Error("test error: ", fmt.Errorf("error message"))
 	logger.Errorf("test errorf: %v", fmt.Errorf("error message"))
 	logger.Panic("test panic")
-	// logger.Fatal("test fatal")
 }
 
-func (*TestWrapper) TestDebugFile(c *C) {
+func (*tester) TestDebugFile(c *C) {
 	os.Clearenv()
 	os.Create(DebugFile)
 	logger := NewLogger("test_env")
@@ -46,7 +45,7 @@ func (*TestWrapper) TestDebugFile(c *C) {
 	c.Check(logger.level, Equals, LEVEL_INFO)
 }
 
-func (*TestWrapper) TestDebugEnv(c *C) {
+func (*tester) TestDebugEnv(c *C) {
 	os.Clearenv()
 	logger := NewLogger("test_env")
 	c.Check(logger.level, Equals, LEVEL_INFO)
@@ -56,7 +55,7 @@ func (*TestWrapper) TestDebugEnv(c *C) {
 	c.Check(logger.level, Equals, LEVEL_DEBUG)
 }
 
-func (*TestWrapper) TestDebugLevelEnv(c *C) {
+func (*tester) TestDebugLevelEnv(c *C) {
 	os.Clearenv()
 	logger := NewLogger("test_env")
 	c.Check(logger.level, Equals, LEVEL_INFO)
@@ -70,7 +69,7 @@ func (*TestWrapper) TestDebugLevelEnv(c *C) {
 	c.Check(logger.level, Equals, LEVEL_WARNING)
 }
 
-func (*TestWrapper) TestDebugMatchEnv(c *C) {
+func (*tester) TestDebugMatchEnv(c *C) {
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG_MATCH", "test1")
 	logger1 := NewLogger("test1")
@@ -85,7 +84,7 @@ func (*TestWrapper) TestDebugMatchEnv(c *C) {
 	c.Check(logger2.level, Equals, LEVEL_DISABLE)
 }
 
-func (*TestWrapper) TestDebugMixEnv(c *C) {
+func (*tester) TestDebugMixEnv(c *C) {
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG", "1")
 	os.Setenv("DDE_DEBUG_LEVEL", "warning")

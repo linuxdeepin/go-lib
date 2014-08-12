@@ -1,6 +1,8 @@
 /*This file is auto generate by pkg.linuxdeepin.com/dbus-generator. Don't edit it*/
 package log
 
+// TODO: remove
+
 import "pkg.linuxdeepin.com/lib/dbus"
 import "pkg.linuxdeepin.com/lib/dbus/property"
 import "reflect"
