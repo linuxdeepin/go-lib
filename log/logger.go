@@ -157,7 +157,7 @@ type Logger struct {
 // Logger dbus service, if the environment variable exists which name
 // stores in variable "DebugEnv", the default log level will be
 // "LevelDebug" or is "LevelInfo".
-func NewLogger(name string) (logger *Logger) {
+func NewLogger(name string) (l *Logger) {
 	golog.SetFlags(golog.Llongfile)
 
 	// ignore panic
@@ -167,8 +167,8 @@ func NewLogger(name string) (logger *Logger) {
 		}
 	}()
 
-	logger = &Logger{name: name}
-	logger.config = newRestartConfig(name)
+	l = &Logger{name: name}
+	l.config = newRestartConfig(name)
 
 	// dispatch environment variables to set default log level
 	level := LevelInfo
@@ -204,14 +204,14 @@ func NewLogger(name string) (logger *Logger) {
 			level = LevelDisable
 		}
 	}
-	logger.level = level
+	l.level = level
 
 	err := initLogapi()
 	if err != nil {
 		golog.Printf("init logger dbus api failed: %v\n", err)
 		return
 	}
-	logger.id, err = logapi.NewLogger(name)
+	l.id, err = logapi.NewLogger(name)
 	if err != nil {
 		golog.Printf("create logger api object failed: %v\n", err)
 		return
@@ -220,53 +220,53 @@ func NewLogger(name string) (logger *Logger) {
 }
 
 // SetLogLevel reset the log level.
-func (logger *Logger) SetLogLevel(level Priority) *Logger {
-	logger.level = level
-	return logger
+func (l *Logger) SetLogLevel(level Priority) *Logger {
+	l.level = level
+	return l
 }
 
 // GetLogLevel return the log level.
-func (logger *Logger) GetLogLevel() Priority {
-	return logger.level
+func (l *Logger) GetLogLevel() Priority {
+	return l.level
 }
 
 // SetRestartCommand reset the command and argument when restart after fatal.
-func (logger *Logger) SetRestartCommand(exefile string, args ...string) {
-	logger.config.RestartCommand = append([]string{exefile}, args...)
+func (l *Logger) SetRestartCommand(exefile string, args ...string) {
+	l.config.RestartCommand = append([]string{exefile}, args...)
 }
 
 // AddExtArgForRestart add the command option which be used when
 // process fataled and restart by Logger dbus service.
-func (logger *Logger) AddExtArgForRestart(arg string) {
-	if !stringInSlice(arg, logger.config.RestartCommand[1:]) {
-		logger.config.RestartCommand = append(logger.config.RestartCommand, arg)
+func (l *Logger) AddExtArgForRestart(arg string) {
+	if !stringInSlice(arg, l.config.RestartCommand[1:]) {
+		l.config.RestartCommand = append(l.config.RestartCommand, arg)
 	}
 }
 
-func (logger *Logger) BeginTracing() {
-	logger.Infof("%s begin", logger.name)
+func (l *Logger) BeginTracing() {
+	l.Infof("%s begin", l.name)
 }
 
-func (logger *Logger) EndTracing() {
+func (l *Logger) EndTracing() {
 	if err := recover(); err != nil {
 		// TODO how to launch crash reporter
-		logger.Error(err)
-		logger.logEndFailed()
+		l.Error(err)
+		l.logEndFailed()
 	} else {
-		logger.logEndSuccess()
+		l.logEndSuccess()
 	}
 }
 
-func (logger *Logger) logEndSuccess() {
-	logger.Infof("%s end", logger.name)
+func (l *Logger) logEndSuccess() {
+	l.Infof("%s end", l.name)
 }
 
-func (logger *Logger) logEndFailed() {
-	logger.Infof("%s interruption", logger.name)
+func (l *Logger) logEndFailed() {
+	l.Infof("%s interruption", l.name)
 }
 
-func (logger *Logger) log(level Priority, v ...interface{}) {
-	if level < logger.level {
+func (l *Logger) log(level Priority, v ...interface{}) {
+	if level < l.level {
 		return
 	}
 	var s string
@@ -275,11 +275,11 @@ func (logger *Logger) log(level Priority, v ...interface{}) {
 	} else {
 		s = buildMsg(3, false, v...)
 	}
-	logger.doLog(level, s)
+	l.doLog(level, s)
 }
 
-func (logger *Logger) logf(level Priority, format string, v ...interface{}) {
-	if level < logger.level {
+func (l *Logger) logf(level Priority, format string, v ...interface{}) {
+	if level < l.level {
 		return
 	}
 	var s string
@@ -288,143 +288,143 @@ func (logger *Logger) logf(level Priority, format string, v ...interface{}) {
 	} else {
 		s = buildFormatMsg(3, false, format, v...)
 	}
-	logger.doLog(level, s)
+	l.doLog(level, s)
 }
 
-func (logger *Logger) doLog(level Priority, s string) {
+func (l *Logger) doLog(level Priority, s string) {
 	switch level {
 	case LevelDebug:
 		if logapi != nil {
-			logapi.Debug(logger.id, logger.name, s)
+			logapi.Debug(l.id, l.name, s)
 		}
-		logger.printLocal("[DEBUG]", s)
+		l.printLocal("[DEBUG]", s)
 	case LevelInfo:
 		if logapi != nil {
-			logapi.Info(logger.id, logger.name, s)
+			logapi.Info(l.id, l.name, s)
 		}
-		logger.printLocal("[INFO]", s)
+		l.printLocal("[INFO]", s)
 	case LevelWarning:
 		if logapi != nil {
-			logapi.Warning(logger.id, logger.name, s)
+			logapi.Warning(l.id, l.name, s)
 		}
-		logger.printLocal("[WARNING]", s)
+		l.printLocal("[WARNING]", s)
 	case LevelError:
 		if logapi != nil {
-			logapi.Error(logger.id, logger.name, s)
+			logapi.Error(l.id, l.name, s)
 		}
-		logger.printLocal("[ERROR]", s)
+		l.printLocal("[ERROR]", s)
 	case LevelPanic:
 		if logapi != nil {
-			logapi.Error(logger.id, logger.name, s)
+			logapi.Error(l.id, l.name, s)
 		}
-		logger.printLocal("[PANIC]", s)
+		l.printLocal("[PANIC]", s)
 	case LevelFatal:
 		if logapi != nil {
-			logapi.Fatal(logger.id, logger.name, s)
+			logapi.Fatal(l.id, l.name, s)
 		}
-		logger.printLocal("[FATAL]", s)
+		l.printLocal("[FATAL]", s)
 	}
 }
 
-func (logger *Logger) printLocal(prefix, msg string) {
+func (l *Logger) printLocal(prefix, msg string) {
 	fmtmsg := prefix + " " + msg
 	fmtmsg = strings.Replace(fmtmsg, "\n", "\n"+prefix+" ", -1) // format multi-lines message
 	fmt.Println(fmtmsg)
 }
 
 // Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Debug(v ...interface{}) {
-	logger.log(LevelDebug, v...)
+func (l *Logger) Debug(v ...interface{}) {
+	l.log(LevelDebug, v...)
 }
 
-func (logger *Logger) Debugf(format string, v ...interface{}) {
-	logger.logf(LevelDebug, format, v...)
+func (l *Logger) Debugf(format string, v ...interface{}) {
+	l.logf(LevelDebug, format, v...)
 }
 
 // Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Info(v ...interface{}) {
-	logger.log(LevelInfo, v...)
+func (l *Logger) Info(v ...interface{}) {
+	l.log(LevelInfo, v...)
 }
 
-func (logger *Logger) Infof(format string, v ...interface{}) {
-	logger.logf(LevelInfo, format, v...)
+func (l *Logger) Infof(format string, v ...interface{}) {
+	l.logf(LevelInfo, format, v...)
 }
 
 // Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Warning(v ...interface{}) {
-	logger.log(LevelWarning, v...)
+func (l *Logger) Warning(v ...interface{}) {
+	l.log(LevelWarning, v...)
 }
 
-func (logger *Logger) Warningf(format string, v ...interface{}) {
-	logger.logf(LevelWarning, format, v...)
+func (l *Logger) Warningf(format string, v ...interface{}) {
+	l.logf(LevelWarning, format, v...)
 }
 
 // Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
-func (logger *Logger) Error(v ...interface{}) {
-	logger.log(LevelError, v...)
+func (l *Logger) Error(v ...interface{}) {
+	l.log(LevelError, v...)
 }
 
-func (logger *Logger) Errorf(format string, v ...interface{}) {
-	logger.logf(LevelError, format, v...)
+func (l *Logger) Errorf(format string, v ...interface{}) {
+	l.logf(LevelError, format, v...)
 }
 
 // Panic is equivalent to Error() followed by a call to panic().
-func (logger *Logger) Panic(v ...interface{}) {
-	logger.log(LevelPanic, v...)
+func (l *Logger) Panic(v ...interface{}) {
+	l.log(LevelPanic, v...)
 	s := buildMsg(2, true, v...)
 	panic(s)
 }
 
-func (logger *Logger) Panicf(format string, v ...interface{}) {
-	logger.logf(LevelPanic, format, v...)
+func (l *Logger) Panicf(format string, v ...interface{}) {
+	l.logf(LevelPanic, format, v...)
 	s := buildFormatMsg(2, true, format, v...)
 	panic(s)
 }
 
 // Fatal send a log message with 'FATAL' as prefix to Logger dbus service
 // and print it to console, then call os.Exit(1).
-func (logger *Logger) Fatal(v ...interface{}) {
-	logger.log(LevelFatal, v...)
-	logger.launchCrashReporter() // TODO
+func (l *Logger) Fatal(v ...interface{}) {
+	l.log(LevelFatal, v...)
+	l.launchCrashReporter() // TODO
 	os.Exit(1)
 }
 
-func (logger *Logger) Fatalf(format string, v ...interface{}) {
-	logger.logf(LevelFatal, format, v...)
-	logger.launchCrashReporter()
+func (l *Logger) Fatalf(format string, v ...interface{}) {
+	l.logf(LevelFatal, format, v...)
+	l.launchCrashReporter()
 	os.Exit(1)
 }
 
-func (logger *Logger) launchCrashReporter() {
+func (l *Logger) launchCrashReporter() {
 	if logapi == nil {
 		return
 	}
 	// if deepin-crash-reporter exists, launch it
 	if isFileExists(crashReporterExe) {
 		// save config to a temporary json file
-		logger.config.LogDetail, _ = logapi.GetLog(logger.id)
-		fileContent, err := json.Marshal(logger.config)
+		l.config.LogDetail, _ = logapi.GetLog(l.id)
+		fileContent, err := json.Marshal(l.config)
 		if err != nil {
-			logger.Error(err)
+			l.Error(err)
 		}
 
 		// create temporary json file and it will be removed by deepin-crash-reporter
 		f, err := ioutil.TempFile("", "deepin_crash_reporter_config_")
 		defer f.Close()
 		if err != nil {
-			logger.Error(err)
+			l.Error(err)
 		}
 		_, err = f.Write(fileContent)
 		if err != nil {
-			logger.Error(err)
+			l.Error(err)
 		}
 
 		// launch crash reporter
-		logger.Info("launch deepin-crash-reporter: %s %s", crashReporterExe, append(crashReporterArgs, f.Name()))
+		l.Info("launch deepin-crash-reporter: %s %s", crashReporterExe, append(crashReporterArgs, f.Name()))
 		_, err = os.StartProcess(crashReporterExe, append(crashReporterArgs, f.Name()),
 			&os.ProcAttr{Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}})
 		if err != nil {
-			logger.Error("launch deepin-crash-reporter failed:", err)
+			l.Error("launch deepin-crash-reporter failed:", err)
 		}
 	}
 }
