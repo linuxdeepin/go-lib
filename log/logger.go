@@ -109,7 +109,7 @@ func NewLogger(name string) (l *Logger) {
 	l.config = newRestartConfig(name)
 	l.level = getDefaultLogLevel(name)
 	l.AppendBackend(GetBackendConsole())
-	l.AppendBackend(GetBackendDeepinlog(name))
+	l.AppendBackend(GetBackendSyslog(name))
 
 	// notify new logger created
 	for _, b := range l.backends {

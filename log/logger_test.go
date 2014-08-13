@@ -19,6 +19,20 @@ func init() {
 	Suite(testWrapper)
 }
 
+func (*tester) BenchmarkSyslog(c *C) {
+	b := newBackendSyslog("benchSyslog")
+	for i := 0; i < c.N; i++ {
+		b.log("benchSyslog", LevelInfo, "test")
+	}
+}
+
+func (*tester) BenchmarkDeepinlog(c *C) {
+	b := newBackendDeepinlog("benchDeepinlog")
+	for i := 0; i < c.N; i++ {
+		b.log("benchDeepinlog", LevelInfo, "test")
+	}
+}
+
 func (*tester) TestGeneral(c *C) {
 	logger := NewLogger("logger_test")
 	logger.BeginTracing()
