@@ -343,8 +343,8 @@ func (l *Logger) launchCrashReporter() {
 	var logId string
 	for _, b := range l.backends {
 		switch b.(type) {
-		case *deepinlog:
-			d, _ := b.(*deepinlog)
+		case *backendDeepinlog:
+			d, _ := b.(*backendDeepinlog)
 			logId = d.id
 			break
 		}

@@ -140,7 +140,7 @@ func (*tester) TestDebugConsoleEnv(c *C) {
 	defer os.Clearenv()
 
 	os.Setenv("DDE_DEBUG_CONSOLE", "1")
-	console := newConsole()
+	console := newBackendConsole()
 	c.Check(console.syslogMode, Equals, true)
 	console.log("test-console", LevelInfo, "this line shows as syslog format in console")
 }

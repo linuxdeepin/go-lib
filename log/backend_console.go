@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 ~ 2014 Deepin, Inc.
+ * Copyright (b) 2013 ~ 2014 Deepin, Inc.
  *               2013 ~ 2014 Xu FaSheng
  *
  * Author:      Xu FaSheng <fasheng.xu@gmail.com>
@@ -34,31 +34,31 @@ var (
 	// the console backend print log in syslog format.
 	DebugConsoleEnv = defaultDebugConsoleEnv
 
-	backendConsole = newConsole()
+	backendConsoleObj = newBackendConsole()
 )
 
-type console struct {
+type backendConsole struct {
 	syslogMode bool
 }
 
-func newConsole() (c *console) {
-	c = &console{}
+func newBackendConsole() (b *backendConsole) {
+	b = &backendConsole{}
 	if utils.IsEnvExists(DebugConsoleEnv) {
-		c.syslogMode = true
+		b.syslogMode = true
 	}
 	return
 }
 
 // GetBackendConsole return the only console back-end object.
 func GetBackendConsole() Backend {
-	return backendConsole
+	return backendConsoleObj
 }
 
-func (c *console) log(name string, level Priority, msg string) (err error) {
-	if c.syslogMode {
-		fmt.Println(getSyslogPrefix(name), c.formatMsg(level, msg))
+func (b *backendConsole) log(name string, level Priority, msg string) (err error) {
+	if b.syslogMode {
+		fmt.Println(getSyslogPrefix(name), b.formatMsg(level, msg))
 	} else {
-		fmt.Println(c.formatMsg(level, msg))
+		fmt.Println(b.formatMsg(level, msg))
 	}
 	return
 }
@@ -68,7 +68,7 @@ func getSyslogPrefix(name string) (prefix string) {
 	return
 }
 
-func (c *console) formatMsg(level Priority, msg string) (fmtMsg string) {
+func (b *backendConsole) formatMsg(level Priority, msg string) (fmtMsg string) {
 	var levelStr string
 	switch level {
 	case LevelDebug:
