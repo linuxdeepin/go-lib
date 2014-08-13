@@ -28,8 +28,7 @@ import (
 var logapi *Logapi
 
 type deepinlog struct {
-	id   string
-	name string
+	id string
 }
 
 func newDeepinlog(name string) (d *deepinlog) {
@@ -53,29 +52,29 @@ func initLogapi() (err error) {
 	return
 }
 
-// GetBackendConsole return the only deepinlog back-end object.
+// GetBackendConsole new and return a deepinlog back-end object.
 func GetBackendDeepinlog(name string) Backend {
 	return newDeepinlog(name)
 }
 
-func (d *deepinlog) log(level Priority, msg string) (err error) {
+func (d *deepinlog) log(name string, level Priority, msg string) (err error) {
 	if logapi == nil {
 		err = fmt.Errorf("deepin log dbus interface could not access")
 		return
 	}
 	switch level {
 	case LevelDebug:
-		err = logapi.Debug(d.id, d.name, msg)
+		err = logapi.Debug(d.id, name, msg)
 	case LevelInfo:
-		err = logapi.Info(d.id, d.name, msg)
+		err = logapi.Info(d.id, name, msg)
 	case LevelWarning:
-		err = logapi.Warning(d.id, d.name, msg)
+		err = logapi.Warning(d.id, name, msg)
 	case LevelError:
-		err = logapi.Error(d.id, d.name, msg)
+		err = logapi.Error(d.id, name, msg)
 	case LevelPanic:
-		err = logapi.Error(d.id, d.name, msg)
+		err = logapi.Error(d.id, name, msg)
 	case LevelFatal:
-		err = logapi.Fatal(d.id, d.name, msg)
+		err = logapi.Fatal(d.id, name, msg)
 	}
 	return
 }

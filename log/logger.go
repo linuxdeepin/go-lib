@@ -76,13 +76,12 @@ var (
 
 // Backend defines interface of logger's back-ends.
 type Backend interface {
-	log(level Priority, msg string) error
+	log(name string, level Priority, msg string) error
 }
 
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
 	name     string
-	id       string // TODO
 	level    Priority
 	backends []Backend
 	config   *restartConfig
@@ -106,6 +105,11 @@ func NewLogger(name string) (l *Logger) {
 	l.level = getDefaultLogLevel(name)
 	l.AppendBackend(GetBackendConsole())
 	l.AppendBackend(GetBackendDeepinlog(name))
+
+	// notify new logger created
+	for _, b := range l.backends {
+		b.log(name, LevelInfo, "new logger: "+name)
+	}
 
 	return
 }
@@ -231,7 +235,7 @@ func (l *Logger) logf(level Priority, format string, v ...interface{}) {
 }
 func (l *Logger) doLog(level Priority, msg string) {
 	for _, b := range l.backends {
-		b.log(level, msg)
+		b.log(l.name, level, msg)
 	}
 }
 
@@ -336,10 +340,22 @@ func (l *Logger) launchCrashReporter() {
 	if logapi == nil {
 		return
 	}
+	var logId string
+	for _, b := range l.backends {
+		switch b.(type) {
+		case *deepinlog:
+			d, _ := b.(*deepinlog)
+			logId = d.id
+			break
+		}
+	}
+	if len(logId) == 0 {
+		return
+	}
 	// if deepin-crash-reporter exists, launch it
 	if utils.IsFileExist(crashReporterExe) {
 		// save config to a temporary json file
-		l.config.LogDetail, _ = logapi.GetLog(l.id)
+		l.config.LogDetail, _ = logapi.GetLog(logId)
 		fileContent, err := json.Marshal(l.config)
 		if err != nil {
 			l.Error(err)

@@ -23,7 +23,6 @@ package log
 import (
 	"fmt"
 	"pkg.linuxdeepin.com/lib/utils"
-	"strings"
 )
 
 const defaultDebugConsoleEnv = "DDE_DEBUG_CONSOLE"
@@ -53,12 +52,11 @@ func GetBackendConsole() Backend {
 	return backendConsole
 }
 
-func (c *console) log(level Priority, msg string) (err error) {
+func (c *console) log(name string, level Priority, msg string) (err error) {
 	fmt.Println(c.formatMsg(level, msg))
 	return
 }
 
-// TODO
 func (c *console) formatMsg(level Priority, msg string) (fmtMsg string) {
 	var levelStr string
 	switch level {
@@ -76,7 +74,5 @@ func (c *console) formatMsg(level Priority, msg string) (fmtMsg string) {
 		levelStr = "<error>"
 	}
 	fmtMsg = levelStr + " " + msg
-	// fmtMsg = strings.Replace(fmtMsg, "\n", "\n"+levelStr+" ", -1) // format multi-lines message
-	strings.Replace(fmtMsg, "\n", "\n"+levelStr+" ", -1) // format multi-lines message
 	return
 }
