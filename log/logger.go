@@ -48,13 +48,13 @@ type Priority int
 // Definitions of log level, the larger of the value, the higher of
 // the priority.
 const (
-	LevelDebug Priority = iota
-	LevelInfo
-	LevelWarning
-	LevelError
-	LevelPanic
+	LevelDisable Priority = iota
 	LevelFatal
-	LevelDisable
+	LevelPanic
+	LevelError
+	LevelWarning
+	LevelInfo
+	LevelDebug
 )
 
 var (
@@ -266,17 +266,17 @@ func (l *Logger) logEndFailed() {
 }
 
 func (l *Logger) isNeedLog(level Priority) bool {
-	if level < l.level {
-		return false
+	if level <= l.level {
+		return true
 	}
-	return true
+	return false
 }
 
 func (l *Logger) isNeedTraceMore(level Priority) bool {
-	if level < LevelError {
-		return false
+	if level <= LevelError {
+		return true
 	}
-	return true
+	return false
 }
 
 func (l *Logger) log(level Priority, v ...interface{}) {
