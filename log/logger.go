@@ -61,17 +61,18 @@ const (
 var (
 	logapi *Logapi
 
-	// DebugEnv is the name of environment variable to enable debug
-	// mode , if exists the default log level will be "LevelDebug".
+	// DebugEnv is the name of environment variable that used to
+	// enable debug mode , if exists the default log level will be
+	// "LevelDebug".
 	DebugEnv = defaultDebugEnv
 
-	// DebugLevelEnv is the name of environment variable to control
-	// the log level, could be "debug", "info", "warning", "error" and
-	// "fatal".
+	// DebugLevelEnv is the name of environment variable that used to
+	// control the log level, could be "debug", "info", "warning",
+	// "error", "fatal" and "disable".
 	DebugLevelEnv = defaultDebugLelveEnv
 
-	// DebugMatchEnv is the name of environment variable to enable
-	// debug mode for target logger object.
+	// DebugMatchEnv is the name of environment variable that used to
+	// enable debug mode for target logger object.
 	DebugMatchEnv = defaultDebugMatchEnv
 
 	// DebugFile if the file name that if exist the default log level
@@ -115,37 +116,6 @@ func newRestartConfig(logname string) *restartConfig {
 	return config
 }
 
-func buildMsg(calldepth int, loop bool, v ...interface{}) (msg string) {
-	s := fmt.Sprintln(v...)
-	s = strings.TrimSuffix(s, "\n")
-	msg = doBuildMsg(calldepth+1, loop, s)
-	return
-}
-
-func buildFormatMsg(calldepth int, loop bool, format string, v ...interface{}) (msg string) {
-	s := fmt.Sprintf(format, v...)
-	msg = doBuildMsg(calldepth+1, loop, s)
-	return
-}
-
-func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
-	if !loop {
-		_, file, line, _ := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
-	} else {
-		_, file, line, ok := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
-		for ok {
-			calldepth++
-			_, file, line, ok = runtime.Caller(calldepth)
-			if ok {
-				msg = fmt.Sprintf("%s\n-> %s:%d", msg, file, line)
-			}
-		}
-	}
-	return
-}
-
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
 	name   string
@@ -170,25 +140,39 @@ func NewLogger(name string) (l *Logger) {
 
 	l = &Logger{name: name}
 	l.config = newRestartConfig(name)
+	l.level = getDefaultLogLevel(name)
 
-	// dispatch environment variables to set default log level
-	level := LevelInfo
-	var customLevel Priority
-	// level := defaultLevel
+	err := initLogapi()
+	if err != nil {
+		golog.Printf("init logger dbus api failed: %v\n", err)
+		return
+	}
+	l.id, err = logapi.NewLogger(name)
+	if err != nil {
+		golog.Printf("create logger api object failed: %v\n", err)
+		return
+	}
+	return
+}
+
+// parse environment variables to get default log level
+func getDefaultLogLevel(name string) (level Priority) {
+	level = LevelInfo
 	if utils.IsEnvExists(DebugLevelEnv) {
 		switch os.Getenv(DebugLevelEnv) {
 		case "debug":
-			customLevel = LevelDebug
+			level = LevelDebug
 		case "info":
-			customLevel = LevelInfo
+			level = LevelInfo
 		case "warning":
-			customLevel = LevelWarning
+			level = LevelWarning
 		case "error":
-			customLevel = LevelError
+			level = LevelError
 		case "fatal":
-			customLevel = LevelFatal
+			level = LevelFatal
+		case "disable":
+			level = LevelDisable
 		}
-		level = customLevel
 	}
 	if utils.IsEnvExists(DebugEnv) || utils.IsFileExist(DebugFile) {
 		if !utils.IsEnvExists(DebugLevelEnv) {
@@ -204,18 +188,6 @@ func NewLogger(name string) (l *Logger) {
 		} else {
 			level = LevelDisable
 		}
-	}
-	l.level = level
-
-	err := initLogapi()
-	if err != nil {
-		golog.Printf("init logger dbus api failed: %v\n", err)
-		return
-	}
-	l.id, err = logapi.NewLogger(name)
-	if err != nil {
-		golog.Printf("create logger api object failed: %v\n", err)
-		return
 	}
 	return
 }
@@ -288,13 +260,41 @@ func (l *Logger) log(level Priority, v ...interface{}) {
 	s := buildMsg(3, l.isNeedTraceMore(level), v...)
 	l.doLog(level, s)
 }
-
 func (l *Logger) logf(level Priority, format string, v ...interface{}) {
 	if !l.isNeedLog(level) {
 		return
 	}
 	s := buildFormatMsg(3, l.isNeedTraceMore(level), format, v...)
 	l.doLog(level, s)
+}
+
+func buildMsg(calldepth int, loop bool, v ...interface{}) (msg string) {
+	s := fmt.Sprintln(v...)
+	s = strings.TrimSuffix(s, "\n")
+	msg = doBuildMsg(calldepth+1, loop, s)
+	return
+}
+func buildFormatMsg(calldepth int, loop bool, format string, v ...interface{}) (msg string) {
+	s := fmt.Sprintf(format, v...)
+	msg = doBuildMsg(calldepth+1, loop, s)
+	return
+}
+func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
+	if !loop {
+		_, file, line, _ := runtime.Caller(calldepth)
+		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
+	} else {
+		_, file, line, ok := runtime.Caller(calldepth)
+		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
+		for ok {
+			calldepth++
+			_, file, line, ok = runtime.Caller(calldepth)
+			if ok {
+				msg = fmt.Sprintf("%s\n-> %s:%d", msg, file, line)
+			}
+		}
+	}
+	return
 }
 
 func (l *Logger) doLog(level Priority, s string) {
