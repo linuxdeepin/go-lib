@@ -20,20 +20,9 @@
 
 package log
 
-import (
-	"os"
-)
-
-func isFileExists(file string) bool {
-	if _, err := os.Stat(file); err == nil {
-		return true
-	}
-	return false
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
+func isStringInArray(s string, arr []string) bool {
+	for _, t := range arr {
+		if t == s {
 			return true
 		}
 	}

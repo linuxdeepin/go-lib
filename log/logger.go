@@ -43,6 +43,7 @@ const (
 // TODO
 var crashReporterArgs = []string{crashReporterExe, "--remove-config", "--config"}
 
+// Priority is the data type of log level.
 type Priority int
 
 // Definitions of log level, the larger of the value, the higher of
@@ -148,7 +149,7 @@ func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
 	name   string
-	id     string
+	id     string // TODO
 	level  Priority
 	config *restartConfig
 }
@@ -189,7 +190,7 @@ func NewLogger(name string) (l *Logger) {
 		}
 		level = customLevel
 	}
-	if utils.IsEnvExists(DebugEnv) || isFileExists(DebugFile) {
+	if utils.IsEnvExists(DebugEnv) || utils.IsFileExist(DebugFile) {
 		if !utils.IsEnvExists(DebugLevelEnv) {
 			level = LevelDebug
 		}
@@ -238,11 +239,12 @@ func (l *Logger) SetRestartCommand(exefile string, args ...string) {
 // AddExtArgForRestart add the command option which be used when
 // process fataled and restart by Logger dbus service.
 func (l *Logger) AddExtArgForRestart(arg string) {
-	if !stringInSlice(arg, l.config.RestartCommand[1:]) {
+	if !isStringInArray(arg, l.config.RestartCommand[1:]) {
 		l.config.RestartCommand = append(l.config.RestartCommand, arg)
 	}
 }
 
+// TODO
 func (l *Logger) BeginTracing() {
 	l.Infof("%s begin", l.name)
 }
@@ -342,6 +344,7 @@ func (l *Logger) Debug(v ...interface{}) {
 	l.log(LevelDebug, v...)
 }
 
+// TODO
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.logf(LevelDebug, format, v...)
 }
@@ -405,7 +408,7 @@ func (l *Logger) launchCrashReporter() {
 		return
 	}
 	// if deepin-crash-reporter exists, launch it
-	if isFileExists(crashReporterExe) {
+	if utils.IsFileExist(crashReporterExe) {
 		// save config to a temporary json file
 		l.config.LogDetail, _ = logapi.GetLog(l.id)
 		fileContent, err := json.Marshal(l.config)
