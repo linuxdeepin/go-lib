@@ -19,7 +19,7 @@ func init() {
 	Suite(testWrapper)
 }
 
-func (*tester) TestFunc(c *C) {
+func (*tester) TestGeneral(c *C) {
 	logger := NewLogger("logger_test")
 	logger.BeginTracing()
 	defer logger.EndTracing()
@@ -32,6 +32,35 @@ func (*tester) TestFunc(c *C) {
 	logger.Error("test error: ", fmt.Errorf("error message"))
 	logger.Errorf("test errorf: %v", fmt.Errorf("error message"))
 	logger.Panic("test panic")
+}
+
+func (*tester) TestIsNeedLog(c *C) {
+	logger := &Logger{}
+	logger.SetLogLevel(LevelInfo)
+	c.Check(logger.isNeedLog(LevelDebug), Equals, false)
+	c.Check(logger.isNeedLog(LevelInfo), Equals, true)
+	c.Check(logger.isNeedLog(LevelWarning), Equals, true)
+	c.Check(logger.isNeedLog(LevelError), Equals, true)
+	c.Check(logger.isNeedLog(LevelPanic), Equals, true)
+	c.Check(logger.isNeedLog(LevelFatal), Equals, true)
+	logger.SetLogLevel(LevelDebug)
+	c.Check(logger.isNeedLog(LevelDebug), Equals, true)
+	c.Check(logger.isNeedLog(LevelInfo), Equals, true)
+	c.Check(logger.isNeedLog(LevelWarning), Equals, true)
+	c.Check(logger.isNeedLog(LevelError), Equals, true)
+	c.Check(logger.isNeedLog(LevelPanic), Equals, true)
+	c.Check(logger.isNeedLog(LevelFatal), Equals, true)
+}
+
+func (*tester) TestIsNeedTraceMore(c *C) {
+	logger := &Logger{}
+	logger.SetLogLevel(LevelInfo)
+	c.Check(logger.isNeedTraceMore(LevelDebug), Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelInfo), Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelWarning), Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelError), Equals, true)
+	c.Check(logger.isNeedTraceMore(LevelPanic), Equals, true)
+	c.Check(logger.isNeedTraceMore(LevelFatal), Equals, true)
 }
 
 func (*tester) TestDebugFile(c *C) {

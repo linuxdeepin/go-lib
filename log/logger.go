@@ -153,10 +153,10 @@ type Logger struct {
 	config *restartConfig
 }
 
-// NewLogger create a Logger object, it need a string as name to register
-// Logger dbus service, if the environment variable exists which name
-// stores in variable "DebugEnv", the default log level will be
-// "LevelDebug" or is "LevelInfo".
+// NewLogger create a Logger object, which need a string as name to
+// register Logger dbus service, if the environment variable exists
+// which name stores in variable "DebugEnv", the default log level
+// will be "LevelDebug" or is "LevelInfo".
 func NewLogger(name string) (l *Logger) {
 	golog.SetFlags(golog.Llongfile)
 
@@ -265,29 +265,33 @@ func (l *Logger) logEndFailed() {
 	l.Infof("%s interruption", l.name)
 }
 
-func (l *Logger) log(level Priority, v ...interface{}) {
+func (l *Logger) isNeedLog(level Priority) bool {
 	if level < l.level {
+		return false
+	}
+	return true
+}
+
+func (l *Logger) isNeedTraceMore(level Priority) bool {
+	if level < LevelError {
+		return false
+	}
+	return true
+}
+
+func (l *Logger) log(level Priority, v ...interface{}) {
+	if !l.isNeedLog(level) {
 		return
 	}
-	var s string
-	if level >= LevelError {
-		s = buildMsg(3, true, v...)
-	} else {
-		s = buildMsg(3, false, v...)
-	}
+	s := buildMsg(3, l.isNeedTraceMore(level), v...)
 	l.doLog(level, s)
 }
 
 func (l *Logger) logf(level Priority, format string, v ...interface{}) {
-	if level < l.level {
+	if !l.isNeedLog(level) {
 		return
 	}
-	var s string
-	if level >= LevelError {
-		s = buildFormatMsg(3, true, format, v...)
-	} else {
-		s = buildFormatMsg(3, false, format, v...)
-	}
+	s := buildFormatMsg(3, l.isNeedTraceMore(level), format, v...)
 	l.doLog(level, s)
 }
 
@@ -297,6 +301,7 @@ func (l *Logger) doLog(level Priority, s string) {
 		if logapi != nil {
 			logapi.Debug(l.id, l.name, s)
 		}
+		// TODO
 		l.printLocal("[DEBUG]", s)
 	case LevelInfo:
 		if logapi != nil {
