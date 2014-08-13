@@ -135,6 +135,16 @@ func (*tester) TestDebugMixEnv(c *C) {
 	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDisable)
 }
 
+func (*tester) TestDebugConsoleEnv(c *C) {
+	os.Clearenv()
+	defer os.Clearenv()
+
+	os.Setenv("DDE_DEBUG_CONSOLE", "1")
+	console := newConsole()
+	c.Check(console.syslogMode, Equals, true)
+	console.log("test-console", LevelInfo, "this line shows as syslog format in console")
+}
+
 func (*tester) TestFmtSprint(c *C) {
 	c.Check(fmtSprint(""), Equals, "")
 	c.Check(fmtSprint("a", "b", "c"), Equals, "a b c")

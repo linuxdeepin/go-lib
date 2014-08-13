@@ -22,7 +22,9 @@ package log
 
 import (
 	"fmt"
+	"os"
 	"pkg.linuxdeepin.com/lib/utils"
+	"time"
 )
 
 const defaultDebugConsoleEnv = "DDE_DEBUG_CONSOLE"
@@ -53,7 +55,16 @@ func GetBackendConsole() Backend {
 }
 
 func (c *console) log(name string, level Priority, msg string) (err error) {
-	fmt.Println(c.formatMsg(level, msg))
+	if c.syslogMode {
+		fmt.Println(getSyslogPrefix(name), c.formatMsg(level, msg))
+	} else {
+		fmt.Println(c.formatMsg(level, msg))
+	}
+	return
+}
+func getSyslogPrefix(name string) (prefix string) {
+	hostname, _ := os.Hostname()
+	prefix = fmt.Sprintf("%s %s %s[%d]: ", time.Now().Format("Jan 2 15:04:05"), hostname, name, os.Getpid())
 	return
 }
 
