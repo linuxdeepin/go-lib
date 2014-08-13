@@ -26,6 +26,7 @@ func (*tester) TestGeneral(c *C) {
 	logger.SetLogLevel(LevelDebug)
 	logger.Debug("test debug")
 	logger.Info("test info")
+	logger.Info("test info multi-lines\n\nthe thread line and following two empty lines\n\n")
 	logger.Warning("test warning: ", fmt.Errorf("error message"), "append string")
 	logger.Warning("test warning: %v ", fmt.Errorf("error message"))
 	logger.Warningf("test warningf: %v", fmt.Errorf("error message"))
@@ -131,4 +132,10 @@ func (*tester) TestDebugMixEnv(c *C) {
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
 	logger = NewLogger("test_env")
 	c.Check(logger.level, Equals, LevelDisable)
+}
+
+func (*tester) TestFmtSprint(c *C) {
+	c.Check(fmtSprint(""), Equals, "")
+	c.Check(fmtSprint("a", "b", "c"), Equals, "a b c")
+	c.Check(fmtSprint("a\n", "b\n", "c\n"), Equals, "a\n b\n c\n")
 }

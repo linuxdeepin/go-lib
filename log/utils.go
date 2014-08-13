@@ -20,6 +20,18 @@
 
 package log
 
+import (
+	"fmt"
+	"strings"
+)
+
+// same with fmt.Sprintln() but trim the additional end line
+func fmtSprint(v ...interface{}) (s string) {
+	s = fmt.Sprintln(v...)
+	s = strings.TrimSuffix(s, "\n")
+	return
+}
+
 func isStringInArray(s string, arr []string) bool {
 	for _, t := range arr {
 		if t == s {

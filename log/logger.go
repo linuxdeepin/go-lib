@@ -26,7 +26,6 @@ import (
 	"io/ioutil"
 	golog "log"
 	"os"
-	"path/filepath"
 	"pkg.linuxdeepin.com/lib/utils"
 	"runtime"
 	"strings"
@@ -39,9 +38,6 @@ const (
 	defaultDebugFile     = "/var/cache/dde_debug"
 	crashReporterExe     = "/usr/bin/deepin-crash-reporter" // TODO
 )
-
-// TODO
-var crashReporterArgs = []string{crashReporterExe, "--remove-config", "--config"}
 
 // Priority is the data type of log level.
 type Priority int
@@ -59,8 +55,6 @@ const (
 )
 
 var (
-	logapi *Logapi
-
 	// DebugEnv is the name of environment variable that used to
 	// enable debug mode , if exists the default log level will be
 	// "LevelDebug".
@@ -80,48 +74,18 @@ var (
 	DebugFile = defaultDebugFile
 )
 
-func initLogapi() (err error) {
-	if logapi == nil {
-		logapi, err = newLogapi("/com/deepin/api/Logger")
-	}
-	return
-}
-
-// restartConfig stores data to be used by deepin-crash-reporter
-type restartConfig struct {
-	AppName          string
-	RestartCommand   []string
-	RestartEnv       map[string]string
-	RestartDirectory string
-	LogDetail        string
-}
-
-func newRestartConfig(logname string) *restartConfig {
-	config := &restartConfig{}
-	config.AppName = logname
-	config.RestartCommand = os.Args
-	config.RestartCommand[0], _ = filepath.Abs(os.Args[0])
-	config.RestartDirectory, _ = os.Getwd()
-
-	// setup envrionment variables
-	config.RestartEnv = make(map[string]string)
-	environs := os.Environ()
-	for _, env := range environs {
-		values := strings.SplitN(env, "=", 2)
-		// values[0] is environment variable name, values[1] is the value
-		if len(values) == 2 {
-			config.RestartEnv[values[0]] = values[1]
-		}
-	}
-	return config
+// Backend defines interface of logger's back-ends.
+type Backend interface {
+	log(level Priority, msg string) error
 }
 
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
-	name   string
-	id     string // TODO
-	level  Priority
-	config *restartConfig
+	name     string
+	id       string // TODO
+	level    Priority
+	backends []Backend
+	config   *restartConfig
 }
 
 // NewLogger create a Logger object, which need a string as name to
@@ -129,29 +93,20 @@ type Logger struct {
 // which name stores in variable "DebugEnv", the default log level
 // will be "LevelDebug" or is "LevelInfo".
 func NewLogger(name string) (l *Logger) {
-	golog.SetFlags(golog.Llongfile)
-
 	// ignore panic
 	defer func() {
 		if err := recover(); err != nil {
-			golog.Println("[INFO] dbus unavailable,", err)
+			golog.Println("<info> dbus unavailable,", err)
 		}
 	}()
+	golog.SetFlags(golog.Llongfile)
 
 	l = &Logger{name: name}
 	l.config = newRestartConfig(name)
 	l.level = getDefaultLogLevel(name)
+	l.AppendBackend(GetBackendConsole())
+	l.AppendBackend(GetBackendDeepinlog(name))
 
-	err := initLogapi()
-	if err != nil {
-		golog.Printf("init logger dbus api failed: %v\n", err)
-		return
-	}
-	l.id, err = logapi.NewLogger(name)
-	if err != nil {
-		golog.Printf("create logger api object failed: %v\n", err)
-		return
-	}
 	return
 }
 
@@ -203,6 +158,16 @@ func (l *Logger) GetLogLevel() Priority {
 	return l.level
 }
 
+// AppendBackend append a log backend.
+func (l *Logger) AppendBackend(b Backend) {
+	l.backends = append(l.backends, b)
+}
+
+// ResetBackends clear all backends.
+func (l *Logger) ResetBackends() {
+	l.backends = nil
+}
+
 // SetRestartCommand reset the command and argument when restart after fatal.
 func (l *Logger) SetRestartCommand(exefile string, args ...string) {
 	l.config.RestartCommand = append([]string{exefile}, args...)
@@ -220,7 +185,6 @@ func (l *Logger) AddExtArgForRestart(arg string) {
 func (l *Logger) BeginTracing() {
 	l.Infof("%s begin", l.name)
 }
-
 func (l *Logger) EndTracing() {
 	if err := recover(); err != nil {
 		// TODO how to launch crash reporter
@@ -230,11 +194,9 @@ func (l *Logger) EndTracing() {
 		l.logEndSuccess()
 	}
 }
-
 func (l *Logger) logEndSuccess() {
 	l.Infof("%s end", l.name)
 }
-
 func (l *Logger) logEndFailed() {
 	l.Infof("%s interruption", l.name)
 }
@@ -267,10 +229,14 @@ func (l *Logger) logf(level Priority, format string, v ...interface{}) {
 	s := buildFormatMsg(3, l.isNeedTraceMore(level), format, v...)
 	l.doLog(level, s)
 }
+func (l *Logger) doLog(level Priority, msg string) {
+	for _, b := range l.backends {
+		b.log(level, msg)
+	}
+}
 
 func buildMsg(calldepth int, loop bool, v ...interface{}) (msg string) {
-	s := fmt.Sprintln(v...)
-	s = strings.TrimSuffix(s, "\n")
+	s := fmtSprint(v...)
 	msg = doBuildMsg(calldepth+1, loop, s)
 	return
 }
@@ -290,88 +256,49 @@ func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
 			if ok {
-				msg = fmt.Sprintf("%s\n-> %s:%d", msg, file, line)
+				msg = fmt.Sprintf("%s\n  -> %s:%d", msg, file, line)
 			}
 		}
 	}
 	return
 }
 
-func (l *Logger) doLog(level Priority, s string) {
-	switch level {
-	case LevelDebug:
-		if logapi != nil {
-			logapi.Debug(l.id, l.name, s)
-		}
-		// TODO
-		l.printLocal("[DEBUG]", s)
-	case LevelInfo:
-		if logapi != nil {
-			logapi.Info(l.id, l.name, s)
-		}
-		l.printLocal("[INFO]", s)
-	case LevelWarning:
-		if logapi != nil {
-			logapi.Warning(l.id, l.name, s)
-		}
-		l.printLocal("[WARNING]", s)
-	case LevelError:
-		if logapi != nil {
-			logapi.Error(l.id, l.name, s)
-		}
-		l.printLocal("[ERROR]", s)
-	case LevelPanic:
-		if logapi != nil {
-			logapi.Error(l.id, l.name, s)
-		}
-		l.printLocal("[PANIC]", s)
-	case LevelFatal:
-		if logapi != nil {
-			logapi.Fatal(l.id, l.name, s)
-		}
-		l.printLocal("[FATAL]", s)
-	}
-}
-
-func (l *Logger) printLocal(prefix, msg string) {
-	fmtmsg := prefix + " " + msg
-	fmtmsg = strings.Replace(fmtmsg, "\n", "\n"+prefix+" ", -1) // format multi-lines message
-	fmt.Println(fmtmsg)
-}
-
-// Debug send a log message with 'DEBUG' as prefix to Logger dbus service and print it to console, too.
+// Debug log a message in "debug" level.
 func (l *Logger) Debug(v ...interface{}) {
 	l.log(LevelDebug, v...)
 }
 
-// TODO
+// Debugf formats message according to a format specifier and log it in "debug" level.
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.logf(LevelDebug, format, v...)
 }
 
-// Info send a log message with 'INFO' as prefix to Logger dbus service and print it to console, too.
+// Info log a message in "info" level.
 func (l *Logger) Info(v ...interface{}) {
 	l.log(LevelInfo, v...)
 }
 
+// Infof formats message according to a format specifier and log it in "info" level.
 func (l *Logger) Infof(format string, v ...interface{}) {
 	l.logf(LevelInfo, format, v...)
 }
 
-// Warning send a log message with 'WARNING' as prefix to Logger dbus service and print it to console, too.
+// Warning log a message in "warning" level.
 func (l *Logger) Warning(v ...interface{}) {
 	l.log(LevelWarning, v...)
 }
 
+// Warningf formats message according to a format specifier and log it in "warning" level.
 func (l *Logger) Warningf(format string, v ...interface{}) {
 	l.logf(LevelWarning, format, v...)
 }
 
-// Error send a log message with 'ERROR' as prefix to Logger dbus service and print it to console, too.
+// Error log a message in "error" level.
 func (l *Logger) Error(v ...interface{}) {
 	l.log(LevelError, v...)
 }
 
+// Errorf formats message according to a format specifier and log it in "error" level.
 func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.logf(LevelError, format, v...)
 }
@@ -379,24 +306,25 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 // Panic is equivalent to Error() followed by a call to panic().
 func (l *Logger) Panic(v ...interface{}) {
 	l.log(LevelPanic, v...)
-	s := buildMsg(2, true, v...)
+	s := fmtSprint(v...)
 	panic(s)
 }
 
+// Panicf is equivalent to Errorf() followed by a call to panic().
 func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.logf(LevelPanic, format, v...)
-	s := buildFormatMsg(2, true, format, v...)
+	s := fmt.Sprintf(format, v...)
 	panic(s)
 }
 
-// Fatal send a log message with 'FATAL' as prefix to Logger dbus service
-// and print it to console, then call os.Exit(1).
+// Fatal is equivalent to Error() followed by a call to os.Exit(1).
 func (l *Logger) Fatal(v ...interface{}) {
 	l.log(LevelFatal, v...)
-	l.launchCrashReporter() // TODO
+	l.launchCrashReporter()
 	os.Exit(1)
 }
 
+// Fatalf is equivalent to Errorf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.logf(LevelFatal, format, v...)
 	l.launchCrashReporter()
@@ -404,6 +332,7 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 }
 
 func (l *Logger) launchCrashReporter() {
+	// TODO use lib/logquery to get log messages.
 	if logapi == nil {
 		return
 	}
