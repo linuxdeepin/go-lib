@@ -66,72 +66,73 @@ func (*tester) TestIsNeedTraceMore(c *C) {
 
 func (*tester) TestDebugFile(c *C) {
 	os.Clearenv()
+	defer os.Clearenv()
+
 	os.Create(DebugFile)
-	logger := NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
 
 	os.Remove(DebugFile)
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelInfo)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
 }
 
 func (*tester) TestDebugEnv(c *C) {
 	os.Clearenv()
-	logger := NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelInfo)
+	defer os.Clearenv()
 
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
+
+	os.Clearenv()
+	os.Setenv("DDE_DEBUG", "")
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
+
+	os.Clearenv()
 	os.Setenv("DDE_DEBUG", "1")
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
 }
 
 func (*tester) TestDebugLevelEnv(c *C) {
 	os.Clearenv()
-	logger := NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelInfo)
+	defer os.Clearenv()
+
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
 
 	os.Setenv("DDE_DEBUG_LEVEL", "debug")
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
 
 	os.Setenv("DDE_DEBUG_LEVEL", "warning")
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelWarning)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelWarning)
 }
 
 func (*tester) TestDebugMatchEnv(c *C) {
 	os.Clearenv()
+	defer os.Clearenv()
+
 	os.Setenv("DDE_DEBUG_MATCH", "test1")
-	logger1 := NewLogger("test1")
-	logger2 := NewLogger("test2")
-	c.Check(logger1.level, Equals, LevelDebug)
-	c.Check(logger2.level, Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test1"), Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test2"), Equals, LevelDisable)
 
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
-	logger1 = NewLogger("test1")
-	logger2 = NewLogger("test2")
-	c.Check(logger1.level, Equals, LevelDisable)
-	c.Check(logger2.level, Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test1"), Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test2"), Equals, LevelDisable)
 }
 
 func (*tester) TestDebugMixEnv(c *C) {
 	os.Clearenv()
+	defer os.Clearenv()
+
 	os.Setenv("DDE_DEBUG", "1")
 	os.Setenv("DDE_DEBUG_LEVEL", "warning")
-	logger := NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelWarning)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelWarning)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG_LEVEL", "error")
 	os.Setenv("DDE_DEBUG_MATCH", "test_env")
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelError)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelError)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG_LEVEL", "error")
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
-	logger = NewLogger("test_env")
-	c.Check(logger.level, Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDisable)
 }
 
 func (*tester) TestFmtSprint(c *C) {
