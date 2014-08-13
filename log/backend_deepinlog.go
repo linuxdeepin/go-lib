@@ -75,6 +75,13 @@ func (b *backendDeepinlog) log(name string, level Priority, msg string) (err err
 		err = logapi.Error(b.id, name, msg)
 	case LevelFatal:
 		err = logapi.Fatal(b.id, name, msg)
+	default:
+		err = errUnknownLogLevel
+		return
 	}
+	return
+}
+
+func (b *backendDeepinlog) close() (err error) {
 	return
 }

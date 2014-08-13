@@ -74,9 +74,14 @@ var (
 	DebugFile = defaultDebugFile
 )
 
+var (
+	errUnknownLogLevel = fmt.Errorf("unknown log level")
+)
+
 // Backend defines interface of logger's back-ends.
 type Backend interface {
 	log(name string, level Priority, msg string) error
+	close() error
 }
 
 // Logger is a wrapper object to access Logger dbus service.
@@ -164,11 +169,16 @@ func (l *Logger) GetLogLevel() Priority {
 
 // AppendBackend append a log backend.
 func (l *Logger) AppendBackend(b Backend) {
-	l.backends = append(l.backends, b)
+	if b != nil {
+		l.backends = append(l.backends, b)
+	}
 }
 
 // ResetBackends clear all backends.
 func (l *Logger) ResetBackends() {
+	for _, b := range l.backends {
+		b.close()
+	}
 	l.backends = nil
 }
 

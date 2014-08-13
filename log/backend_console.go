@@ -55,10 +55,14 @@ func GetBackendConsole() Backend {
 }
 
 func (b *backendConsole) log(name string, level Priority, msg string) (err error) {
+	formatMsg, err := b.formatMsg(level, msg)
+	if err != nil {
+		return
+	}
 	if b.syslogMode {
-		fmt.Println(getSyslogPrefix(name), b.formatMsg(level, msg))
+		fmt.Println(getSyslogPrefix(name), formatMsg)
 	} else {
-		fmt.Println(b.formatMsg(level, msg))
+		fmt.Println(formatMsg)
 	}
 	return
 }
@@ -68,7 +72,7 @@ func getSyslogPrefix(name string) (prefix string) {
 	return
 }
 
-func (b *backendConsole) formatMsg(level Priority, msg string) (fmtMsg string) {
+func (b *backendConsole) formatMsg(level Priority, msg string) (fmtMsg string, err error) {
 	var levelStr string
 	switch level {
 	case LevelDebug:
@@ -83,7 +87,14 @@ func (b *backendConsole) formatMsg(level Priority, msg string) (fmtMsg string) {
 		levelStr = "<error>"
 	case LevelFatal:
 		levelStr = "<error>"
+	default:
+		err = errUnknownLogLevel
+		return
 	}
 	fmtMsg = levelStr + " " + msg
+	return
+}
+
+func (b *backendConsole) close() (err error) {
 	return
 }
