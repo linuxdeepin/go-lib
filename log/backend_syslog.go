@@ -29,20 +29,21 @@ const defaultSyslogTagPrefix = "deepin"
 var (
 	// SyslogTagPrefix define the prefix of syslog tag, default is "deepin".
 	SyslogTagPrefix = defaultSyslogTagPrefix
-
-	syslogWriter *syslog.Writer
 )
 
 type backendSyslog struct {
+	name   string
 	writer *syslog.Writer
 }
 
 func newBackendSyslog(name string) (b *backendSyslog) {
 	b = &backendSyslog{}
+	b.name = name
 	var err error
 	b.writer, err = newSyslogWriter(name)
 	if err != nil {
-		b = nil
+		gologPrintln("syslog is not available:", err)
+		return nil
 	}
 	return
 }
@@ -52,12 +53,7 @@ func newSyslogWriter(name string) (l *syslog.Writer, err error) {
 	return
 }
 
-// GetBackendSyslog new and return a syslog back-end object.
-func GetBackendSyslog(name string) Backend {
-	return newBackendSyslog(name)
-}
-
-func (b *backendSyslog) log(name string, level Priority, msg string) (err error) {
+func (b *backendSyslog) log(level Priority, msg string) (err error) {
 	switch level {
 	case LevelDebug:
 		err = b.writer.Debug(msg)

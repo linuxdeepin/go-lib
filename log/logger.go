@@ -24,11 +24,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	golog "log"
 	"os"
 	"pkg.linuxdeepin.com/lib/utils"
+	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 const (
@@ -80,16 +81,17 @@ var (
 
 // Backend defines interface of logger's back-ends.
 type Backend interface {
-	log(name string, level Priority, msg string) error
+	log(level Priority, msg string) error
 	close() error
 }
 
 // Logger is a wrapper object to access Logger dbus service.
 type Logger struct {
-	name     string
-	level    Priority
-	backends []Backend
-	config   *restartConfig
+	name         string
+	level        Priority
+	backends     []Backend
+	backendsLock sync.Mutex
+	config       *restartConfig
 }
 
 // NewLogger create a Logger object, which need a string as name to
@@ -100,20 +102,17 @@ func NewLogger(name string) (l *Logger) {
 	// ignore panic
 	defer func() {
 		if err := recover(); err != nil {
-			golog.Println("<info> dbus unavailable,", err)
+			gologPrintln("<info> dbus unavailable,", err)
 		}
 	}()
-	golog.SetFlags(golog.Llongfile)
 
 	l = &Logger{name: name}
 	l.config = newRestartConfig(name)
 	l.level = getDefaultLogLevel(name)
-	l.AppendBackend(GetBackendConsole())
-	l.AppendBackend(GetBackendSyslog(name))
 
-	// notify new logger created
-	for _, b := range l.backends {
-		b.log(name, LevelInfo, "new logger: "+name)
+	l.AddBackendConsole()
+	if ok := l.AddBackendSyslog(); !ok {
+		l.AddBackendDeepinlog()
 	}
 
 	return
@@ -167,19 +166,75 @@ func (l *Logger) GetLogLevel() Priority {
 	return l.level
 }
 
-// AppendBackend append a log backend.
-func (l *Logger) AppendBackend(b Backend) {
-	if b != nil {
-		l.backends = append(l.backends, b)
-	}
-}
-
 // ResetBackends clear all backends.
 func (l *Logger) ResetBackends() {
 	for _, b := range l.backends {
 		b.close()
 	}
 	l.backends = nil
+}
+
+// AddBackend append a log back-end.
+func (l *Logger) AddBackend(b Backend) bool {
+	l.backendsLock.Lock()
+	defer l.backendsLock.Unlock()
+	if b != nil {
+		l.backends = append(l.backends, b)
+		return true
+	}
+	return false
+}
+
+// RemoveBackend remove all back-end with target type.
+func (l *Logger) RemoveBackend(b Backend) {
+	len := len(l.backends)
+	targetType := reflect.TypeOf(b)
+	for i := len - 1; i >= 0; i-- {
+		itemType := reflect.TypeOf(l.backends[i])
+		if itemType == targetType {
+			l.doRemoveBackend(i)
+		}
+	}
+}
+func (l *Logger) doRemoveBackend(i int) {
+	l.backendsLock.Lock()
+	defer l.backendsLock.Unlock()
+	l.backends[i].close()
+	l.backends[i] = nil
+	newLen := len(l.backends) - 1
+	copy(l.backends[i:], l.backends[i+1:])
+	l.backends[newLen] = nil
+	l.backends = l.backends[:newLen]
+}
+
+// AddBackendConsole append a console back-end.
+func (l *Logger) AddBackendConsole() bool {
+	return l.AddBackend(newBackendConsole(l.name))
+}
+
+// RemoveBackendConsole remove all console back-end.
+func (l *Logger) RemoveBackendConsole() {
+	l.RemoveBackend(&backendConsole{})
+}
+
+// AddBackendSyslog append a syslog back-end.
+func (l *Logger) AddBackendSyslog() bool {
+	return l.AddBackend(newBackendSyslog(l.name))
+}
+
+// RemoveBackendSyslog remove all console back-end.
+func (l *Logger) RemoveBackendSyslog() {
+	l.RemoveBackend(&backendSyslog{})
+}
+
+// AddBackendDeepinlog append a deepinlog back-end.
+func (l *Logger) AddBackendDeepinlog() bool {
+	return l.AddBackend(newBackendDeepinlog(l.name))
+}
+
+// RemoveBackendDeepinlog remove all console back-end.
+func (l *Logger) RemoveBackendDeepinlog() {
+	l.RemoveBackend(&backendDeepinlog{})
 }
 
 // SetRestartCommand reset the command and argument when restart after fatal.
@@ -195,24 +250,58 @@ func (l *Logger) AddExtArgForRestart(arg string) {
 	}
 }
 
-// TODO
+// BeginTracing log function information when entering it.
 func (l *Logger) BeginTracing() {
-	l.Infof("%s begin", l.name)
-}
-func (l *Logger) EndTracing() {
-	if err := recover(); err != nil {
-		// TODO how to launch crash reporter
-		l.Error(err)
-		l.logEndFailed()
-	} else {
-		l.logEndSuccess()
+	funcName, file, line, ok := getCallerFuncInfo(2)
+	if !ok {
+		return
 	}
+	msg := fmt.Sprintf("%s:%d begin %s", file, line, funcName)
+	l.doLog(LevelInfo, msg)
 }
-func (l *Logger) logEndSuccess() {
-	l.Infof("%s end", l.name)
+
+// EndTracing log function information when leaving it.
+func (l *Logger) EndTracing() {
+	funcName, file, line, ok := getCallerFuncInfo(2)
+	if !ok {
+		return
+	}
+	msg := fmt.Sprintf("%s:%d end %s", file, line, funcName)
+	l.doLog(LevelInfo, msg)
 }
-func (l *Logger) logEndFailed() {
-	l.Infof("%s interruption", l.name)
+
+func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok bool) {
+	_, file, line, ok = runtime.Caller(skip)
+	if !ok {
+		return
+	}
+	for {
+		pc, _, _, ok2 := runtime.Caller(skip)
+		if !ok2 {
+			break
+		}
+		if funcInfo := runtime.FuncForPC(pc); funcInfo != nil {
+			// get the sort function name
+			fullFuncName := funcInfo.Name()
+			a := strings.Split(fullFuncName, "/")
+			funcName = a[len(a)-1]
+			if funcName == "runtime.panic" {
+				// if is panic function, skip it and get file/line again
+				_, file, line, ok = runtime.Caller(skip + 1)
+				skip++
+				continue
+			} else if strings.Contains(funcName, "func·") {
+				// if is an anonymous function, just skip it
+				skip++
+				continue
+			} else {
+				break
+			}
+		} else {
+			break
+		}
+	}
+	return
 }
 
 func (l *Logger) isNeedLog(level Priority) bool {
@@ -245,7 +334,7 @@ func (l *Logger) logf(level Priority, format string, v ...interface{}) {
 }
 func (l *Logger) doLog(level Priority, msg string) {
 	for _, b := range l.backends {
-		b.log(l.name, level, msg)
+		b.log(level, msg)
 	}
 }
 
@@ -270,7 +359,7 @@ func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
 			if ok {
-				msg = fmt.Sprintf("%s\n  -> %s:%d", msg, file, line)
+				msg = fmt.Sprintf("%s\n  ->  %s:%d", msg, file, line)
 			}
 		}
 	}

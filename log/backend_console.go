@@ -33,34 +33,29 @@ var (
 	// DebugConsoleEnv is the name of environment variable that used to control
 	// the console backend print log in syslog format.
 	DebugConsoleEnv = defaultDebugConsoleEnv
-
-	backendConsoleObj = newBackendConsole()
 )
 
 type backendConsole struct {
+	name       string
 	syslogMode bool
 }
 
-func newBackendConsole() (b *backendConsole) {
+func newBackendConsole(name string) (b *backendConsole) {
 	b = &backendConsole{}
+	b.name = name
 	if utils.IsEnvExists(DebugConsoleEnv) {
 		b.syslogMode = true
 	}
 	return
 }
 
-// GetBackendConsole return the only console back-end object.
-func GetBackendConsole() Backend {
-	return backendConsoleObj
-}
-
-func (b *backendConsole) log(name string, level Priority, msg string) (err error) {
+func (b *backendConsole) log(level Priority, msg string) (err error) {
 	formatMsg, err := b.formatMsg(level, msg)
 	if err != nil {
 		return
 	}
 	if b.syslogMode {
-		fmt.Println(getSyslogPrefix(name), formatMsg)
+		fmt.Println(getSyslogPrefix(b.name), formatMsg)
 	} else {
 		fmt.Println(formatMsg)
 	}

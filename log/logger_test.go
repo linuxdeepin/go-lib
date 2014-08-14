@@ -22,21 +22,24 @@ func init() {
 func (*tester) BenchmarkSyslog(c *C) {
 	b := newBackendSyslog("benchSyslog")
 	for i := 0; i < c.N; i++ {
-		b.log("benchSyslog", LevelInfo, "test")
+		b.log(LevelInfo, "test")
 	}
 }
 
 func (*tester) BenchmarkDeepinlog(c *C) {
 	b := newBackendDeepinlog("benchDeepinlog")
 	for i := 0; i < c.N; i++ {
-		b.log("benchDeepinlog", LevelInfo, "test")
+		b.log(LevelInfo, "test")
 	}
 }
 
 func (*tester) TestGeneral(c *C) {
 	logger := NewLogger("logger_test")
-	logger.BeginTracing()
-	defer logger.EndTracing()
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Info("catch error:", err)
+		}
+	}()
 	logger.SetLogLevel(LevelDebug)
 	logger.Debug("test debug")
 	logger.Info("test info")
@@ -47,6 +50,22 @@ func (*tester) TestGeneral(c *C) {
 	logger.Error("test error: ", fmt.Errorf("error message"))
 	logger.Errorf("test errorf: %v", fmt.Errorf("error message"))
 	logger.Panic("test panic")
+}
+
+func (*tester) TestFuncTracing(c *C) {
+	logger := NewLogger("logger_test")
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Info("catch error:", err)
+		}
+	}()
+	logger.BeginTracing()
+	defer logger.EndTracing()
+	defer func() {
+		logger.EndTracing()
+	}()
+	logger.EndTracing()
+	panic("test panic")
 }
 
 func (*tester) TestIsNeedLog(c *C) {
@@ -76,6 +95,16 @@ func (*tester) TestIsNeedTraceMore(c *C) {
 	c.Check(logger.isNeedTraceMore(LevelError), Equals, true)
 	c.Check(logger.isNeedTraceMore(LevelPanic), Equals, true)
 	c.Check(logger.isNeedTraceMore(LevelFatal), Equals, true)
+}
+
+func (*tester) TestAddRemoveBackend(c *C) {
+	logger := &Logger{}
+	logger.AddBackendConsole()
+	c.Check(len(logger.backends), Equals, 1)
+	logger.AddBackendConsole()
+	c.Check(len(logger.backends), Equals, 2)
+	logger.RemoveBackendConsole()
+	c.Check(len(logger.backends), Equals, 0)
 }
 
 func (*tester) TestDebugFile(c *C) {
@@ -154,9 +183,9 @@ func (*tester) TestDebugConsoleEnv(c *C) {
 	defer os.Clearenv()
 
 	os.Setenv("DDE_DEBUG_CONSOLE", "1")
-	console := newBackendConsole()
+	console := newBackendConsole("test-console")
 	c.Check(console.syslogMode, Equals, true)
-	console.log("test-console", LevelInfo, "this line shows as syslog format in console")
+	console.log(LevelInfo, "this line shows as syslog format in console")
 }
 
 func (*tester) TestFmtSprint(c *C) {

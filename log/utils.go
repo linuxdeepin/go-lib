@@ -22,8 +22,14 @@ package log
 
 import (
 	"fmt"
+	golog "log"
 	"strings"
 )
+
+func gologPrintln(v ...interface{}) {
+	golog.SetFlags(golog.Llongfile)
+	golog.Println(v...)
+}
 
 // same with fmt.Sprintln() but trim the additional end line
 func fmtSprint(v ...interface{}) (s string) {
