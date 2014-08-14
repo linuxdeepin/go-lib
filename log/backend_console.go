@@ -63,7 +63,7 @@ func (b *backendConsole) log(level Priority, msg string) (err error) {
 }
 func getSyslogPrefix(name string) (prefix string) {
 	hostname, _ := os.Hostname()
-	prefix = fmt.Sprintf("%s %s %s[%d]: ", time.Now().Format("Jan 2 15:04:05"), hostname, name, os.Getpid())
+	prefix = fmt.Sprintf("%s %s %s[%d]:", time.Now().Format("Jan 2 15:04:05"), hostname, name, os.Getpid())
 	return
 }
 

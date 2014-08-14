@@ -24,10 +24,11 @@ import (
 	"log/syslog"
 )
 
-const defaultSyslogTagPrefix = "deepin"
+const defaultSyslogTagPrefix = ""
 
 var (
-	// SyslogTagPrefix define the prefix of syslog tag, default is "deepin".
+	// SyslogTagPrefix define the prefix of syslog tag, default is
+	// empty.
 	SyslogTagPrefix = defaultSyslogTagPrefix
 )
 
@@ -48,7 +49,7 @@ func newBackendSyslog(name string) (b *backendSyslog) {
 	return
 }
 func newSyslogWriter(name string) (l *syslog.Writer, err error) {
-	tag := SyslogTagPrefix + "/" + name
+	tag := SyslogTagPrefix + name
 	l, err = syslog.New(syslog.LOG_DAEMON, tag)
 	return
 }
