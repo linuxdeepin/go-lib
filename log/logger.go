@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"pkg.linuxdeepin.com/lib/utils"
 	"reflect"
 	"runtime"
@@ -256,7 +257,7 @@ func (l *Logger) BeginTracing() {
 	if !ok {
 		return
 	}
-	msg := fmt.Sprintf("%s:%d begin %s", file, line, funcName)
+	msg := fmt.Sprintf("%s:%d begin %s", filepath.Base(file), line, funcName)
 	l.doLog(LevelInfo, msg)
 }
 
@@ -266,7 +267,7 @@ func (l *Logger) EndTracing() {
 	if !ok {
 		return
 	}
-	msg := fmt.Sprintf("%s:%d end %s", file, line, funcName)
+	msg := fmt.Sprintf("%s:%d end %s", filepath.Base(file), line, funcName)
 	l.doLog(LevelInfo, msg)
 }
 
@@ -281,7 +282,7 @@ func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok boo
 			break
 		}
 		if funcInfo := runtime.FuncForPC(pc); funcInfo != nil {
-			// get the sort function name
+			// get the short function name
 			fullFuncName := funcInfo.Name()
 			a := strings.Split(fullFuncName, "/")
 			funcName = a[len(a)-1]
@@ -351,15 +352,15 @@ func buildFormatMsg(calldepth int, loop bool, format string, v ...interface{}) (
 func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
 	if !loop {
 		_, file, line, _ := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
+		msg = fmt.Sprintf("%s:%d: %s", filepath.Base(file), line, s)
 	} else {
 		_, file, line, ok := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", file, line, s)
+		msg = fmt.Sprintf("%s:%d: %s", filepath.Base(file), line, s)
 		for ok {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
 			if ok {
-				msg = fmt.Sprintf("%s\n  ->  %s:%d", msg, file, line)
+				msg = fmt.Sprintf("%s\n  ->  %s:%d", msg, filepath.Base(file), line)
 			}
 		}
 	}
