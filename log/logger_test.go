@@ -99,6 +99,15 @@ func (*tester) TestIsNeedTraceMore(c *C) {
 
 func (*tester) TestAddRemoveBackend(c *C) {
 	logger := &Logger{}
+
+	var backendNull Backend
+	logger.AddBackend(backendNull)
+	c.Check(len(logger.backends), Equals, 0)
+	var backendConsoleNull *backendConsole
+	logger.AddBackend(backendConsoleNull)
+	c.Check(len(logger.backends), Equals, 0)
+	logger.ResetBackends()
+
 	logger.AddBackendConsole()
 	c.Check(len(logger.backends), Equals, 1)
 	logger.AddBackendConsole()

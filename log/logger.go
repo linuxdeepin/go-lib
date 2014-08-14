@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	golog "log"
 	"os"
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/utils"
@@ -78,6 +79,7 @@ var (
 
 var (
 	errUnknownLogLevel = fmt.Errorf("unknown log level")
+	std                = golog.New(os.Stderr, "", golog.Lshortfile)
 )
 
 // Backend defines interface of logger's back-ends.
@@ -103,7 +105,7 @@ func NewLogger(name string) (l *Logger) {
 	// ignore panic
 	defer func() {
 		if err := recover(); err != nil {
-			gologPrintln("<info> dbus unavailable,", err)
+			std.Println("<info> dbus unavailable,", err)
 		}
 	}()
 
@@ -179,11 +181,11 @@ func (l *Logger) ResetBackends() {
 func (l *Logger) AddBackend(b Backend) bool {
 	l.backendsLock.Lock()
 	defer l.backendsLock.Unlock()
-	if b != nil {
-		l.backends = append(l.backends, b)
-		return true
+	if utils.IsInterfaceNil(b) {
+		return false
 	}
-	return false
+	l.backends = append(l.backends, b)
+	return true
 }
 
 // RemoveBackend remove all back-end with target type.

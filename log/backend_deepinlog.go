@@ -36,12 +36,12 @@ func newBackendDeepinlog(name string) (b *backendDeepinlog) {
 	b.name = name
 	err := initLogapi()
 	if err != nil {
-		gologPrintln("initialize deepin log dbus interface failed:", err)
+		std.Println("deepinlog is not available:", err)
 		return nil
 	}
 	b.id, err = logapi.NewLogger(name)
 	if err != nil {
-		gologPrintln("create deepin log object failed:", err)
+		std.Println("create deepin log object failed:", err)
 		return nil
 	}
 	return

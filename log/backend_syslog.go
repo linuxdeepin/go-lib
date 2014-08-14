@@ -42,7 +42,7 @@ func newBackendSyslog(name string) (b *backendSyslog) {
 	var err error
 	b.writer, err = newSyslogWriter(name)
 	if err != nil {
-		gologPrintln("syslog is not available:", err)
+		std.Println("<info> syslog is not available:", err)
 		return nil
 	}
 	return
