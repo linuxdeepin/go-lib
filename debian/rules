@@ -12,9 +12,10 @@
 %:
 	dh $@ 
 
+PKG_NAME := go-dlib
+
 override_dh_auto_install:
-	mkdir -p $(CURDIR)/debian/tmp
-	make DESTDIR=$(CURDIR)/debian/tmp install
+	make DESTDIR=debian/${PKG_NAME} install
 
 override_dh_clean:
 	dh_clean
