@@ -49,10 +49,20 @@ const (
 	// FormatXpm  Format = "xpm"
 )
 
+// InitGdkXlib initialize gdk and xlib, should not be used with InitGdk().
 func InitGdkXlib() (err error) {
 	ret := C.init_gdk_xlib()
 	if ret == 0 {
 		err = fmt.Errorf("initialize gdk xlib failed %v", ret)
+	}
+	return
+}
+
+// InitGdk initialize gdk.
+func InitGdk() (err error) {
+	ret := C.init_gdk()
+	if ret == 0 {
+		err = fmt.Errorf("initialize gdk failed %v", ret)
 	}
 	return
 }
@@ -459,6 +469,21 @@ func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C
 	return
 }
 
-// TODO
-// func XPutImage(drawable uint32) {
-// }
+func ScreenshotImage(file string, f Format) (err error) {
+	pixbuf, err := Screenshot()
+	defer FreePixbuf(pixbuf)
+	if err != nil {
+		return
+	}
+	err = Save(pixbuf, file, f)
+	return
+}
+func Screenshot() (pixbuf *C.GdkPixbuf, err error) {
+	defaultError := fmt.Errorf("take a screenshot failed")
+	pixbuf = C.screenshot()
+	if pixbuf == nil {
+		err = defaultError
+		return
+	}
+	return
+}

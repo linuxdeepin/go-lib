@@ -30,10 +30,16 @@
 #include <gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
 
 int init_gdk_xlib() {
-        XInitThreads();
-        gdk_init(NULL, NULL);
+        XInitThreads();         /* should be called before gdk_init() */
+        if (!init_gdk()) {
+                return FALSE;
+        }
         gdk_pixbuf_xlib_init(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), 0);
         return TRUE;
+}
+
+int init_gdk() {
+        return gdk_init_check(NULL, NULL);
 }
 
 const char *get_image_format(const char *img_file) {
@@ -132,4 +138,14 @@ GdkPixbuf *copy_area_simple(const GdkPixbuf *src_pixbuf, int src_x, int src_y, i
         gdk_pixbuf_copy_area(src_pixbuf, src_x, src_y, width, height,
                              dest_pixbuf, 0, 0);
         return dest_pixbuf;
+}
+
+GdkPixbuf *screenshot() {
+        GdkWindow *root;
+        GdkPixbuf *pixbuf;
+        root = gdk_get_default_root_window();
+        int width = gdk_window_get_width(root);
+        int height = gdk_window_get_height(root);
+        pixbuf = gdk_pixbuf_get_from_window(root, 0, 0, width, height);
+        return pixbuf;
 }

@@ -324,3 +324,12 @@ func (*gdkpixbufTester) TestRotateImageUpsizedown(c *C) {
 		c.Error(err)
 	}
 }
+
+func (*gdkpixbufTester) TestScreenshotImage(c *C) {
+	InitGdk()
+	resultFile := "testdata/test_screenshot.png"
+	err := ScreenshotImage(resultFile, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+}
