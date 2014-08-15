@@ -1,5 +1,6 @@
 */*.test
 _tmp
 graphic/testdata/test*
+gdkpibuf/testdata/test*
 *.bak
 _*

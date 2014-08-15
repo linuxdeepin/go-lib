@@ -12,28 +12,9 @@
 %:
 	dh $@ 
 
-PKG_NAME := go-dlib
-PKG_URI := pkg.linuxdeepin.com
-PKG := lib
-
-override_dh_auto_build:
-	mkdir -p lib
-	for i in `find . -maxdepth 1 -mindepth 1 | grep -v debian | grep -v '^lib$$' `; do mv $$i lib;done
-	mkdir -p ${PKG_NAME}-build/src/${PKG_URI}
-	cp -r lib ${PKG_NAME}-build/src/${PKG_URI}
-	rm -rf ${PKG_NAME}-build/src/${PKG_URI}/${PKG}/.git
-	cd ${PKG_NAME}-build && GOPATH=`pwd` go install ${PKG_URI}/${PKG}
-	for i in `find ${PKG_NAME}-build/src/${PKG_URI}/${PKG} -maxdepth 1 -mindepth 1 -type d`;do \
-		cd ${PKG_NAME}-build && GOPATH=`pwd` go install ${PKG_URI}/${PKG}/`basename $$i` && cd ..;done
-
 override_dh_auto_install:
-	mkdir -p debian/${PKG_NAME}/usr/share/go/src/pkg/
-	mkdir -p debian/${PKG_NAME}/usr/lib/go/pkg
-	cp -r ${PKG_NAME}-build/src/* debian/${PKG_NAME}/usr/share/go/src/pkg/
-	cp -r ${PKG_NAME}-build/pkg/* debian/${PKG_NAME}/usr/lib/go/pkg/
-
-override_dh_strip:
+	mkdir -p $(CURDIR)/debian/tmp
+	make DESTDIR=$(CURDIR)/debian/tmp install
 
 override_dh_clean:
-	-rm -rf lib
 	dh_clean
