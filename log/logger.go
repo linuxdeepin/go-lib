@@ -259,7 +259,7 @@ func (l *Logger) BeginTracing() {
 	if !ok {
 		return
 	}
-	msg := fmt.Sprintf("%s:%d begin %s", filepath.Base(file), line, funcName)
+	msg := fmt.Sprintf("%s:%d %s begin", filepath.Base(file), line, funcName)
 	l.doLog(LevelInfo, msg)
 }
 
@@ -269,7 +269,7 @@ func (l *Logger) EndTracing() {
 	if !ok {
 		return
 	}
-	msg := fmt.Sprintf("%s:%d end %s", filepath.Base(file), line, funcName)
+	msg := fmt.Sprintf("%s:%d %s end", filepath.Base(file), line, funcName)
 	l.doLog(LevelInfo, msg)
 }
 
@@ -286,8 +286,7 @@ func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok boo
 		if funcInfo := runtime.FuncForPC(pc); funcInfo != nil {
 			// get the short function name
 			fullFuncName := funcInfo.Name()
-			a := strings.Split(fullFuncName, "/")
-			funcName = a[len(a)-1]
+			funcName = filepath.Base(fullFuncName)
 			if funcName == "runtime.panic" {
 				// if is panic function, skip it and get file/line again
 				_, file, line, ok = runtime.Caller(skip + 1)
@@ -304,6 +303,12 @@ func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok boo
 			break
 		}
 	}
+	// fix function name
+	a := strings.Split(funcName, ".")
+	// strings.Split() will return at least one element, so we could
+	// get the last element safely
+	funcName = a[len(a)-1]
+	funcName = funcName + "()"
 	return
 }
 
