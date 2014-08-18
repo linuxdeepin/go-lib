@@ -1,6 +1,6 @@
 PREFIX = /usr
-GOOS = $(go env GOOS)
-GOARCH = $(go env GOARCH)
+GOOS = $(shell go env GOOS)
+GOARCH = $(shell go env GOARCH)
 GOPATH_DIR = gopath
 GOPKG_PREFIX = pkg.linuxdeepin.com/lib
 
