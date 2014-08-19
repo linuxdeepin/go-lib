@@ -255,22 +255,24 @@ func (l *Logger) AddExtArgForRestart(arg string) {
 
 // BeginTracing log function information when entering it.
 func (l *Logger) BeginTracing() {
-	funcName, file, line, ok := getCallerFuncInfo(2)
-	if !ok {
-		return
-	}
-	msg := fmt.Sprintf("%s:%d %s begin", filepath.Base(file), line, funcName)
-	l.doLog(LevelInfo, msg)
+	// TODO
+	// funcName, file, line, ok := getCallerFuncInfo(2)
+	// if !ok {
+	// 	return
+	// }
+	// msg := fmt.Sprintf("%s:%d %s begin", filepath.Base(file), line, funcName)
+	// l.doLog(LevelInfo, msg)
 }
 
 // EndTracing log function information when leaving it.
 func (l *Logger) EndTracing() {
-	funcName, file, line, ok := getCallerFuncInfo(2)
-	if !ok {
-		return
-	}
-	msg := fmt.Sprintf("%s:%d %s end", filepath.Base(file), line, funcName)
-	l.doLog(LevelInfo, msg)
+	// TODO
+	// funcName, file, line, ok := getCallerFuncInfo(2)
+	// if !ok {
+	// 	return
+	// }
+	// msg := fmt.Sprintf("%s:%d %s end", filepath.Base(file), line, funcName)
+	// l.doLog(LevelInfo, msg)
 }
 
 func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok bool) {

@@ -12,6 +12,7 @@ func Test(t *testing.T) { TestingT(t) }
 type tester struct{}
 
 var testDebugFile = "./dde_debug"
+var logger = NewLogger("logger_test")
 
 func init() {
 	DebugFile = testDebugFile
@@ -34,7 +35,6 @@ func (*tester) BenchmarkDeepinlog(c *C) {
 }
 
 func (*tester) TestGeneral(c *C) {
-	logger := NewLogger("logger_test")
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Info("catch error:", err)
@@ -53,7 +53,6 @@ func (*tester) TestGeneral(c *C) {
 }
 
 func (*tester) TestFuncTracing(c *C) {
-	logger := NewLogger("logger_test")
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Info("catch error:", err)
@@ -65,7 +64,12 @@ func (*tester) TestFuncTracing(c *C) {
 		logger.EndTracing()
 	}()
 	logger.EndTracing()
+	go doTestFuncTracing()
 	panic("test panic")
+}
+func doTestFuncTracing() {
+	logger.BeginTracing()
+	logger.EndTracing()
 }
 
 func (*tester) TestIsNeedLog(c *C) {
