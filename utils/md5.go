@@ -26,7 +26,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os/exec"
 	"strconv"
+	"strings"
 )
 
 // TODO refactor code, use doSumStrMd5 instead of SumStrMd5
@@ -77,6 +79,27 @@ func SumFileMd5(filename string) (string, bool) {
 
 	md5Byte := md5.Sum(contents)
 	md5Str := md5ByteToStr(md5Byte)
+	if len(md5Str) < 32 {
+		return "", false
+	}
+
+	return md5Str, true
+}
+
+//SysMd5Sum will call sh to exec md5sum to get the md5 of file
+func SysMd5Sum(filename string) (string, bool) {
+	if !IsFileExist(filename) {
+		return "", false
+	}
+
+	cmdLine := "md5sum -b " + filename
+	cmd := exec.Command("/bin/sh", "-c", cmdLine)
+	out, err := cmd.Output()
+	if nil != err {
+		return "", false
+	}
+
+	md5Str := strings.Split(string(out), " ")[0]
 	if len(md5Str) < 32 {
 		return "", false
 	}
