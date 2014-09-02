@@ -1,3 +1,10 @@
+go-dlib (0.0.4+20140729232220~b3a86186ab+nmu1) trusty; urgency=medium
+
+  * Non-maintainer upload.
+  * Using dh-golang.
+
+ -- 宋文武 <songwenwu@linuxdeepin.com>  Tue, 02 Sep 2014 10:11:50 +0800
+
 go-dlib (0.0.4+20140729232220~b3a86186ab) trusty; urgency=low
 
   * Build from git b3a86186abe4f6ab93f7d1af440d7fc877c547fe

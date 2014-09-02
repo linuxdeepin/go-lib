@@ -1,21 +1,19 @@
 Source: go-dlib
 Section: devel
 Priority: extra
-Maintainer: Deepin Packages Builder <packages@linuxdeepin.com>
-Build-Depends: debhelper (>= 8.0.0),
- golang,
- libglib2.0-dev,
- golang-gocheck-dev,
- libgdk-pixbuf2.0-dev,
- libpulse-dev,
- libgtk-3-dev,
- go-xgb,
- pkg-config,
-Standards-Version: 3.9.4
+Maintainer: Yueqian Zhang <zhangyueqian@linuxdeepin.com>
+Build-Depends: debhelper (>= 9), dh-golang, golang-go,
+               golang-xgb-dev,
+               libpulse-dev,
+               libgtk-3-dev
+Standards-Version: 3.9.5
 Homepage: http://www.linuxdeepin.com
 
-Package: go-dlib
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libglib2.0-0 
-Description: Go-lang bingdings for dlib
- Go-lang bindings for dlib
+Package: golang-dlib-dev
+Architecture: all
+Depends: ${misc:Depends}, golang-xgb-dev, libpulse-dev, libgtk-3-dev
+Built-Using: ${misc:Built-Using}
+Provides: go-dlib
+Description: Go bindings for Deepin Desktop Environment development
+ DLib is a set of Go bindings/libraries for DDE development.
+ Containing dbus (forking from guelfey), glib, gdkpixbuf, pulse and more.
