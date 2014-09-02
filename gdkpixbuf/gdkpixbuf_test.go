@@ -325,7 +325,7 @@ func (*gdkpixbufTester) TestRotateImageUpsizedown(c *C) {
 	}
 }
 
-func (*gdkpixbufTester) TestScreenshotImage(c *C) {
+func (*gdkpixbufTester) ManualTestScreenshotImage(c *C) {
 	InitGdk()
 	resultFile := "testdata/test_screenshot.png"
 	err := ScreenshotImage(resultFile, FormatPng)
