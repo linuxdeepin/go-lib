@@ -53,7 +53,7 @@ type Conn struct {
 	closed bool
 	outLck sync.RWMutex
 
-	signals    []chan<- *Signal
+	signals    map[<-chan *Signal]*signalChannel
 	signalsLck sync.Mutex
 
 	eavesdropped    chan<- *Message
@@ -163,6 +163,7 @@ func newConn(tr transport) (*Conn, error) {
 	conn.nextSerial = 1
 	conn.serialUsed = map[uint32]bool{0: true}
 	conn.busObj = conn.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+	conn.signals = make(map[<-chan *Signal]*signalChannel)
 	return conn, nil
 }
 
@@ -182,7 +183,7 @@ func (conn *Conn) Close() error {
 	conn.outLck.Unlock()
 	conn.signalsLck.Lock()
 	for _, ch := range conn.signals {
-		close(ch)
+		ch.Close()
 	}
 	conn.signalsLck.Unlock()
 	conn.eavesdroppedLck.Lock()
@@ -322,15 +323,8 @@ func (conn *Conn) inWorker() {
 					Name:   iface + "." + member,
 					Body:   msg.Body,
 				}
-				conn.signalsLck.Lock()
-				for _, ch := range conn.signals {
-					// don't block trying to send a signal
-					select {
-					case ch <- signal:
-					default:
-					}
-				}
-				conn.signalsLck.Unlock()
+
+				conn.sendSignals(signal)
 			case TypeMethodCall:
 				go conn.handleCall(msg)
 			}
@@ -484,35 +478,6 @@ func (conn *Conn) sendReply(dest string, serial uint32, values ...interface{}) {
 		conn.out <- msg
 	}
 	conn.outLck.RUnlock()
-}
-
-// Signal registers the given channel to be passed all received signal messages.
-// The caller has to make sure that ch is sufficiently buffered; if a message
-// arrives when a write to c is not possible, it is discarded.
-//
-// Multiple of these channels can be registered at the same time. Passing a
-// channel that already is registered will remove it from the list of the
-// registered channels.
-//
-// These channels are "overwritten" by Eavesdrop; i.e., if there currently is a
-// channel for eavesdropped messages, this channel receives all signals, and
-// none of the channels passed to Signal will receive any signals.
-func (conn *Conn) Signal(ch chan<- *Signal) {
-	conn.signalsLck.Lock()
-	conn.signals = append(conn.signals, ch)
-	conn.signalsLck.Unlock()
-}
-
-func (conn *Conn) DetachSignal(removingChan chan<- *Signal) {
-	conn.signalsLck.Lock()
-	newSignals := make([]chan<- *Signal, 0)
-	for _, ch := range conn.signals {
-		if ch != removingChan {
-			newSignals = append(newSignals, ch)
-		}
-	}
-	conn.signals = newSignals
-	conn.signalsLck.Unlock()
 }
 
 // SupportsUnixFDs returns whether the underlying transport supports passing of
