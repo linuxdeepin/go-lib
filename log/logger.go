@@ -112,12 +112,8 @@ func NewLogger(name string) (l *Logger) {
 	l = &Logger{name: name}
 	l.config = newRestartConfig(name)
 	l.level = getDefaultLogLevel(name)
-
 	l.AddBackendConsole()
-	if ok := l.AddBackendSyslog(); !ok {
-		l.AddBackendDeepinlog()
-	}
-
+	l.AddBackendSyslog()
 	return
 }
 
@@ -228,16 +224,6 @@ func (l *Logger) AddBackendSyslog() bool {
 // RemoveBackendSyslog remove all console back-end.
 func (l *Logger) RemoveBackendSyslog() {
 	l.RemoveBackend(&backendSyslog{})
-}
-
-// AddBackendDeepinlog append a deepinlog back-end.
-func (l *Logger) AddBackendDeepinlog() bool {
-	return l.AddBackend(newBackendDeepinlog(l.name))
-}
-
-// RemoveBackendDeepinlog remove all console back-end.
-func (l *Logger) RemoveBackendDeepinlog() {
-	l.RemoveBackend(&backendDeepinlog{})
 }
 
 // SetRestartCommand reset the command and argument when restart after fatal.
@@ -445,26 +431,10 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 }
 
 func (l *Logger) launchCrashReporter() {
-	// TODO use lib/logquery to get log messages.
-	if logapi == nil {
-		return
-	}
-	var logId string
-	for _, b := range l.backends {
-		switch b.(type) {
-		case *backendDeepinlog:
-			d, _ := b.(*backendDeepinlog)
-			logId = d.id
-			break
-		}
-	}
-	if len(logId) == 0 {
-		return
-	}
 	// if deepin-crash-reporter exists, launch it
 	if utils.IsFileExist(crashReporterExe) {
 		// save config to a temporary json file
-		l.config.LogDetail, _ = logapi.GetLog(logId)
+		l.config.LogDetail = "not ready" // TODO use lib/logquery to get log messages.
 		fileContent, err := json.Marshal(l.config)
 		if err != nil {
 			l.Error(err)
