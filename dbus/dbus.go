@@ -2,6 +2,7 @@ package dbus
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -63,7 +64,7 @@ func store(src, dest interface{}) error {
 		case reflect.Struct:
 			vs, ok := src.([]interface{})
 			if !ok {
-				return errors.New("dbus.Store: type mismatch")
+				return fmt.Errorf("dbus.Store: struct type mismatch. src type: %v, dest type: %v", reflect.TypeOf(src), reflect.TypeOf(dest))
 			}
 			t := rv.Type()
 			ndest := make([]interface{}, 0, rv.NumField())
@@ -74,16 +75,16 @@ func store(src, dest interface{}) error {
 				}
 			}
 			if len(vs) != len(ndest) {
-				return errors.New("dbus.Store: type mismatch")
+				return fmt.Errorf("dbus.Store: lenght of struct mismatch. src: %v, dest: %v", src, dest)
 			}
 			err := Store(vs, ndest...)
 			if err != nil {
-				return errors.New("dbus.Store: type mismatch")
+				return fmt.Errorf("dbus.Store: Store fialed. %v", err)
 			}
 		case reflect.Slice:
 			sv := reflect.ValueOf(src)
 			if sv.Kind() != reflect.Slice {
-				return errors.New("dbus.Store: type mismatch")
+				return fmt.Errorf("dbus.Store: slice type mismatch. src type: %v, dest type: %v", reflect.TypeOf(src), reflect.TypeOf(dest))
 			}
 			rv.Set(reflect.MakeSlice(rv.Type(), sv.Len(), sv.Len()))
 			for i := 0; i < sv.Len(); i++ {
@@ -94,7 +95,7 @@ func store(src, dest interface{}) error {
 		case reflect.Map:
 			sv := reflect.ValueOf(src)
 			if sv.Kind() != reflect.Map {
-				return errors.New("dbus.Store: type mismatch")
+				return fmt.Errorf("dbus.Store: map type mismatch. src type: %v, dest type: %v", reflect.TypeOf(src), reflect.TypeOf(dest))
 			}
 			keys := sv.MapKeys()
 			rv.Set(reflect.MakeMap(sv.Type()))
@@ -106,11 +107,11 @@ func store(src, dest interface{}) error {
 				rv.SetMapIndex(key, v.Elem())
 			}
 		default:
-			return errors.New("dbus.Store: type mismatch")
+			return fmt.Errorf("dbus.Store: dest type is not recognized. src type: %v, dest type: %v", reflect.TypeOf(src), reflect.TypeOf(dest))
 		}
 		return nil
 	} else {
-		return errors.New("dbus.Store: type mismatch")
+		return fmt.Errorf("dbus.Store: type mismatch. src type: %v, dest type: %v", reflect.TypeOf(src), reflect.TypeOf(dest))
 	}
 }
 
