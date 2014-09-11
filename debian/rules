@@ -3,8 +3,6 @@
 export DH_GOPKG := pkg.linuxdeepin.com/lib
 export DH_GOLANG_INSTALL_ALL := 1
 
-export DEB_BUILD_OPTIONS := nocheck
-
 %:
 	dh $@ --buildsystem=golang --with=golang
 
