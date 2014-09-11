@@ -27,13 +27,6 @@ func (*tester) BenchmarkSyslog(c *C) {
 	}
 }
 
-func (*tester) BenchmarkDeepinlog(c *C) {
-	b := newBackendDeepinlog("benchDeepinlog")
-	for i := 0; i < c.N; i++ {
-		b.log(LevelInfo, "test")
-	}
-}
-
 func (*tester) TestGeneral(c *C) {
 	defer func() {
 		if err := recover(); err != nil {
