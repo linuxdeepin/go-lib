@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for p in *.po ;do
+    name=${p%.po}
+    mkdir -p locale/$name/LC_MESSAGES
+    msgfmt $p -o locale/$name/LC_MESSAGES/test.mo
+done
