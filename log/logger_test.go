@@ -2,200 +2,284 @@ package log
 
 import (
 	"fmt"
-	. "launchpad.net/gocheck"
+	"io/ioutil"
+	C "launchpad.net/gocheck"
 	"os"
+	"regexp"
 	"testing"
 )
 
-func Test(t *testing.T) { TestingT(t) }
+var originStdout = os.Stdout
+var redirectStdoutFile = "testdata/stdout"
+var redirectStdout, _ = os.OpenFile(redirectStdoutFile, os.O_CREATE|os.O_RDWR, 0644)
 
-type tester struct{}
+func Test(t *testing.T) { C.TestingT(t) }
 
-var testDebugFile = "./dde_debug"
-var logger = NewLogger("logger_test")
+type testWrapper struct{}
 
 func init() {
-	DebugFile = testDebugFile
-	testWrapper := &tester{}
-	Suite(testWrapper)
+	DebugFile = "" // disable outside debug file
+	testWrapper := &testWrapper{}
+	C.Suite(testWrapper)
 }
 
-func (*tester) BenchmarkSyslog(c *C) {
+func redirectOutput() {
+	os.Stdout = redirectStdout
+}
+func restoreOutput() {
+	os.Stdout = originStdout
+}
+func resetOutput() {
+	redirectStdout.Truncate(0)
+	redirectStdout.Seek(0, os.SEEK_SET)
+}
+func readOutput() string {
+	fileContent, err := ioutil.ReadFile(redirectStdoutFile)
+	if err != nil {
+		std.Println("read stdout file failed:", err)
+	}
+	return string(fileContent)
+}
+func checkOutput(c *C.C, regfmt string, preferResult bool) {
+	output := readOutput()
+	result, _ := regexp.MatchString(regfmt, output)
+	if result != preferResult {
+		c.Errorf("match output failed: `%s`, `%#v`", regfmt, output)
+	}
+}
+
+func (*testWrapper) BenchmarkSyslog(c *C.C) {
 	b := newBackendSyslog("benchSyslog")
 	for i := 0; i < c.N; i++ {
 		b.log(LevelInfo, "test")
 	}
 }
 
-func (*tester) TestGeneral(c *C) {
+func (*testWrapper) TestGeneral(c *C.C) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Info("catch error:", err)
+			std.Println("catch panic:", err)
 		}
 	}()
+
+	redirectOutput()
+	defer restoreOutput()
+	defer resetOutput()
+
+	logger := NewLogger("logger_test")
 	logger.SetLogLevel(LevelDebug)
+
+	resetOutput()
 	logger.Debug("test debug")
+	checkOutput(c, `^<debug> logger_test.go:\d+: test debug\n$`, true)
+
+	resetOutput()
 	logger.Info("test info")
+	checkOutput(c, `^<info> logger_test.go:\d+: test info\n$`, true)
+
+	resetOutput()
 	logger.Info("test info multi-lines\n\nthe thread line and following two empty lines\n\n")
-	logger.Warning("test warning: ", fmt.Errorf("error message"), "append string")
-	logger.Warning("test warning: %v ", fmt.Errorf("error message"))
+	checkOutput(c, `^<info> logger_test.go:\d+: test info multi-lines\n\nthe thread line and following two empty lines\n\n\n$`, true)
+
+	resetOutput()
+	logger.Warning("test warning:", fmt.Errorf("error message"), "append string")
+	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: error message append string\n$`, true)
+
+	resetOutput()
+	logger.Warning("test warning: %v", fmt.Errorf("error message"))
+	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: %v error message\n$`, true)
+
+	resetOutput()
 	logger.Warningf("test warningf: %v", fmt.Errorf("error message"))
-	logger.Error("test error: ", fmt.Errorf("error message"))
+	checkOutput(c, `^<warning> logger_test.go:\d+: test warningf: error message\n$`, true)
+
+	resetOutput()
+	logger.Error("test error:", fmt.Errorf("error message"))
+	checkOutput(c, `^<error> logger_test.go:\d+: test error: error message\n(  ->  \w+\.\w+:\d+\n)+$`, true)
+
+	resetOutput()
 	logger.Errorf("test errorf: %v", fmt.Errorf("error message"))
-	logger.Panic("test panic")
+	checkOutput(c, `^<error> logger_test.go:\d+: test errorf: error message\n(  ->  \w+\.\w+:\d+\n)+$`, true)
+
+	testPanicFunc := func() {
+		defer func() {
+			if err := recover(); err != nil {
+				logger.Info("got panic")
+			}
+		}()
+		logger.Panic("test panic")
+	}
+	resetOutput()
+	testPanicFunc()
+	checkOutput(c, `^<error> logger_test.go:\d+: test panic\n(  ->  \w+\.\w+:\d+\n)+<info> logger_test.go:\d+: got panic\n$`, true)
 }
 
-func (*tester) TestFuncTracing(c *C) {
+// TODO: remove
+func (*testWrapper) TestFuncTracing(c *C.C) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Info("catch error:", err)
+			std.Println("catch error:", err)
 		}
 	}()
+
+	logger := NewLogger("logger_test")
+
 	logger.BeginTracing()
 	defer logger.EndTracing()
 	defer func() {
 		logger.EndTracing()
 	}()
 	logger.EndTracing()
-	go doTestFuncTracing()
+
+	subFunc := func() {
+		logger.BeginTracing()
+		logger.EndTracing()
+	}
+	go subFunc()
+
 	panic("test panic")
 }
-func doTestFuncTracing() {
-	logger.BeginTracing()
-	logger.EndTracing()
-}
 
-func (*tester) TestIsNeedLog(c *C) {
+func (*testWrapper) TestIsNeedLog(c *C.C) {
 	logger := &Logger{}
 	logger.SetLogLevel(LevelInfo)
-	c.Check(logger.isNeedLog(LevelDebug), Equals, false)
-	c.Check(logger.isNeedLog(LevelInfo), Equals, true)
-	c.Check(logger.isNeedLog(LevelWarning), Equals, true)
-	c.Check(logger.isNeedLog(LevelError), Equals, true)
-	c.Check(logger.isNeedLog(LevelPanic), Equals, true)
-	c.Check(logger.isNeedLog(LevelFatal), Equals, true)
+	c.Check(logger.isNeedLog(LevelDebug), C.Equals, false)
+	c.Check(logger.isNeedLog(LevelInfo), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelWarning), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelError), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelPanic), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelFatal), C.Equals, true)
 	logger.SetLogLevel(LevelDebug)
-	c.Check(logger.isNeedLog(LevelDebug), Equals, true)
-	c.Check(logger.isNeedLog(LevelInfo), Equals, true)
-	c.Check(logger.isNeedLog(LevelWarning), Equals, true)
-	c.Check(logger.isNeedLog(LevelError), Equals, true)
-	c.Check(logger.isNeedLog(LevelPanic), Equals, true)
-	c.Check(logger.isNeedLog(LevelFatal), Equals, true)
+	c.Check(logger.isNeedLog(LevelDebug), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelInfo), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelWarning), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelError), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelPanic), C.Equals, true)
+	c.Check(logger.isNeedLog(LevelFatal), C.Equals, true)
 }
 
-func (*tester) TestIsNeedTraceMore(c *C) {
+func (*testWrapper) TestIsNeedTraceMore(c *C.C) {
 	logger := &Logger{}
 	logger.SetLogLevel(LevelInfo)
-	c.Check(logger.isNeedTraceMore(LevelDebug), Equals, false)
-	c.Check(logger.isNeedTraceMore(LevelInfo), Equals, false)
-	c.Check(logger.isNeedTraceMore(LevelWarning), Equals, false)
-	c.Check(logger.isNeedTraceMore(LevelError), Equals, true)
-	c.Check(logger.isNeedTraceMore(LevelPanic), Equals, true)
-	c.Check(logger.isNeedTraceMore(LevelFatal), Equals, true)
+	c.Check(logger.isNeedTraceMore(LevelDebug), C.Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelInfo), C.Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelWarning), C.Equals, false)
+	c.Check(logger.isNeedTraceMore(LevelError), C.Equals, true)
+	c.Check(logger.isNeedTraceMore(LevelPanic), C.Equals, true)
+	c.Check(logger.isNeedTraceMore(LevelFatal), C.Equals, true)
 }
 
-func (*tester) TestAddRemoveBackend(c *C) {
+func (*testWrapper) TestAddRemoveBackend(c *C.C) {
 	logger := &Logger{}
 
 	var backendNull Backend
 	logger.AddBackend(backendNull)
-	c.Check(len(logger.backends), Equals, 0)
+	c.Check(len(logger.backends), C.Equals, 0)
 	var backendConsoleNull *backendConsole
 	logger.AddBackend(backendConsoleNull)
-	c.Check(len(logger.backends), Equals, 0)
+	c.Check(len(logger.backends), C.Equals, 0)
 	logger.ResetBackends()
 
 	logger.AddBackendConsole()
-	c.Check(len(logger.backends), Equals, 1)
+	c.Check(len(logger.backends), C.Equals, 1)
 	logger.AddBackendConsole()
-	c.Check(len(logger.backends), Equals, 2)
+	c.Check(len(logger.backends), C.Equals, 2)
 	logger.RemoveBackendConsole()
-	c.Check(len(logger.backends), Equals, 0)
+	c.Check(len(logger.backends), C.Equals, 0)
 }
 
-func (*tester) TestDebugFile(c *C) {
+func (*testWrapper) TestDebugFile(c *C.C) {
+	oldDebugFile := DebugFile
+	DebugFile = "testdata/dde_debug"
+	defer func() { DebugFile = oldDebugFile }()
+
 	os.Clearenv()
 	defer os.Clearenv()
-
-	os.Create(DebugFile)
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
 
 	os.Remove(DebugFile)
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
+	c.Check(getDefaultLogLevel("test_debug_file"), C.Equals, LevelInfo)
+
+	os.Create(DebugFile)
+	c.Check(getDefaultLogLevel("test_debug_file"), C.Equals, LevelDebug)
 }
 
-func (*tester) TestDebugEnv(c *C) {
+func (*testWrapper) TestDebugEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelInfo)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG", "")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG", "1")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 }
 
-func (*tester) TestDebugLevelEnv(c *C) {
+func (*testWrapper) TestDebugLevelEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelInfo)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelInfo)
 
 	os.Setenv("DDE_DEBUG_LEVEL", "debug")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 
 	os.Setenv("DDE_DEBUG_LEVEL", "warning")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelWarning)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelWarning)
 }
 
-func (*tester) TestDebugMatchEnv(c *C) {
+func (*testWrapper) TestDebugMatchEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
 	os.Setenv("DDE_DEBUG_MATCH", "test1")
-	c.Check(getDefaultLogLevel("test1"), Equals, LevelDebug)
-	c.Check(getDefaultLogLevel("test2"), Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)
 
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
-	c.Check(getDefaultLogLevel("test1"), Equals, LevelDisable)
-	c.Check(getDefaultLogLevel("test2"), Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)
 }
 
-func (*tester) TestDebugMixEnv(c *C) {
+func (*testWrapper) TestDebugMixEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
 	os.Setenv("DDE_DEBUG", "1")
 	os.Setenv("DDE_DEBUG_LEVEL", "warning")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelWarning)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelWarning)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG_LEVEL", "error")
 	os.Setenv("DDE_DEBUG_MATCH", "test_env")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelError)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelError)
 
 	os.Clearenv()
 	os.Setenv("DDE_DEBUG_LEVEL", "error")
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
-	c.Check(getDefaultLogLevel("test_env"), Equals, LevelDisable)
+	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDisable)
 }
 
-func (*tester) TestDebugConsoleEnv(c *C) {
+func (*testWrapper) TestDebugConsoleEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
 	os.Setenv("DDE_DEBUG_CONSOLE", "1")
 	console := newBackendConsole("test-console")
-	c.Check(console.syslogMode, Equals, true)
+	c.Check(console.syslogMode, C.Equals, true)
+
+	redirectOutput()
+	defer restoreOutput()
+	resetOutput()
 	console.log(LevelInfo, "this line shows as syslog format in console")
+	checkOutput(c, `\w+ \d+ \d{2}:\d{2}:\d{2} .* test-console\[\d+\]: <info> this line shows as syslog format in console\n$`, true)
 }
 
-func (*tester) TestFmtSprint(c *C) {
-	c.Check(fmtSprint(""), Equals, "")
-	c.Check(fmtSprint("a", "b", "c"), Equals, "a b c")
-	c.Check(fmtSprint("a\n", "b\n", "c\n"), Equals, "a\n b\n c\n")
+func (*testWrapper) TestFmtSprint(c *C.C) {
+	c.Check(fmtSprint(""), C.Equals, "")
+	c.Check(fmtSprint("a", "b", "c"), C.Equals, "a b c")
+	c.Check(fmtSprint("a\n", "b\n", "c\n"), C.Equals, "a\n b\n c\n")
 }
