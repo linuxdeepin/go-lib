@@ -1,8 +1,7 @@
 package utils
 
 import (
-	"fmt"
-	. "launchpad.net/gocheck"
+	C "launchpad.net/gocheck"
 )
 
 type testConfig struct {
@@ -13,7 +12,6 @@ type testConfig struct {
 func newTestConfig() (c *testConfig) {
 	c = &testConfig{}
 	c.core.SetConfigName("test")
-	fmt.Println("config file:", c.core.GetConfigFile())
 	return
 }
 func (c *testConfig) save() {
@@ -23,12 +21,12 @@ func (c *testConfig) load() {
 	c.core.Load(c)
 }
 
-func (*UtilsTest) TestConfig(c *C) {
+func (*testWrapper) TestConfig(c *C.C) {
 	conf := newTestConfig()
 	conf.core.RemoveConfigFile()
 	conf.Data = "data"
 	conf.save()
 	conf.Data = ""
 	conf.load()
-	c.Check(conf.Data, Equals, "data")
+	c.Check(conf.Data, C.Equals, "data")
 }

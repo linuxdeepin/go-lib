@@ -1,23 +1,23 @@
 package utils
 
 import (
-	"fmt"
 	"io/ioutil"
-	. "launchpad.net/gocheck"
+	C "launchpad.net/gocheck"
 	"os"
+	"regexp"
 	"testing"
 )
 
-type UtilsTest struct{}
+type testWrapper struct{}
 
 // Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) { TestingT(t) }
+func Test(t *testing.T) { C.TestingT(t) }
 
 func init() {
-	Suite(&UtilsTest{})
+	C.Suite(&testWrapper{})
 }
 
-func (*UtilsTest) TestIsURI(c *C) {
+func (*testWrapper) TestIsURI(c *C.C) {
 	var data = []struct {
 		value  string
 		result bool
@@ -32,11 +32,11 @@ func (*UtilsTest) TestIsURI(c *C) {
 		{"unknown:///usr/share", true},
 	}
 	for _, d := range data {
-		c.Check(IsURI(d.value), Equals, d.result)
+		c.Check(IsURI(d.value), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestGetURIScheme(c *C) {
+func (*testWrapper) TestGetURIScheme(c *C.C) {
 	var data = []struct {
 		value, result string
 	}{
@@ -50,11 +50,11 @@ func (*UtilsTest) TestGetURIScheme(c *C) {
 		{"unknown:///usr/share", "unknown"},
 	}
 	for _, d := range data {
-		c.Check(GetURIScheme(d.value), Equals, d.result)
+		c.Check(GetURIScheme(d.value), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestGetURIContent(c *C) {
+func (*testWrapper) TestGetURIContent(c *C.C) {
 	var data = []struct {
 		value, result string
 	}{
@@ -68,11 +68,11 @@ func (*UtilsTest) TestGetURIContent(c *C) {
 		{"unknown:///usr/share", "/usr/share"},
 	}
 	for _, d := range data {
-		c.Check(GetURIContent(d.value), Equals, d.result)
+		c.Check(GetURIContent(d.value), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestEncodeURI(c *C) {
+func (*testWrapper) TestEncodeURI(c *C.C) {
 	var data = []struct {
 		value, scheme, result string
 	}{
@@ -93,11 +93,11 @@ func (*UtilsTest) TestEncodeURI(c *C) {
 		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(EncodeURI(d.value, d.scheme), Equals, d.result)
+		c.Check(EncodeURI(d.value, d.scheme), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestDecodeURI(c *C) {
+func (*testWrapper) TestDecodeURI(c *C.C) {
 	var data = []struct {
 		value, result string
 	}{
@@ -113,34 +113,28 @@ func (*UtilsTest) TestDecodeURI(c *C) {
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(DecodeURI(d.value), Equals, d.result)
+		c.Check(DecodeURI(d.value), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestPathToURI(c *C) {
+func (*testWrapper) TestPathToURI(c *C.C) {
 	var data = []struct {
 		value, scheme, result string
 	}{
 		{"", SCHEME_FILE, ""},
-		// {"", SCHEME_FILE, "file://"},
 		{"/usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_FTP, "ftp:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTP, "http:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_HTTPS, "https:///usr/lib/share/test"},
 		{"/usr/lib/share/test", SCHEME_SMB, "smb:///usr/lib/share/test"},
-		// TODO
 		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		// {"/usr/lib/share/中文路径/1 2 3", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		// {"/home/fsh/Wallpapers/中文 name with %.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
-		// {"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", SCHEME_FILE, "file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg"},
-		// {"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(PathToURI(d.value, d.scheme), Equals, d.result)
+		c.Check(PathToURI(d.value, d.scheme), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestURIToPath(c *C) {
+func (*testWrapper) TestURIToPath(c *C.C) {
 	var data = []struct {
 		value, result string
 	}{
@@ -150,18 +144,15 @@ func (*UtilsTest) TestURIToPath(c *C) {
 		{"http:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"https:///usr/lib/share/test", "/usr/lib/share/test"},
 		{"smb:///usr/lib/share/test", "/usr/lib/share/test"},
-		// TODO
 		{"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
-		// {"file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", "/usr/lib/share/中文路径/1 2 3"},
-		// {"file:///home/fsh/Wallpapers/%E4%B8%AD%E6%96%87%20name%20with%20%25.jpg", "/home/fsh/Wallpapers/中文 name with %.jpg"},
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(URIToPath(d.value), Equals, d.result)
+		c.Check(URIToPath(d.value), C.Equals, d.result)
 	}
 }
 
-func (*UtilsTest) TestIsFileExist(c *C) {
+func (*testWrapper) TestIsFileExist(c *C.C) {
 	var data = []struct {
 		path, uri string
 	}{
@@ -172,71 +163,81 @@ func (*UtilsTest) TestIsFileExist(c *C) {
 	}
 	for _, d := range data {
 		os.Remove(d.path)
-		c.Check(IsFileExist(d.path), Equals, false)
+		c.Check(IsFileExist(d.path), C.Equals, false)
 		ioutil.WriteFile(d.path, nil, 0644)
-		c.Check(IsFileExist(d.path), Equals, true)
-		c.Check(IsFileExist(d.uri), Equals, true)
+		c.Check(IsFileExist(d.path), C.Equals, true)
+		c.Check(IsFileExist(d.uri), C.Equals, true)
 		os.Remove(d.path)
 	}
 }
 
-func (*UtilsTest) TestIsDir(c *C) {
+func (*testWrapper) TestIsDir(c *C.C) {
 	testDir := "/tmp/deepin_test_dir"
 	os.RemoveAll(testDir)
-	c.Check(IsDir(testDir), Equals, false)
+	c.Check(IsDir(testDir), C.Equals, false)
 	os.MkdirAll(testDir, 0644)
-	c.Check(IsDir(testDir), Equals, true)
+	c.Check(IsDir(testDir), C.Equals, true)
 	os.RemoveAll(testDir)
 }
 
-func (*UtilsTest) TestIsSymlink(c *C) {
+func (*testWrapper) TestIsSymlink(c *C.C) {
 	testFile := "/tmp/deepin_test_file"
 	testSymlink := "/tmp/deepin_test_symlink"
 	os.Remove(testSymlink)
-	c.Check(IsSymlink(testSymlink), Equals, false)
+	c.Check(IsSymlink(testSymlink), C.Equals, false)
 	ioutil.WriteFile(testFile, nil, 0644)
 	os.Symlink(testFile, testSymlink)
-	c.Check(IsSymlink(testSymlink), Equals, true)
+	c.Check(IsSymlink(testSymlink), C.Equals, true)
 	os.Remove(testSymlink)
 	os.Remove(testFile)
 }
 
-func (*UtilsTest) TestIsEnvExists(c *C) {
+func (*testWrapper) TestIsEnvExists(c *C.C) {
 	testEnvName := "test_is_env_exists"
 	testEnvValue := "test_env_value"
-	c.Check(false, Equals, IsEnvExists(testEnvName))
+	c.Check(false, C.Equals, IsEnvExists(testEnvName))
 	os.Setenv(testEnvName, testEnvValue)
-	c.Check(true, Equals, IsEnvExists(testEnvName))
+	c.Check(true, C.Equals, IsEnvExists(testEnvName))
 }
 
-func (*UtilsTest) TestUnsetEnv(c *C) {
+func (*testWrapper) TestUnsetEnv(c *C.C) {
 	testEnvName := "test_unset_env"
 	testEnvValue := "test_env_value"
-	c.Check(false, Equals, IsEnvExists(testEnvName))
+	c.Check(false, C.Equals, IsEnvExists(testEnvName))
 	os.Setenv(testEnvName, testEnvValue)
-	c.Check(true, Equals, IsEnvExists(testEnvName))
+	c.Check(true, C.Equals, IsEnvExists(testEnvName))
 	envCount := len(os.Environ())
 	UnsetEnv(testEnvName)
-	c.Check(false, Equals, IsEnvExists(testEnvName))
-	c.Check(len(os.Environ()), Equals, envCount-1)
+	c.Check(false, C.Equals, IsEnvExists(testEnvName))
+	c.Check(len(os.Environ()), C.Equals, envCount-1)
 }
 
-func (*UtilsTest) TestGenUuid(c *C) {
+func (*testWrapper) TestGenUuid(c *C.C) {
+	validUuid := regexp.MustCompile(`^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$`)
+	var lastUuid string
 	for i := 0; i < 5; i++ {
-		fmt.Println("GenUuid:", GenUuid())
+		currentUuid := GenUuid()
+		c.Check(currentUuid != lastUuid, C.Equals, true)
+		c.Check(validUuid.MatchString(currentUuid), C.Equals, true)
+		lastUuid = currentUuid
 	}
 }
 
-func (*UtilsTest) TestRandString(c *C) {
+func (*testWrapper) TestRandString(c *C.C) {
+	validStr := regexp.MustCompile(`^[0-za-f]{10}$`)
+	var lastStr string
 	for i := 0; i < 5; i++ {
-		fmt.Println("RandString:", RandString(10))
+		currentStr := RandString(10)
+		c.Check(currentStr != lastStr, C.Equals, true)
+		c.Check(validStr.MatchString(currentStr), C.Equals, true)
+		lastStr = currentStr
 	}
 }
 
-func (*UtilsTest) TestIsInterfaceNil(c *C) {
-	c.Check(IsInterfaceNil(1), Equals, false)
-	c.Check(IsInterfaceNil(true), Equals, false)
-	c.Check(IsInterfaceNil(nil), Equals, true)
+func (*testWrapper) TestIsInterfaceNil(c *C.C) {
+	c.Check(IsInterfaceNil(1), C.Equals, false)
+	c.Check(IsInterfaceNil(true), C.Equals, false)
+	c.Check(IsInterfaceNil(nil), C.Equals, true)
 	var a []int = nil
-	c.Check(IsInterfaceNil(a), Equals, true)
+	c.Check(IsInterfaceNil(a), C.Equals, true)
 }

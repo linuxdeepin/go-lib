@@ -22,31 +22,30 @@
 package utils
 
 import (
-	"fmt"
-	"testing"
+	C "launchpad.net/gocheck"
 )
 
-func TestMD5Sum(t *testing.T) {
+func (*testWrapper) TestMD5Sum(c *C.C) {
 	testStr := "hello world"
 	if ret, ok := SumStrMd5(testStr); !ok {
-		t.Errorf("SumStrMd5 '%s' Faild", testStr)
+		c.Errorf("SumStrMd5 '%s' Faild", testStr)
 		return
 	} else {
-		fmt.Printf("String '%s' md5: %v\n", testStr, ret)
+		c.Check(ret, C.Equals, "5eb63bbbe01eeed093cb22bb8f5acdc3")
 	}
 
-	testFile := "utils.go"
+	testFile := "testdata/testfile"
 	if ret, ok := SumFileMd5(testFile); !ok {
-		t.Errorf("SumFileMd5 '%s' Failed", testFile)
+		c.Errorf("SumFileMd5 '%s' Failed", testFile)
 		return
 	} else {
-		fmt.Printf("File '%s' md5: %v\n", testFile, ret)
+		c.Check(ret, C.Equals, "0a75266cc21da8c88a940b00d4d535b7")
 	}
 
 	if ret, ok := SysMd5Sum(testFile); !ok {
-		t.Errorf("SysMd5Sum '%s' Failed", testFile)
+		c.Errorf("SysMd5Sum '%s' Failed", testFile)
 		return
 	} else {
-		fmt.Printf("File '%s' md5: %v\n", testFile, ret)
+		c.Check(ret, C.Equals, "0a75266cc21da8c88a940b00d4d535b7")
 	}
 }
