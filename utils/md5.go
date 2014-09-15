@@ -25,65 +25,23 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
-// TODO refactor code, use doSumStrMd5 instead of SumStrMd5
-func doSumStrMd5(s string) string {
-	h := md5.New()
-	io.WriteString(h, s)
-	return fmt.Sprintf("%x", h.Sum(nil))
-}
-
-func md5ByteToStr(bytes [16]byte) string {
-	str := ""
-
-	for _, b := range bytes {
-		s := strconv.FormatInt(int64(b), 16)
-		if len(s) == 1 {
-			str += "0" + s
-		} else {
-			str += s
-		}
-	}
-
-	return str
-}
-
 func SumStrMd5(str string) (string, bool) {
-	if len(str) < 1 {
-		return "", false
-	}
-
-	md5Byte := md5.Sum([]byte(str))
-	md5Str := md5ByteToStr(md5Byte)
-	if len(md5Str) < 32 {
-		return "", false
-	}
-
-	return md5Str, true
+	return fmt.Sprintf("%x", md5.Sum([]byte(str))), true
 }
 
 func SumFileMd5(filename string) (string, bool) {
-	if !IsFileExist(filename) {
-		return "", false
-	}
-
-	contents, err := ioutil.ReadFile(filename)
+	f, err := os.Open(filename)
 	if err != nil {
 		return "", false
 	}
-
-	md5Byte := md5.Sum(contents)
-	md5Str := md5ByteToStr(md5Byte)
-	if len(md5Str) < 32 {
-		return "", false
-	}
-
-	return md5Str, true
+	h := md5.New()
+	io.Copy(h, f)
+	return fmt.Sprintf("%x", h.Sum(nil)), true
 }
 
 //SysMd5Sum will call sh to exec md5sum to get the md5 of file
