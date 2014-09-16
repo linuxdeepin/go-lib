@@ -345,3 +345,47 @@ func (g *testWrapper) TestRotateImageRight(c *C.C) {
 	}
 	c.Check(sumFileMd5(resultFile), C.Equals, "e9142938dda0537c7e1bf9eb0a0345f6")
 }
+
+func (*testWrapper) TestGetPreferScaleClipRect(c *C.C) {
+	data := []struct {
+		refWidth, refHeight, imgWidth, imgHeight int
+		x, y, w, h                               int
+	}{
+		{1024, 768, 512, 100, 189, 0, 133, 100},
+		{1024, 768, 100, 384, 0, 154, 100, 75},
+
+		{1024, 768, 512, 384, 0, 0, 512, 384},
+		{1024, 768, 1024, 768, 0, 0, 1024, 768},
+		{1440, 900, 1440, 900, 0, 0, 1440, 900},
+
+		{1024, 768, 1920, 1080, 240, 0, 1440, 1080},
+	}
+	for _, d := range data {
+		x, y, w, h, err := GetPreferScaleClipRect(d.refWidth, d.refHeight, d.imgWidth, d.imgHeight)
+		c.Check(err, C.Equals, nil)
+		c.Check(x, C.Equals, d.x)
+		c.Check(y, C.Equals, d.y)
+		c.Check(w, C.Equals, d.w)
+		c.Check(h, C.Equals, d.h)
+	}
+
+	// check same clip rectangle size with original width and height
+	for i := 1; i < 10000; i++ {
+		x, y, w, h, _ := GetPreferScaleClipRect(i, 768, i, 768)
+		c.Check(x, C.Equals, 0)
+		c.Check(y, C.Equals, 0)
+		c.Check(w, C.Equals, i)
+		c.Check(h, C.Equals, 768)
+	}
+
+	// check exceptions
+	var err error
+	_, _, _, _, err = GetPreferScaleClipRect(0, 0, 100, 100)
+	c.Check(err, C.NotNil)
+	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 512, 0)
+	c.Check(err, C.NotNil)
+	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 0, 384)
+	c.Check(err, C.NotNil)
+	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 0, 0)
+	c.Check(err, C.NotNil)
+}
