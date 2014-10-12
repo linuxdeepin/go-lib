@@ -70,7 +70,7 @@ func (ifc IntrospectProxy) Introspect() (string, error) {
 		})
 	}
 	for name, ifc := range ifc.infos {
-		info := genInterfaceInfo(ifc)
+		info := BuildInterfaceInfo(ifc)
 		info.Name = name
 		node.Interfaces = append(node.Interfaces, *info)
 	}

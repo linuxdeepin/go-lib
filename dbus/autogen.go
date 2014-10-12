@@ -29,7 +29,7 @@ func getValueOf(ifc interface{}) (r reflect.Value) {
 	return
 }
 
-func genInterfaceInfo(ifc interface{}) *InterfaceInfo {
+func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 	ifc_info := new(InterfaceInfo)
 	o_type := reflect.TypeOf(ifc)
 	n := o_type.NumMethod()
