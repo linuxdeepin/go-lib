@@ -3,7 +3,7 @@ Section: devel
 Priority: extra
 Maintainer: Yueqian Zhang <zhangyueqian@linuxdeepin.com>
 Build-Depends: debhelper (>= 9), dh-golang, golang-go,
-               golang-xgb-dev,
+               golang-xgb-dev, golang-fsnotify-dev,
 	       golang-gocheck-dev,
                libpulse-dev,
                libgtk-3-dev
