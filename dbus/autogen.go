@@ -172,27 +172,6 @@ func UnInstallObject(obj DBusObject) {
 	}
 }
 
-func setupSignalHandler(c *Conn, v interface{}, path ObjectPath, iface string) {
-	value := reflect.ValueOf(v).Elem()
-	types := reflect.TypeOf(v).Elem()
-	n := value.NumField()
-	for i := 0; i < n; i++ {
-		fn := value.Field(i)
-		t := types.Field(i)
-		if isExportedStructField(t) && fn.Type().Kind() == reflect.Func {
-			name := iface + "." + reflect.TypeOf(v).Elem().Field(i).Name
-			fn.Set(reflect.MakeFunc(fn.Type(), func(in []reflect.Value) []reflect.Value {
-				inputs := make([]interface{}, len(in))
-				for i, v := range in {
-					inputs[i] = v.Interface()
-				}
-				c.Emit(path, name, inputs...)
-				return nil
-			}))
-		}
-	}
-}
-
 func ownerName(c *Conn, v interface{}, name string) error {
 	if name != "." {
 		not_registered := true

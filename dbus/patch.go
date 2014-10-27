@@ -175,3 +175,28 @@ func ReleaseName(obj DBusObject) {
 		con.busObj.Call("org.freedesktop.DBus.ReleaseName", 0, obj.GetDBusInfo().Dest)
 	}
 }
+
+func Emit(obj DBusObject, name string, ins ...interface{}) error {
+	c := detectConnByDBusObject(obj)
+	if c == nil {
+		return fmt.Errorf("%s is not installed on any bus", obj.GetDBusInfo().Dest)
+	}
+	v := getValueOf(obj)
+	fn := v.FieldByName(name)
+	if !fn.IsValid() {
+		return fmt.Errorf("Can't find method of %s in %s", name, obj.GetDBusInfo().Interface)
+	}
+
+	fnType := getTypeOf(fn.Interface())
+	if fnType.NumOut() != 0 || fnType.NumIn() != len(ins) {
+		return fmt.Errorf("Invalid signal type (%d != %d)", fnType.NumIn(), len(ins))
+	}
+	for i, in := range ins {
+		if fnType.In(i) != reflect.TypeOf(in) {
+			return fmt.Errorf("Invalid signal type %d (%v != %v)", i, fnType.In(i), reflect.TypeOf(in))
+		}
+	}
+
+	info := obj.GetDBusInfo()
+	return c.Emit(ObjectPath(info.ObjectPath), info.Interface+"."+name, ins...)
+}
