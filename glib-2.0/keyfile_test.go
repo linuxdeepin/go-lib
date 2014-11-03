@@ -2,6 +2,7 @@ package glib
 
 import (
 	C "launchpad.net/gocheck"
+	"os"
 	"strings"
 	"testing"
 )
@@ -66,6 +67,11 @@ func checkDesktopFile(f *KeyFile, c *C.C) {
 		r, err := f.GetLocaleString("NewWindow Shortcut Group", "Name", "zh_CN")
 		c.Check(err, C.Equals, nil)
 		c.Check(r, C.Equals, "新建窗口")
+
+		os.Setenv("LANGUAGE", "zh_TW")
+		r, err = f.GetLocaleString("NewWindow Shortcut Group", "Name", "\x00")
+		c.Check(err, C.Equals, nil)
+		c.Check(r, C.Equals, "開啟新視窗")
 	}
 	{
 		l, r, err := f.GetLocaleStringList("Desktop Entry", "Keywords", "zh_CN")
