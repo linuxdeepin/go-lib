@@ -5,6 +5,9 @@ import "bytes"
 import "fmt"
 import "reflect"
 import "sync"
+import "pkg.linuxdeepin.com/lib/dbus/introspect"
+
+const InterfaceLifeManager = "com.deepin.DBus.LifeManager"
 
 type LifeManager struct {
 	name        string
@@ -18,12 +21,21 @@ func RegisterLifeManagerCallback(m DBusObject, cb func()) {
 	if con := detectConnByDBusObject(m); con != nil {
 		path := ObjectPath(m.GetDBusInfo().ObjectPath)
 		if infos, ok := con.handlers[path]; ok {
-			if i, ok := (infos["org.freedesktop.DBus.LifeManager"]).(*LifeManager); ok {
+			if i, ok := (infos[InterfaceLifeManager]).(*LifeManager); ok {
 				i.onDestroy = cb
 			}
 		}
 	}
 }
+
+func NewLifeManager(name string, path ObjectPath) *LifeManager {
+	return &LifeManager{name: name, path: path, count: 1}
+}
+
+func (ifc *LifeManager) InterfaceName() string {
+	return InterfaceLifeManager
+}
+
 func (ifc *LifeManager) Ref() {
 	ifc.countLocker.Lock()
 
@@ -42,30 +54,28 @@ func (ifc *LifeManager) Unref() {
 	ifc.countLocker.Unlock()
 }
 
+const InterfaceIntrospectProxy = "org.freedesktop.DBus.Introspectable"
+
 type IntrospectProxy struct {
 	infos map[string]interface{}
 	child map[string]bool
 }
 
-func (ifc IntrospectProxy) String() string {
-	// ifc.infos reference ifc so can't use default String()
-	ret := "IntrospectProxy ["
-	comma := false
-	for k, _ := range ifc.infos {
-		if comma {
-			ret += ","
-		}
-		comma = true
-		ret += `"` + k + `"`
+func NewIntrospectProxy(infos map[string]interface{}) *IntrospectProxy {
+	return &IntrospectProxy{
+		infos: infos,
+		child: make(map[string]bool),
 	}
-	ret += "]"
-	return ret
+}
+
+func (ifc IntrospectProxy) InterfaceName() string {
+	return InterfaceIntrospectProxy
 }
 
 func (ifc IntrospectProxy) Introspect() (string, error) {
-	var node = new(NodeInfo)
+	var node = new(introspect.NodeInfo)
 	for k, _ := range ifc.child {
-		node.Children = append(node.Children, NodeInfo{
+		node.Children = append(node.Children, introspect.NodeInfo{
 			Name: k,
 		})
 	}
@@ -82,15 +92,21 @@ func (ifc IntrospectProxy) Introspect() (string, error) {
 	return buffer.String(), nil
 }
 
+const InterfacePropertiesProxy = "org.freedesktop.DBus.Properties"
+
 type PropertiesProxy struct {
 	infos             map[string]interface{}
 	PropertiesChanged func(string, map[string]Variant, []string)
 }
-type Property interface {
-	GetValue() interface{}
-	SetValue(interface{})
-	ConnectChanged(func())
-	GetType() reflect.Type
+
+func NewPropertiesProxy(infos map[string]interface{}) *PropertiesProxy {
+	return &PropertiesProxy{
+		infos: infos,
+	}
+}
+
+func (PropertiesProxy) InterfaceName() string {
+	return InterfacePropertiesProxy
 }
 
 func (propProxy PropertiesProxy) GetAll(ifcName string) (props map[string]Variant, err error) {

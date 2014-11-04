@@ -1,6 +1,6 @@
 // Package introspect provides some utilities for dealing with the DBus
 // introspection format.
-package dbus
+package introspect
 
 import "encoding/xml"
 
@@ -45,9 +45,10 @@ type PropertyInfo struct {
 
 // Arg represents an argument of a method or a signal.
 type ArgInfo struct {
-	Name      string `xml:"name,attr,omitempty"`
-	Type      string `xml:"type,attr"`
-	Direction string `xml:"direction,attr,omitempty"`
+	Name        string           `xml:"name,attr,omitempty"`
+	Type        string           `xml:"type,attr"`
+	Direction   string           `xml:"direction,attr,omitempty"`
+	Annotations []AnnotationInfo `xml:"annotation"`
 }
 
 // Annotation is an annotation in the introspection format.

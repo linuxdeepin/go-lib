@@ -5,6 +5,7 @@ Maintainer: Yueqian Zhang <zhangyueqian@linuxdeepin.com>
 Build-Depends: debhelper (>= 9), dh-golang, golang-go,
                golang-xgb-dev, golang-fsnotify-dev,
 	       golang-gocheck-dev,
+	       golang-goconvey-dev,
                libpulse-dev,
                libgtk-3-dev
 Standards-Version: 3.9.5

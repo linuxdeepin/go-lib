@@ -16,6 +16,13 @@ type DMessage struct {
 	c *Conn
 }
 
+type Property interface {
+	GetValue() interface{}
+	SetValue(interface{})
+	ConnectChanged(func())
+	GetType() reflect.Type
+}
+
 func (msg DMessage) GetSender() string {
 	sender := msg.m.Headers[FieldSender].value.(string)
 	return sender

@@ -2,8 +2,11 @@ package dbus
 
 import "reflect"
 import "errors"
+import "fmt"
 import "strings"
 import "log"
+import "pkg.linuxdeepin.com/lib/dbus/interfaces"
+import "pkg.linuxdeepin.com/lib/dbus/introspect"
 
 func splitObjectPath(path ObjectPath) (parent, base string) {
 	i := strings.LastIndex(string(path), "/")
@@ -29,8 +32,8 @@ func getValueOf(ifc interface{}) (r reflect.Value) {
 	return
 }
 
-func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
-	ifc_info := new(InterfaceInfo)
+func BuildInterfaceInfo(ifc interface{}) *introspect.InterfaceInfo {
+	ifc_info := new(introspect.InterfaceInfo)
 	o_type := reflect.TypeOf(ifc)
 	n := o_type.NumMethod()
 
@@ -43,20 +46,20 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 		if (name == "GetDBusInfo" && o_type.Implements(dbusObjectInterface)) || name == "OnPropertiesChanged" {
 			continue
 		}
-		method_info := MethodInfo{}
+		method_info := introspect.MethodInfo{}
 		method_info.Name = name
 
 		m := method.Type
 		n_in := m.NumIn()
 		n_out := m.NumOut()
-		args := make([]ArgInfo, 0)
+		args := make([]introspect.ArgInfo, 0)
 		//Method's first paramter is the struct which this method bound to.
 		for i := 1; i < n_in; i++ {
 			t := m.In(i)
 			if i == 1 && t == dbusMessageType {
 				continue
 			}
-			args = append(args, ArgInfo{
+			args = append(args, introspect.ArgInfo{
 				Type:      SignatureOfType(t).String(),
 				Direction: "in",
 			})
@@ -66,7 +69,7 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 			if t.Implements(goErrorType) {
 				continue
 			}
-			args = append(args, ArgInfo{
+			args = append(args, introspect.ArgInfo{
 				Type:      SignatureOfType(t).String(),
 				Direction: "out",
 			})
@@ -86,14 +89,14 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 			continue
 		}
 		if field.Type.Kind() == reflect.Func {
-			ifc_info.Signals = append(ifc_info.Signals, SignalInfo{
+			ifc_info.Signals = append(ifc_info.Signals, introspect.SignalInfo{
 				Name: field.Name,
-				Args: func() []ArgInfo {
+				Args: func() []introspect.ArgInfo {
 					n := field.Type.NumIn()
-					ret := make([]ArgInfo, n)
+					ret := make([]introspect.ArgInfo, n)
 					for i := 0; i < n; i++ {
 						arg := field.Type.In(i)
-						ret[i] = ArgInfo{
+						ret[i] = introspect.ArgInfo{
 							Type: SignatureOfType(arg).String(),
 						}
 					}
@@ -112,7 +115,7 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 				} else {
 					t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
 					if t != nil {
-						ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
+						ifc_info.Properties = append(ifc_info.Properties, introspect.PropertyInfo{
 							Name:   field.Name,
 							Type:   SignatureOfType(t).String(),
 							Access: access,
@@ -120,7 +123,7 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 					}
 				}
 			} else {
-				ifc_info.Properties = append(ifc_info.Properties, PropertyInfo{
+				ifc_info.Properties = append(ifc_info.Properties, introspect.PropertyInfo{
 					Name:   field.Name,
 					Type:   SignatureOfType(field.Type).String(),
 					Access: access,
@@ -132,36 +135,30 @@ func BuildInterfaceInfo(ifc interface{}) *InterfaceInfo {
 	return ifc_info
 }
 
-func InstallOnSession(obj DBusObject) error {
+func InstallOnSession(obj DBusObject, ifcs ...interfaces.DBusInterface) error {
 	conn, err := SessionBus()
 	if err != nil {
 		return err
 	}
-	return InstallOnAny(conn, obj)
+	return InstallOnAny(conn, obj, ifcs...)
 }
 
-func InstallOnSystem(obj DBusObject) error {
+func InstallOnSystem(obj DBusObject, ifcs ...interfaces.DBusInterface) error {
 	conn, err := SystemBus()
 	if err != nil {
 		return err
 	}
-	return InstallOnAny(conn, obj)
+	return InstallOnAny(conn, obj, ifcs...)
 }
 
-func InstallOnAny(conn *Conn, obj DBusObject) error {
+func InstallOnAny(conn *Conn, obj DBusObject, ifcs ...interfaces.DBusInterface) error {
 	if obj == nil {
 		panic("Can't install an nil DBusObject to dbus")
 	}
 	if reflect.TypeOf(obj).Kind() != reflect.Ptr {
 		panic("DBusObject must be an ptr at this moment")
 	}
-	info := obj.GetDBusInfo()
-	path := ObjectPath(info.ObjectPath)
-	if path.IsValid() {
-		return export(conn, obj, info.Dest, path, info.Interface)
-	} else {
-		return errors.New("ObjectPath " + info.ObjectPath + " is invalid")
-	}
+	return export(conn, obj, ifcs)
 }
 
 func UnInstallObject(obj DBusObject) {
@@ -195,22 +192,28 @@ func ownerName(c *Conn, v interface{}, name string) error {
 	return nil
 }
 
-//TODO: Need exported?
-func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) error {
-	if err := ownerName(c, v, name); err != nil {
+//TODO: try to remove DBusObject
+func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error {
+	dinfo := v.GetDBusInfo()
+	path := ObjectPath(dinfo.ObjectPath)
+	if !path.IsValid() {
+		return fmt.Errorf("ObjectPath %q is invalid", dinfo.ObjectPath)
+	}
+
+	err := ownerName(c, v, dinfo.Dest)
+	if err != nil {
 		return err
 	}
 
-	setupSignalHandler(c, v, path, iface)
-
-	if err := c.Export(v, path, iface); err != nil {
+	err = c.Export(v, path, dinfo.Interface)
+	if err != nil {
 		return err
 	}
 
-	//handle subpath
+	//TODO: handle subpath
 	parentpath, basepath := splitObjectPath(path)
 	if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
-		intro := parent["org.freedesktop.DBus.Introspectable"]
+		intro := parent[InterfaceIntrospectProxy]
 		if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
 			intro.(IntrospectProxy).child[basepath] = true
 		}
@@ -220,9 +223,13 @@ func export(c *Conn, v interface{}, name string, path ObjectPath, iface string) 
 	ifcs := c.handlers[path]
 	c.handlersLck.RUnlock()
 
-	c.Export(IntrospectProxy{ifcs, make(map[string]bool)}, path, "org.freedesktop.DBus.Introspectable")
-	c.Export(PropertiesProxy{ifcs, nil}, path, "org.freedesktop.DBus.Properties")
-	c.Export(&LifeManager{name: name, path: path, count: 1}, path, "org.freedesktop.DBus.LifeManager")
+	interfaces = append(interfaces, NewIntrospectProxy(ifcs))
+	interfaces = append(interfaces, NewPropertiesProxy(ifcs))
+	interfaces = append(interfaces, NewLifeManager(dinfo.Dest, path))
+
+	for _, ifc := range interfaces {
+		c.Export(ifc, path, ifc.InterfaceName())
+	}
 
 	return nil
 }
