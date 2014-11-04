@@ -70,3 +70,58 @@ func TestIsExportedStructField(t *testing.T) {
 	}
 
 }
+
+type testEmbedded struct {
+	A string
+	B int
+}
+type testEmebdedding struct {
+	testEmbedded `dbus:"-"`
+	A            string
+}
+
+func (testEmebdedding) Test() string {
+	return "ABC"
+}
+
+func (testEmebdedding) GetDBusInfo() DBusInfo {
+	return DBusInfo{
+		Dest:       "com.deepin.test",
+		ObjectPath: "/com/deepin/test",
+		Interface:  "com.deepin.test",
+	}
+}
+
+func TestEmbededStrcut(t *testing.T) {
+	s := &testEmebdedding{}
+	err := InstallOnSession(s)
+	if err != nil {
+		t.Skip("connect bus session failed" + err.Error())
+	}
+	c := detectConnByDBusObject(s)
+	var ret string
+	c.Object("com.deepin.test", "/com/deepin/test").Call("Test", 0).Store(&ret)
+	if ret != "ABC" {
+		t.Fail()
+	}
+	var props map[string]Variant
+	c.Object("com.deepin.test", "/com/deepin/test").Call(
+		"org.freedesktop.DBus.Properties.GetAll", 0, "com.deepin.test").Store(&props)
+	_, ok := props["A"]
+	if !ok {
+		t.Fail()
+	}
+
+	var prop Variant
+	err = c.Object("com.deepin.test", "/com/deepin/test").Call(
+		"org.freedesktop.DBus.Properties.Get", 0, "com.deepin.test", "testEmbedded").Store(&prop)
+	if err == nil {
+		t.Fail()
+	}
+
+	err = c.Object("com.deepin.test", "/com/deepin/test").Call(
+		"org.freedesktop.DBus.Properties.Get", 0, "com.deepin.test", "A").Store(&prop)
+	if err != nil {
+		t.Fail()
+	}
+}
