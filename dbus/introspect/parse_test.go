@@ -15,7 +15,7 @@ var testXML = `
       <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_manager_activate_connection"/>
       <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
       <arg name="UUID" type="s" direction="in">
-      	<annotation name="com.deepin.DBus.I18n" value="true"/>
+	<annotation name="com.deepin.DBus.I18n.Dir" value="true"/>
       </arg>
     </method>
     <method name="DisconnectProfile">
@@ -27,10 +27,11 @@ var testXML = `
     <method name="CancelPairing"/>
 
     <property name="Address" type="s" access="read">
-      <annotation name="com.deepin.DBus.I18n" value="true"/>
+      <annotation name="com.deepin.DBus.I18n.Dir" value=""/>
+      <annotation name="com.deepin.DBus.I18n.Domain" value="dde-daemon"/>
     </property>
     <property name="Name" type="s" access="read">
-      <annotation name="com.deepin.DBus.I18n" value="false"/>
+      <annotation name="com.deepin.DBus.I18n.Domain" value="test"/>
     </property>
     <property name="Alias" type="s" access="readwrite"/>
     <property name="Class" type="u" access="read"/>
@@ -66,19 +67,29 @@ func TestParse(t *testing.T) {
 				C.So(m.Name, C.ShouldEqual, "ConnectProfile")
 				C.So(m.Annotations[0].Name, C.ShouldEqual, "org.freedesktop.DBus.GLib.CSymbol")
 				C.So(m.Annotations[0].Value, C.ShouldEqual, "impl_manager_activate_connection")
-				C.So(m.Args[0].I18nField(), C.ShouldEqual, true)
+				dir, domain, ok := m.Args[0].I18nInfo()
+				C.So(ok, C.ShouldEqual, false)
 
 				C.So(ifc.Methods[4].Name, C.ShouldEqual, "Pair")
 				C.So(ifc.Methods[4].NoReply(), C.ShouldEqual, true)
 
-				C.So(ifc.Methods[3].Args[0].I18nField(), C.ShouldEqual, false)
+				dir, domain, ok = ifc.Methods[3].Args[0].I18nInfo()
+				C.So(dir, C.ShouldEqual, "")
+				C.So(domain, C.ShouldEqual, "")
+				C.So(ok, C.ShouldEqual, false)
 
 				p := ifc.Properties[0]
 				C.So(p.Name, C.ShouldEqual, "Address")
-				C.So(p.I18nField(), C.ShouldEqual, true)
+				dir, domain, ok = p.I18nInfo()
+				C.So(dir, C.ShouldEqual, "")
+				C.So(domain, C.ShouldEqual, "dde-daemon")
+				C.So(ok, C.ShouldEqual, true)
 
-				C.So(ifc.Properties[1].I18nField(), C.ShouldEqual, false)
-				C.So(ifc.Properties[2].I18nField(), C.ShouldEqual, false)
+				dir, domain, ok = ifc.Properties[1].I18nInfo()
+				C.So(domain, C.ShouldEqual, "test")
+				C.So(ok, C.ShouldEqual, true)
+				dir, domain, ok = ifc.Properties[2].I18nInfo()
+				C.So(ok, C.ShouldEqual, false)
 				C.So(m.NoReply(), C.ShouldEqual, false)
 			})
 		})
