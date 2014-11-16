@@ -22,14 +22,13 @@
 package utils
 
 import (
-	"fmt"
 	"io"
 	"os"
 )
 
 func CopyFile(src, dest string) (err error) {
 	if dest == src {
-		return fmt.Errorf("source and destination are same file")
+		return nil
 	}
 
 	sf, err := os.Open(src)
