@@ -21,7 +21,10 @@
 
 package utils
 
-import "github.com/howeyc/fsnotify"
+import (
+	"github.com/howeyc/fsnotify"
+	"sync"
+)
 
 type WatchProxy struct {
 	watcher      *fsnotify.Watcher
@@ -30,6 +33,7 @@ type WatchProxy struct {
 	fileList     []string
 	end          chan bool
 	endFlag      bool
+	lock         sync.Mutex
 }
 
 func NewWatchProxy() *WatchProxy {
@@ -42,7 +46,7 @@ func NewWatchProxy() *WatchProxy {
 	}
 
 	w.end = make(chan bool, 1)
-	w.endFlag = true
+	w.setEndFlag(true)
 
 	return w
 }
@@ -88,10 +92,10 @@ func (w *WatchProxy) StartWatch() {
 	if !w.endFlag || w.eventHandler == nil {
 		return
 	}
-	w.endFlag = false
+	w.setEndFlag(false)
 
 	if len(w.fileList) == 0 || w.watcher == nil {
-		w.endFlag = true
+		w.setEndFlag(true)
 		return
 	}
 
@@ -102,16 +106,25 @@ func (w *WatchProxy) StartWatch() {
 		case ev, ok := <-w.watcher.Event:
 			if !ok {
 				w.ResetFileListWatch()
+				break
+			}
+			if w.eventHandler == nil {
+				break
 			}
 			w.eventHandler(ev)
 		case err, ok := <-w.watcher.Error:
 			if !ok {
 				w.ResetFileListWatch()
+				break
 			}
-			if w.errorHandler != nil {
-				w.errorHandler(err)
+			if w.errorHandler == nil {
+				break
 			}
+			w.errorHandler(err)
 		case <-w.end:
+			if w.watcher == nil {
+				return
+			}
 			w.watcher.Close()
 			return
 		}
@@ -120,10 +133,16 @@ func (w *WatchProxy) StartWatch() {
 
 func (w *WatchProxy) EndWatch() {
 	if !w.endFlag {
-		w.endFlag = true
+		w.setEndFlag(true)
 		w.removeFileListWatch()
 		w.end <- true
 	}
+}
+
+func (w *WatchProxy) setEndFlag(value bool) {
+	w.lock.Lock()
+	w.endFlag = value
+	w.lock.Unlock()
 }
 
 /**
