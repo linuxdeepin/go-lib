@@ -239,6 +239,10 @@ func (*testWrapper) TestDebugMatchEnv(c *C.C) {
 	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDebug)
 	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)
 
+	os.Setenv("DDE_DEBUG_MATCH", "test1|test2")
+	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDebug)
+	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDebug)
+
 	os.Setenv("DDE_DEBUG_MATCH", "not match")
 	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDisable)
 	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)

@@ -29,6 +29,7 @@ import (
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/utils"
 	"reflect"
+	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -142,8 +143,7 @@ func getDefaultLogLevel(name string) (level Priority) {
 		}
 	}
 	if utils.IsEnvExists(DebugMatchEnv) {
-		if strings.Contains(strings.ToLower(name),
-			strings.ToLower(os.Getenv(DebugMatchEnv))) {
+		if matchLogger(name, os.Getenv(DebugMatchEnv)) {
 			if !utils.IsEnvExists(DebugLevelEnv) {
 				level = LevelDebug
 			}
@@ -152,6 +152,14 @@ func getDefaultLogLevel(name string) (level Priority) {
 		}
 	}
 	return
+}
+func matchLogger(name, expr string) bool {
+	reg, err := regexp.Compile(expr)
+	if err != nil {
+		std.Printf("match variable $%s failed %v\n", DebugMatchEnv, err)
+		return false
+	}
+	return reg.Match([]byte(name))
 }
 
 // SetLogLevel reset the log level.
