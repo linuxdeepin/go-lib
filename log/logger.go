@@ -353,18 +353,25 @@ func buildFormatMsg(calldepth int, loop bool, format string, v ...interface{}) (
 	return
 }
 func doBuildMsg(calldepth int, loop bool, s string) (msg string) {
-	if !loop {
-		_, file, line, _ := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", filepath.Base(file), line, s)
-	} else {
-		_, file, line, ok := runtime.Caller(calldepth)
-		msg = fmt.Sprintf("%s:%d: %s", filepath.Base(file), line, s)
-		for ok {
+	var file, lastFile string
+	var line, lastLine int
+	var ok bool
+	_, file, line, ok = runtime.Caller(calldepth)
+	lastFile, lastLine = file, line
+	msg = fmt.Sprintf("%s:%d: %s", filepath.Base(file), line, s)
+	if loop && ok {
+		for {
 			calldepth++
 			_, file, line, ok = runtime.Caller(calldepth)
+			if file == lastFile && line == lastLine {
+				// prevent infinite loop for that some platforms not
+				// works well, e.g. mips
+				break
+			}
 			if ok {
 				msg = fmt.Sprintf("%s\n  ->  %s:%d", msg, filepath.Base(file), line)
 			}
+			lastFile, lastLine = file, line
 		}
 	}
 	return
