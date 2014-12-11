@@ -215,7 +215,7 @@ func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error 
 	if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
 		intro := parent[InterfaceIntrospectProxy]
 		if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
-			intro.(IntrospectProxy).child[basepath] = true
+			intro.(*IntrospectProxy).child[basepath] = true
 		}
 	}
 

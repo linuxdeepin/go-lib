@@ -36,7 +36,7 @@ func (msg DMessage) GetSenderPID() (r uint32) {
 var (
 	dbusObject          DBusObject
 	dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
-	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil)).Elem()
+	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil))
 	propertyType        = reflect.TypeOf((*Property)(nil)).Elem()
 	dbusStructType      = reflect.TypeOf((*[]interface{})(nil)).Elem()
 	dbusMessageType     = reflect.TypeOf((*DMessage)(nil)).Elem()
