@@ -162,17 +162,20 @@ func GetContext() *Context {
 }
 
 //export receive_some_info
-func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, end bool) {
+func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, status int) {
 	c := fetchCookie(cookie)
 	if c == nil {
-		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, end)
+		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, status)
 		return
 	}
 
-	if end {
+	switch {
+	case status == 1:
 		c.EndOfList()
-	} else {
+	case status == 0:
 		c.Feed(infoType, info)
+	case status < 0:
+		c.Failed()
 	}
 }
 
