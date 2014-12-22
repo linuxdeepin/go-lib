@@ -3,19 +3,23 @@
 #include "dde-pulse.h"
 #include <string.h>
 #include <stdio.h>
+
+#include "_cgo_export.h" //convert int
+
 static pa_threaded_mainloop* m = NULL;
 
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
 void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
 {\
+    receive_some_info((int64_t)userdata, ID, (void*)i, eol); \
     if (eol < 0) { \
 	if (pa_context_errno(c) == PA_ERR_NOENTITY) {\
+	    fprintf(stderr, "errno == PA_ERR_NOENTITY"); \
 	    return;\
 	}\
 	fprintf(stderr, "receive info failed");\
 	return;\
     }\
-    receive_some_info((int64_t)userdata, ID, (void*)i, eol); \
 }\
 void get_##TYPE##_info(pa_context *c, int64_t cookie, uint32_t index) \
 {\

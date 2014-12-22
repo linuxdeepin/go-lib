@@ -59,6 +59,12 @@ func (c *cookie) Feed(infoType int, info unsafe.Pointer) {
 }
 func (c *cookie) EndOfList() {
 	close(c.data)
+	deleteCookie(c.id)
+}
+
+func (c *cookie) Failed() {
+	close(c.data)
+	deleteCookie(c.id)
 }
 
 var newCookie, fetchCookie, deleteCookie = func() (func() *cookie,
