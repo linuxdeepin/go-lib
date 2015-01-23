@@ -4,3 +4,4 @@ graphic/testdata/test*
 gdkpixbuf/testdata/test*
 *.bak
 _*
+**/*.test
