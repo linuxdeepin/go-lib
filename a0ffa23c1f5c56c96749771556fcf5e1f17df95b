@@ -1,3 +1,12 @@
+build-config+1: <songwenwu@linuxdeepin.com>
+Verified+1: Anonymous Coward #1000004
+Code-Review+2: <songwenwu@linuxdeepin.com>
+Submitted-by: <songwenwu@linuxdeepin.com>
+Submitted-at: Mon, 18 Aug 2014 10:47:26 -0500
+Reviewed-on: https://cr.deepin.io/232
+Project: go-lib
+Branch: refs/heads/master
+
 build-config+1: 宋文武 <songwenwu@linuxdeepin.com>
 Verified+1: Anonymous Coward #1000004
 Code-Review+2: 宋文武 <songwenwu@linuxdeepin.com>

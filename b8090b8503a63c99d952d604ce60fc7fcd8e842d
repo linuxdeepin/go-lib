@@ -1,4 +1,15 @@
 Verified+1: Anonymous Coward #1000004
+Code-Review+2: <songwenwu@linuxdeepin.com>
+build-config+1: <songwenwu@linuxdeepin.com>
+Code-Review+2: <snyh@snyh.org>
+Verified+1: <snyh@snyh.org>
+Submitted-by: <snyh@snyh.org>
+Submitted-at: Thu, 11 Sep 2014 16:10:54 -0500
+Reviewed-on: https://cr.deepin.io/720
+Project: go-lib
+Branch: refs/heads/master
+
+Verified+1: Anonymous Coward #1000004
 build-config+1: 宋文武 <songwenwu@linuxdeepin.com>
 Code-Review+2: 宋文武 <songwenwu@linuxdeepin.com>
 Verified+1: snyh <snyh@snyh.org>
