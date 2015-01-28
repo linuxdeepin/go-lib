@@ -8,7 +8,8 @@ Build-Depends: debhelper (>= 9), dh-golang, golang-go,
                golang-goconvey-dev,
                libpulse-dev,
                libgtk-3-dev,
-               iso-codes
+               iso-codes,
+               mobile-broadband-provider-info
 Standards-Version: 3.9.5
 Homepage: http://www.linuxdeepin.com
 
