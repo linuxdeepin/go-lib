@@ -44,14 +44,14 @@ func (c *Context) GetSinkList() (r []*Sink) {
 	return
 }
 
-func (c *Context) GetSink(index uint32) *Sink {
+func (c *Context) GetSink(index uint32) (*Sink, error) {
 	ck := newCookie()
 	C.get_sink_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 	info := ck.Reply()
 	if info == nil {
-		return nil
+		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
 	}
-	return info.ToSink()
+	return info.ToSink(), nil
 }
 
 func (c *Context) GetSinkInputList() (r []*SinkInput) {
@@ -64,15 +64,15 @@ func (c *Context) GetSinkInputList() (r []*SinkInput) {
 	return
 }
 
-func (c *Context) GetSinkInput(index uint32) *SinkInput {
+func (c *Context) GetSinkInput(index uint32) (*SinkInput, error) {
 	ck := newCookie()
 	C.get_sink_input_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 
 	info := ck.Reply()
 	if info == nil {
-		return nil
+		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
 	}
-	return info.ToSinkInput()
+	return info.ToSinkInput(), nil
 }
 
 func (c *Context) GetSourceList() (r []*Source) {
@@ -85,16 +85,26 @@ func (c *Context) GetSourceList() (r []*Source) {
 	return
 }
 
-func (c *Context) GetSource(index uint32) *Source {
+func (c *Context) GetSource(index uint32) (*Source, error) {
 	ck := newCookie()
 	C.get_source_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
-	return ck.Reply().ToSource()
+
+	info := ck.Reply()
+	if info == nil {
+		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
+	}
+	return info.ToSource(), nil
 }
 
-func (c *Context) GetServer() *Server {
+func (c *Context) GetServer() (*Server, error) {
 	ck := newCookie()
 	C.get_server_info(c.ctx, C.int64_t(ck.id))
-	return ck.Reply().ToServer()
+
+	info := ck.Reply()
+	if info == nil {
+		return nil, fmt.Errorf("Can't obtain the server instance.")
+	}
+	return info.ToServer(), nil
 }
 
 func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
