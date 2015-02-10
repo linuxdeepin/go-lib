@@ -50,6 +50,18 @@ type _GError struct {
 	code int32
 	message *C.char
 }
+func (e _GError) ToGError() GError {
+	return GError{e.domain, e.code, C.GoString(e.message)}
+}
+
+type GError struct {
+	Domain uint32
+	Code int32
+	Message string
+}
+func (e GError) Error() string {
+	return e.Message
+}
 
 func _GoStringToGString(x string) *C.char {
 	if x == "\x00" {
@@ -120,7 +132,7 @@ func BindingGetType() Type {
 func (this0 *Binding) GetFlags() BindingFlags {
 	var this1 *C.GBinding
 	if this0 != nil {
-		this1 = this0.InheritedFromGBinding()
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
 	}
 	ret1 := C.g_binding_get_flags(this1)
 	var ret2 BindingFlags
@@ -130,7 +142,7 @@ func (this0 *Binding) GetFlags() BindingFlags {
 func (this0 *Binding) GetSource() *Object {
 	var this1 *C.GBinding
 	if this0 != nil {
-		this1 = this0.InheritedFromGBinding()
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
 	}
 	ret1 := C.g_binding_get_source(this1)
 	var ret2 *Object
@@ -140,7 +152,7 @@ func (this0 *Binding) GetSource() *Object {
 func (this0 *Binding) GetSourceProperty() string {
 	var this1 *C.GBinding
 	if this0 != nil {
-		this1 = this0.InheritedFromGBinding()
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
 	}
 	ret1 := C.g_binding_get_source_property(this1)
 	var ret2 string
@@ -150,7 +162,7 @@ func (this0 *Binding) GetSourceProperty() string {
 func (this0 *Binding) GetTarget() *Object {
 	var this1 *C.GBinding
 	if this0 != nil {
-		this1 = this0.InheritedFromGBinding()
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
 	}
 	ret1 := C.g_binding_get_target(this1)
 	var ret2 *Object
@@ -160,12 +172,19 @@ func (this0 *Binding) GetTarget() *Object {
 func (this0 *Binding) GetTargetProperty() string {
 	var this1 *C.GBinding
 	if this0 != nil {
-		this1 = this0.InheritedFromGBinding()
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
 	}
 	ret1 := C.g_binding_get_target_property(this1)
 	var ret2 string
 	ret2 = C.GoString(ret1)
 	return ret2
+}
+func (this0 *Binding) Unbind() {
+	var this1 *C.GBinding
+	if this0 != nil {
+		this1 = (*C.GBinding)(this0.InheritedFromGBinding())
+	}
+	C.g_binding_unbind(this1)
 }
 type BindingFlags C.uint32_t
 const (
@@ -548,7 +567,7 @@ func NewClosureObject(sizeof_closure0 int, object0 ObjectLike) *Closure {
 	var object1 *C.GObject
 	sizeof_closure1 = C.uint32_t(sizeof_closure0)
 	if object0 != nil {
-		object1 = object0.InheritedFromGObject()
+		object1 = (*C.GObject)(object0.InheritedFromGObject())
 	}
 	ret1 := C.g_closure_new_object(sizeof_closure1, object1)
 	var ret2 *Closure
@@ -872,12 +891,19 @@ type SignalQuery struct {
 	ReturnType Type
 	NParams uint32
 	_ [4]byte
-	ParamTypes *Type
+	param_types0 *C.GType
 }
 func (this0 *SignalQuery) SignalName() string {
 	var signal_name1 string
 	signal_name1 = C.GoString(this0.signal_name0)
 	return signal_name1
+}
+func (this0 *SignalQuery) ParamTypes() []Type {
+	var param_types1 []Type
+	for i := range param_types1 {
+		param_types1[i] = Type((*(*[999999]C.GType)(unsafe.Pointer(this0.param_types0)))[i])
+	}
+	return param_types1
 }
 const TypeFlagReservedIdBit = 0x1
 const TypeFundamentalMax = 255
@@ -908,6 +934,13 @@ func TypeClassAddPrivate(g_class0 unsafe.Pointer, private_size0 uint64) {
 	g_class1 = unsafe.Pointer(g_class0)
 	private_size1 = C.uint64_t(private_size0)
 	C.g_type_class_add_private(g_class1, private_size1)
+}
+func TypeClassAdjustPrivateOffset(g_class0 unsafe.Pointer, private_size_or_offset0 *int) {
+	var g_class1 unsafe.Pointer
+	var private_size_or_offset1 *C.int32_t
+	g_class1 = unsafe.Pointer(g_class0)
+	private_size_or_offset1 = (*C.int32_t)(unsafe.Pointer(private_size_or_offset0))
+	C.g_type_class_adjust_private_offset(g_class1, private_size_or_offset1)
 }
 func TypeClassPeek(type0 Type) *TypeClass {
 	var type1 C.GType
@@ -1029,12 +1062,16 @@ type TypePlugin struct {
 	TypePluginImpl
 }
 
+func (*TypePlugin) GetStaticType() Type {
+	return Type(C.g_type_plugin_get_type())
+}
+
+
 type TypePluginImpl struct {}
 
 func ToTypePlugin(objlike ObjectLike) *TypePlugin {
-	t := (*TypePluginImpl)(nil).GetStaticType()
 	c := objlike.InheritedFromGObject()
-	obj := ObjectGrabIfType(unsafe.Pointer(c), t)
+	obj := ObjectGrabIfType(unsafe.Pointer(c), Type(C.g_type_plugin_get_type()))
 	if obj != nil {
 		return (*TypePlugin)(obj)
 	}
@@ -1044,14 +1081,6 @@ func ToTypePlugin(objlike ObjectLike) *TypePlugin {
 func (this0 *TypePluginImpl) ImplementsGTypePlugin() *C.GTypePlugin {
 	obj := uintptr(unsafe.Pointer(this0)) - unsafe.Sizeof(uintptr(0))
 	return (*C.GTypePlugin)((*Object)(unsafe.Pointer(obj)).C)
-}
-
-func (this0 *TypePluginImpl) GetStaticType() Type {
-	return Type(C.g_type_plugin_get_type())
-}
-
-func TypePluginGetType() Type {
-	return (*TypePluginImpl)(nil).GetStaticType()
 }
 func (this0 *TypePluginImpl) CompleteInterfaceInfo(instance_type0 Type, interface_type0 Type, info0 *InterfaceInfo) {
 	var this1 *C.GTypePlugin
@@ -1227,6 +1256,7 @@ type WeakRef struct {}
 type _Value__data__union struct {
 	_data [8]byte
 }
+// blacklisted: boxed_copy (function)
 // blacklisted: boxed_free (function)
 // blacklisted: cclosure_marshal_BOOLEAN__BOXED_BOXED (function)
 // blacklisted: cclosure_marshal_BOOLEAN__FLAGS (function)
@@ -1252,8 +1282,14 @@ type _Value__data__union struct {
 // blacklisted: cclosure_marshal_VOID__VOID (function)
 // blacklisted: cclosure_marshal_generic (function)
 // blacklisted: enum_complete_type_info (function)
+// blacklisted: enum_get_value (function)
+// blacklisted: enum_get_value_by_name (function)
+// blacklisted: enum_get_value_by_nick (function)
 // blacklisted: enum_register_static (function)
 // blacklisted: flags_complete_type_info (function)
+// blacklisted: flags_get_first_value (function)
+// blacklisted: flags_get_value_by_name (function)
+// blacklisted: flags_get_value_by_nick (function)
 // blacklisted: flags_register_static (function)
 // blacklisted: gtype_get_type (function)
 // blacklisted: param_spec_boolean (function)
@@ -1318,6 +1354,7 @@ type _Value__data__union struct {
 // blacklisted: source_set_dummy_callback (function)
 // blacklisted: strdup_value_contents (function)
 // blacklisted: type_add_class_private (function)
+// blacklisted: type_add_instance_private (function)
 // blacklisted: type_add_interface_dynamic (function)
 // blacklisted: type_add_interface_static (function)
 // blacklisted: type_check_class_is_a (function)
@@ -1328,6 +1365,7 @@ type _Value__data__union struct {
 // blacklisted: type_check_value_holds (function)
 // blacklisted: type_children (function)
 // blacklisted: type_class_add_private (function)
+// blacklisted: type_class_adjust_private_offset (function)
 // blacklisted: type_class_peek (function)
 // blacklisted: type_class_peek_static (function)
 // blacklisted: type_class_ref (function)
@@ -2357,7 +2395,7 @@ func (this *Object) Connect(signal string, clo interface{}) {
 	csignal := C.CString(signal)
 	Holder.Grab(clo)
 	goclosure := C.g_goclosure_new(unsafe.Pointer(&clo), nil)
-	C.g_signal_connect_closure(this.C, csignal, (*C.GClosure)(unsafe.Pointer(goclosure)), 0)
+	C.g_signal_connect_closure((*C.GObject)(this.C), csignal, (*C.GClosure)(unsafe.Pointer(goclosure)), 0)
 	C.free(unsafe.Pointer(csignal))
 }
 
@@ -2366,7 +2404,7 @@ func (this *Object) ConnectMethod(signal string, clo interface{}, recv interface
 	Holder.Grab(clo)
 	Holder.Grab(recv)
 	goclosure := C.g_goclosure_new(unsafe.Pointer(&clo), unsafe.Pointer(&recv))
-	C.g_signal_connect_closure(this.C, csignal, (*C.GClosure)(unsafe.Pointer(goclosure)), 0)
+	C.g_signal_connect_closure((*C.GObject)(this.C), csignal, (*C.GClosure)(unsafe.Pointer(goclosure)), 0)
 	C.free(unsafe.Pointer(csignal))
 
 }
