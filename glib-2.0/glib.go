@@ -79,7 +79,637 @@ const (
 )
 // blacklisted: AsyncQueue (struct)
 const BigEndian = 4321
-// blacklisted: BookmarkFile (struct)
+type BookmarkFile struct {}
+func (this0 *BookmarkFile) AddApplication(uri0 string, name0 string, exec0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	exec1 = _GoStringToGString(exec0)
+	defer C.free(unsafe.Pointer(exec1))
+	C.g_bookmark_file_add_application(this1, uri1, name1, exec1)
+}
+func (this0 *BookmarkFile) AddGroup(uri0 string, group0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	C.g_bookmark_file_add_group(this1, uri1, group1)
+}
+func (this0 *BookmarkFile) Free() {
+	var this1 *C.GBookmarkFile
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	C.g_bookmark_file_free(this1)
+}
+func (this0 *BookmarkFile) GetAdded(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_added(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetAppInfo(uri0 string, name0 string) (string, int, int64, bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	var count1 C.uint32_t
+	var stamp1 C.int64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_get_app_info(this1, uri1, name1, &exec1, &count1, &stamp1, &err1)
+	var exec2 string
+	var count2 int
+	var stamp2 int64
+	var ret2 bool
+	var err2 error
+	exec2 = C.GoString(exec1)
+	C.g_free(unsafe.Pointer(exec1))
+	count2 = int(count1)
+	stamp2 = int64(stamp1)
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return exec2, count2, stamp2, ret2, err2
+}
+func (this0 *BookmarkFile) GetApplications(uri0 string) (uint64, []string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_applications(this1, uri1, &length1, &err1)
+	var length2 uint64
+	var ret2 []string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) GetDescription(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_description(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetGroups(uri0 string) (uint64, []string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_groups(this1, uri1, &length1, &err1)
+	var length2 uint64
+	var ret2 []string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) GetIcon(uri0 string) (string, string, bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var href1 *C.char
+	var mime_type1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_icon(this1, uri1, &href1, &mime_type1, &err1)
+	var href2 string
+	var mime_type2 string
+	var ret2 bool
+	var err2 error
+	href2 = C.GoString(href1)
+	C.g_free(unsafe.Pointer(href1))
+	mime_type2 = C.GoString(mime_type1)
+	C.g_free(unsafe.Pointer(mime_type1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return href2, mime_type2, ret2, err2
+}
+func (this0 *BookmarkFile) GetIsPrivate(uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_is_private(this1, uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetMimeType(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_mime_type(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetModified(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_modified(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetSize() int {
+	var this1 *C.GBookmarkFile
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_get_size(this1)
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
+func (this0 *BookmarkFile) GetTitle(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_title(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetUris() (uint64, []string) {
+	var this1 *C.GBookmarkFile
+	var length1 C.uint64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_get_uris(this1, &length1)
+	var length2 uint64
+	var ret2 []string
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	return length2, ret2
+}
+func (this0 *BookmarkFile) GetVisited(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_visited(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasApplication(uri0 string, name0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_has_application(this1, uri1, name1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasGroup(uri0 string, group0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	ret1 := C.g_bookmark_file_has_group(this1, uri1, group1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasItem(uri0 string) bool {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_has_item(this1, uri1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *BookmarkFile) LoadFromData(data0 string, length0 uint64) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var data1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	data1 = _GoStringToGString(data0)
+	defer C.free(unsafe.Pointer(data1))
+	length1 = C.uint64_t(length0)
+	ret1 := C.g_bookmark_file_load_from_data(this1, data1, length1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) LoadFromDataDirs(file0 string, full_path0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var file1 *C.char
+	var full_path1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	file1 = _GoStringToGString(file0)
+	defer C.free(unsafe.Pointer(file1))
+	full_path1 = _GoStringToGString(full_path0)
+	defer C.free(unsafe.Pointer(full_path1))
+	ret1 := C.g_bookmark_file_load_from_data_dirs(this1, file1, full_path1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) LoadFromFile(filename0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_bookmark_file_load_from_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) MoveItem(old_uri0 string, new_uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var old_uri1 *C.char
+	var new_uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	old_uri1 = _GoStringToGString(old_uri0)
+	defer C.free(unsafe.Pointer(old_uri1))
+	new_uri1 = _GoStringToGString(new_uri0)
+	defer C.free(unsafe.Pointer(new_uri1))
+	ret1 := C.g_bookmark_file_move_item(this1, old_uri1, new_uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveApplication(uri0 string, name0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_remove_application(this1, uri1, name1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveGroup(uri0 string, group0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	ret1 := C.g_bookmark_file_remove_group(this1, uri1, group1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveItem(uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_remove_item(this1, uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) SetAdded(uri0 string, added0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var added1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	added1 = C.int64_t(added0)
+	C.g_bookmark_file_set_added(this1, uri1, added1)
+}
+func (this0 *BookmarkFile) SetAppInfo(uri0 string, name0 string, exec0 string, count0 int, stamp0 int64) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	var count1 C.int32_t
+	var stamp1 C.int64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	exec1 = _GoStringToGString(exec0)
+	defer C.free(unsafe.Pointer(exec1))
+	count1 = C.int32_t(count0)
+	stamp1 = C.int64_t(stamp0)
+	ret1 := C.g_bookmark_file_set_app_info(this1, uri1, name1, exec1, count1, stamp1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) SetDescription(uri0 string, description0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var description1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	description1 = _GoStringToGString(description0)
+	defer C.free(unsafe.Pointer(description1))
+	C.g_bookmark_file_set_description(this1, uri1, description1)
+}
+func (this0 *BookmarkFile) SetGroups(uri0 string, groups0 string, length0 uint64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var groups1 *C.char
+	var length1 C.uint64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	groups1 = _GoStringToGString(groups0)
+	defer C.free(unsafe.Pointer(groups1))
+	length1 = C.uint64_t(length0)
+	C.g_bookmark_file_set_groups(this1, uri1, groups1, length1)
+}
+func (this0 *BookmarkFile) SetIcon(uri0 string, href0 string, mime_type0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var href1 *C.char
+	var mime_type1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	href1 = _GoStringToGString(href0)
+	defer C.free(unsafe.Pointer(href1))
+	mime_type1 = _GoStringToGString(mime_type0)
+	defer C.free(unsafe.Pointer(mime_type1))
+	C.g_bookmark_file_set_icon(this1, uri1, href1, mime_type1)
+}
+func (this0 *BookmarkFile) SetIsPrivate(uri0 string, is_private0 bool) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var is_private1 C.int
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	is_private1 = _GoBoolToCBool(is_private0)
+	C.g_bookmark_file_set_is_private(this1, uri1, is_private1)
+}
+func (this0 *BookmarkFile) SetMimeType(uri0 string, mime_type0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var mime_type1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	mime_type1 = _GoStringToGString(mime_type0)
+	defer C.free(unsafe.Pointer(mime_type1))
+	C.g_bookmark_file_set_mime_type(this1, uri1, mime_type1)
+}
+func (this0 *BookmarkFile) SetModified(uri0 string, modified0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var modified1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	modified1 = C.int64_t(modified0)
+	C.g_bookmark_file_set_modified(this1, uri1, modified1)
+}
+func (this0 *BookmarkFile) SetTitle(uri0 string, title0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var title1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	title1 = _GoStringToGString(title0)
+	defer C.free(unsafe.Pointer(title1))
+	C.g_bookmark_file_set_title(this1, uri1, title1)
+}
+func (this0 *BookmarkFile) SetVisited(uri0 string, visited0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var visited1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	visited1 = C.int64_t(visited0)
+	C.g_bookmark_file_set_visited(this1, uri1, visited1)
+}
+func (this0 *BookmarkFile) ToData() (uint64, string, error) {
+	var this1 *C.GBookmarkFile
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_to_data(this1, &length1, &err1)
+	var length2 uint64
+	var ret2 string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) ToFile(filename0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_bookmark_file_to_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func BookmarkFileErrorQuark() int {
+	ret1 := C.g_bookmark_file_error_quark()
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
+}
 type BookmarkFileError C.uint32_t
 const (
 	BookmarkFileErrorInvalidUri BookmarkFileError = 0
