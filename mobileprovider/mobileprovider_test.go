@@ -127,7 +127,7 @@ func (*testWrapper) TestGetDefaultPlan(c *C.C) {
 
 func (*testWrapper) TestGetDefaultGSMPlanForCountry(c *C.C) {
 	plan, err := GetDefaultGSMPlanForCountry("cn")
-	c.Check(plan.Name, C.Equals, "WAP")
+	c.Check(plan.Name, C.Equals, "Internet")
 	c.Check(plan.ProviderName, C.Equals, "China Mobile")
 	c.Check(err, C.Equals, nil)
 

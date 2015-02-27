@@ -97,6 +97,13 @@ func GetDefaultGSMPlanForCountry(countryCode string) (defaultGSMPlan Plan, err e
 		return
 	}
 
+	// plans which apn usage type is "internet" owns higher priority
+	defaultGSMInternetPlan, err := getDefaultGSMInternetPlanForCountry(countryCode)
+	if err == nil {
+		defaultGSMPlan = defaultGSMInternetPlan
+		return
+	}
+
 	found := false
 outside:
 	for _, providerName := range providerNames {
@@ -108,6 +115,33 @@ outside:
 			if p.IsGSM {
 				found = true
 				defaultGSMPlan = p
+				break outside
+			}
+		}
+	}
+
+	if !found {
+		err = errPlanNotFound
+	}
+	return
+}
+func getDefaultGSMInternetPlanForCountry(countryCode string) (defaultGSMInternetPlan Plan, err error) {
+	providerNames, err := GetProviderNames(countryCode)
+	if err != nil {
+		return
+	}
+
+	found := false
+outside:
+	for _, providerName := range providerNames {
+		plans, err := GetPlans(countryCode, providerName)
+		if err != nil {
+			continue
+		}
+		for _, p := range plans {
+			if p.IsGSM && p.APNUsageType == "internet" {
+				found = true
+				defaultGSMInternetPlan = p
 				break outside
 			}
 		}
