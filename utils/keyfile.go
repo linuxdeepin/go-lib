@@ -22,60 +22,75 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"pkg.linuxdeepin.com/lib/glib-2.0"
 	"sync"
 )
 
+var (
+	kfLocker sync.Mutex
+)
+
+func NewKeyFileFromFile(file string) (*glib.KeyFile, error) {
+	kfLocker.Lock()
+	defer kfLocker.Unlock()
+
+	var kFile = glib.NewKeyFile()
+	_, err := kFile.LoadFromFile(file, glib.KeyFileFlagsKeepComments|
+		glib.KeyFileFlagsKeepTranslations)
+	if err != nil {
+		kFile.Free()
+		return nil, err
+	}
+
+	return kFile, nil
+}
+
 func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}, bool) {
-	if len(filename) <= 0 || !IsFileExist(filename) {
+	if !IsFileExist(filename) {
 		return nil, false
 	}
-	rwMutex := new(sync.RWMutex)
-	rwMutex.Lock()
-	defer rwMutex.Unlock()
 
-	keyFile := glib.NewKeyFile()
-	defer keyFile.Free()
-	_, err := keyFile.LoadFromFile(filename,
-		glib.KeyFileFlagsKeepComments)
+	kFile, err := NewKeyFileFromFile(filename)
 	if err != nil {
 		return nil, false
 	}
+	defer kFile.Free()
 
 	switch t.(type) {
 	case bool:
-		value, err := keyFile.GetBoolean(group, key)
+		value, err := kFile.GetBoolean(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return value, true
 	case []bool:
-		_, value, err := keyFile.GetBooleanList(group, key)
+		_, value, err := kFile.GetBooleanList(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return value, true
 	case int, int32, uint32:
-		value, err := keyFile.GetInteger(group, key)
+		value, err := kFile.GetInteger(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return int32(value), true
 	case int64:
-		value, err := keyFile.GetInt64(group, key)
+		value, err := kFile.GetInt64(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return int64(value), true
 	case uint64:
-		value, err := keyFile.GetUint64(group, key)
+		value, err := kFile.GetUint64(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return uint64(value), true
 	case []int, []int32, []uint32, []int64, []uint64:
-		_, value, err := keyFile.GetIntegerList(group, key)
+		_, value, err := kFile.GetIntegerList(group, key)
 		if err != nil {
 			return nil, false
 		}
@@ -85,13 +100,13 @@ func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}
 		}
 		return list, true
 	case float32, float64:
-		value, err := keyFile.GetDouble(group, key)
+		value, err := kFile.GetDouble(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return float64(value), true
 	case []float32, []float64:
-		_, value, err := keyFile.GetDoubleList(group, key)
+		_, value, err := kFile.GetDoubleList(group, key)
 		if err != nil {
 			return nil, false
 		}
@@ -101,19 +116,19 @@ func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}
 		}
 		return list, true
 	case string:
-		value, err := keyFile.GetString(group, key)
+		value, err := kFile.GetString(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return value, true
 	case []string:
-		_, value, err := keyFile.GetStringList(group, key)
+		_, value, err := kFile.GetStringList(group, key)
 		if err != nil {
 			return nil, false
 		}
 		return value, true
 	default:
-		value, err := keyFile.GetValue(group, key)
+		value, err := kFile.GetValue(group, key)
 		if err != nil {
 			return nil, false
 		}
@@ -124,94 +139,88 @@ func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}
 }
 
 func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
-	if len(filename) <= 0 {
+	if len(filename) == 0 {
 		return false
 	}
-	rwMutex := new(sync.RWMutex)
-	rwMutex.Lock()
-	defer rwMutex.Unlock()
 
 	if !IsFileExist(filename) {
-		f, err := os.Create(filename)
+		err := CreateFile(filename)
 		if err != nil {
 			return false
 		}
-		f.Close()
 	}
 
-	keyFile := glib.NewKeyFile()
-	defer keyFile.Free()
-	_, err := keyFile.LoadFromFile(filename,
-		glib.KeyFileFlagsKeepComments)
+	kFile, err := NewKeyFileFromFile(filename)
 	if err != nil {
 		return false
 	}
+	defer kFile.Free()
 
 	switch value.(type) {
 	case bool:
-		keyFile.SetBoolean(group, key, value.(bool))
+		kFile.SetBoolean(group, key, value.(bool))
 	case []bool:
-		keyFile.SetBooleanList(group, key, value.([]bool))
+		kFile.SetBooleanList(group, key, value.([]bool))
 	case int:
-		keyFile.SetInteger(group, key, value.(int))
+		kFile.SetInteger(group, key, value.(int))
 	case int32:
-		keyFile.SetInteger(group, key, int(value.(int32)))
+		kFile.SetInteger(group, key, int(value.(int32)))
 	case uint32:
-		keyFile.SetInteger(group, key, int(value.(uint32)))
+		kFile.SetInteger(group, key, int(value.(uint32)))
 	case []int:
-		keyFile.SetIntegerList(group, key, value.([]int))
+		kFile.SetIntegerList(group, key, value.([]int))
 	case []int32:
 		list := value.([]int32)
 		tmp := []int{}
 		for _, l := range list {
 			tmp = append(tmp, int(l))
 		}
-		keyFile.SetIntegerList(group, key, tmp)
+		kFile.SetIntegerList(group, key, tmp)
 	case []uint32:
 		list := value.([]uint32)
 		tmp := []int{}
 		for _, l := range list {
 			tmp = append(tmp, int(l))
 		}
-		keyFile.SetIntegerList(group, key, tmp)
+		kFile.SetIntegerList(group, key, tmp)
 	case []int64:
 		list := value.([]int64)
 		tmp := []int{}
 		for _, l := range list {
 			tmp = append(tmp, int(l))
 		}
-		keyFile.SetIntegerList(group, key, tmp)
+		kFile.SetIntegerList(group, key, tmp)
 	case []uint64:
 		list := value.([]uint64)
 		tmp := []int{}
 		for _, l := range list {
 			tmp = append(tmp, int(l))
 		}
-		keyFile.SetIntegerList(group, key, tmp)
+		kFile.SetIntegerList(group, key, tmp)
 	case int64:
-		keyFile.SetInt64(group, key, value.(int64))
+		kFile.SetInt64(group, key, value.(int64))
 	case uint64:
-		keyFile.SetUint64(group, key, value.(uint64))
+		kFile.SetUint64(group, key, value.(uint64))
 	case float32:
-		keyFile.SetDouble(group, key, float64(value.(float32)))
+		kFile.SetDouble(group, key, float64(value.(float32)))
 	case float64:
-		keyFile.SetDouble(group, key, value.(float64))
+		kFile.SetDouble(group, key, value.(float64))
 	case []float32:
 		list := value.([]float32)
 		tmp := []float64{}
 		for _, l := range list {
 			tmp = append(tmp, float64(l))
 		}
-		keyFile.SetDoubleList(group, key, tmp)
+		kFile.SetDoubleList(group, key, tmp)
 	case []float64:
-		keyFile.SetDoubleList(group, key, value.([]float64))
+		kFile.SetDoubleList(group, key, value.([]float64))
 	case string:
-		keyFile.SetString(group, key, value.(string))
+		kFile.SetString(group, key, value.(string))
 	case []string:
-		keyFile.SetStringList(group, key, value.([]string))
+		kFile.SetStringList(group, key, value.([]string))
 	}
 
-	_, contents, err1 := keyFile.ToData()
+	_, contents, err1 := kFile.ToData()
 	if err1 != nil {
 		return false
 	}
@@ -224,22 +233,35 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	return true
 }
 
-func WriteStringToKeyFile(filename, contents string) bool {
-	if len(filename) <= 0 {
-		return false
-	}
-
-	f, err := os.Create(filename + "~")
+//TODO: Abandoned it
+//Do't use this interface.
+func WriteStringToKeyFile(filename, content string) bool {
+	err := WriteStringToFile(filename, content)
 	if err != nil {
 		return false
 	}
-	defer f.Close()
-
-	if _, err = f.WriteString(contents); err != nil {
-		return false
-	}
-	f.Sync()
-	os.Rename(filename+"~", filename)
 
 	return true
+}
+
+func WriteStringToFile(filename, content string) error {
+	if len(filename) == 0 {
+		return fmt.Errorf("Not found this file: %q", filename)
+	}
+
+	kfLocker.Lock()
+	defer kfLocker.Unlock()
+	var swapFile = filename + ".swap"
+	fp, err := os.Create(filename + ".swap")
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+
+	_, err = fp.WriteString(content)
+	if err != nil {
+		return err
+	}
+	fp.Sync()
+	return os.Rename(swapFile, filename)
 }

@@ -123,6 +123,14 @@ func EnsureDirExistWithPerm(path string, perm os.FileMode) error {
 	return os.MkdirAll(path, perm)
 }
 
+func CreateFile(filename string) error {
+	fp, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	return fp.Close()
+}
+
 func iterCopyDir(src, dest string, mode os.FileMode) error {
 	sr, err := os.Open(src)
 	if err != nil {

@@ -22,8 +22,17 @@
 package utils
 
 import (
+	"fmt"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 )
+
+func CheckAndNewGSettings(schema string) (*gio.Settings, error) {
+	if !IsGSchemaExist(schema) {
+		return nil, fmt.Errorf("Not found this schema: %s", schema)
+	}
+
+	return gio.NewSettings(schema), nil
+}
 
 func IsGSchemaExist(schema string) bool {
 	if isSchemaInList(schema, gio.SettingsListSchemas()) ||
