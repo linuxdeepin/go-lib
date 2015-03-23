@@ -101,6 +101,25 @@ func IsDir(path string) bool {
 	return f.IsDir()
 }
 
+func SymlinkFile(src, dest string) error {
+	if !IsFileExist(src) {
+		return fmt.Errorf("The src file '%s' not exist.", src)
+	}
+
+	if IsFileExist(dest) {
+		if !IsSymlink(dest) {
+			return fmt.Errorf("The dest file '%s' already exists.", dest)
+		}
+
+		err := os.Remove(dest)
+		if err != nil {
+			return err
+		}
+	}
+
+	return os.Symlink(src, dest)
+}
+
 func IsSymlink(path string) bool {
 	// if is uri path, ensure it decoded
 	path = DecodeURI(path)

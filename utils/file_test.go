@@ -72,3 +72,38 @@ func (*testWrapper) TestCreateFile(c *C.C) {
 	err = CreateFile(file)
 	c.Check(err, C.NotNil)
 }
+
+func (*testWrapper) TestSymlinkFile(c *C.C) {
+	var datas = []struct {
+		src     string
+		dest    string
+		success bool
+	}{
+		{
+			src:     "testdata/testfile",
+			dest:    "testdata/test_symlink",
+			success: true,
+		},
+		{
+			src:     "testdata/testfile",
+			dest:    "testdata/test1",
+			success: false,
+		},
+		{
+			src:     "testdata/testfile_xxx",
+			dest:    "testdata/test_symlink",
+			success: false,
+		},
+	}
+
+	for _, data := range datas {
+		if data.success {
+			c.Check(SymlinkFile(data.src, data.dest),
+				C.Equals, nil)
+			os.Remove(data.dest)
+		} else {
+			c.Check(SymlinkFile(data.src, data.dest),
+				C.Not(C.Equals), nil)
+		}
+	}
+}
