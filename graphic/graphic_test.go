@@ -389,3 +389,12 @@ func (*testWrapper) TestGetPreferScaleClipRect(c *C.C) {
 	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 0, 0)
 	c.Check(err, C.NotNil)
 }
+
+func (g *testWrapper) TestNewImageWithColor(c *C.C) {
+	resultFile := "testdata/test_newimagewithcolor.png"
+	err := NewImageWithColor(resultFile, 10, 10, uint8(12), uint8(200), uint8(12), uint8(220), FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
+	c.Check(sumFileMd5(resultFile), C.Equals, "21ba3463aa8daabf86685ff92a7bc164")
+}
