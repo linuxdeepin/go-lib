@@ -107,3 +107,37 @@ func (*testWrapper) TestSymlinkFile(c *C.C) {
 		}
 	}
 }
+
+func (*testWrapper) TestGetFiles(c *C.C) {
+	var datas = []struct {
+		dir    string
+		length int
+		ret    bool
+	}{
+		{
+			dir:    "testdata/test-get_files",
+			length: 2,
+			ret:    true,
+		},
+		{
+			dir:    "testdata/xxx",
+			length: 0,
+			ret:    false,
+		},
+		{
+			dir:    "testdata/testfile",
+			length: 0,
+			ret:    false,
+		},
+	}
+
+	for _, data := range datas {
+		files, err := GetFilesInDir(data.dir)
+		c.Check(len(files), C.Equals, data.length)
+		if data.ret {
+			c.Check(err, C.Equals, nil)
+		} else {
+			c.Check(err, C.Not(C.Equals), nil)
+		}
+	}
+}

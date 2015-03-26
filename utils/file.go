@@ -94,6 +94,15 @@ func IsFileExist(path string) bool {
 func IsDir(path string) bool {
 	// if is uri path, ensure it decoded
 	path = DecodeURI(path)
+	if IsSymlink(path) {
+		target, err := os.Readlink(path)
+		if err != nil {
+			return false
+		}
+
+		return IsDir(target)
+	}
+
 	f, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -148,6 +157,31 @@ func CreateFile(filename string) error {
 		return err
 	}
 	return fp.Close()
+}
+
+func GetFilesInDir(dir string) ([]string, error) {
+	if !IsDir(dir) {
+		return nil, fmt.Errorf("The '%s' is not a dir", dir)
+	}
+
+	fp, err := os.Open(dir)
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+
+	names, err := fp.Readdirnames(0)
+	if err != nil {
+		return nil, err
+	}
+
+	var files []string
+	for _, name := range names {
+		file := path.Join(dir, name)
+		files = append(files, file)
+	}
+
+	return files, nil
 }
 
 func iterCopyDir(src, dest string, mode os.FileMode) error {
