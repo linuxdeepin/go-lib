@@ -1290,14 +1290,14 @@ func (this0 *Cancellable) Disconnect(handler_id0 uint64) {
 	handler_id1 = C.uint64_t(handler_id0)
 	C.g_cancellable_disconnect(this1, handler_id1)
 }
-func (this0 *Cancellable) GetFd() int {
+func (this0 *Cancellable) GetFd() int32 {
 	var this1 *C.GCancellable
 	if this0 != nil {
 		this1 = (*C.GCancellable)(this0.InheritedFromGCancellable())
 	}
 	ret1 := C.g_cancellable_get_fd(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *Cancellable) IsCancelled() bool {
@@ -1869,14 +1869,14 @@ func (this0 *DesktopAppInfo) ListActions() []string {
 // blacklisted: DesktopAppInfoClass (struct)
 // blacklisted: DesktopAppInfoLookup (interface)
 // blacklisted: DesktopAppInfoLookupIface (struct)
-type DesktopAppLaunchCallback func(appinfo *DesktopAppInfo, pid int)
+type DesktopAppLaunchCallback func(appinfo *DesktopAppInfo, pid int32)
 //export _GDesktopAppLaunchCallback_c_wrapper
 func _GDesktopAppLaunchCallback_c_wrapper(appinfo0 unsafe.Pointer, pid0 int32, user_data0 unsafe.Pointer) {
 	var appinfo1 *DesktopAppInfo
-	var pid1 int
+	var pid1 int32
 	var user_data1 DesktopAppLaunchCallback
 	appinfo1 = (*DesktopAppInfo)(gobject.ObjectWrap(unsafe.Pointer((*C.GDesktopAppInfo)(appinfo0)), true))
-	pid1 = int((C.int32_t)(pid0))
+	pid1 = int32((C.int32_t)(pid0))
 	user_data1 = *(*DesktopAppLaunchCallback)(user_data0)
 	user_data1(appinfo1, pid1)
 }
@@ -2622,7 +2622,7 @@ func (this0 *FileImpl) AppendTo(flags0 FileCreateFlags, cancellable0 Cancellable
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) AppendToAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) AppendToAsync(flags0 FileCreateFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var flags1 C.GFileCreateFlags
 	var io_priority1 C.int32_t
@@ -2758,7 +2758,7 @@ func (this0 *FileImpl) Create(flags0 FileCreateFlags, cancellable0 CancellableLi
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) CreateAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) CreateAsync(flags0 FileCreateFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var flags1 C.GFileCreateFlags
 	var io_priority1 C.int32_t
@@ -2819,7 +2819,7 @@ func (this0 *FileImpl) CreateReadwrite(flags0 FileCreateFlags, cancellable0 Canc
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) CreateReadwriteAsync(flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) CreateReadwriteAsync(flags0 FileCreateFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var flags1 C.GFileCreateFlags
 	var io_priority1 C.int32_t
@@ -2878,7 +2878,7 @@ func (this0 *FileImpl) Delete(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) DeleteAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) DeleteAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -3028,7 +3028,7 @@ func (this0 *FileImpl) EnumerateChildren(attributes0 string, flags0 FileQueryInf
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) EnumerateChildrenAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) EnumerateChildrenAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var attributes1 *C.char
 	var flags1 C.GFileQueryInfoFlags
@@ -3104,7 +3104,7 @@ func (this0 *FileImpl) FindEnclosingMount(cancellable0 CancellableLike) (*Mount,
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) FindEnclosingMountAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) FindEnclosingMountAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -3294,14 +3294,14 @@ func (this0 *FileImpl) HasUriScheme(uri_scheme0 string) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *FileImpl) Hash() int {
+func (this0 *FileImpl) Hash() uint32 {
 	var this1 *C.GFile
 	if this0 != nil {
 		this1 = this0.ImplementsGFile()
 	}
 	ret1 := C.g_file_hash(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *FileImpl) IsNative() bool {
@@ -3314,7 +3314,7 @@ func (this0 *FileImpl) IsNative() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *FileImpl) LoadContents(cancellable0 CancellableLike) ([]int, string, bool, error) {
+func (this0 *FileImpl) LoadContents(cancellable0 CancellableLike) ([]uint8, string, bool, error) {
 	var this1 *C.GFile
 	var cancellable1 *C.GCancellable
 	var contents1 *C.uint8_t
@@ -3328,13 +3328,13 @@ func (this0 *FileImpl) LoadContents(cancellable0 CancellableLike) ([]int, string
 		cancellable1 = (*C.GCancellable)(cancellable0.InheritedFromGCancellable())
 	}
 	ret1 := C.g_file_load_contents(this1, cancellable1, &contents1, &length1, &etag_out1, &err1)
-	var contents2 []int
+	var contents2 []uint8
 	var etag_out2 string
 	var ret2 bool
 	var err2 error
-	contents2 = make([]int, length1)
+	contents2 = make([]uint8, length1)
 	for i := range contents2 {
-		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+		contents2[i] = uint8((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
 	}
 	etag_out2 = C.GoString(etag_out1)
 	C.g_free(unsafe.Pointer(etag_out1))
@@ -3360,7 +3360,7 @@ func (this0 *FileImpl) LoadContentsAsync(cancellable0 CancellableLike, callback0
 	gobject.Holder.Grab(callback1)
 	C._g_file_load_contents_async(this1, cancellable1, callback1)
 }
-func (this0 *FileImpl) LoadContentsFinish(res0 AsyncResultLike) ([]int, string, bool, error) {
+func (this0 *FileImpl) LoadContentsFinish(res0 AsyncResultLike) ([]uint8, string, bool, error) {
 	var this1 *C.GFile
 	var res1 *C.GAsyncResult
 	var contents1 *C.uint8_t
@@ -3374,13 +3374,13 @@ func (this0 *FileImpl) LoadContentsFinish(res0 AsyncResultLike) ([]int, string, 
 		res1 = res0.ImplementsGAsyncResult()
 	}
 	ret1 := C.g_file_load_contents_finish(this1, res1, &contents1, &length1, &etag_out1, &err1)
-	var contents2 []int
+	var contents2 []uint8
 	var etag_out2 string
 	var ret2 bool
 	var err2 error
-	contents2 = make([]int, length1)
+	contents2 = make([]uint8, length1)
 	for i := range contents2 {
-		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+		contents2[i] = uint8((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
 	}
 	etag_out2 = C.GoString(etag_out1)
 	C.g_free(unsafe.Pointer(etag_out1))
@@ -3391,7 +3391,7 @@ func (this0 *FileImpl) LoadContentsFinish(res0 AsyncResultLike) ([]int, string, 
 	}
 	return contents2, etag_out2, ret2, err2
 }
-func (this0 *FileImpl) LoadPartialContentsFinish(res0 AsyncResultLike) ([]int, string, bool, error) {
+func (this0 *FileImpl) LoadPartialContentsFinish(res0 AsyncResultLike) ([]uint8, string, bool, error) {
 	var this1 *C.GFile
 	var res1 *C.GAsyncResult
 	var contents1 *C.uint8_t
@@ -3405,13 +3405,13 @@ func (this0 *FileImpl) LoadPartialContentsFinish(res0 AsyncResultLike) ([]int, s
 		res1 = res0.ImplementsGAsyncResult()
 	}
 	ret1 := C.g_file_load_partial_contents_finish(this1, res1, &contents1, &length1, &etag_out1, &err1)
-	var contents2 []int
+	var contents2 []uint8
 	var etag_out2 string
 	var ret2 bool
 	var err2 error
-	contents2 = make([]int, length1)
+	contents2 = make([]uint8, length1)
 	for i := range contents2 {
-		contents2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
+		contents2[i] = uint8((*(*[999999]C.uint8_t)(unsafe.Pointer(contents1)))[i])
 	}
 	etag_out2 = C.GoString(etag_out1)
 	C.g_free(unsafe.Pointer(etag_out1))
@@ -3442,7 +3442,7 @@ func (this0 *FileImpl) MakeDirectory(cancellable0 CancellableLike) (bool, error)
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) MakeDirectoryAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) MakeDirectoryAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -3748,7 +3748,7 @@ func (this0 *FileImpl) OpenReadwrite(cancellable0 CancellableLike) (*FileIOStrea
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) OpenReadwriteAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) OpenReadwriteAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -3893,7 +3893,7 @@ func (this0 *FileImpl) QueryFilesystemInfo(attributes0 string, cancellable0 Canc
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) QueryFilesystemInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) QueryFilesystemInfoAsync(attributes0 string, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var attributes1 *C.char
 	var io_priority1 C.int32_t
@@ -3958,7 +3958,7 @@ func (this0 *FileImpl) QueryInfo(attributes0 string, flags0 FileQueryInfoFlags, 
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) QueryInfoAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) QueryInfoAsync(attributes0 string, flags0 FileQueryInfoFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var attributes1 *C.char
 	var flags1 C.GFileQueryInfoFlags
@@ -4060,7 +4060,7 @@ func (this0 *FileImpl) Read(cancellable0 CancellableLike) (*FileInputStream, err
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) ReadAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) ReadAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -4124,7 +4124,7 @@ func (this0 *FileImpl) Replace(etag0 string, make_backup0 bool, flags0 FileCreat
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) ReplaceAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) ReplaceAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var etag1 *C.char
 	var make_backup1 C.int
@@ -4148,7 +4148,7 @@ func (this0 *FileImpl) ReplaceAsync(etag0 string, make_backup0 bool, flags0 File
 	gobject.Holder.Grab(callback1)
 	C._g_file_replace_async(this1, etag1, make_backup1, flags1, io_priority1, cancellable1, callback1)
 }
-func (this0 *FileImpl) ReplaceContents(contents0 []int, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike) (string, bool, error) {
+func (this0 *FileImpl) ReplaceContents(contents0 []uint8, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike) (string, bool, error) {
 	var this1 *C.GFile
 	var contents1 *C.uint8_t
 	var length1 C.uint64_t
@@ -4187,7 +4187,7 @@ func (this0 *FileImpl) ReplaceContents(contents0 []int, etag0 string, make_backu
 	}
 	return new_etag2, ret2, err2
 }
-func (this0 *FileImpl) ReplaceContentsAsync(contents0 []int, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) ReplaceContentsAsync(contents0 []uint8, etag0 string, make_backup0 bool, flags0 FileCreateFlags, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var contents1 *C.uint8_t
 	var length1 C.uint64_t
@@ -4289,7 +4289,7 @@ func (this0 *FileImpl) ReplaceReadwrite(etag0 string, make_backup0 bool, flags0 
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) ReplaceReadwriteAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) ReplaceReadwriteAsync(etag0 string, make_backup0 bool, flags0 FileCreateFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var etag1 *C.char
 	var make_backup1 C.int
@@ -4403,7 +4403,7 @@ func (this0 *FileImpl) SetAttributeByteString(attribute0 string, value0 string, 
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) SetAttributeInt32(attribute0 string, value0 int, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+func (this0 *FileImpl) SetAttributeInt32(attribute0 string, value0 int32, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
 	var this1 *C.GFile
 	var attribute1 *C.char
 	var value1 C.int32_t
@@ -4485,7 +4485,7 @@ func (this0 *FileImpl) SetAttributeString(attribute0 string, value0 string, flag
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) SetAttributeUint32(attribute0 string, value0 int, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
+func (this0 *FileImpl) SetAttributeUint32(attribute0 string, value0 uint32, flags0 FileQueryInfoFlags, cancellable0 CancellableLike) (bool, error) {
 	var this1 *C.GFile
 	var attribute1 *C.char
 	var value1 C.uint32_t
@@ -4539,7 +4539,7 @@ func (this0 *FileImpl) SetAttributeUint64(attribute0 string, value0 uint64, flag
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) SetAttributesAsync(info0 FileInfoLike, flags0 FileQueryInfoFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) SetAttributesAsync(info0 FileInfoLike, flags0 FileQueryInfoFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var info1 *C.GFileInfo
 	var flags1 C.GFileQueryInfoFlags
@@ -4634,7 +4634,7 @@ func (this0 *FileImpl) SetDisplayName(display_name0 string, cancellable0 Cancell
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) SetDisplayNameAsync(display_name0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) SetDisplayNameAsync(display_name0 string, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var display_name1 *C.char
 	var io_priority1 C.int32_t
@@ -4786,7 +4786,7 @@ func (this0 *FileImpl) Trash(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *FileImpl) TrashAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileImpl) TrashAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFile
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -5123,7 +5123,7 @@ func (this0 *FileEnumerator) Close(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *FileEnumerator) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileEnumerator) CloseAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFileEnumerator
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -5224,7 +5224,7 @@ func (this0 *FileEnumerator) NextFile(cancellable0 CancellableLike) (*FileInfo, 
 	}
 	return ret2, err2
 }
-func (this0 *FileEnumerator) NextFilesAsync(num_files0 int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileEnumerator) NextFilesAsync(num_files0 int32, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFileEnumerator
 	var num_files1 C.int32_t
 	var io_priority1 C.int32_t
@@ -5349,7 +5349,7 @@ func (this0 *FileIOStream) QueryInfo(attributes0 string, cancellable0 Cancellabl
 	}
 	return ret2, err2
 }
-func (this0 *FileIOStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileIOStream) QueryInfoAsync(attributes0 string, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFileIOStream
 	var attributes1 *C.char
 	var io_priority1 C.int32_t
@@ -5527,7 +5527,7 @@ func (this0 *FileInfo) GetAttributeData(attribute0 string) (FileAttributeType, u
 	ret2 = ret1 != 0
 	return type2, value_pp2, status2, ret2
 }
-func (this0 *FileInfo) GetAttributeInt32(attribute0 string) int {
+func (this0 *FileInfo) GetAttributeInt32(attribute0 string) int32 {
 	var this1 *C.GFileInfo
 	var attribute1 *C.char
 	if this0 != nil {
@@ -5536,8 +5536,8 @@ func (this0 *FileInfo) GetAttributeInt32(attribute0 string) int {
 	attribute1 = _GoStringToGString(attribute0)
 	defer C.free(unsafe.Pointer(attribute1))
 	ret1 := C.g_file_info_get_attribute_int32(this1, attribute1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *FileInfo) GetAttributeInt64(attribute0 string) int64 {
@@ -5621,7 +5621,7 @@ func (this0 *FileInfo) GetAttributeType(attribute0 string) FileAttributeType {
 	ret2 = FileAttributeType(ret1)
 	return ret2
 }
-func (this0 *FileInfo) GetAttributeUint32(attribute0 string) int {
+func (this0 *FileInfo) GetAttributeUint32(attribute0 string) uint32 {
 	var this1 *C.GFileInfo
 	var attribute1 *C.char
 	if this0 != nil {
@@ -5630,8 +5630,8 @@ func (this0 *FileInfo) GetAttributeUint32(attribute0 string) int {
 	attribute1 = _GoStringToGString(attribute0)
 	defer C.free(unsafe.Pointer(attribute1))
 	ret1 := C.g_file_info_get_attribute_uint32(this1, attribute1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *FileInfo) GetAttributeUint64(attribute0 string) uint64 {
@@ -5778,14 +5778,14 @@ func (this0 *FileInfo) GetSize() int64 {
 	ret2 = int64(ret1)
 	return ret2
 }
-func (this0 *FileInfo) GetSortOrder() int {
+func (this0 *FileInfo) GetSortOrder() int32 {
 	var this1 *C.GFileInfo
 	if this0 != nil {
 		this1 = (*C.GFileInfo)(this0.InheritedFromGFileInfo())
 	}
 	ret1 := C.g_file_info_get_sort_order(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *FileInfo) GetSymbolicIcon() *Icon {
@@ -5900,7 +5900,7 @@ func (this0 *FileInfo) SetAttributeByteString(attribute0 string, attr_value0 str
 	defer C.free(unsafe.Pointer(attr_value1))
 	C.g_file_info_set_attribute_byte_string(this1, attribute1, attr_value1)
 }
-func (this0 *FileInfo) SetAttributeInt32(attribute0 string, attr_value0 int) {
+func (this0 *FileInfo) SetAttributeInt32(attribute0 string, attr_value0 int32) {
 	var this1 *C.GFileInfo
 	var attribute1 *C.char
 	var attr_value1 C.int32_t
@@ -5992,7 +5992,7 @@ func (this0 *FileInfo) SetAttributeStringv(attribute0 string, attr_value0 []stri
 	}
 	C.g_file_info_set_attribute_stringv(this1, attribute1, attr_value1)
 }
-func (this0 *FileInfo) SetAttributeUint32(attribute0 string, attr_value0 int) {
+func (this0 *FileInfo) SetAttributeUint32(attribute0 string, attr_value0 uint32) {
 	var this1 *C.GFileInfo
 	var attribute1 *C.char
 	var attr_value1 C.uint32_t
@@ -6112,7 +6112,7 @@ func (this0 *FileInfo) SetSize(size0 int64) {
 	size1 = C.int64_t(size0)
 	C.g_file_info_set_size(this1, size1)
 }
-func (this0 *FileInfo) SetSortOrder(sort_order0 int) {
+func (this0 *FileInfo) SetSortOrder(sort_order0 int32) {
 	var this1 *C.GFileInfo
 	var sort_order1 C.int32_t
 	if this0 != nil {
@@ -6210,7 +6210,7 @@ func (this0 *FileInputStream) QueryInfo(attributes0 string, cancellable0 Cancell
 	}
 	return ret2, err2
 }
-func (this0 *FileInputStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileInputStream) QueryInfoAsync(attributes0 string, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFileInputStream
 	var attributes1 *C.char
 	var io_priority1 C.int32_t
@@ -6334,7 +6334,7 @@ func (this0 *FileMonitor) IsCancelled() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *FileMonitor) SetRateLimit(limit_msecs0 int) {
+func (this0 *FileMonitor) SetRateLimit(limit_msecs0 int32) {
 	var this1 *C.GFileMonitor
 	var limit_msecs1 C.int32_t
 	if this0 != nil {
@@ -6434,7 +6434,7 @@ func (this0 *FileOutputStream) QueryInfo(attributes0 string, cancellable0 Cancel
 	}
 	return ret2, err2
 }
-func (this0 *FileOutputStream) QueryInfoAsync(attributes0 string, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *FileOutputStream) QueryInfoAsync(attributes0 string, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GFileOutputStream
 	var attributes1 *C.char
 	var io_priority1 C.int32_t
@@ -6660,7 +6660,7 @@ func (this0 *IOStream) Close(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *IOStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *IOStream) CloseAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GIOStream
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -6753,7 +6753,7 @@ func (this0 *IOStream) SetPending() (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *IOStream) SpliceAsync(stream20 IOStreamLike, flags0 IOStreamSpliceFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *IOStream) SpliceAsync(stream20 IOStreamLike, flags0 IOStreamSpliceFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GIOStream
 	var stream21 *C.GIOStream
 	var flags1 C.GIOStreamSpliceFlags
@@ -6823,12 +6823,12 @@ func IconDeserialize(value0 *glib.Variant) *Icon {
 	ret2 = (*Icon)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
-func IconHash(icon0 unsafe.Pointer) int {
+func IconHash(icon0 unsafe.Pointer) uint32 {
 	var icon1 unsafe.Pointer
 	icon1 = unsafe.Pointer(icon0)
 	ret1 := C.g_icon_hash(icon1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func IconNewForString(str0 string) (*Icon, error) {
@@ -6957,7 +6957,7 @@ func (this0 *InputStream) Close(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *InputStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *InputStream) CloseAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GInputStream
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -7014,7 +7014,7 @@ func (this0 *InputStream) IsClosed() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *InputStream) Read(buffer0 []int, cancellable0 CancellableLike) (int64, error) {
+func (this0 *InputStream) Read(buffer0 []uint8, cancellable0 CancellableLike) (int64, error) {
 	var this1 *C.GInputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -7042,7 +7042,7 @@ func (this0 *InputStream) Read(buffer0 []int, cancellable0 CancellableLike) (int
 	}
 	return ret2, err2
 }
-func (this0 *InputStream) ReadAll(buffer0 []int, cancellable0 CancellableLike) (uint64, bool, error) {
+func (this0 *InputStream) ReadAll(buffer0 []uint8, cancellable0 CancellableLike) (uint64, bool, error) {
 	var this1 *C.GInputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -7073,7 +7073,7 @@ func (this0 *InputStream) ReadAll(buffer0 []int, cancellable0 CancellableLike) (
 	}
 	return bytes_read2, ret2, err2
 }
-func (this0 *InputStream) ReadAsync(buffer0 []int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *InputStream) ReadAsync(buffer0 []uint8, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GInputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -7120,7 +7120,7 @@ func (this0 *InputStream) ReadBytes(count0 uint64, cancellable0 CancellableLike)
 	}
 	return ret2, err2
 }
-func (this0 *InputStream) ReadBytesAsync(count0 uint64, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *InputStream) ReadBytesAsync(count0 uint64, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GInputStream
 	var count1 C.uint64_t
 	var io_priority1 C.int32_t
@@ -7217,7 +7217,7 @@ func (this0 *InputStream) Skip(count0 uint64, cancellable0 CancellableLike) (int
 	}
 	return ret2, err2
 }
-func (this0 *InputStream) SkipAsync(count0 uint64, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *InputStream) SkipAsync(count0 uint64, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GInputStream
 	var count1 C.uint64_t
 	var io_priority1 C.int32_t
@@ -7483,7 +7483,7 @@ func (this0 *MenuModel) GetStaticType() gobject.Type {
 func MenuModelGetType() gobject.Type {
 	return (*MenuModel)(nil).GetStaticType()
 }
-func (this0 *MenuModel) GetItemAttributeValue(item_index0 int, attribute0 string, expected_type0 *glib.VariantType) *glib.Variant {
+func (this0 *MenuModel) GetItemAttributeValue(item_index0 int32, attribute0 string, expected_type0 *glib.VariantType) *glib.Variant {
 	var this1 *C.GMenuModel
 	var item_index1 C.int32_t
 	var attribute1 *C.char
@@ -7500,7 +7500,7 @@ func (this0 *MenuModel) GetItemAttributeValue(item_index0 int, attribute0 string
 	ret2 = (*glib.Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *MenuModel) GetItemLink(item_index0 int, link0 string) *MenuModel {
+func (this0 *MenuModel) GetItemLink(item_index0 int32, link0 string) *MenuModel {
 	var this1 *C.GMenuModel
 	var item_index1 C.int32_t
 	var link1 *C.char
@@ -7515,14 +7515,14 @@ func (this0 *MenuModel) GetItemLink(item_index0 int, link0 string) *MenuModel {
 	ret2 = (*MenuModel)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
-func (this0 *MenuModel) GetNItems() int {
+func (this0 *MenuModel) GetNItems() int32 {
 	var this1 *C.GMenuModel
 	if this0 != nil {
 		this1 = (*C.GMenuModel)(this0.InheritedFromGMenuModel())
 	}
 	ret1 := C.g_menu_model_get_n_items(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *MenuModel) IsMutable() bool {
@@ -7535,7 +7535,7 @@ func (this0 *MenuModel) IsMutable() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *MenuModel) ItemsChanged(position0 int, removed0 int, added0 int) {
+func (this0 *MenuModel) ItemsChanged(position0 int32, removed0 int32, added0 int32) {
 	var this1 *C.GMenuModel
 	var position1 C.int32_t
 	var removed1 C.int32_t
@@ -7548,7 +7548,7 @@ func (this0 *MenuModel) ItemsChanged(position0 int, removed0 int, added0 int) {
 	added1 = C.int32_t(added0)
 	C.g_menu_model_items_changed(this1, position1, removed1, added1)
 }
-func (this0 *MenuModel) IterateItemAttributes(item_index0 int) *MenuAttributeIter {
+func (this0 *MenuModel) IterateItemAttributes(item_index0 int32) *MenuAttributeIter {
 	var this1 *C.GMenuModel
 	var item_index1 C.int32_t
 	if this0 != nil {
@@ -7560,7 +7560,7 @@ func (this0 *MenuModel) IterateItemAttributes(item_index0 int) *MenuAttributeIte
 	ret2 = (*MenuAttributeIter)(gobject.ObjectWrap(unsafe.Pointer(ret1), false))
 	return ret2
 }
-func (this0 *MenuModel) IterateItemLinks(item_index0 int) *MenuLinkIter {
+func (this0 *MenuModel) IterateItemLinks(item_index0 int32) *MenuLinkIter {
 	var this1 *C.GMenuModel
 	var item_index1 C.int32_t
 	if this0 != nil {
@@ -8060,14 +8060,14 @@ func (this0 *MountOperation) GetAnonymous() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *MountOperation) GetChoice() int {
+func (this0 *MountOperation) GetChoice() int32 {
 	var this1 *C.GMountOperation
 	if this0 != nil {
 		this1 = (*C.GMountOperation)(this0.InheritedFromGMountOperation())
 	}
 	ret1 := C.g_mount_operation_get_choice(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *MountOperation) GetDomain() string {
@@ -8128,7 +8128,7 @@ func (this0 *MountOperation) SetAnonymous(anonymous0 bool) {
 	anonymous1 = _GoBoolToCBool(anonymous0)
 	C.g_mount_operation_set_anonymous(this1, anonymous1)
 }
-func (this0 *MountOperation) SetChoice(choice0 int) {
+func (this0 *MountOperation) SetChoice(choice0 int32) {
 	var this1 *C.GMountOperation
 	var choice1 C.int32_t
 	if this0 != nil {
@@ -8266,7 +8266,7 @@ func (this0 *OutputStream) Close(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) CloseAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *OutputStream) CloseAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GOutputStream
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -8323,7 +8323,7 @@ func (this0 *OutputStream) Flush(cancellable0 CancellableLike) (bool, error) {
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) FlushAsync(io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *OutputStream) FlushAsync(io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GOutputStream
 	var io_priority1 C.int32_t
 	var cancellable1 *C.GCancellable
@@ -8432,7 +8432,7 @@ func (this0 *OutputStream) Splice(source0 InputStreamLike, flags0 OutputStreamSp
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) SpliceAsync(source0 InputStreamLike, flags0 OutputStreamSpliceFlags, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *OutputStream) SpliceAsync(source0 InputStreamLike, flags0 OutputStreamSpliceFlags, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GOutputStream
 	var source1 *C.GInputStream
 	var flags1 C.GOutputStreamSpliceFlags
@@ -8475,7 +8475,7 @@ func (this0 *OutputStream) SpliceFinish(result0 AsyncResultLike) (int64, error) 
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) Write(buffer0 []int, cancellable0 CancellableLike) (int64, error) {
+func (this0 *OutputStream) Write(buffer0 []uint8, cancellable0 CancellableLike) (int64, error) {
 	var this1 *C.GOutputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -8503,7 +8503,7 @@ func (this0 *OutputStream) Write(buffer0 []int, cancellable0 CancellableLike) (i
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) WriteAll(buffer0 []int, cancellable0 CancellableLike) (uint64, bool, error) {
+func (this0 *OutputStream) WriteAll(buffer0 []uint8, cancellable0 CancellableLike) (uint64, bool, error) {
 	var this1 *C.GOutputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -8534,7 +8534,7 @@ func (this0 *OutputStream) WriteAll(buffer0 []int, cancellable0 CancellableLike)
 	}
 	return bytes_written2, ret2, err2
 }
-func (this0 *OutputStream) WriteAsync(buffer0 []int, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *OutputStream) WriteAsync(buffer0 []uint8, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GOutputStream
 	var buffer1 *C.uint8_t
 	var count1 C.uint64_t
@@ -8581,7 +8581,7 @@ func (this0 *OutputStream) WriteBytes(bytes0 *glib.Bytes, cancellable0 Cancellab
 	}
 	return ret2, err2
 }
-func (this0 *OutputStream) WriteBytesAsync(bytes0 *glib.Bytes, io_priority0 int, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
+func (this0 *OutputStream) WriteBytesAsync(bytes0 *glib.Bytes, io_priority0 int32, cancellable0 CancellableLike, callback0 AsyncReadyCallback) {
 	var this1 *C.GOutputStream
 	var bytes1 *C.GBytes
 	var io_priority1 C.int32_t
@@ -9235,7 +9235,7 @@ func (this0 *Settings) GetDouble(key0 string) float64 {
 	ret2 = float64(ret1)
 	return ret2
 }
-func (this0 *Settings) GetEnum(key0 string) int {
+func (this0 *Settings) GetEnum(key0 string) int32 {
 	var this1 *C.GSettings
 	var key1 *C.char
 	if this0 != nil {
@@ -9244,11 +9244,11 @@ func (this0 *Settings) GetEnum(key0 string) int {
 	key1 = _GoStringToGString(key0)
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_settings_get_enum(this1, key1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *Settings) GetFlags(key0 string) int {
+func (this0 *Settings) GetFlags(key0 string) uint32 {
 	var this1 *C.GSettings
 	var key1 *C.char
 	if this0 != nil {
@@ -9257,8 +9257,8 @@ func (this0 *Settings) GetFlags(key0 string) int {
 	key1 = _GoStringToGString(key0)
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_settings_get_flags(this1, key1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *Settings) GetHasUnapplied() bool {
@@ -9271,7 +9271,7 @@ func (this0 *Settings) GetHasUnapplied() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Settings) GetInt(key0 string) int {
+func (this0 *Settings) GetInt(key0 string) int32 {
 	var this1 *C.GSettings
 	var key1 *C.char
 	if this0 != nil {
@@ -9280,8 +9280,8 @@ func (this0 *Settings) GetInt(key0 string) int {
 	key1 = _GoStringToGString(key0)
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_settings_get_int(this1, key1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 // blacklisted: Settings.get_mapped (method)
@@ -9329,7 +9329,7 @@ func (this0 *Settings) GetStrv(key0 string) []string {
 	}
 	return ret2
 }
-func (this0 *Settings) GetUint(key0 string) int {
+func (this0 *Settings) GetUint(key0 string) uint32 {
 	var this1 *C.GSettings
 	var key1 *C.char
 	if this0 != nil {
@@ -9338,8 +9338,8 @@ func (this0 *Settings) GetUint(key0 string) int {
 	key1 = _GoStringToGString(key0)
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_settings_get_uint(this1, key1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *Settings) GetUserValue(key0 string) *glib.Variant {
@@ -9471,7 +9471,7 @@ func (this0 *Settings) SetDouble(key0 string, value0 float64) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Settings) SetEnum(key0 string, value0 int) bool {
+func (this0 *Settings) SetEnum(key0 string, value0 int32) bool {
 	var this1 *C.GSettings
 	var key1 *C.char
 	var value1 C.int32_t
@@ -9486,7 +9486,7 @@ func (this0 *Settings) SetEnum(key0 string, value0 int) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Settings) SetFlags(key0 string, value0 int) bool {
+func (this0 *Settings) SetFlags(key0 string, value0 uint32) bool {
 	var this1 *C.GSettings
 	var key1 *C.char
 	var value1 C.uint32_t
@@ -9501,7 +9501,7 @@ func (this0 *Settings) SetFlags(key0 string, value0 int) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Settings) SetInt(key0 string, value0 int) bool {
+func (this0 *Settings) SetInt(key0 string, value0 int32) bool {
 	var this1 *C.GSettings
 	var key1 *C.char
 	var value1 C.int32_t
@@ -9553,7 +9553,7 @@ func (this0 *Settings) SetStrv(key0 string, value0 []string) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Settings) SetUint(key0 string, value0 int) bool {
+func (this0 *Settings) SetUint(key0 string, value0 uint32) bool {
 	var this1 *C.GSettings
 	var key1 *C.char
 	var value1 C.uint32_t

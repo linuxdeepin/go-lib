@@ -162,39 +162,39 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	case []bool:
 		kFile.SetBooleanList(group, key, value.([]bool))
 	case int:
-		kFile.SetInteger(group, key, value.(int))
+		kFile.SetInteger(group, key, int32(value.(int)))
 	case int32:
-		kFile.SetInteger(group, key, int(value.(int32)))
+		kFile.SetInteger(group, key, int32(value.(int32)))
 	case uint32:
-		kFile.SetInteger(group, key, int(value.(uint32)))
+		kFile.SetInteger(group, key, int32(value.(uint32)))
 	case []int:
-		kFile.SetIntegerList(group, key, value.([]int))
-	case []int32:
-		list := value.([]int32)
-		tmp := []int{}
+		list := value.([]int)
+		tmp := []int32{}
 		for _, l := range list {
-			tmp = append(tmp, int(l))
+			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
+	case []int32:
+		kFile.SetIntegerList(group, key, value.([]int32))
 	case []uint32:
 		list := value.([]uint32)
-		tmp := []int{}
+		tmp := []int32{}
 		for _, l := range list {
-			tmp = append(tmp, int(l))
+			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case []int64:
 		list := value.([]int64)
-		tmp := []int{}
+		tmp := []int32{}
 		for _, l := range list {
-			tmp = append(tmp, int(l))
+			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case []uint64:
 		list := value.([]uint64)
-		tmp := []int{}
+		tmp := []int32{}
 		for _, l := range list {
-			tmp = append(tmp, int(l))
+			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case int64:
