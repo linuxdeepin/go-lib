@@ -7,7 +7,6 @@ extern void g_key_file_free(GKeyFile*);
 */
 import "C"
 import "unsafe"
-import "errors"
 
 const alot = 999999
 
@@ -26,6 +25,18 @@ type _GError struct {
 	domain uint32
 	code int32
 	message *C.char
+}
+func (e _GError) ToGError() GError {
+	return GError{e.domain, e.code, C.GoString(e.message)}
+}
+
+type GError struct {
+	Domain uint32
+	Code int32
+	Message string
+}
+func (e GError) Error() string {
+	return e.Message
 }
 
 func _GoStringToGString(x string) *C.char {
@@ -189,6 +200,7 @@ const (
 	ConvertErrorPartialInput ConvertError = 3
 	ConvertErrorBadUri ConvertError = 4
 	ConvertErrorNotAbsolutePath ConvertError = 5
+	ConvertErrorNoMemory ConvertError = 6
 )
 const DatalistFlagsMask = 3
 const DateBadDay = 0
@@ -758,7 +770,7 @@ const GuintptrFormat = "lu"
 const HaveGint64 = 1
 const HaveGnucVarargs = 1
 const HaveGnucVisibility = 1
-const HaveGrowingStack = 1
+const HaveGrowingStack = 0
 const HaveInline = 1
 const HaveIsoVarargs = 1
 const Have__Inline = 1
@@ -888,7 +900,7 @@ func (this0 *KeyFile) GetBoolean(group_name0 string, key0 string) (bool, error) 
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -914,7 +926,7 @@ func (this0 *KeyFile) GetBooleanList(group_name0 string, key0 string) (uint64, [
 		ret2[i] = (*(*[999999]C.int)(unsafe.Pointer(ret1)))[i] != 0
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -935,7 +947,7 @@ func (this0 *KeyFile) GetComment(group_name0 string, key0 string) (string, error
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -955,7 +967,7 @@ func (this0 *KeyFile) GetDouble(group_name0 string, key0 string) (float64, error
 	var err2 error
 	ret2 = float64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -981,7 +993,7 @@ func (this0 *KeyFile) GetDoubleList(group_name0 string, key0 string) (uint64, []
 		ret2[i] = float64((*(*[999999]C.double)(unsafe.Pointer(ret1)))[i])
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1016,7 +1028,7 @@ func (this0 *KeyFile) GetInt64(group_name0 string, key0 string) (int64, error) {
 	var err2 error
 	ret2 = int64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1036,7 +1048,7 @@ func (this0 *KeyFile) GetInteger(group_name0 string, key0 string) (int, error) {
 	var err2 error
 	ret2 = int(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1062,7 +1074,7 @@ func (this0 *KeyFile) GetIntegerList(group_name0 string, key0 string) (uint64, [
 		ret2[i] = int((*(*[999999]C.int32_t)(unsafe.Pointer(ret1)))[i])
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1086,7 +1098,7 @@ func (this0 *KeyFile) GetKeys(group_name0 string) (uint64, []string, error) {
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1110,7 +1122,7 @@ func (this0 *KeyFile) GetLocaleString(group_name0 string, key0 string, locale0 s
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1140,7 +1152,7 @@ func (this0 *KeyFile) GetLocaleStringList(group_name0 string, key0 string, local
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1170,7 +1182,7 @@ func (this0 *KeyFile) GetString(group_name0 string, key0 string) (string, error)
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1197,7 +1209,7 @@ func (this0 *KeyFile) GetStringList(group_name0 string, key0 string) (uint64, []
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1217,7 +1229,7 @@ func (this0 *KeyFile) GetUint64(group_name0 string, key0 string) (uint64, error)
 	var err2 error
 	ret2 = uint64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1238,7 +1250,7 @@ func (this0 *KeyFile) GetValue(group_name0 string, key0 string) (string, error) 
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1270,7 +1282,7 @@ func (this0 *KeyFile) LoadFromData(data0 string, length0 uint64, flags0 KeyFileF
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1293,7 +1305,7 @@ func (this0 *KeyFile) LoadFromDataDirs(file0 string, flags0 KeyFileFlags) (strin
 	C.g_free(unsafe.Pointer(full_path1))
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return full_path2, ret2, err2
@@ -1324,7 +1336,7 @@ func (this0 *KeyFile) LoadFromDirs(file0 string, search_dirs0 []string, flags0 K
 	C.g_free(unsafe.Pointer(full_path1))
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return full_path2, ret2, err2
@@ -1343,7 +1355,7 @@ func (this0 *KeyFile) LoadFromFile(file0 string, flags0 KeyFileFlags) (bool, err
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1363,7 +1375,7 @@ func (this0 *KeyFile) RemoveComment(group_name0 string, key0 string) (bool, erro
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1380,7 +1392,7 @@ func (this0 *KeyFile) RemoveGroup(group_name0 string) (bool, error) {
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1400,7 +1412,24 @@ func (this0 *KeyFile) RemoveKey(group_name0 string, key0 string) (bool, error) {
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *KeyFile) SaveToFile(filename0 string) (bool, error) {
+	var this1 *C.GKeyFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GKeyFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_key_file_save_to_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1455,7 +1484,7 @@ func (this0 *KeyFile) SetComment(group_name0 string, key0 string, comment0 strin
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1660,7 +1689,7 @@ func (this0 *KeyFile) ToData() (uint64, string, error) {
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1721,7 +1750,7 @@ const Minint16 = -32768
 const Minint32 = -2147483648
 const Minint64 = -9223372036854775808
 const Minint8 = -128
-const MinorVersion = 38
+const MinorVersion = 40
 const ModuleSuffix = "so"
 // blacklisted: MainContext (struct)
 // blacklisted: MainLoop (struct)
@@ -1751,6 +1780,7 @@ const (
 	MarkupParseFlagsDoNotUseThisUnsupportedFlag MarkupParseFlags = 1
 	MarkupParseFlagsTreatCdataAsText MarkupParseFlags = 2
 	MarkupParseFlagsPrefixErrorPosition MarkupParseFlags = 4
+	MarkupParseFlagsIgnoreQualified MarkupParseFlags = 8
 )
 // blacklisted: MarkupParser (struct)
 // blacklisted: MatchInfo (struct)
@@ -1969,6 +1999,8 @@ const SizeofSizeT = 8
 const SizeofSsizeT = 8
 const SizeofVoidP = 8
 // blacklisted: SList (struct)
+const SourceContinue = true
+const SourceRemove = false
 const Sqrt2 = 1.414214
 const StrDelimiters = "_-|> <."
 const SysdefAfInet = 2
@@ -2046,6 +2078,7 @@ const (
 	SpawnFlagsChildInheritsStdin SpawnFlags = 32
 	SpawnFlagsFileAndArgvZero SpawnFlags = 64
 	SpawnFlagsSearchPathFromEnvp SpawnFlags = 128
+	SpawnFlagsCloexecPipes SpawnFlags = 256
 )
 // blacklisted: StatBuf (struct)
 // blacklisted: String (struct)
@@ -3153,10 +3186,29 @@ func VariantParse(type0 *VariantType, text0 string, limit0 string, endptr0 strin
 	var err2 error
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
+}
+func VariantParseErrorPrintContext(error0 error, source_str0 string) string {
+	var error1 *C.GError
+	var source_str1 *C.char
+	//NOTEO: hasn't implemnt GSLIST/GHASH/GERROR convert.
+	
+	source_str1 = _GoStringToGString(source_str0)
+	defer C.free(unsafe.Pointer(source_str1))
+	ret1 := C.g_variant_parse_error_print_context(error1, source_str1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func VariantParseErrorQuark() int {
+	ret1 := C.g_variant_parse_error_quark()
+	var ret2 int
+	ret2 = int(ret1)
+	return ret2
 }
 func VariantParserGetErrorQuark() int {
 	ret1 := C.g_variant_parser_get_error_quark()
@@ -3186,6 +3238,7 @@ const (
 	VariantClassTuple VariantClass = 40
 	VariantClassDictEntry VariantClass = 123
 )
+// blacklisted: VariantDict (struct)
 type VariantParseError C.uint32_t
 const (
 	VariantParseErrorFailed VariantParseError = 0
@@ -3698,6 +3751,7 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: hostname_is_non_ascii (function)
 // blacklisted: hostname_to_ascii (function)
 // blacklisted: hostname_to_unicode (function)
+// blacklisted: iconv (function)
 // blacklisted: idle_add (function)
 // blacklisted: idle_remove_by_data (function)
 // blacklisted: idle_source_new (function)
@@ -3809,6 +3863,10 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: str_has_prefix (function)
 // blacklisted: str_has_suffix (function)
 // blacklisted: str_hash (function)
+// blacklisted: str_is_ascii (function)
+// blacklisted: str_match_string (function)
+// blacklisted: str_to_ascii (function)
+// blacklisted: str_tokenize_and_fold (function)
 // blacklisted: strcanon (function)
 // blacklisted: strcasecmp (function)
 // blacklisted: strchomp (function)
@@ -3969,6 +4027,8 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: variant_is_object_path (function)
 // blacklisted: variant_is_signature (function)
 // blacklisted: variant_parse (function)
+// blacklisted: variant_parse_error_print_context (function)
+// blacklisted: variant_parse_error_quark (function)
 // blacklisted: variant_parser_get_error_quark (function)
 // blacklisted: variant_type_checked_ (function)
 // blacklisted: variant_type_string_is_valid (function)
