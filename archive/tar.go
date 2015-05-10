@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2011 ~ 2014 Deepin, Inc.
- *               2013 ~ 2014 jouyouyun
+ * Copyright (c) 2011 ~ 2015 Deepin, Inc.
+ *               2013 ~ 2015 jouyouyun
  *
  * Author:      jouyouyun <jouyouwen717@gmail.com>
  * Maintainer:  jouyouyun <jouyouwen717@gmail.com>
@@ -19,11 +19,10 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  **/
 
-package gzip
+package archive
 
 import (
 	"archive/tar"
-	"compress/gzip"
 	"os"
 	"pkg.linuxdeepin.com/lib/archive/utils"
 )
@@ -35,26 +34,18 @@ func tarCompressFiles(files []string, dest string) error {
 	}
 	defer dw.Close()
 
-	gw := gzip.NewWriter(dw)
-	defer gw.Close()
-	tw := tar.NewWriter(gw)
+	tw := tar.NewWriter(dw)
 	defer tw.Close()
 
 	return utils.TarWriterCompressFiles(tw, files)
 }
 
-func tarExtracte(src, dest string) ([]string, error) {
+func tarExtracteFile(src, dest string) ([]string, error) {
 	sr, err := os.Open(src)
 	if err != nil {
 		return nil, err
 	}
 	defer sr.Close()
 
-	gr, err := gzip.NewReader(sr)
-	if err != nil {
-		return nil, err
-	}
-	defer gr.Close()
-
-	return utils.TarReaderExtracte(tar.NewReader(gr), dest)
+	return utils.TarReaderExtracte(tar.NewReader(sr), dest)
 }

@@ -38,7 +38,7 @@ const (
 func CompressDir(src, dest string) error {
 	switch getCompressType(dest) {
 	case CompressTypeTar:
-		return nil
+		return tarCompressFiles([]string{src}, dest)
 	case CompressTypeTarGz:
 		return gzip.CompressDir(src, dest, gzip.ArchiveTypeTar)
 	case CompressTypeTarBz2:
@@ -55,7 +55,7 @@ func CompressDir(src, dest string) error {
 func CompressFiles(files []string, dest string) error {
 	switch getCompressType(dest) {
 	case CompressTypeTar:
-		return nil
+		return tarCompressFiles(files, dest)
 	case CompressTypeTarGz:
 		return gzip.CompressFiles(files, dest, gzip.ArchiveTypeTar)
 	case CompressTypeTarBz2:
@@ -69,12 +69,12 @@ func CompressFiles(files []string, dest string) error {
 	return nil
 }
 
-func Extracte(src, destDir string) ([]string, error) {
+func Extracte(src, dest string) ([]string, error) {
 	switch getCompressType(src) {
 	case CompressTypeTar:
-		return nil, nil
+		return tarExtracteFile(src, dest)
 	case CompressTypeTarGz:
-		return gzip.Extracte(src, destDir, gzip.ArchiveTypeTar)
+		return gzip.Extracte(src, dest, gzip.ArchiveTypeTar)
 	case CompressTypeTarBz2:
 		return nil, nil
 	case CompressTypeZip:
