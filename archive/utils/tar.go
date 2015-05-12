@@ -66,6 +66,13 @@ func TarReaderExtracte(reader *tar.Reader, dest string) ([]string, error) {
 		}
 
 		tmp := path.Join(dest, h.Name)
+		if h.FileInfo().IsDir() {
+			err = os.MkdirAll(tmp, 0755)
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
 		err = os.MkdirAll(path.Dir(tmp), 0755)
 		if err != nil {
 			return nil, err
