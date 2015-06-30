@@ -1,0 +1,4 @@
+#!/bin/sh
+
+
+xgettext -L c --keyword=NTr:1,2 --keyword=DNGettext:2,3 -o plural.pot t.go

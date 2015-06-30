@@ -201,3 +201,8 @@ msgstr ""
 #: ../ui/dialog.py:709
 msgid "Preferences"
 msgstr ""
+
+msgid "%d test"
+msgid_plural "%d tests"
+msgstr ""
+

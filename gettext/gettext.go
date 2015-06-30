@@ -40,3 +40,26 @@ func Bindtextdomain(domain, dirname string) string {
 	defer C.free(unsafe.Pointer(_dirname))
 	return C.GoString(C.bindtextdomain(_domain, _dirname))
 }
+
+func NTr(msgid, plural string, n int) string {
+	cMsgid := C.CString(msgid)
+	defer C.free(unsafe.Pointer(cMsgid))
+
+	cPlural := C.CString(plural)
+	defer C.free(unsafe.Pointer(cPlural))
+
+	return C.GoString(C.ngettext(cMsgid, cPlural, C.ulong(n)))
+}
+
+func DNGettext(domain, msgid, plural string, n int) string {
+	cDomain := C.CString(domain)
+	defer C.free(unsafe.Pointer(cDomain))
+
+	cMsgid := C.CString(msgid)
+	defer C.free(unsafe.Pointer(cMsgid))
+
+	cPlural := C.CString(plural)
+	defer C.free(unsafe.Pointer(cPlural))
+
+	return C.GoString(C.dngettext(cDomain, cMsgid, cPlural, C.ulong(n)))
+}
