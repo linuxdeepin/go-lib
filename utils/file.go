@@ -22,8 +22,10 @@
 package utils
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"path"
 )
 
 func CopyFile(src, dest string) (err error) {
@@ -45,6 +47,41 @@ func CopyFile(src, dest string) (err error) {
 
 	_, err = io.Copy(df, sf)
 	return
+}
+
+func CopyDir(src, dest string) error {
+	sInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	return iterCopyDir(src, dest, sInfo.Mode())
+}
+
+func MoveDir(src, dest string) error {
+	if !IsDir(src) {
+		return fmt.Errorf("%q not a dir", src)
+	}
+
+	err := CopyDir(src, dest)
+	if err != nil {
+		return err
+	}
+
+	return os.RemoveAll(src)
+}
+
+func MoveFile(src, dest string) error {
+	if IsDir(src) {
+		return fmt.Errorf("%q not a file", src)
+	}
+
+	err := CopyFile(src, dest)
+	if err != nil {
+		return err
+	}
+
+	return os.RemoveAll(src)
 }
 
 func IsFileExist(path string) bool {
@@ -84,4 +121,40 @@ func EnsureDirExist(path string) error {
 func EnsureDirExistWithPerm(path string, perm os.FileMode) error {
 	// TODO if path exists with wrong perm, fix it
 	return os.MkdirAll(path, perm)
+}
+
+func iterCopyDir(src, dest string, mode os.FileMode) error {
+	sr, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sr.Close()
+
+	finfos, err := sr.Readdir(0)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(dest, mode)
+	if err != nil {
+		return err
+	}
+
+	for _, fi := range finfos {
+		sTmp := path.Join(src, fi.Name())
+		dTmp := path.Join(dest, fi.Name())
+
+		var err error
+		if fi.IsDir() {
+			err = iterCopyDir(sTmp, dTmp, fi.Mode())
+		} else {
+			err = CopyFile(sTmp, dTmp)
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
