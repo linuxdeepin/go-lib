@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"net/url"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"strings"
 )
@@ -93,7 +92,7 @@ func (job *StatJob) Execute() {
 }
 
 // NewStatJob creates a new StatJob.
-func NewStatJob(uri *url.URL) *StatJob {
-	dest := uriToGFile(uri)
+func NewStatJob(uri string) *StatJob {
+	dest := gio.FileNewForCommandlineArg(uri)
 	return newStatJob(dest)
 }

@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"net/url"
 	"sync"
 )
 
@@ -88,7 +87,7 @@ func (m *FileUndoManager) ListenJobRecordingFinished(fn func(CommandType)) (func
 	return m.ListenSignal(_UndoManagerSignalJobRecordingFinished, fn)
 }
 
-func (*FileUndoManager) RecordJob(op CommandType, srcURLs []*url.URL, destURL *url.URL, job interface{}) {
+func (*FileUndoManager) RecordJob(op CommandType, srcURLs []string, destURL string, job interface{}) {
 	switch op {
 	case CommandMove, CommandCopy:
 		copyMoveJob := job.(*CopyMoveJob)

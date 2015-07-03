@@ -2,7 +2,6 @@ package operations
 
 import (
 	"fmt"
-	"net/url"
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"strings"
@@ -324,24 +323,24 @@ func newCreateJob(destDir *gio.File, src *gio.File, makeDir bool, filename strin
 
 // NewCreateFileJob is used to create a new file.
 // @param destURL: parent dir which contains the new directory.
-func NewCreateFileJob(destDirURL *url.URL, filename string, initContent []byte, uiDelegate IUIDelegate) *CreateJob {
-	destDir := uriToGFile(destDirURL)
+func NewCreateFileJob(destDirURL string, filename string, initContent []byte, uiDelegate IUIDelegate) *CreateJob {
+	destDir := gio.FileNewForCommandlineArg(destDirURL)
 	return newCreateJob(destDir, nil, false, filename, initContent, uiDelegate)
 }
 
 // NewCreateFileFromTemplateJob creates new file from template.
 // @param destURL: parent dir which contains the new directory.
-func NewCreateFileFromTemplateJob(destDirURL *url.URL, templateURL *url.URL, uiDelegate IUIDelegate) *CreateJob {
-	src := uriToGFile(templateURL)
-	destDir := uriToGFile(destDirURL)
+func NewCreateFileFromTemplateJob(destDirURL string, templateURL string, uiDelegate IUIDelegate) *CreateJob {
+	src := gio.FileNewForCommandlineArg(templateURL)
+	destDir := gio.FileNewForCommandlineArg(destDirURL)
 	job := newCreateJob(destDir, src, false, "", []byte{}, uiDelegate)
 	return job
 }
 
 // NewCreateDirectoryJob creates directory
 // @param destURL: parent dir which contains the new directory.
-func NewCreateDirectoryJob(destDirURL *url.URL, dirname string, uiDelegate IUIDelegate) *CreateJob {
-	destDir := uriToGFile(destDirURL)
+func NewCreateDirectoryJob(destDirURL string, dirname string, uiDelegate IUIDelegate) *CreateJob {
+	destDir := gio.FileNewForCommandlineArg(destDirURL)
 	return newCreateJob(destDir, nil, true, dirname, []byte{}, uiDelegate)
 }
 
@@ -561,8 +560,8 @@ func newCreateLinkJob(src *gio.File, destDir *gio.File, uiDelegate IUIDelegate) 
 }
 
 // NewCreateLinkJob creates symbol link.
-func NewCreateLinkJob(srcURL *url.URL, destDirURL *url.URL, uiDelegate IUIDelegate) *CreateJob {
-	src := uriToGFile(srcURL)
-	destDir := uriToGFile(destDirURL)
+func NewCreateLinkJob(srcURL string, destDirURL string, uiDelegate IUIDelegate) *CreateJob {
+	src := gio.FileNewForCommandlineArg(srcURL)
+	destDir := gio.FileNewForCommandlineArg(destDirURL)
 	return newCreateLinkJob(src, destDir, uiDelegate)
 }

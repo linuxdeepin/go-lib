@@ -2,7 +2,6 @@ package operations_test
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
-	"net/url"
 	"os"
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
@@ -16,10 +15,8 @@ func TestCopyJob(t *testing.T) {
 		os.Setenv("LANGUAGE", "en_US")
 		srcFilePath, _ := filepath.Abs("./testdata/copy/src/afile")
 		destPath, _ := filepath.Abs("./testdata/copy/dest")
-		srcFileURL, _ := url.Parse(srcFilePath)
-		destURL, _ := url.Parse(destPath)
 
-		job := NewCopyJob([]*url.URL{srcFileURL}, destURL, "", gio.FileCopyFlagsNone, nil)
+		job := NewCopyJob([]string{srcFilePath}, destPath, "", gio.FileCopyFlagsNone, nil)
 		job.Execute()
 
 		copyedFileURL, _ := filepath.Abs("./testdata/copy/dest/afile")
@@ -31,10 +28,8 @@ func TestCopyJob(t *testing.T) {
 		os.Setenv("LANGUAGE", "en_US")
 		srcFilePath, _ := filepath.Abs("./testdata/copy/src/exsitfile")
 		destPath, _ := filepath.Abs("./testdata/copy/dest")
-		srcFileURL, _ := url.Parse(srcFilePath)
-		destURL, _ := url.Parse(destPath)
 
-		job := NewCopyJob([]*url.URL{srcFileURL}, destURL, "", gio.FileCopyFlagsNone, renameMock)
+		job := NewCopyJob([]string{srcFilePath}, destPath, "", gio.FileCopyFlagsNone, renameMock)
 		job.Execute()
 
 		copyedFileURL, _ := filepath.Abs("./testdata/copy/dest/exsitfile")
@@ -46,10 +41,8 @@ func TestCopyJob(t *testing.T) {
 		os.Setenv("LANGUAGE", "en_US")
 		srcFilePath, _ := filepath.Abs("./testdata/copy/src/adir")
 		destPath, _ := filepath.Abs("./testdata/copy/dest")
-		srcFileURL, _ := url.Parse(srcFilePath)
-		destURL, _ := url.Parse(destPath)
 
-		job := NewCopyJob([]*url.URL{srcFileURL}, destURL, "", gio.FileCopyFlagsNone, nil)
+		job := NewCopyJob([]string{srcFilePath}, destPath, "", gio.FileCopyFlagsNone, nil)
 		job.Execute()
 
 		copyedFileURL, _ := filepath.Abs("./testdata/copy/dest/adir")
@@ -61,10 +54,8 @@ func TestCopyJob(t *testing.T) {
 		os.Setenv("LANGUAGE", "en_US")
 		srcFilePath, _ := filepath.Abs("./testdata/copy/src/exsitdir")
 		destPath, _ := filepath.Abs("./testdata/copy/dest")
-		srcFileURL, _ := url.Parse(srcFilePath)
-		destURL, _ := url.Parse(destPath)
 
-		job := NewCopyJob([]*url.URL{srcFileURL}, destURL, "", gio.FileCopyFlagsNone, renameMock)
+		job := NewCopyJob([]string{srcFilePath}, destPath, "", gio.FileCopyFlagsNone, renameMock)
 		job.Execute()
 
 		copyedFileURL, _ := filepath.Abs("./testdata/copy/dest/adir")

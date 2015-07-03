@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"net/url"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"strings"
 )
@@ -485,21 +484,21 @@ func newDeleteOrTrashJob(files []*gio.File, trash bool, shouldConfirm bool, uiDe
 }
 
 // convenient function for creating delete or trash job.
-func delOrTrash(urls []*url.URL, trash bool, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
-	files := []*gio.File{}
-	for _, fileURL := range urls {
-		files = append(files, uriToGFile(fileURL))
+func delOrTrash(urls []string, trash bool, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
+	files := make([]*gio.File, len(urls))
+	for i, fileURL := range urls {
+		files[i] = gio.FileNewForCommandlineArg(fileURL)
 	}
 
 	return newDeleteOrTrashJob(files, trash, shouldConfirm, uiDelegate)
 }
 
 // NewDeleteJob creates a new delete job to delete files or directories.
-func NewDeleteJob(urls []*url.URL, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
+func NewDeleteJob(urls []string, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
 	return delOrTrash(urls, false, shouldConfirm, uiDelegate)
 }
 
 // NewTrashJob creates a new trash job to trash files or directories.
-func NewTrashJob(urls []*url.URL, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
+func NewTrashJob(urls []string, shouldConfirm bool, uiDelegate IUIDelegate) *DeleteJob {
 	return delOrTrash(urls, true, shouldConfirm, uiDelegate)
 }

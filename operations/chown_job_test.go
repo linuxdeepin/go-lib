@@ -19,14 +19,14 @@ func _TestChownJob(t *testing.T) {
 		}
 
 		// TODO: generate a not existed group.
-		job := NewChownJob(u, "xx", "xx")
+		job := NewChownJob(u.String(), "xx", "xx")
 		job.Execute()
 		So(job.HasError(), ShouldBeTrue)
 
 		// TODO: make sure the original group is not targetGroup.
 		// and permission denied won't happen.
 		targetGroup := "video"
-		job2 := NewChownJob(u, "", targetGroup)
+		job2 := NewChownJob(u.String(), "", targetGroup)
 		job2.Execute()
 		So(job2.HasError(), ShouldBeFalse)
 

@@ -20,7 +20,7 @@ func TestChmodJob(t *testing.T) {
 			t.Error(err)
 			t.Fail()
 		}
-		NewChmodJob(uri, 0000).Execute()
+		NewChmodJob(uri.String(), 0000).Execute()
 		fi, err := os.Stat(target)
 		if err != nil {
 			t.Error(err)
@@ -41,7 +41,7 @@ func TestChmodJob(t *testing.T) {
 			t.Error(err)
 			t.Fail()
 		}
-		NewChmodJob(uri, 0000).Execute()
+		NewChmodJob(uri.String(), 0000).Execute()
 		// TODO: cannot find target on jenkins
 		fi, err := os.Stat(target)
 		if err != nil {

@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"net/url"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"sort"
 )
@@ -108,8 +107,8 @@ func newLaunchAppJob(file *gio.File) *LaunchAppJob {
 }
 
 // NewLaunchAppJob creates a new LaunchAppJob.
-func NewLaunchAppJob(uri *url.URL) *LaunchAppJob {
-	file := uriToGFile(uri)
+func NewLaunchAppJob(uri string) *LaunchAppJob {
+	file := gio.FileNewForCommandlineArg(uri)
 	return newLaunchAppJob(file)
 }
 

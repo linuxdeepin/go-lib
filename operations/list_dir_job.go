@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"net/url"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"strings"
 	"sync"
@@ -258,7 +257,7 @@ func newListDir(dir *gio.File, flags ListJobFlag) *ListJob {
 // NewListDirJob creates a new list job to list the contents of a directory.
 // if recusive, recusively list the contents of a directory.
 // if includeHidden, list hidden files and direcories as well.
-func NewListDirJob(dir *url.URL, flags ListJobFlag) *ListJob {
-	dest := uriToGFile(dir)
+func NewListDirJob(dir string, flags ListJobFlag) *ListJob {
+	dest := gio.FileNewForCommandlineArg(dir)
 	return newListDir(dest, flags)
 }

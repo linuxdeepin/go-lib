@@ -1,16 +1,14 @@
 package operations_test
 
 import (
-	. "pkg.linuxdeepin.com/lib/operations"
 	. "github.com/smartystreets/goconvey/convey"
-	"net/url"
+	. "pkg.linuxdeepin.com/lib/operations"
 	"testing"
 )
 
 func TestGetTemplateJob(t *testing.T) {
 	Convey("Get template from directory which consists of directories", t, func() {
-		uri, err := url.Parse("./testdata")
-		So(err, ShouldBeNil)
+		uri := "./testdata"
 		op := NewGetTemplateJob(uri)
 		So(len(op.Execute()), ShouldEqual, 0)
 	})

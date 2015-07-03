@@ -1,25 +1,20 @@
 package operations
 
-import (
-	"net/url"
-)
-
 type GetTemplateJob struct {
-	templateDirURI *url.URL
+	templateDirURI string
 }
 
-func NewGetTemplateJob(templateDirURI *url.URL) *GetTemplateJob {
+func NewGetTemplateJob(templateDirURI string) *GetTemplateJob {
 	return &GetTemplateJob{
 		templateDirURI: templateDirURI,
 	}
 }
 
 func shouldShow(property ListProperty) bool {
-	return property.CanRead && !property.IsHidden && !property.IsBackup // && property.MIME != "inode/directory"
+	return property.CanRead && !property.IsHidden && !property.IsBackup && property.MIME != "inode/directory"
 }
 
 func (job *GetTemplateJob) Execute() []string {
-
 	files := []string{}
 	listJob := NewListDirJob(job.templateDirURI, ListJobFlagNone)
 	listJob.ListenProperty(func(property ListProperty) {

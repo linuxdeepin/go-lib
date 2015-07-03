@@ -26,10 +26,8 @@ func TestRenameFile(t *testing.T) {
 
 		targetPath := filepath.Join(renameTestDir, "afile")
 		defer exec.Command("rm", targetPath).Run()
-		targetURL, err := pathToURL(targetPath)
-		So(err, ShouldBeNil)
 		newName := "newFileName"
-		job := NewRenameJob(targetURL, newName)
+		job := NewRenameJob(targetPath, newName)
 		job.Execute()
 		f, err := os.Open(targetPath)
 		if f != nil {
@@ -53,10 +51,8 @@ func TestRenameFile(t *testing.T) {
 
 		targetPath := filepath.Join(renameTestDir, "adir")
 		defer exec.Command("rm", "-r", targetPath).Run()
-		targetURL, err := pathToURL(targetPath)
-		So(err, ShouldBeNil)
 		newName := "newDirName"
-		job := NewRenameJob(targetURL, newName)
+		job := NewRenameJob(targetPath, newName)
 		job.Execute()
 		f, err := os.Open(targetPath)
 		if f != nil {
@@ -87,10 +83,8 @@ func TestRenameFile(t *testing.T) {
 		defer exec.Command("rm", "-r", targetPath).Run()
 		exec.Command("cp", "-r", src, targetPath).Run()
 
-		targetURL, err := pathToURL(targetPath)
-		So(err, ShouldBeNil)
 		newName := "newDesktop"
-		job := NewRenameJob(targetURL, newName)
+		job := NewRenameJob(targetPath, newName)
 		job.Execute()
 
 		f, err := os.Open(targetPath)
@@ -149,11 +143,8 @@ func TestRenameFile(t *testing.T) {
 		info.Unref()
 		p.Unref()
 
-		targetURL, err := pathToURL(targetPath)
-		So(err, ShouldBeNil)
-
 		newName := "newDesktopName.desktop"
-		job := NewRenameJob(targetURL, newName)
+		job := NewRenameJob(targetPath, newName)
 		job.Execute()
 
 		newTargetPath := filepath.Join(renameTestDir, newName)
@@ -183,10 +174,7 @@ func TestRenameFile(t *testing.T) {
 			So(p.GetDisplayName(), ShouldEqual, "Executable")
 			p.Unref()
 
-			targetURL, err := pathToURL(targetPath)
-			So(err, ShouldBeNil)
-
-			job := NewRenameJob(targetURL, newName)
+			job := NewRenameJob(targetPath, newName)
 			job.Execute()
 
 			a := gio.NewDesktopAppInfoFromFilename(targetPath)
@@ -203,15 +191,13 @@ func TestRenameFile(t *testing.T) {
 			targetPath := filepath.Join(renameTestDir, "zhexecutable.desktop")
 			exec.Command("cp", src, targetPath).Run()
 			defer exec.Command("rm", targetPath).Run()
-			targetURL, err := pathToURL(targetPath)
-			So(err, ShouldBeNil)
 
 			p := gio.NewDesktopAppInfoFromFilename(targetPath)
 			So(p, ShouldNotBeNil)
 			So(p.GetDisplayName(), ShouldEqual, "可执行")
 			p.Unref()
 
-			job := NewRenameJob(targetURL, newName)
+			job := NewRenameJob(targetPath, newName)
 			job.Execute()
 
 			a := gio.NewDesktopAppInfoFromFilename(targetPath)

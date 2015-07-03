@@ -36,7 +36,15 @@ func uriToGFile(uri *url.URL) *gio.File {
 	return gio.FileNewForUri(uri.String())
 }
 
-func locationListFromUrkList(uris []*url.URL) []*gio.File {
+func locationListFromUriList(uris []string) []*gio.File {
+	files := make([]*gio.File, len(uris))
+	for i, uri := range uris {
+		files[i] = gio.FileNewForCommandlineArg(uri)
+	}
+	return files
+}
+
+func locationListFromUrlList(uris []*url.URL) []*gio.File {
 	files := []*gio.File{}
 	for _, uri := range uris {
 		files = append(files, uriToGFile(uri))

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path/filepath"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
@@ -284,7 +283,7 @@ func newRenameJob(file *gio.File, newName string) *RenameJob {
 	return job
 }
 
-func NewRenameJob(file *url.URL, newName string) *RenameJob {
-	gfile := uriToGFile(file)
+func NewRenameJob(file string, newName string) *RenameJob {
+	gfile := gio.FileNewForCommandlineArg(file)
 	return newRenameJob(gfile, newName)
 }

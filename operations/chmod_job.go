@@ -2,7 +2,6 @@ package operations
 
 import (
 	"errors"
-	"net/url"
 	"os"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 )
@@ -45,7 +44,7 @@ func newChmodJob(file *gio.File, permission uint32) *ChmodJob {
 }
 
 // NewChmodJob creates a new ChmodJob.
-func NewChmodJob(uri *url.URL, permission uint32) *ChmodJob {
-	file := uriToGFile(uri)
+func NewChmodJob(uri string, permission uint32) *ChmodJob {
+	file := gio.FileNewForCommandlineArg(uri)
 	return newChmodJob(file, permission)
 }

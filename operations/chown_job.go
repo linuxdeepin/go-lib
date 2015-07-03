@@ -7,7 +7,6 @@ import "C"
 import "unsafe"
 import (
 	"errors"
-	"net/url"
 	"os"
 	"os/user"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
@@ -68,7 +67,7 @@ func newChownJob(file *gio.File, newOwner string, newGroup string) *ChownJob {
 }
 
 // NewChownJob creates a new ChownJob.
-func NewChownJob(uri *url.URL, newOwner string, newGroup string) *ChownJob {
-	file := uriToGFile(uri)
+func NewChownJob(uri string, newOwner string, newGroup string) *ChownJob {
+	file := gio.FileNewForCommandlineArg(uri)
 	return newChownJob(file, newOwner, newGroup)
 }

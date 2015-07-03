@@ -3,7 +3,6 @@ package operations
 import (
 	"fmt"
 	"math"
-	"net/url"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"pkg.linuxdeepin.com/lib/timer"
 	"strings"
@@ -1146,15 +1145,15 @@ func newCopyMoveJob(srcs []*gio.File, destDir *gio.File, targetName string, flag
 	return job
 }
 
-func newCopyMoveJobFromURL(srcURLs []*url.URL, destDirURL *url.URL, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
-	srcs := locationListFromUrkList(srcURLs)
-	destDir := uriToGFile(destDirURL)
+func newCopyMoveJobFromURL(srcURLs []string, destDirURL string, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
+	srcs := locationListFromUriList(srcURLs)
+	destDir := gio.FileNewForCommandlineArg(destDirURL)
 
 	return newCopyMoveJob(srcs, destDir, targetName, flags, uiDelegate)
 }
 
 // NewCopyJob creates a copy job.
-func NewCopyJob(srcURLs []*url.URL, destDirURL *url.URL, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
+func NewCopyJob(srcURLs []string, destDirURL string, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
 	return newCopyMoveJobFromURL(srcURLs, destDirURL, targetName, flags, uiDelegate)
 }
 
@@ -1186,6 +1185,6 @@ func markAsMoveJob(job *CopyMoveJob) *CopyMoveJob {
 }
 
 // NewMoveJob creates a move job.
-func NewMoveJob(srcURLs []*url.URL, destDirURL *url.URL, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
+func NewMoveJob(srcURLs []string, destDirURL string, targetName string, flags gio.FileCopyFlags, uiDelegate IUIDelegate) *CopyMoveJob {
 	return markAsMoveJob(newCopyMoveJobFromURL(srcURLs, destDirURL, targetName, flags, uiDelegate))
 }
