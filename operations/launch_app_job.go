@@ -1,20 +1,15 @@
 package operations
 
 import (
+	"fmt"
 	"pkg.linuxdeepin.com/lib/gio-2.0"
 	"sort"
 )
 
-// AppInfo holds the Name and Id of a application.
-type AppInfo struct {
-	Name string
-	ID   string
-}
-
-type byName []AppInfo
+type byName []*gio.AppInfo
 
 func (self byName) Less(i, j int) bool {
-	return self[i].Name < self[j].Name
+	return self[i].GetName() < self[j].GetName()
 }
 
 func (self byName) Swap(i, j int) {
@@ -25,122 +20,147 @@ func (self byName) Len() int {
 	return len(self)
 }
 
-func newAppInfo(name string, id string) AppInfo {
-	return AppInfo{
-		Name: name,
-		ID:   id,
-	}
-}
-
-// LaunchAppInfo holds default launch application, recommended applications and all the applications.
-type LaunchAppInfo struct {
-	DefaultApp      AppInfo
-	RecommendedApps []AppInfo
-	OtherApps       []AppInfo
-}
-
-// LaunchAppJob is used to list all the possible apps for launch a MIME type.
-type LaunchAppJob struct {
+// GetLaunchAppJob is the base struct for get launch relatived job.
+type GetLaunchAppJob struct {
 	*CommonJob
+	uri  string
 	file *gio.File
 }
 
-func (job *LaunchAppJob) finalize() {
+func NewGetLaunchAppJob(uri string) *GetLaunchAppJob {
+	return &GetLaunchAppJob{
+		CommonJob: newCommon(nil),
+		uri:       uri,
+		file:      gio.FileNewForCommandlineArg(uri),
+	}
+}
+
+func (job *GetLaunchAppJob) getContentType() string {
+	info, err := job.file.QueryInfo(gio.FileAttributeStandardContentType, gio.FileQueryInfoFlagsNone, nil)
+	if err != nil {
+		job.setError(err)
+		return ""
+	}
+	defer info.Unref()
+
+	return info.GetContentType()
+}
+
+func (job *GetLaunchAppJob) finalize() {
 	if job.file != nil {
 		job.file.Unref()
 	}
 }
 
-func appendApp(apps []*gio.AppInfo, appInfos *[]AppInfo, defaultAppID string) {
-	for _, app := range apps {
-		id := app.GetId()
-		name := app.GetName()
-		app.Unref()
-		if id == defaultAppID {
-			continue
-		}
-		*appInfos = append(*appInfos, newAppInfo(name, id))
+// GetDefaultLaunchAppJob will get the default launch app.
+type GetDefaultLaunchAppJob struct {
+	*GetLaunchAppJob
+	mustSupportURI bool
+}
+
+func NewGetDefaultLaunchAppJob(uri string, mustSupportURI bool) *GetDefaultLaunchAppJob {
+	return &GetDefaultLaunchAppJob{
+		GetLaunchAppJob: NewGetLaunchAppJob(uri),
+		mustSupportURI:  mustSupportURI,
 	}
 }
 
-// Execute the LaunchAppJob.
-func (job *LaunchAppJob) Execute() {
+func (job *GetDefaultLaunchAppJob) Execute() {
 	defer job.finalize()
 	defer job.emitDone()
 
-	launchAppInfo := &LaunchAppInfo{
-		RecommendedApps: []AppInfo{},
-		OtherApps:       []AppInfo{},
-	}
-	info, err := job.file.QueryInfo(gio.FileAttributeStandardContentType, gio.FileQueryInfoFlagsNone, nil)
-	if err != nil {
-		job.setError(err)
+	if job.file == nil {
+		job.setError(fmt.Errorf("No such a file: %q", job.uri))
 		return
 	}
 
-	mimeType := info.GetContentType()
-	defaultApp := gio.AppInfoGetDefaultForType(mimeType, false)
-	defaultAppName := defaultApp.GetName()
-	defaultAppID := defaultApp.GetId()
-	launchAppInfo.DefaultApp = newAppInfo(defaultAppName, defaultAppID)
+	mimeType := job.getContentType()
+	defaultApp := gio.AppInfoGetDefaultForType(mimeType, job.mustSupportURI)
+	if defaultApp == nil {
+		job.setError(fmt.Errorf("the default app of %q is not existed", job.uri))
+		return
+	}
 
-	apps := gio.AppInfoGetRecommendedForType(mimeType)
-	appendApp(apps, &(launchAppInfo.RecommendedApps), defaultAppID)
-
-	apps = gio.AppInfoGetFallbackForType(mimeType)
-	appendApp(apps, &launchAppInfo.RecommendedApps, defaultAppID)
-
-	apps = gio.AppInfoGetAll()
-	appendApp(apps, &launchAppInfo.OtherApps, defaultAppID)
-
-	sort.Sort(byName(launchAppInfo.RecommendedApps))
-	sort.Sort(byName(launchAppInfo.OtherApps))
-
-	job.setResult(launchAppInfo)
+	job.setResult(defaultApp)
 }
 
-func newLaunchAppJob(file *gio.File) *LaunchAppJob {
-	return &LaunchAppJob{
-		CommonJob: newCommon(nil),
-		file:      file,
+// GetRecommendedLaunchAppsJob will get all recommended launch apps.
+type GetRecommendedLaunchAppsJob struct {
+	*GetLaunchAppJob
+}
+
+func NewGetRecommendedLaunchAppsJob(uri string) *GetRecommendedLaunchAppsJob {
+	return &GetRecommendedLaunchAppsJob{
+		GetLaunchAppJob: NewGetLaunchAppJob(uri),
 	}
 }
 
-// NewLaunchAppJob creates a new LaunchAppJob.
-func NewLaunchAppJob(uri string) *LaunchAppJob {
-	file := gio.FileNewForCommandlineArg(uri)
-	return newLaunchAppJob(file)
+func (job *GetRecommendedLaunchAppsJob) Execute() {
+	defer job.finalize()
+	defer job.emitDone()
+
+	if job.file == nil {
+		job.setError(fmt.Errorf("No such a file: %q", job.uri))
+		return
+	}
+
+	mimeType := job.getContentType()
+	apps := gio.AppInfoGetRecommendedForType(mimeType)
+	apps = append(apps, gio.AppInfoGetFallbackForType(mimeType)...)
+
+	sort.Sort(byName(apps))
+	job.setResult(apps)
 }
 
-// SetLaunchAppJob sets the default launch applications for a MIME type.
-type SetLaunchAppJob struct {
+// GetAllLaunchAppsJob will get all apps.
+type GetAllLaunchAppsJob struct {
+	*CommonJob
+}
+
+func NewGetAllLaunchAppsJob() *GetAllLaunchAppsJob {
+	return &GetAllLaunchAppsJob{
+		CommonJob: newCommon(nil),
+	}
+}
+
+func (job *GetAllLaunchAppsJob) Execute() {
+	defer job.finalize()
+	defer job.emitDone()
+
+	apps := gio.AppInfoGetAll()
+	sort.Sort(byName(apps))
+
+	job.setResult(apps)
+}
+
+// SetDefaultLaunchAppJob sets the default launch applications for a MIME type.
+type SetDefaultLaunchAppJob struct {
 	*CommonJob
 	app      *gio.AppInfo
 	mimeType string
 }
 
-func (job *SetLaunchAppJob) finalize() {
+func (job *SetDefaultLaunchAppJob) finalize() {
 	if job.app != nil {
 		job.app.Unref()
 	}
 }
 
 // Execute the SetLaunchAppJob.
-func (job *SetLaunchAppJob) Execute() {
+func (job *SetDefaultLaunchAppJob) Execute() {
 	defer job.finalize()
 	defer job.emitDone()
 
 	_, err := job.app.SetAsDefaultForType(job.mimeType)
 	job.setError(err)
-	return
 }
 
 // NewSetLaunchAppJob creates a new SetLaunchAppJob.
-func NewSetLaunchAppJob(id string, mimeType string) *SetLaunchAppJob {
+func NewSetDefaultLaunchAppJob(id string, mimeType string) *SetDefaultLaunchAppJob {
 	desktopApp := gio.NewDesktopAppInfo(id)
 	app := gio.ToAppInfo(desktopApp)
 
-	return &SetLaunchAppJob{
+	return &SetDefaultLaunchAppJob{
 		CommonJob: newCommon(nil),
 		app:       app,
 		mimeType:  mimeType,

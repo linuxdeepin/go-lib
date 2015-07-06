@@ -1,8 +1,8 @@
 package operations_test
 
 import (
-	. "pkg.linuxdeepin.com/lib/operations"
 	. "github.com/smartystreets/goconvey/convey"
+	. "pkg.linuxdeepin.com/lib/operations"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ func TestSetLaunchAppInfo(t *testing.T) {
 	// FIXME: how to make a stable test???
 	SkipConvey("set launch app info", t, func() {
 		mimeType := "text/html"
-		job := NewSetLaunchAppJob("google-chrome.desktop", mimeType)
+		job := NewSetDefaultLaunchAppJob("google-chrome.desktop", mimeType)
 		job.Execute()
 		So(job.HasError(), ShouldBeFalse)
 	})
