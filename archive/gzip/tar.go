@@ -25,7 +25,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"os"
-	"pkg.linuxdeepin.com/lib/archive/utils"
+	"pkg.deepin.io/lib/archive/utils"
 )
 
 func tarCompressFiles(files []string, dest string) error {

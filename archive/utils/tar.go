@@ -27,7 +27,7 @@ import (
 	"io"
 	"os"
 	"path"
-	dutils "pkg.linuxdeepin.com/lib/utils"
+	dutils "pkg.deepin.io/lib/utils"
 )
 
 func TarWriterCompressFiles(writer *tar.Writer, files []string) error {

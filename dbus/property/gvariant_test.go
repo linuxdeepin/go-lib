@@ -1,7 +1,7 @@
 package property
 
 import "testing"
-import "pkg.linuxdeepin.com/lib/glib-2.0"
+import "pkg.deepin.io/lib/glib-2.0"
 
 func TestGVariant(t *testing.T) {
 	if glib.NewVariantByte(0).GetTypeString() != "y" {
