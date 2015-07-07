@@ -24,7 +24,7 @@ package graphic
 import (
 	"image"
 	"os"
-	dutils "pkg.linuxdeepin.com/lib/utils"
+	dutils "pkg.deepin.io/lib/utils"
 )
 
 // GetImageSize return image's width and height.

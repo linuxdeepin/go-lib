@@ -1,7 +1,7 @@
 package operations
 
 import (
-	"pkg.linuxdeepin.com/lib/gio-2.0"
+	"pkg.deepin.io/lib/gio-2.0"
 	"strings"
 	"sync"
 )

@@ -27,7 +27,7 @@ import (
 	golog "log"
 	"os"
 	"path/filepath"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 	"reflect"
 	"regexp"
 	"runtime"

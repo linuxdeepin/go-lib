@@ -9,7 +9,7 @@ package operations
 import "C"
 import "unsafe"
 import (
-	"pkg.linuxdeepin.com/lib/gio-2.0"
+	"pkg.deepin.io/lib/gio-2.0"
 )
 
 func getIcon(icon *gio.Icon, size int, fn func(*C.char, C.int) *C.char) string {

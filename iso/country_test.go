@@ -3,7 +3,7 @@ package iso
 import (
 	C "launchpad.net/gocheck"
 	"os"
-	. "pkg.linuxdeepin.com/lib/gettext"
+	. "pkg.deepin.io/lib/gettext"
 )
 
 const envLanguage = "LANGUAGE"

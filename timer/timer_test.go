@@ -2,7 +2,7 @@ package timer_test
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
-	. "pkg.linuxdeepin.com/lib/timer"
+	. "pkg.deepin.io/lib/timer"
 	"testing"
 	"time"
 )

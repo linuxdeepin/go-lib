@@ -3,8 +3,8 @@ package operations
 import (
 	"fmt"
 	"math"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
-	"pkg.linuxdeepin.com/lib/timer"
+	"pkg.deepin.io/lib/gio-2.0"
+	"pkg.deepin.io/lib/timer"
 	"strings"
 )
 

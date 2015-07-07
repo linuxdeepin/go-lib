@@ -23,7 +23,7 @@ package archive
 
 import (
 	"fmt"
-	"pkg.linuxdeepin.com/lib/archive/gzip"
+	"pkg.deepin.io/lib/archive/gzip"
 	"strings"
 )
 

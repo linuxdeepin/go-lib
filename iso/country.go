@@ -26,7 +26,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	. "pkg.linuxdeepin.com/lib/gettext"
+	. "pkg.deepin.io/lib/gettext"
 	"strings"
 	"sync"
 )

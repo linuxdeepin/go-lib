@@ -7,9 +7,9 @@ import "C"
 
 import (
 	"net/url"
-	"pkg.linuxdeepin.com/lib/gettext"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
-	"pkg.linuxdeepin.com/lib/gobject-2.0"
+	"pkg.deepin.io/lib/gettext"
+	"pkg.deepin.io/lib/gio-2.0"
+	"pkg.deepin.io/lib/gobject-2.0"
 	"unicode/utf8"
 	"unsafe"
 )

@@ -25,7 +25,7 @@ import (
 	"fmt"
 	C "launchpad.net/gocheck"
 	"os"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 	"testing"
 )
 

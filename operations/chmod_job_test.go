@@ -4,7 +4,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"os/exec"
-	. "pkg.linuxdeepin.com/lib/operations"
+	. "pkg.deepin.io/lib/operations"
 	"testing"
 )
 

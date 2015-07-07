@@ -5,8 +5,8 @@ import "errors"
 import "fmt"
 import "strings"
 import "log"
-import "pkg.linuxdeepin.com/lib/dbus/interfaces"
-import "pkg.linuxdeepin.com/lib/dbus/introspect"
+import "pkg.deepin.io/lib/dbus/interfaces"
+import "pkg.deepin.io/lib/dbus/introspect"
 
 func splitObjectPath(path ObjectPath) (parent ObjectPath, base string) {
 	if !path.IsValid() {

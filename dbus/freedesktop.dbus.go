@@ -5,7 +5,7 @@ import "bytes"
 import "fmt"
 import "reflect"
 import "sync"
-import "pkg.linuxdeepin.com/lib/dbus/introspect"
+import "pkg.deepin.io/lib/dbus/introspect"
 
 const InterfaceLifeManager = "com.deepin.DBus.LifeManager"
 

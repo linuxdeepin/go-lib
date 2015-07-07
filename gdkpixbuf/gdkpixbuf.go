@@ -31,7 +31,7 @@ import "unsafe"
 import (
 	"fmt"
 	"github.com/BurntSushi/xgb/xproto"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 )
 
 // Format defines the type of image format.

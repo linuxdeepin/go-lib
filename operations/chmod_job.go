@@ -3,7 +3,7 @@ package operations
 import (
 	"errors"
 	"os"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
+	"pkg.deepin.io/lib/gio-2.0"
 )
 
 // ChmodJob change the mode of a file/directory.

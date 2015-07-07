@@ -1,7 +1,7 @@
 package operations_test
 
 import (
-	. "pkg.linuxdeepin.com/lib/operations"
+	. "pkg.deepin.io/lib/operations"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )

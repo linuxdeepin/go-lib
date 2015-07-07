@@ -3,7 +3,7 @@ package initializer_test
 import (
 	"errors"
 	. "github.com/smartystreets/goconvey/convey"
-	. "pkg.linuxdeepin.com/lib/initializer"
+	. "pkg.deepin.io/lib/initializer"
 	"testing"
 )
 

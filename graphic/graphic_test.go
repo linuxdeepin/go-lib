@@ -2,7 +2,7 @@ package graphic
 
 import (
 	C "launchpad.net/gocheck"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 	"testing"
 )
 
@@ -402,15 +402,15 @@ func (g *testWrapper) TestNewImageWithColor(c *C.C) {
 func (*testWrapper) TestGetIcons(c *C.C) {
 	var datas = []struct {
 		dir    string
-		images []string
+		images map[string]string
 		ret    bool
 	}{
 		{
 			dir: "testdata/test-get_images",
-			images: []string{
-				"testdata/test-get_images/1.png",
-				"testdata/test-get_images/2.png",
-				"testdata/test-get_images/3.png",
+			images: map[string]string{
+				"testdata/test-get_images/1.png": "testdata/test-get_images/1.png",
+				"testdata/test-get_images/2.png": "testdata/test-get_images/2.png",
+				"testdata/test-get_images/3.png": "testdata/test-get_images/3.png",
 			},
 			ret: true,
 		},
@@ -431,8 +431,8 @@ func (*testWrapper) TestGetIcons(c *C.C) {
 		if data.ret {
 			c.Check(err, C.Equals, nil)
 			c.Check(len(icons), C.Equals, len(data.images))
-			for i, v := range icons {
-				c.Check(v, C.Equals, data.images[i])
+			for _, v := range icons {
+				c.Check(v, C.Equals, data.images[v])
 			}
 		} else {
 			c.Check(err, C.Not(C.Equals), nil)

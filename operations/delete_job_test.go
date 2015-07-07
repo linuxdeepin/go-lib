@@ -4,8 +4,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"os/exec"
 	"path/filepath"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
-	. "pkg.linuxdeepin.com/lib/operations"
+	"pkg.deepin.io/lib/gio-2.0"
+	. "pkg.deepin.io/lib/operations"
 	"testing"
 )
 

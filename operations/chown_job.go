@@ -9,7 +9,7 @@ import (
 	"errors"
 	"os"
 	"os/user"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
+	"pkg.deepin.io/lib/gio-2.0"
 	"strconv"
 )
 
