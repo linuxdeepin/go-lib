@@ -20,7 +20,6 @@ type ListProperty struct {
 	BaseName    string
 	URI         string
 	MIME        string
-	Icon        string
 	Size        int64
 	FileType    uint16
 	IsBackup    bool
@@ -130,11 +129,6 @@ func (job *ListJob) appendChild(child *gio.File) {
 			desktopApp.Unref()
 		}
 	}
-	gIcon := info.GetIcon()
-	icon := ""
-	if gIcon != nil {
-		icon = gIcon.ToString()
-	}
 
 	size := info.GetSize()
 	property := ListProperty{
@@ -143,7 +137,6 @@ func (job *ListJob) appendChild(child *gio.File) {
 		URI:         uri,
 		MIME:        contentType,
 		FileType:    uint16(info.GetFileType()),
-		Icon:        icon,
 		Size:        size,
 		IsBackup:    info.GetIsBackup(),
 		IsHidden:    info.GetIsHidden(),

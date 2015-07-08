@@ -68,24 +68,24 @@ char* icon_name_to_path(const char* name, int size)
 
     char* pic_name = g_strndup(name, pic_name_len);
     GtkIconTheme* them = gtk_icon_theme_get_default(); // NB: do not ref or unref it
-
     GtkIconInfo* info = gtk_icon_theme_lookup_icon(them, pic_name, size, GTK_ICON_LOOKUP_GENERIC_FALLBACK);
+
+    if (info == NULL) {
+        g_warning("get gtk icon theme info failed for %s", pic_name);
+        g_free(pic_name);
+        return NULL;
+    }
     g_free(pic_name);
 
-    if (info) {
-        char* path = g_strdup(gtk_icon_info_get_filename(info));
+    char* path = g_strdup(gtk_icon_info_get_filename(info));
 
 #if GTK_MAJOR_VERSION >= 3
-        g_object_unref(info);
+    g_object_unref(info);
 #elif GTK_MAJOR_VERSION == 2
-        gtk_icon_info_free(info);
+    gtk_icon_info_free(info);
 #endif
-        g_debug("get icon from icon theme is: %s", path);
-        return path;
-    }
-    g_warning("get gtk icon theme info failed");
-
-    return NULL;
+    g_debug("get icon from icon theme is: %s", path);
+    return path;
 }
 
 

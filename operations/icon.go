@@ -9,6 +9,7 @@ package operations
 import "C"
 import "unsafe"
 import (
+	"path/filepath"
 	"pkg.deepin.io/lib/gio-2.0"
 )
 
@@ -27,14 +28,49 @@ func getIcon(icon *gio.Icon, size int, fn func(*C.char, C.int) *C.char) string {
 	return C.GoString(cIcon)
 }
 
-func GetIconForApp(icon *gio.Icon, size int) string {
+func GetThemeIconForApp(icon *gio.Icon, size int) string {
 	return getIcon(icon, size, func(icon *C.char, size C.int) *C.char {
 		return C.get_icon_for_app(icon, size)
 	})
 }
 
-func GetIconForFile(icon *gio.Icon, size int) string {
+func GetThemeIconForFile(icon *gio.Icon, size int) string {
 	return getIcon(icon, size, func(icon *C.char, size C.int) *C.char {
 		return C.get_icon_for_file(icon, size)
 	})
+}
+
+func GetThemeIcon(file string, size int) string {
+	icon := ""
+	if filepath.Ext(file) == ".desktop" {
+		app := gio.NewDesktopAppInfoFromFilename(file)
+		if app != nil {
+			defer app.Unref()
+			gicon := app.GetIcon()
+			if gicon != nil {
+				icon = GetThemeIconForApp(gicon, size)
+			}
+		}
+	}
+
+	if icon == "" {
+		file := gio.FileNewForCommandlineArg(file)
+		if file == nil {
+			return icon
+		}
+		defer file.Unref()
+
+		info, _ := file.QueryInfo(gio.FileAttributeStandardIcon, gio.FileQueryInfoFlagsNone, nil)
+		if info == nil {
+			return icon
+		}
+		defer info.Unref()
+
+		gicon := info.GetIcon()
+		if gicon != nil {
+			icon = GetThemeIconForFile(gicon, size)
+		}
+	}
+
+	return icon
 }
