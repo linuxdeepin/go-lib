@@ -72,8 +72,10 @@ func (job *ListJob) finalize() {
 	job.CommonJob.finalize()
 }
 
-func (job *ListJob) appendChild(child *gio.File) {
-	info, err := child.QueryInfo(strings.Join(
+func GetListProperty(file *gio.File, cancellable *gio.Cancellable) (ListProperty, error) {
+	property := ListProperty{}
+
+	info, err := file.QueryInfo(strings.Join(
 		[]string{
 			gio.FileAttributeStandardName,
 			gio.FileAttributeStandardType,
@@ -96,34 +98,30 @@ func (job *ListJob) appendChild(child *gio.File) {
 			gio.FileAttributeStandardContentType,
 		}, ","),
 		gio.FileQueryInfoFlagsNofollowSymlinks,
-		nil,
+		cancellable,
 	)
 
 	if err != nil {
-		return
-	}
-
-	if info == nil {
-		return
+		return property, err
 	}
 	defer info.Unref()
 
-	fsInfo, _ := child.QueryFilesystemInfo(gio.FileAttributeFilesystemReadonly, job.cancellable)
-	if fsInfo == nil {
-		return
+	fsInfo, err := file.QueryFilesystemInfo(gio.FileAttributeFilesystemReadonly, cancellable)
+	if fsInfo != nil {
+		return property, err
 	}
 	defer fsInfo.Unref()
 
-	uri := child.GetUri()
+	uri := file.GetUri()
 	displayName := info.GetDisplayName()
 	if displayName == "" {
-		displayName = child.GetBasename()
+		displayName = file.GetBasename()
 	}
-	basename := child.GetBasename()
+	basename := file.GetBasename()
 	contentType := info.GetContentType()
 	canExecute := info.GetAttributeBoolean(gio.FileAttributeAccessCanExecute)
 	if contentType == _DesktopMIMEType && canExecute {
-		desktopApp := gio.NewDesktopAppInfoFromFilename(child.GetPath())
+		desktopApp := gio.NewDesktopAppInfoFromFilename(file.GetPath())
 		if desktopApp != nil {
 			displayName = desktopApp.GetDisplayName()
 			desktopApp.Unref()
@@ -131,7 +129,7 @@ func (job *ListJob) appendChild(child *gio.File) {
 	}
 
 	size := info.GetSize()
-	property := ListProperty{
+	property = ListProperty{
 		DisplayName: displayName,
 		BaseName:    basename,
 		URI:         uri,
@@ -148,11 +146,18 @@ func (job *ListJob) appendChild(child *gio.File) {
 		CanTrash:    info.GetAttributeBoolean(gio.FileAttributeAccessCanTrash),
 		CanWrite:    info.GetAttributeBoolean(gio.FileAttributeAccessCanWrite),
 	}
+	return property, nil
+}
+
+func (job *ListJob) appendChild(child *gio.File) {
+	property, err := GetListProperty(child, job.cancellable)
+	if err != nil {
+		return
+	}
 
 	job.emitProperty(property)
-	fileType := child.QueryFileType(gio.FileQueryInfoFlagsNofollowSymlinks, job.cancellable)
 	unit := AmountUnitFiles
-	switch gio.FileType(fileType) {
+	switch gio.FileType(property.FileType) {
 	case gio.FileTypeDirectory:
 		unit = AmountUnitDirectories
 	}
