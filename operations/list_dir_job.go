@@ -107,7 +107,7 @@ func GetListProperty(file *gio.File, cancellable *gio.Cancellable) (ListProperty
 	defer info.Unref()
 
 	fsInfo, err := file.QueryFilesystemInfo(gio.FileAttributeFilesystemReadonly, cancellable)
-	if fsInfo != nil {
+	if err != nil {
 		return property, err
 	}
 	defer fsInfo.Unref()
