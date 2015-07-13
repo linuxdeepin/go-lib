@@ -29,6 +29,52 @@ func QueryURI(uri string) (string, error) {
 	return queryThemeMime(file)
 }
 
+// Set 'mime' default app to 'desktopId'
+//
+// desktopId: the basename of the desktop file
+func SetDefaultApp(mime, desktopId string) error {
+	app := gio.NewDesktopAppInfo(desktopId)
+	if app == nil {
+		return fmt.Errorf("Invalid id '%v'", desktopId)
+	}
+	defer app.Unref()
+
+	_, err := app.SetAsDefaultForType(mime)
+	return err
+}
+
+// Get default app for 'mime'
+//
+// ret0: desktopId
+func GetDefaultApp(mime string, mustSupportURIs bool) (string, error) {
+	app := gio.AppInfoGetDefaultForType(mime, false)
+	if app == nil {
+		return "", fmt.Errorf("Invalid mime '%v'", mime)
+	}
+	defer app.Unref()
+
+	if mustSupportURIs {
+		if !app.SupportsUris() {
+			return "", fmt.Errorf("Not found app supported '%s' and uris", mime)
+		}
+	}
+
+	return app.GetId(), nil
+}
+
+// Get app list of supported the 'mime'
+// ret0: desktopId list
+func GetAppList(mime string) []string {
+	apps := gio.AppInfoGetAllForType(mime)
+
+	var list []string
+	for _, app := range apps {
+		list = append(list, app.GetId())
+		app.Unref()
+	}
+	return list
+}
+
 func queryThemeMime(file string) (string, error) {
 	gtk, _ := checker.IsGtkTheme(file)
 	if gtk {
