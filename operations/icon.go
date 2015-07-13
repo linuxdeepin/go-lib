@@ -9,6 +9,9 @@ package operations
 import "C"
 import "unsafe"
 import (
+	"fmt"
+	"net/url"
+	"os"
 	"path/filepath"
 	"pkg.deepin.io/lib/gio-2.0"
 )
@@ -40,15 +43,31 @@ func GetThemeIconForFile(icon *gio.Icon, size int) string {
 	})
 }
 
+const (
+	_UserExecutable os.FileMode = 0500
+)
+
+func isUserExecutable(perm os.FileMode) bool {
+	return perm&_UserExecutable != 0
+}
+
 func GetThemeIcon(file string, size int) string {
 	icon := ""
 	if filepath.Ext(file) == ".desktop" {
-		app := gio.NewDesktopAppInfoFromFilename(file)
-		if app != nil {
-			defer app.Unref()
-			gicon := app.GetIcon()
-			if gicon != nil {
-				icon = GetThemeIconForApp(gicon, size)
+		u, _ := url.Parse(file)
+		stat, err := os.Stat(u.Path)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			if isUserExecutable(stat.Mode().Perm()) {
+				app := gio.NewDesktopAppInfoFromFilename(u.Path)
+				if app != nil {
+					defer app.Unref()
+					gicon := app.GetIcon()
+					if gicon != nil {
+						icon = GetThemeIconForApp(gicon, size)
+					}
+				}
 			}
 		}
 	}
