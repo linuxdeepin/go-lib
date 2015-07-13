@@ -49,7 +49,8 @@ func (err *UserNotFoundError) Error() string {
 	}
 }
 
-// GetPasswdByName wraps up `getpwnam` system call
+// GetPasswdByName wraps up `getpwnam` system call.
+// It retrieves records from the password file based on username.
 func GetPasswdByName(name string) (*Passwd, error) {
 	nameC := C.CString(name)
 	defer C.free(unsafe.Pointer(nameC))
@@ -65,7 +66,8 @@ func GetPasswdByName(name string) (*Passwd, error) {
 	}
 }
 
-// GetPasswdByUid wraps up `getpwuid` system call
+// GetPasswdByUid wraps up `getpwuid` system call.
+// It retrieves records from the password file based on uid.
 func GetPasswdByUid(uid uint32) (*Passwd, error) {
 	uidC := C.__uid_t(uid)
 	passwdC, err := C.getpwuid(uidC)
@@ -78,4 +80,24 @@ func GetPasswdByUid(uid uint32) (*Passwd, error) {
 	} else {
 		return passwdC2Go(passwdC), nil
 	}
+}
+
+// GetPasswdEntry wraps up `getpwent` system call
+// It performs sequential scans of the records in the password file.
+func GetPasswdEntry() []*Passwd {
+	passwds := make([]*Passwd, 0)
+
+	// Restart scanning from the begging of the password file.
+	C.setpwent()
+
+	for passwdC, err := C.getpwent(); passwdC != nil && err == nil; passwdC, err = C.getpwent() {
+		passwd := passwdC2Go(passwdC)
+		passwds = append(passwds, passwd)
+	}
+
+	// Call endpwent() is necessary so that any subsequent getpwent() call will
+	// reopen the password file and start from the beginning.
+	C.endpwent()
+
+	return passwds
 }

@@ -38,3 +38,9 @@ func (*testWrapper) TestGetPasswdByUid(c *C.C) {
 	c.Check(err, C.IsNil)
 	c.Check(passwd.Name, C.Equals, "root")
 }
+
+func (*testWrapper) TestGetPasswdEntry(c *C.C) {
+	passwds := GetPasswdEntry()
+	c.Check(len(passwds), C.Not(C.Equals), 0)
+	c.Check(passwds[0].Name, C.Equals, "root")
+}
