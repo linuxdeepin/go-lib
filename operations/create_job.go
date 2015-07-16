@@ -8,6 +8,8 @@ import (
 	"unicode/utf8"
 )
 
+// TODO: add flags?? like CreateFlagAutoRename
+
 type _TargetInfo struct {
 	filename               string
 	newFilename            string
@@ -19,6 +21,7 @@ type _TargetInfo struct {
 }
 
 // CreateJob is used to create file, directory or symbol link.
+// The uri of created file will be returned.
 type CreateJob struct {
 	*CommonJob
 	destDir     *gio.File
@@ -285,9 +288,9 @@ func (job *CreateJob) Execute() error {
 	dest := job.getDest(targetInfo)
 
 retry:
-	res, err := job.createTarget(dest)
+	ok, err := job.createTarget(dest)
 
-	if res {
+	if ok {
 		job.createdFile = dest // Ref??
 		// TODO:
 		// nautilus_file_changes_queue_file_added(dest)
@@ -296,6 +299,7 @@ retry:
 		// } else {
 		// 	nautilus_file_changes_queue_schedule_position_remove(dest)
 		// }
+		job.setResult(dest.GetUri())
 		return nil
 	}
 
@@ -305,6 +309,7 @@ retry:
 		goto retry
 	}
 
+	job.setResult(dest.GetUri())
 	dest.Unref()
 	return nil
 }
