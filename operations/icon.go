@@ -4,6 +4,7 @@ package operations
 // #cgo pkg-config: gtk+-3.0
 // #cgo CFLAGS: -std=c99
 // #include <stdlib.h>
+// char* icon_name_to_path_with_check_xpm(const char* name, int size);
 // char* get_icon_for_app(char* file_path, int size);
 // char* get_icon_for_file(char* icons, int size);
 import "C"
@@ -43,6 +44,20 @@ func GetThemeIconForFile(icon *gio.Icon, size int) string {
 	})
 }
 
+func GetThemeIconFromIconName(iconName string, size int) string {
+	if iconName == "" {
+		return ""
+	}
+
+	cIconName := C.CString(iconName)
+	defer C.free(unsafe.Pointer(cIconName))
+
+	cIcon := C.icon_name_to_path_with_check_xpm(cIconName, C.int(size))
+	defer C.free(unsafe.Pointer(cIcon))
+
+	return C.GoString(cIcon)
+}
+
 const (
 	_UserExecutable os.FileMode = 0500
 )
@@ -75,7 +90,7 @@ func GetThemeIcon(file string, size int) string {
 	if icon == "" {
 		file := gio.FileNewForCommandlineArg(file)
 		if file == nil {
-			return icon
+			return GetThemeIconFromIconName(icon, size)
 		}
 		defer file.Unref()
 

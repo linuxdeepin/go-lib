@@ -103,7 +103,6 @@ char* check_xpm(const char* path)
 }
 
 
-static
 char* icon_name_to_path_with_check_xpm(const char* name, int size)
 {
     char* path = icon_name_to_path(name, size);
