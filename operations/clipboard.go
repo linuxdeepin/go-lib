@@ -46,7 +46,7 @@ func CanPasteInto(file string) bool {
 			gio.FileAttributeStandardType,
 			gio.FileAttributeAccessCanWrite,
 			gio.FileAttributeStandardTargetUri,
-		}, "+"), gio.FileQueryInfoFlagsNone, nil)
+		}, ","), gio.FileQueryInfoFlagsNone, nil)
 	if info == nil {
 		return false
 	}
