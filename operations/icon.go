@@ -1,4 +1,3 @@
-// gtk_init should be invokded first.
 package operations
 
 // #cgo pkg-config: gtk+-3.0
@@ -32,18 +31,21 @@ func getIcon(icon *gio.Icon, size int, fn func(*C.char, C.int) *C.char) string {
 	return C.GoString(cIcon)
 }
 
+// GetThemeIconForApp returns the icon for application.
 func GetThemeIconForApp(icon *gio.Icon, size int) string {
 	return getIcon(icon, size, func(icon *C.char, size C.int) *C.char {
 		return C.get_icon_for_app(icon, size)
 	})
 }
 
+// GetThemeIconForFile returns the icon for normal files.
 func GetThemeIconForFile(icon *gio.Icon, size int) string {
 	return getIcon(icon, size, func(icon *C.char, size C.int) *C.char {
 		return C.get_icon_for_file(icon, size)
 	})
 }
 
+// GetThemeIconFromIconName returns icon from icon name.
 func GetThemeIconFromIconName(iconName string, size int) string {
 	if iconName == "" {
 		return ""
@@ -66,10 +68,14 @@ func isUserExecutable(perm os.FileMode) bool {
 	return perm&_UserExecutable != 0
 }
 
-func GetThemeIcon(file string, size int) string {
-	icon := ""
-	if filepath.Ext(file) == ".desktop" {
-		u, _ := url.Parse(file)
+// GetThemeIcon returns full path for icon.
+// @param iconStr can be uri or path of files, or the icon name.
+// @param size is the expected size of icon.
+func GetThemeIcon(iconStr string, size int) string {
+	icon := GetThemeIconFromIconName(iconStr, size)
+
+	if icon == "" && filepath.Ext(iconStr) == ".desktop" {
+		u, _ := url.Parse(iconStr)
 		stat, err := os.Stat(u.Path)
 		if err != nil {
 			fmt.Println(err)
@@ -88,14 +94,13 @@ func GetThemeIcon(file string, size int) string {
 	}
 
 	if icon == "" {
-		file := gio.FileNewForCommandlineArg(file)
-		if file == nil {
-			return GetThemeIconFromIconName(icon, size)
-		}
+		// gio.FileNewForCommandlineArg never failed, even if the arg is malformed path.
+		file := gio.FileNewForCommandlineArg(iconStr)
 		defer file.Unref()
 
-		info, _ := file.QueryInfo(gio.FileAttributeStandardIcon, gio.FileQueryInfoFlagsNone, nil)
+		info, err := file.QueryInfo(gio.FileAttributeStandardIcon, gio.FileQueryInfoFlagsNone, nil)
 		if info == nil {
+			fmt.Println(err)
 			return icon
 		}
 		defer info.Unref()
