@@ -26,6 +26,9 @@ func (e SignalError) Error() string {
 		return fmt.Sprintf("Invalid signal name %q", e.SignalName)
 	case ErrorSignalNotFound:
 		return fmt.Sprintf("No such a signal %q", e.SignalName)
+	case ErrorNoMonitor:
+		return fmt.Sprintf("No such a monitor %q", e.SignalName)
+
 	}
 
 	panic("wrong SignalError Code")
