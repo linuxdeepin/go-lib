@@ -105,7 +105,7 @@ func (m *SignalManager) ListenSignal(signalName string, fn interface{}) (func(),
 	}
 
 	if reflect.TypeOf(fn).Kind() != reflect.Func {
-		return func() {}, errors.New("not a function")
+		panic("function is required for listening signal.")
 	}
 
 	return reactor.Add(fn), nil
@@ -120,11 +120,11 @@ func (m *SignalManager) Emit(signalName string, args ...interface{}) error {
 	return m.emitReactor(reactor, args...)
 }
 
-func genArgs(fnType reflect.Type, args []interface{}) ([]reflect.Value, error) {
+func genArgs(fnType reflect.Type, args []interface{}) []reflect.Value {
 	expectNArgs := fnType.NumIn()
 	actualNArgs := len(args)
 	if expectNArgs != actualNArgs {
-		return nil, fmt.Errorf("the function %s expect %d arguments, acctually get %d arguments", fnType, expectNArgs, actualNArgs)
+		panic(fmt.Sprintf("the function %s expect %d arguments, acctually get %d arguments", fnType, expectNArgs, actualNArgs))
 	}
 
 	argsValues := make([]reflect.Value, expectNArgs)
@@ -139,12 +139,12 @@ func genArgs(fnType reflect.Type, args []interface{}) ([]reflect.Value, error) {
 		actualType := argValue.Type()
 		if argType != actualType && !actualType.Implements(argType) {
 			// TODO: change %dth to %dst, %dnd, %drd, %dth.
-			return nil, fmt.Errorf("the %dth argument on function %s gets wrong type: expect %v, actually get %v", i, fnType, argType, actualType)
+			panic(fmt.Sprintf("the %dth argument on function %s gets wrong type: expect %v, actually get %v", i, fnType, argType, actualType))
 		}
 		argsValues[i] = argValue
 	}
 
-	return argsValues, nil
+	return argsValues
 }
 
 func (m *SignalManager) emitReactor(reactor *SignalReactor, args ...interface{}) error {
@@ -152,19 +152,15 @@ func (m *SignalManager) emitReactor(reactor *SignalReactor, args ...interface{})
 	defer enumerator.Close()
 	for f := range enumerator.Next() {
 		if m.cancellable != nil && m.cancellable.IsCancelled() {
-			return nil
+			return errors.New("emit operations is cancelled.")
 		}
 
 		fn := reflect.ValueOf(f)
 		if fn.Kind() != reflect.Func {
-			return errors.New("not a function")
+			panic("function is required for emitting signal.")
 		}
 
-		argsValues, err := genArgs(fn.Type(), args)
-		if err != nil {
-			return err
-		}
-
+		argsValues := genArgs(fn.Type(), args)
 		fn.Call(argsValues)
 	}
 

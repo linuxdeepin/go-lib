@@ -128,10 +128,10 @@ func (job *CommonJob) ListenProcessedAmount(fn func(amount int64, unit AmountUni
 }
 
 func (job *CommonJob) emitProcessedAmount(amount int64, unit AmountUnit) {
-	job.Emit(_JobSignalProcessedAmount, func(f interface{}, args ...interface{}) {
-		fn := f.(func(int64, AmountUnit))
-		fn(amount, unit)
-	})
+	err := job.Emit(_JobSignalProcessedAmount, amount, unit)
+	if err != nil {
+		fmt.Println("emit ProcessedAmount signal failed:", err)
+	}
 }
 
 func (job *CommonJob) setProcessedAmount(size int64, unit AmountUnit) {
@@ -148,10 +148,10 @@ func (job *CommonJob) setProcessedAmount(size int64, unit AmountUnit) {
 }
 
 func (job *CommonJob) doEmitSpeed(speed uint64) {
-	job.Emit(_JobSignalSpeed, func(f interface{}, args ...interface{}) {
-		fn := f.(func(uint64))
-		fn(speed)
-	})
+	err := job.Emit(_JobSignalSpeed, speed)
+	if err != nil {
+		fmt.Println("emit Speed signal failed:", err)
+	}
 }
 
 func (job *CommonJob) emitSpeed(speed uint64) {
@@ -180,10 +180,10 @@ func (job *CommonJob) ListenSpeed(fn func(uint64)) (func(), error) {
 }
 
 func (job *CommonJob) doEmitPercent(percent int64) {
-	job.Emit(_JobSignalPercent, func(f interface{}, args ...interface{}) {
-		fn := f.(func(int64))
-		fn(percent)
-	})
+	err := job.Emit(_JobSignalPercent, percent)
+	if err != nil {
+		fmt.Println("emit Percent signal failed", err)
+	}
 }
 
 func (job *CommonJob) emitPercent(processedAmount int64, totalAmount int64) {
@@ -201,10 +201,10 @@ func (job *CommonJob) ListenPercent(fn func(int64)) (func(), error) {
 }
 
 func (job *CommonJob) emitTotalAmount(totalAmount int64, unit AmountUnit) {
-	job.Emit(_JobSignalTotalAmount, func(f interface{}, args ...interface{}) {
-		fn := f.(func(int64, AmountUnit))
-		fn(totalAmount, unit)
-	})
+	err := job.Emit(_JobSignalTotalAmount, totalAmount, unit)
+	if err != nil {
+		fmt.Println("emit TotalAmount signal failed:", err)
+	}
 }
 
 func (job *CommonJob) ListenTotalAmount(fn func(int64, AmountUnit)) (func(), error) {
