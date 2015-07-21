@@ -89,7 +89,7 @@ func (m *SignalManager) getSignalReactor(signalName string) (*SignalReactor, err
 
 func (m *SignalManager) createMonitor(signalName string) *SignalReactor {
 	signalName = normalizeSignalName(signalName)
-	m.reactors[signalName] = NewSignalReactor(m.cancellable)
+	m.reactors[signalName] = NewSignalReactor(signalName, m.cancellable)
 	return m.reactors[signalName]
 }
 

@@ -49,14 +49,16 @@ func newReactorElement(id int64, fn interface{}) *ReactorElement {
 
 // SignalReactor is a reactor of one signal.
 type SignalReactor struct {
+	signalName  string
 	elements    *list.List // there is no priority, priority queue is not necessary.
 	lock        sync.Mutex
 	cancellable *gio.Cancellable
 }
 
 // NewSignalReactor creates a new SignalReactor.
-func NewSignalReactor(cancellable *gio.Cancellable) *SignalReactor {
+func NewSignalReactor(signalName string, cancellable *gio.Cancellable) *SignalReactor {
 	return &SignalReactor{
+		signalName:  signalName,
 		elements:    list.New(),
 		cancellable: cancellable,
 	}
