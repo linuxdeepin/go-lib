@@ -60,11 +60,6 @@ void init_clipboard()
         /* gdk_error_trap_push(); */
         copied_files_atom = gdk_atom_intern("x-special/gnome-copied-files", FALSE);
         g_signal_connect(clipboard, "owner-change", G_CALLBACK(owner_change_callback), NULL);
-        GdkAtom* targets = NULL;
-        int n_targets = 0;
-        gtk_clipboard_wait_for_targets(clipboard, &targets, &n_targets);
-        can_paste = do_get_can_paste(targets, n_targets);;
-        g_free(targets);
     }
 }
 
@@ -72,6 +67,16 @@ void init_clipboard()
 int get_can_paste()
 {
     init_clipboard();
+
+    static gboolean inited = FALSE;
+    if (!inited) {
+        inited = TRUE;
+        GdkAtom* targets = NULL;
+        int n_targets = 0;
+        gtk_clipboard_wait_for_targets(clipboard, &targets, &n_targets);
+        can_paste = do_get_can_paste(targets, n_targets);;
+        g_free(targets);
+    }
     return can_paste;
 }
 
@@ -156,9 +161,14 @@ char* convert_file_list_to_string(struct ClipboardInfo* info, gboolean format_fo
 
 
 static
-void clipboard_get_callback(GtkClipboard* c, GtkSelectionData* selection_data, guint info, gpointer user_data_or_owner)
+void clipboard_get_callback(GtkClipboard* c, GtkSelectionData* selection_data, guint info, gpointer clear)
 {
     GdkAtom target = gtk_selection_data_get_target(selection_data);
+
+    if (GPOINTER_TO_INT(clear)) {
+        gtk_clipboard_clear(c);
+        return;
+    }
 
     if(gtk_targets_include_uri(&target, 1)) {
         G_LOCK(clipboard_info_lock);
@@ -186,24 +196,15 @@ void clipboard_get_callback(GtkClipboard* c, GtkSelectionData* selection_data, g
 }
 
 
-void clear_clipboard()
+static
+void clipboard_clear_callback(GtkClipboard* c, gpointer clear)
 {
-    init_clipboard();
-    gtk_clipboard_clear(clipboard);
 }
 
 
 static
-void clipboard_clear_callback(GtkClipboard* c, gpointer user_data_or_owner)
+void do_set_op_content_to_clipboard(int is_cut, char** files, int n, int clear)
 {
-    /* gtk_clipboard_clear(c); */
-}
-
-
-void set_op_content_to_clipboard(int is_cut, char** files, int n)
-{
-    init_clipboard();
-
     GtkTargetList *target_list;
     GtkTargetEntry *targets;
     int n_targets;
@@ -237,8 +238,9 @@ void set_op_content_to_clipboard(int is_cut, char** files, int n)
 
     gtk_clipboard_set_with_data(clipboard,
                                 targets, n_targets,
-                                clipboard_get_callback, clipboard_clear_callback,
-                                NULL);
+                                clipboard_get_callback,
+                                clipboard_clear_callback,
+                                GINT_TO_POINTER(clear));
     gtk_target_table_free(targets, n_targets);
 }
 
@@ -247,3 +249,18 @@ void freeStrv(void* p)
 {
     g_strfreev(p);
 }
+
+void set_op_content_to_clipboard(int is_cut, char** files, int n)
+{
+    init_clipboard();
+    do_set_op_content_to_clipboard(is_cut, files, n, 0);
+}
+
+
+void clear_clipboard()
+{
+    init_clipboard();
+    do_set_op_content_to_clipboard(1, NULL, 0, 1);
+}
+
+
