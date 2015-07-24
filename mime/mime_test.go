@@ -22,7 +22,7 @@ func TestQueryURI(t *testing.T) {
 		}
 
 		for _, info := range infos {
-			m, err := QueryURI(info.uri)
+			m, err := Query(info.uri)
 			So(m, ShouldEqual, info.mime)
 			So(err, ShouldBeNil)
 		}

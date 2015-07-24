@@ -15,8 +15,17 @@ const (
 	mimeTypeTheme = "application/x-theme"
 )
 
-func QueryURI(uri string) (string, error) {
+func Query(uri string) (string, error) {
 	file := dutils.DecodeURI(uri)
+	if !dutils.IsFileExist(file) {
+		// 'cursor.theme' may not exist
+		cursor, _ := checker.IsCursorTheme(file)
+		if cursor {
+			return MimeTypeCursor, nil
+		}
+		return "", fmt.Errorf("Not found the file '%s'", uri)
+	}
+
 	mime, err := doQueryFile(file)
 	if err != nil {
 		return "", err
