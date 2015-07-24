@@ -32,9 +32,11 @@ func IsIconTheme(uri string) (bool, error) {
 	}
 	defer kfile.Free()
 
-	if !kfile.HasGroup("Icon Theme") {
-		return false, fmt.Errorf("Not the group 'Icon Theme'")
+	_, err = kfile.GetString("Icon Theme", "Directories")
+	if err != nil {
+		return false, err
 	}
+
 	return true, nil
 }
 
