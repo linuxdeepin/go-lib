@@ -250,25 +250,26 @@ func (job *RenameJob) Execute() {
 		info.GetAttributeBoolean(gio.FileAttributeAccessCanExecute) {
 		err = job.setDesktopName()
 		if err != nil {
+			// FIXME: this error will be overwrite if error occurs later.
 			job.setError(err)
 		}
-	} else {
-		job.emitOldName(displayName)
-		newFile, err := job.file.SetDisplayName(job.newName, job.cancellable)
-		if newFile != nil {
-			job.emitNewFile(newFile.GetUri())
-			newFile.Unref()
-		}
+	}
+
+	job.emitOldName(displayName)
+	newFile, err := job.file.SetDisplayName(job.newName, job.cancellable)
+	if newFile != nil {
+		job.emitNewFile(newFile.GetUri())
+		newFile.Unref()
+	}
+	if err != nil {
+		job.setError(err)
+		return
+	}
+
+	if job.userDir != "" {
+		err = job.changeUserDir()
 		if err != nil {
 			job.setError(err)
-			return
-		}
-
-		if job.userDir != "" {
-			err = job.changeUserDir()
-			if err != nil {
-				job.setError(err)
-			}
 		}
 	}
 }
