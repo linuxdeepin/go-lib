@@ -1,4 +1,4 @@
-package checker
+package mime
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -7,7 +7,7 @@ import (
 
 func TestIsGtkTheme(t *testing.T) {
 	Convey("Deepin is gtk theme", t, func() {
-		ok, err := IsGtkTheme("testdata/Deepin/index.theme")
+		ok, err := isGtkTheme("testdata/Deepin/index.theme")
 		So(ok, ShouldEqual, true)
 		So(err, ShouldBeNil)
 	})
@@ -15,7 +15,7 @@ func TestIsGtkTheme(t *testing.T) {
 
 func TestIsIconTheme(t *testing.T) {
 	Convey("Deepin is icon theme", t, func() {
-		ok, err := IsIconTheme("testdata/Deepin/index.theme")
+		ok, err := isIconTheme("testdata/Deepin/index.theme")
 		So(ok, ShouldEqual, true)
 		So(err, ShouldBeNil)
 	})
@@ -23,7 +23,7 @@ func TestIsIconTheme(t *testing.T) {
 
 func TestIsCursorTheme(t *testing.T) {
 	Convey("Deepin is cursor theme", t, func() {
-		ok, err := IsCursorTheme("testdata/Deepin/index.theme")
+		ok, err := isCursorTheme("testdata/Deepin/index.theme")
 		So(ok, ShouldEqual, true)
 		So(err, ShouldBeNil)
 	})

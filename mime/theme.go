@@ -1,10 +1,8 @@
-// Theme checker
-package checker
+package mime
 
 import (
 	"fmt"
 	"path"
-	"pkg.deepin.io/lib/gio-2.0"
 	dutils "pkg.deepin.io/lib/utils"
 )
 
@@ -12,20 +10,38 @@ const (
 	mimeTypeXCursor = "image/x-xcursor"
 )
 
-// uri: ex "file:///usr/share/themes/Deepin/index.theme"
-func IsGtkTheme(uri string) (bool, error) {
+func queryThemeMime(file string) (string, error) {
+	gtk, _ := isGtkTheme(file)
+	if gtk {
+		return MimeTypeGtk, nil
+	}
+
+	icon, _ := isIconTheme(file)
+	if icon {
+		return MimeTypeIcon, nil
+	}
+
+	cursor, _ := isCursorTheme(file)
+	if cursor {
+		return MimeTypeCursor, nil
+	}
+
+	return "", fmt.Errorf("The mime of '%s' not supported", file)
+}
+
+// file: ex "/usr/share/themes/Deepin/index.theme"
+func isGtkTheme(file string) (bool, error) {
 	var conditions = []string{
 		"gtk-2.0",
 		"gtk-3.0",
 		"metacity-1",
 	}
-	dir := path.Dir(dutils.DecodeURI(uri))
+	dir := path.Dir(file)
 	return isFilesInDir(conditions, dir)
 }
 
-// uri: ex "file:///usr/share/icons/Deepin/index.theme"
-func IsIconTheme(uri string) (bool, error) {
-	file := dutils.DecodeURI(uri)
+// file: ex "/usr/share/icons/Deepin/index.theme"
+func isIconTheme(file string) (bool, error) {
 	kfile, err := dutils.NewKeyFileFromFile(file)
 	if err != nil {
 		return false, err
@@ -40,12 +56,11 @@ func IsIconTheme(uri string) (bool, error) {
 	return true, nil
 }
 
-// uri: ex "file:///usr/share/icons/Deepin/index.theme"
-func IsCursorTheme(uri string) (bool, error) {
-	file := dutils.DecodeURI(uri)
+// file: ex "/usr/share/icons/Deepin/index.theme"
+func isCursorTheme(file string) (bool, error) {
 	parent := path.Dir(file)
 	tmp := path.Join(parent, "cursors", "left_ptr")
-	mime, err := queryFileMime(tmp)
+	mime, err := doQueryFile(tmp)
 	if err != nil {
 		return false, err
 	}
@@ -68,24 +83,4 @@ func isFilesInDir(files []string, dir string) (bool, error) {
 		}
 	}
 	return true, nil
-}
-
-func queryFileMime(file string) (string, error) {
-	if !dutils.IsFileExist(file) {
-		return "", fmt.Errorf("Not found the file '%s'", file)
-	}
-
-	var gf = gio.FileNewForPath(file)
-	defer gf.Unref()
-
-	info, err := gf.QueryInfo(
-		gio.FileAttributeStandardContentType,
-		gio.FileQueryInfoFlagsNone, nil)
-	if err != nil {
-		return "", err
-	}
-	defer info.Unref()
-
-	return info.GetAttributeString(
-		gio.FileAttributeStandardContentType), nil
 }

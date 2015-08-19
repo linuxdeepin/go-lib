@@ -3,7 +3,6 @@ package mime
 import (
 	"fmt"
 	"pkg.deepin.io/lib/gio-2.0"
-	"pkg.deepin.io/lib/theme/checker"
 	dutils "pkg.deepin.io/lib/utils"
 )
 
@@ -15,27 +14,17 @@ const (
 	mimeTypeTheme = "application/x-theme"
 )
 
+// Query query file mime type
 func Query(uri string) (string, error) {
 	file := dutils.DecodeURI(uri)
-	if !dutils.IsFileExist(file) {
-		// 'cursor.theme' may not exist
-		cursor, _ := checker.IsCursorTheme(file)
-		if cursor {
-			return MimeTypeCursor, nil
-		}
-		return "", fmt.Errorf("Not found the file '%s'", uri)
-	}
 
-	mime, err := doQueryFile(file)
-	if err != nil {
-		return "", err
-	}
-
-	if mime != mimeTypeTheme {
+	// determine whether theme type
+	mime, err := queryThemeMime(file)
+	if err == nil {
 		return mime, nil
 	}
 
-	return queryThemeMime(file)
+	return doQueryFile(file)
 }
 
 // Set 'mime' default app to 'desktopId'
@@ -82,25 +71,6 @@ func GetAppList(mime string) []string {
 		app.Unref()
 	}
 	return list
-}
-
-func queryThemeMime(file string) (string, error) {
-	gtk, _ := checker.IsGtkTheme(file)
-	if gtk {
-		return MimeTypeGtk, nil
-	}
-
-	icon, _ := checker.IsIconTheme(file)
-	if icon {
-		return MimeTypeIcon, nil
-	}
-
-	cursor, _ := checker.IsCursorTheme(file)
-	if cursor {
-		return MimeTypeCursor, nil
-	}
-
-	return "", fmt.Errorf("The mime of '%s' not supported", file)
 }
 
 func doQueryFile(file string) (string, error) {
