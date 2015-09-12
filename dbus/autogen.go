@@ -113,12 +113,13 @@ func BuildInterfaceInfo(ifc interface{}) *introspect.InterfaceInfo {
 			if access != "readwrite" {
 				access = "read"
 			}
-			if field.Type.Implements(propertyType) {
-				field_v := getValueOf(ifc).Field(i)
-				if field_v.IsNil() {
+
+			v := getValueOf(ifc).Field(i)
+			if p, ok := v.Interface().(Property); ok {
+				if p == nil {
 					log.Println("UnInit dbus property", field.Name)
 				} else {
-					t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
+					t := p.GetType()
 					if t != nil {
 						ifc_info.Properties = append(ifc_info.Properties, introspect.PropertyInfo{
 							Name:   field.Name,

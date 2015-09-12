@@ -136,9 +136,11 @@ func (propProxy PropertiesProxy) Set(ifcName string, propName string, value Vari
 			if !v.CanAddr() {
 				return NewPropertyNotWritableError(propName)
 			}
-			if v.Type().Implements(propertyType) {
-				if reflect.TypeOf(value.Value()) == v.MethodByName("GetType").Interface().(func() reflect.Type)() {
-					v.MethodByName("SetValue").Interface().(func(interface{}))(value.Value())
+
+			if p, ok := v.Interface().(Property); ok {
+				if reflect.TypeOf(value.Value()) == p.GetType() {
+					p.SetValue(value.Value())
+
 					fn := reflect.ValueOf(ifc).MethodByName("OnPropertiesChanged")
 					if fn.IsValid() && !fn.IsNil() {
 						fn.Call([]reflect.Value{reflect.ValueOf(propName), reflect.Zero(reflect.TypeOf(value.Value()))})
@@ -191,14 +193,11 @@ func (propProxy PropertiesProxy) Get(ifcName string, propName string) (Variant, 
 			return MakeVariant(""), NewUnknowPropertyError(propName)
 		}
 
-		if value.Type().Implements(propertyType) {
-			if value.IsNil() {
+		if p, ok := value.Interface().(Property); ok {
+			if p == nil {
 				return MakeVariant(""), fmt.Errorf("nil dbus.Property(%s:%s)", ifcName, propName)
-			} else if fun, ok := value.MethodByName("GetValue").Interface().(func() interface{}); ok {
-				t := fun()
-				return MakeVariant(t), nil
 			} else {
-				return MakeVariant(""), NewUnknowPropertyError(propName)
+				return MakeVariant(p.GetValue()), nil
 			}
 		} else if reflect.TypeOf(ifc).Implements(dbusObjectInterface) {
 			value = tryTranslateDBusObjectToObjectPath(detectConnByDBusObject(ifc.(DBusObject)), value)

@@ -37,7 +37,6 @@ var (
 	dbusObject          DBusObject
 	dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
 	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil))
-	propertyType        = reflect.TypeOf((*Property)(nil)).Elem()
 	dbusStructType      = reflect.TypeOf((*[]interface{})(nil)).Elem()
 	dbusMessageType     = reflect.TypeOf((*DMessage)(nil)).Elem()
 )
@@ -152,10 +151,11 @@ func NotifyChange(obj DBusObject, propName string) {
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
 		if value.IsValid() {
-			if value.Type().Implements(propertyType) {
-				v := value.MethodByName("GetValue").Interface().(func() interface{})()
+			if p, ok := value.Interface().(Property); ok {
+				v := p.GetValue()
 				if v == nil {
-					log.Println("dbus.NotifyChange", propName, "is an nil value! This shouldn't happen.")
+					log.Printf("The value of %q is nil. This shouldn't happen.", propName)
+					return
 				}
 				value = reflect.ValueOf(v)
 			}
