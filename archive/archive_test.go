@@ -45,12 +45,12 @@ func (*testWrapper) TestTarCompresssFiles(c *C.C) {
 	}{
 		{
 			files:    []string{"testdata/tar-compress-datas"},
-			dest:     "/tmp/tar-compress.tar",
+			dest:     "testdata/tmp-compress.tar",
 			errIsNil: true,
 		},
 		{
 			files:    []string{"testdata/xxxxx"},
-			dest:     "/tmp/xxxxx",
+			dest:     "testdata/xxxxx",
 			errIsNil: false,
 		},
 	}
@@ -74,13 +74,13 @@ func (*testWrapper) TestTarExtracteFile(c *C.C) {
 	}{
 		{
 			src:      "testdata/tar-extracte-data.tar",
-			dest:     "/tmp/tar-extracte",
+			dest:     "testdata/tmp-extracte",
 			fileNum:  2,
 			errIsNil: true,
 		},
 		{
 			src:      "testdata/xxxxx",
-			dest:     "/tmp/xxxxx",
+			dest:     "testdata/xxxxx",
 			errIsNil: false,
 		},
 	}
