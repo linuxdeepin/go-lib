@@ -7,6 +7,7 @@ package pulse
 import "C"
 import "fmt"
 import "unsafe"
+import "runtime"
 
 type Callback func(eventType int, idx uint32)
 
@@ -133,25 +134,26 @@ func (c *Context) SetDefaultSink(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.lock()
-	defer c.unlock()
-	C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
+	c.SafeDo(func() {
+		C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
+	})
 }
 func (c *Context) SetDefaultSource(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.lock()
-	defer c.unlock()
-
-	C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
+	c.SafeDo(func() {
+		C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
+	})
 }
 
-func (c *Context) lock() {
+// SafeDo invoke an function with lock
+func (c *Context) SafeDo(fn func()) {
+	runtime.LockOSThread()
 	C.pa_threaded_mainloop_lock(c.loop)
-}
-func (c *Context) unlock() {
+	fn()
 	C.pa_threaded_mainloop_unlock(c.loop)
+	runtime.UnlockOSThread()
 }
 
 var __context *Context
