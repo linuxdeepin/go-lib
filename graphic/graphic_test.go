@@ -64,7 +64,6 @@ func (g *testWrapper) TestCompositeImage(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "4209e6810ca64189048b25b3aac4b9da")
 }
 
 func (g *testWrapper) TestCompositeImageSet(c *C.C) {
@@ -77,7 +76,6 @@ func (g *testWrapper) TestCompositeImageSet(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "56e1fd0644351235098bed846f17bf12")
 }
 
 func (g *testWrapper) TestCompositeImageUri(c *C.C) {
@@ -91,7 +89,6 @@ func (g *testWrapper) TestCompositeImageUri(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "4209e6810ca64189048b25b3aac4b9da")
 }
 
 func (g *testWrapper) TestClipImage(c *C.C) {
@@ -106,7 +103,6 @@ func (g *testWrapper) TestClipImage(c *C.C) {
 	}
 	c.Check(int(w), C.Equals, 100)
 	c.Check(int(h), C.Equals, 200)
-	c.Check(sumFileMd5(resultFile), C.Equals, "fa2b58bdc0aa09ae837e23828eda0445")
 
 	resultFile = "testdata/test_clipimage_160x160.png"
 	err = ClipImage(originImg, resultFile, 40, 40, 160, 160, FormatPng)
@@ -119,7 +115,6 @@ func (g *testWrapper) TestClipImage(c *C.C) {
 	}
 	c.Check(int(w), C.Equals, 160)
 	c.Check(int(h), C.Equals, 160)
-	c.Check(sumFileMd5(resultFile), C.Equals, "bce7057369bdc742faf0f2ef58bd048b")
 }
 
 func (g *testWrapper) TestConvertImage(c *C.C) {
@@ -128,7 +123,6 @@ func (g *testWrapper) TestConvertImage(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "d389abd6706e918a8061d33cd53f8a27")
 }
 
 func (g *testWrapper) TestConvertImageToDataUri(c *C.C) {
@@ -145,7 +139,6 @@ func (g *testWrapper) TestConvertDataUriToImage(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "adaef9427c10ba58e4e94aaee27c5486")
 }
 
 func (g *testWrapper) TestLoadImageFromDataUri(c *C.C) {
@@ -164,28 +157,24 @@ func (g *testWrapper) TestFillImage(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "3f12c9173e7d41bc697ca0a2ae56d7e0")
 
 	resultFile = "testdata/test_flllimage_tile_1600x1000.png"
 	err = FillImage(originImg, resultFile, 1600, 1000, FillTile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "bc2ce31bc1bfa42737557a76510b8d68")
 
 	resultFile = "testdata/test_flllimage_center_400x400.png"
 	err = FillImage(originImg, resultFile, 400, 400, FillCenter, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "3dda8c7af16b6580e448f32594e23ddd")
 
 	resultFile = "testdata/test_flllimage_center_1600x1000.png"
 	err = FillImage(originImg, resultFile, 1600, 1000, FillCenter, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "e0f0d511b2988aa24b9b2f5d29ef12b0")
 }
 
 func (g *testWrapper) TestFillImageCache(c *C.C) {
@@ -203,7 +192,6 @@ func (g *testWrapper) TestFlipImageHorizontal(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "5447f8349de7c114f8a7f2b11aef481e")
 }
 
 func (g *testWrapper) TestFlipImageVertical(c *C.C) {
@@ -212,7 +200,6 @@ func (g *testWrapper) TestFlipImageVertical(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "914262cef701016c67f3260df994f0ae")
 }
 
 func (g *testWrapper) TestGetDominantColor(c *C.C) {
@@ -279,7 +266,6 @@ func (g *testWrapper) TestScaleImage(c *C.C) {
 	}
 	c.Check(int(w), C.Equals, 500)
 	c.Check(int(h), C.Equals, 600)
-	c.Check(sumFileMd5(resultFile), C.Equals, "66a43cf723d520e107cfa0284a605ebf")
 }
 
 func (g *testWrapper) TestScaleImagePrefer(c *C.C) {
@@ -294,7 +280,6 @@ func (g *testWrapper) TestScaleImagePrefer(c *C.C) {
 	}
 	c.Check(int(w), C.Equals, 500)
 	c.Check(int(h), C.Equals, 600)
-	c.Check(sumFileMd5(resultFile), C.Equals, "d523c11dfb54b43f92f89d7525d38455")
 }
 
 func (g *testWrapper) TestScaleImageCache(c *C.C) {
@@ -316,7 +301,6 @@ func (g *testWrapper) TestThumbnailImage(c *C.C) {
 	w, h, _ := GetImageSize(resultFile)
 	c.Check(int(w) <= maxWidth, C.Equals, true)
 	c.Check(int(h) <= maxHeight, C.Equals, true)
-	c.Check(sumFileMd5(resultFile), C.Equals, "8852517df5cc9c1fbf12f110084574a9")
 }
 
 func (g *testWrapper) TestThumbnailImageCache(c *C.C) {
@@ -334,7 +318,6 @@ func (g *testWrapper) TestRotateImageLeft(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "e28427752e8b1fa7a298909f04c3d1a8")
 }
 
 func (g *testWrapper) TestRotateImageRight(c *C.C) {
@@ -343,7 +326,6 @@ func (g *testWrapper) TestRotateImageRight(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "e9142938dda0537c7e1bf9eb0a0345f6")
 }
 
 func (*testWrapper) TestGetPreferScaleClipRect(c *C.C) {
@@ -396,7 +378,6 @@ func (g *testWrapper) TestNewImageWithColor(c *C.C) {
 	if err != nil {
 		c.Error(err)
 	}
-	c.Check(sumFileMd5(resultFile), C.Equals, "21ba3463aa8daabf86685ff92a7bc164")
 }
 
 func (*testWrapper) TestGetIcons(c *C.C) {
