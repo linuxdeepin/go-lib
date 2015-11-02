@@ -31,6 +31,11 @@ func Query(uri string) (string, error) {
 //
 // desktopId: the basename of the desktop file
 func SetDefaultApp(mime, desktopId string) error {
+	cur, _ := GetDefaultApp(mime, false)
+	if cur == desktopId {
+		return nil
+	}
+
 	app := gio.NewDesktopAppInfo(desktopId)
 	if app == nil {
 		return fmt.Errorf("Invalid id '%v'", desktopId)
