@@ -35,6 +35,26 @@ type Context struct {
 	loop *C.pa_threaded_mainloop
 }
 
+func (c *Context) GetCardList() (r []*Card) {
+	ck := newCookie()
+
+	C.get_card_info_list(c.ctx, C.int64_t(ck.id))
+	for _, info := range ck.ReplyList() {
+		r = append(r, info.ToCard())
+	}
+	return
+}
+
+func (c *Context) GetCard(index uint32) (*Card, error) {
+	ck := newCookie()
+	C.get_card_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	info := ck.Reply()
+	if info == nil {
+		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
+	}
+	return info.ToCard(), nil
+}
+
 func (c *Context) GetSinkList() (r []*Sink) {
 	ck := newCookie()
 

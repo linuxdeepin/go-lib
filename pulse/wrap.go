@@ -17,6 +17,15 @@ func (info *paInfo) ToServer() *Server {
 	}
 }
 
+func (info *paInfo) ToCard() *Card {
+	switch r := info.data.(type) {
+	case *Card:
+		return r
+	default:
+		panic(fmt.Sprintln("the type of paInfo is not Card", r))
+	}
+}
+
 func (info *paInfo) ToSink() *Sink {
 	switch r := info.data.(type) {
 	case *Sink:
@@ -48,6 +57,29 @@ func (info *paInfo) ToSourceOutput() *SourceOutput {
 		return r
 	default:
 		panic(fmt.Sprintln("the type of paInfo is not SourceOutput", r))
+	}
+}
+
+func toProfiles(n uint32, c **C.pa_card_profile_info2) (r []ProfileInfo2) {
+	if n > 0 {
+		pp := (*[1 << 10](*C.pa_card_profile_info2))(unsafe.Pointer(c))[:n:n]
+		for _, p := range pp {
+			r = append(r, toProfile(p))
+		}
+	}
+	return
+}
+func toProfile(c *C.pa_card_profile_info2) ProfileInfo2 {
+	if nil == c {
+		return ProfileInfo2{}
+	}
+	return ProfileInfo2{
+		Name:        C.GoString(c.name),
+		Description: C.GoString(c.description),
+		Priority:    uint32(c.priority),
+		NSinks:      uint32(c.n_sinks),
+		NSources:    uint32(c.n_sources),
+		Available:   int(c.available),
 	}
 }
 
