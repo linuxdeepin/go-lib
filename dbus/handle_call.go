@@ -177,8 +177,6 @@ func (conn *Conn) handleCall(msg *Message) {
 	defer func() {
 		if err := recover(); err != nil {
 			conn.sendError(newInternalError(err), sender, serial)
-			// rethrow the panic!!!!!
-			panic(err)
 		}
 	}()
 
