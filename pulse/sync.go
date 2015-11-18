@@ -30,7 +30,8 @@ func NewPaInfo(data unsafe.Pointer, Type int) *paInfo {
 	case C.PA_SUBSCRIPTION_EVENT_CARD:
 		info.data = toCardInfo((*C.pa_card_info)(data))
 	default:
-		panic("current didn't support this type")
+		// current didn't support this type
+		return nil
 	}
 	return info
 }
@@ -57,7 +58,11 @@ func (c *cookie) ReplyList() []*paInfo {
 }
 
 func (c *cookie) Feed(infoType int, info unsafe.Pointer) {
-	c.data <- NewPaInfo(info, infoType)
+	paInfo := NewPaInfo(info, infoType)
+	if paInfo == nil {
+		return
+	}
+	c.data <- paInfo
 }
 func (c *cookie) EndOfList() {
 	close(c.data)

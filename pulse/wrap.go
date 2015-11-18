@@ -5,59 +5,52 @@ package pulse
 #cgo pkg-config: libpulse
 */
 import "C"
-import "fmt"
 import "unsafe"
 
 func (info *paInfo) ToServer() *Server {
 	switch r := info.data.(type) {
 	case *Server:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Sink", r))
 	}
+	return nil
 }
 
 func (info *paInfo) ToCard() *Card {
 	switch r := info.data.(type) {
 	case *Card:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Card", r))
 	}
+	return nil
 }
 
 func (info *paInfo) ToSink() *Sink {
 	switch r := info.data.(type) {
 	case *Sink:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Sink", r))
 	}
+	return nil
 }
 func (info *paInfo) ToSinkInput() *SinkInput {
 	switch r := info.data.(type) {
 	case *SinkInput:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not SinkInput", r))
 	}
+	return nil
 }
 
 func (info *paInfo) ToSource() *Source {
 	switch r := info.data.(type) {
 	case *Source:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Source", r))
 	}
+	return nil
 }
 func (info *paInfo) ToSourceOutput() *SourceOutput {
 	switch r := info.data.(type) {
 	case *SourceOutput:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not SourceOutput", r))
 	}
+	return nil
 }
 
 func toProfiles(n uint32, c **C.pa_card_profile_info2) (r []ProfileInfo2) {
