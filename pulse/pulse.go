@@ -155,7 +155,7 @@ func (c *Context) SetDefaultSink(name string) {
 	defer C.free(unsafe.Pointer(cname))
 
 	c.SafeDo(func() {
-		C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
+		C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
 	})
 }
 func (c *Context) SetDefaultSource(name string) {
@@ -163,7 +163,7 @@ func (c *Context) SetDefaultSource(name string) {
 	defer C.free(unsafe.Pointer(cname))
 
 	c.SafeDo(func() {
-		C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
+		C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
 	})
 }
 

@@ -7,6 +7,12 @@
 #include "_cgo_export.h" //convert int
 
 static pa_threaded_mainloop* m = NULL;
+static pa_context_success_cb_t success_cb = NULL;
+
+pa_context_success_cb_t get_success_cb()
+{
+    return success_cb;
+}
 
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
 void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
@@ -54,7 +60,7 @@ void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userda
     memcpy(info, i, sizeof(pa_server_info));
     receive_some_info((int64_t)userdata, PA_SUBSCRIPTION_EVENT_SERVER, (void*)info, 0);
 }
-void get_server_info(pa_context *c, int64_t cookie) 
+void get_server_info(pa_context *c, int64_t cookie)
 {
     pa_threaded_mainloop_lock(m);
     pa_operation_unref(pa_context_get_server_info(c, receive_server_info_cb, (void*)cookie));
@@ -73,7 +79,7 @@ void setup_monitor(pa_context *ctx)
 {
     pa_threaded_mainloop_lock(m);
     pa_context_set_subscribe_callback(ctx, dpa_context_subscribe_cb, NULL);
-    pa_context_subscribe(ctx, 
+    pa_context_subscribe(ctx,
 	    PA_SUBSCRIPTION_MASK_CARD |
 	    PA_SUBSCRIPTION_MASK_SINK |
 	    PA_SUBSCRIPTION_MASK_SOURCE |

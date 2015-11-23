@@ -57,6 +57,6 @@ func (card *Card) SetProfile(name string) {
 
 	c := GetContext()
 	c.SafeDo(func() {
-		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.success_cb, nil)
+		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
 	})
 }
