@@ -1,7 +1,7 @@
 package property
 
-import "pkg.linuxdeepin.com/lib/gio-2.0"
-import "pkg.linuxdeepin.com/lib/dbus"
+import "pkg.deepin.io/lib/gio-2.0"
+import "pkg.deepin.io/lib/dbus"
 import "reflect"
 import "fmt"
 import "unicode"
@@ -151,7 +151,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			return int32(s.GetInt(keyName))
 		}
 		prop.setFn = func(v interface{}) {
-			s.SetInt(keyName, int(reflect.ValueOf(v).Int()))
+			s.SetInt(keyName, int32(reflect.ValueOf(v).Int()))
 		}
 	case "e":
 		prop.valueType = int32Type
@@ -159,7 +159,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			return int32(s.GetEnum(keyName))
 		}
 		prop.setFn = func(v interface{}) {
-			s.SetEnum(keyName, int(reflect.ValueOf(v).Int()))
+			s.SetEnum(keyName, int32(reflect.ValueOf(v).Int()))
 		}
 	case "u":
 		prop.valueType = uint32Type
@@ -167,7 +167,7 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 			return uint32(s.GetUint(keyName))
 		}
 		prop.setFn = func(v interface{}) {
-			s.SetUint(keyName, int(reflect.ValueOf(v).Uint()))
+			s.SetUint(keyName, uint32(reflect.ValueOf(v).Uint()))
 		}
 	case "d":
 		prop.valueType = float64Type

@@ -1,4 +1,5 @@
 #include "gio.gen.h"
+#include "_cgo_export.h"
 
 static void _c_callback_cleanup(void *userdata)
 {

@@ -28,6 +28,7 @@
 #include <X11/Xlib.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
+#include "gdk_pixbuf_utils.h"
 
 int init_gdk_xlib() {
         XInitThreads();         /* should be called before gdk_init() */

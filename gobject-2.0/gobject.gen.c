@@ -1,16 +1,9 @@
 #include "gobject.gen.h"
+#include "_cgo_export.h"
 
 static void _c_callback_cleanup(void *userdata)
 {
 	_GObject_go_callback_cleanup(userdata);
-}
-
-unsigned int _array_length(void* _array)
-{
-	void** array = (void**)_array;
-	unsigned int i=0;
-	while (array && array[i] != 0) i++;
-	return i;
 }
 
 extern void _GChildWatchFunc_c_wrapper();

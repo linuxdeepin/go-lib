@@ -5,15 +5,20 @@ import "errors"
 import "fmt"
 import "strings"
 import "log"
-import "pkg.linuxdeepin.com/lib/dbus/interfaces"
-import "pkg.linuxdeepin.com/lib/dbus/introspect"
+import "pkg.deepin.io/lib/dbus/interfaces"
+import "pkg.deepin.io/lib/dbus/introspect"
 
-func splitObjectPath(path ObjectPath) (parent, base string) {
-	i := strings.LastIndex(string(path), "/")
-	if i != -1 && i < len(string(path))-2 {
-		return string(path)[:i], string(path)[i+1:]
+func splitObjectPath(path ObjectPath) (parent ObjectPath, base string) {
+	if !path.IsValid() {
+		return "", ""
 	}
-	return
+	i := strings.LastIndex(string(path), "/")
+	switch i {
+	case 0:
+		return ObjectPath("/"), string(path)[1:]
+	default:
+		return ObjectPath(string(path)[:i]), string(path)[i+1:]
+	}
 }
 
 func getTypeOf(ifc interface{}) (r reflect.Type) {
@@ -108,12 +113,13 @@ func BuildInterfaceInfo(ifc interface{}) *introspect.InterfaceInfo {
 			if access != "readwrite" {
 				access = "read"
 			}
-			if field.Type.Implements(propertyType) {
-				field_v := getValueOf(ifc).Field(i)
-				if field_v.IsNil() {
+
+			v := getValueOf(ifc).Field(i)
+			if p, ok := v.Interface().(Property); ok {
+				if p == nil {
 					log.Println("UnInit dbus property", field.Name)
 				} else {
-					t := field_v.MethodByName("GetType").Interface().(func() reflect.Type)()
+					t := p.GetType()
 					if t != nil {
 						ifc_info.Properties = append(ifc_info.Properties, introspect.PropertyInfo{
 							Name:   field.Name,
@@ -192,6 +198,21 @@ func ownerName(c *Conn, v interface{}, name string) error {
 	return nil
 }
 
+func handleSubpath(c *Conn, path ObjectPath) {
+	for path.IsValid() && path != ObjectPath("/") {
+		parentpath, basepath := splitObjectPath(path)
+		if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
+			intro := parent[InterfaceIntrospectProxy]
+			if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
+				intro.(*IntrospectProxy).child[basepath] = true
+				fmt.Println("Added:", basepath)
+			}
+			return
+		}
+		path = parentpath
+	}
+}
+
 //TODO: try to remove DBusObject
 func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error {
 	dinfo := v.GetDBusInfo()
@@ -210,14 +231,7 @@ func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error 
 		return err
 	}
 
-	//TODO: handle subpath
-	parentpath, basepath := splitObjectPath(path)
-	if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
-		intro := parent[InterfaceIntrospectProxy]
-		if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
-			intro.(*IntrospectProxy).child[basepath] = true
-		}
-	}
+	handleSubpath(c, path)
 
 	c.handlersLck.RLock()
 	ifcs := c.handlers[path]

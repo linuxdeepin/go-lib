@@ -172,12 +172,28 @@ func (*testWrapper) TestIsFileExist(c *C.C) {
 }
 
 func (*testWrapper) TestIsDir(c *C.C) {
-	testDir := "/tmp/deepin_test_dir"
-	os.RemoveAll(testDir)
-	c.Check(IsDir(testDir), C.Equals, false)
-	os.MkdirAll(testDir, 0644)
-	c.Check(IsDir(testDir), C.Equals, true)
-	os.RemoveAll(testDir)
+	var infos = []struct {
+		dir string
+		ok  bool
+	}{
+		{
+			dir: "testdata",
+			ok:  true,
+		},
+		// test symlink dir
+		//{
+		//dir: "testdata/utils",
+		//ok:  true,
+		//},
+		{
+			dir: "testdata/test1",
+			ok:  false,
+		},
+	}
+
+	for _, info := range infos {
+		c.Check(IsDir(info.dir), C.Equals, info.ok)
+	}
 }
 
 func (*testWrapper) TestIsSymlink(c *C.C) {

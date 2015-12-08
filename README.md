@@ -1,0 +1,52 @@
+# Deepin GoLang Library
+
+Deepin GoLang Library is a library containing many useful go routines for things such as glib, gettext, archive, graphic,etc.
+
+## Dependencies
+
+
+### Build dependencies
+
+* gio-2.0
+* glib-2.0
+* x11
+* gdk-pixbuf-2.0
+* libpulse
+
+## Installation
+
+Install prerequisites
+
+```
+$ go get github.com/smartystreets/goconvey
+$ go get github.com/BurntSushi/xgb
+$ go get github.com/howeyc/fsnotify
+$ go get launchpad.net/gocheck
+```
+
+Install
+
+```
+mkdir -p $GOPATH/src/pkg.deepin.io
+cp -r go-lib $GOPATH/src/pkg.deepin.io/lib
+```
+
+## Getting help
+
+Any usage issues can ask for help via
+
+* [Gitter](https://gitter.im/orgs/linuxdeepin/rooms)
+* [IRC channel](https://webchat.freenode.net/?channels=deepin)
+* [Forum](https://bbs.deepin.org/)
+* [WiKi](http://wiki.deepin.org/)
+
+## Getting involved
+
+We encourage you to report issues and contribute changes.
+
+* [Contribution guide for users](http://wiki.deepin.org/index.php?title=Contribution_Guidelines_for_Users)
+* [Contribution guide for developers](http://wiki.deepin.org/index.php?title=Contribution_Guidelines_for_Developers)
+
+## License
+
+Deepin GoLang Library is licensed under [GPLv3](LICENSE).

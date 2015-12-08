@@ -25,7 +25,7 @@ import (
 	"image"
 	"image/draw"
 	"os"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 )
 
 func generateCacheFilePath(keyword string) (dstfile string) {

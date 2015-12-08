@@ -1,7 +1,7 @@
 #include "dde-pulse.h"
 #include <string.h>
 #include <stdio.h>
-
+#include "_cgo_export.h"
 
 
 static void suspended_callback(pa_stream *s, void *userdata) {

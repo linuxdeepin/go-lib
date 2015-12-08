@@ -21,6 +21,15 @@ func toProplist(c *C.pa_proplist) map[string]string {
 	return ret
 }
 
+type ProfileInfo2 struct {
+	Name        string
+	Description string
+	Priority    uint32
+	NSinks      uint32
+	NSources    uint32
+	Available   int
+}
+
 type PortInfo struct {
 	Name        string
 	Description string

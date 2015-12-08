@@ -22,8 +22,8 @@
 package gdkpixbuf
 
 import (
-	"pkg.linuxdeepin.com/lib/graphic"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/graphic"
+	"pkg.deepin.io/lib/utils"
 )
 
 // function links to lib/graphic

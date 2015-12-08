@@ -37,7 +37,6 @@ var (
 	dbusObject          DBusObject
 	dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()
 	introspectProxyType = reflect.TypeOf((*IntrospectProxy)(nil))
-	propertyType        = reflect.TypeOf((*Property)(nil)).Elem()
 	dbusStructType      = reflect.TypeOf((*[]interface{})(nil)).Elem()
 	dbusMessageType     = reflect.TypeOf((*DMessage)(nil)).Elem()
 )
@@ -152,10 +151,11 @@ func NotifyChange(obj DBusObject, propName string) {
 	if con != nil {
 		value := getValueOf(obj).FieldByName(propName)
 		if value.IsValid() {
-			if value.Type().Implements(propertyType) {
-				v := value.MethodByName("GetValue").Interface().(func() interface{})()
+			if p, ok := value.Interface().(Property); ok {
+				v := p.GetValue()
 				if v == nil {
-					log.Println("dbus.NotifyChange", propName, "is an nil value! This shouldn't happen.")
+					log.Printf("The value of %q is nil. This shouldn't happen.", propName)
+					return
 				}
 				value = reflect.ValueOf(v)
 			}
@@ -191,16 +191,16 @@ func Emit(obj DBusObject, name string, ins ...interface{}) error {
 	v := getValueOf(obj)
 	fn := v.FieldByName(name)
 	if !fn.IsValid() {
-		return fmt.Errorf("Can't find method of %s in %s", name, obj.GetDBusInfo().Interface)
+		panic(fmt.Errorf("Can't find method of %s in %s", name, obj.GetDBusInfo().Interface))
 	}
 
 	fnType := getTypeOf(fn.Interface())
 	if fnType.NumOut() != 0 || fnType.NumIn() != len(ins) {
-		return fmt.Errorf("Invalid signal type (%d != %d)", fnType.NumIn(), len(ins))
+		panic(fmt.Errorf("Invalid signal type (%d != %d)", fnType.NumIn(), len(ins)))
 	}
 	for i, in := range ins {
 		if fnType.In(i) != reflect.TypeOf(in) {
-			return fmt.Errorf("Invalid signal type %d (%v != %v)", i, fnType.In(i), reflect.TypeOf(in))
+			panic(fmt.Errorf("Invalid signal type %d (%v != %v)", i, fnType.In(i), reflect.TypeOf(in)))
 		}
 	}
 

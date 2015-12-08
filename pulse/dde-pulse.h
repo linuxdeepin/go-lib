@@ -20,7 +20,8 @@ void get_server_info(pa_context *c, int64_t cookie);
 
 pa_context* pa_init(pa_threaded_mainloop* ml);
 
-void (*success_cb)(pa_context *c, int success, void *userdata);
+// Fixed gccgo(1.4) compile failed, becase of 'success_cb' duplicate definition
+pa_context_success_cb_t get_success_cb();
 
 pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend);
 

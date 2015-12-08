@@ -41,11 +41,4 @@ func (*testWrapper) TestMD5Sum(c *C.C) {
 	} else {
 		c.Check(ret, C.Equals, "0a75266cc21da8c88a940b00d4d535b7")
 	}
-
-	if ret, ok := SysMd5Sum(testFile); !ok {
-		c.Errorf("SysMd5Sum '%s' Failed", testFile)
-		return
-	} else {
-		c.Check(ret, C.Equals, "0a75266cc21da8c88a940b00d4d535b7")
-	}
 }

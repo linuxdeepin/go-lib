@@ -29,7 +29,7 @@ import "C"
 
 import (
 	"fmt"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/utils"
 )
 
 // BlurImage generate blur effect to an image file.

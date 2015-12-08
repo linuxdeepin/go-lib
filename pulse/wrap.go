@@ -5,49 +5,74 @@ package pulse
 #cgo pkg-config: libpulse
 */
 import "C"
-import "fmt"
 import "unsafe"
 
 func (info *paInfo) ToServer() *Server {
 	switch r := info.data.(type) {
 	case *Server:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Sink", r))
 	}
+	return nil
+}
+
+func (info *paInfo) ToCard() *Card {
+	switch r := info.data.(type) {
+	case *Card:
+		return r
+	}
+	return nil
 }
 
 func (info *paInfo) ToSink() *Sink {
 	switch r := info.data.(type) {
 	case *Sink:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Sink", r))
 	}
+	return nil
 }
 func (info *paInfo) ToSinkInput() *SinkInput {
 	switch r := info.data.(type) {
 	case *SinkInput:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not SinkInput", r))
 	}
+	return nil
 }
 
 func (info *paInfo) ToSource() *Source {
 	switch r := info.data.(type) {
 	case *Source:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not Source", r))
 	}
+	return nil
 }
 func (info *paInfo) ToSourceOutput() *SourceOutput {
 	switch r := info.data.(type) {
 	case *SourceOutput:
 		return r
-	default:
-		panic(fmt.Sprintln("the type of paInfo is not SourceOutput", r))
+	}
+	return nil
+}
+
+func toProfiles(n uint32, c **C.pa_card_profile_info2) (r []ProfileInfo2) {
+	if n > 0 {
+		pp := (*[1 << 10](*C.pa_card_profile_info2))(unsafe.Pointer(c))[:n:n]
+		for _, p := range pp {
+			r = append(r, toProfile(p))
+		}
+	}
+	return
+}
+func toProfile(c *C.pa_card_profile_info2) ProfileInfo2 {
+	if nil == c {
+		return ProfileInfo2{}
+	}
+	return ProfileInfo2{
+		Name:        C.GoString(c.name),
+		Description: C.GoString(c.description),
+		Priority:    uint32(c.priority),
+		NSinks:      uint32(c.n_sinks),
+		NSources:    uint32(c.n_sources),
+		Available:   int(c.available),
 	}
 }
 

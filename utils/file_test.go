@@ -58,3 +58,86 @@ func (*testWrapper) TestCopyDir(c *C.C) {
 		c.Check(sNames[i], C.Equals, dNames[i])
 	}
 }
+
+func (*testWrapper) TestCreateFile(c *C.C) {
+	err := CreateFile("")
+	c.Check(err, C.NotNil)
+
+	file := "testdata/create-testfile"
+	err = CreateFile(file)
+	c.Check(err, C.IsNil)
+	os.Remove(file)
+
+	file = "testdata/xxx/create-testfile"
+	err = CreateFile(file)
+	c.Check(err, C.NotNil)
+}
+
+func (*testWrapper) TestSymlinkFile(c *C.C) {
+	var datas = []struct {
+		src     string
+		dest    string
+		success bool
+	}{
+		{
+			src:     "testdata/testfile",
+			dest:    "testdata/test_symlink",
+			success: true,
+		},
+		{
+			src:     "testdata/testfile",
+			dest:    "testdata/test1",
+			success: false,
+		},
+		{
+			src:     "testdata/testfile_xxx",
+			dest:    "testdata/test_symlink",
+			success: false,
+		},
+	}
+
+	for _, data := range datas {
+		if data.success {
+			c.Check(SymlinkFile(data.src, data.dest),
+				C.Equals, nil)
+			os.Remove(data.dest)
+		} else {
+			c.Check(SymlinkFile(data.src, data.dest),
+				C.Not(C.Equals), nil)
+		}
+	}
+}
+
+func (*testWrapper) TestGetFiles(c *C.C) {
+	var datas = []struct {
+		dir    string
+		length int
+		ret    bool
+	}{
+		{
+			dir:    "testdata/test-get_files",
+			length: 2,
+			ret:    true,
+		},
+		{
+			dir:    "testdata/xxx",
+			length: 0,
+			ret:    false,
+		},
+		{
+			dir:    "testdata/testfile",
+			length: 0,
+			ret:    false,
+		},
+	}
+
+	for _, data := range datas {
+		files, err := GetFilesInDir(data.dir)
+		c.Check(len(files), C.Equals, data.length)
+		if data.ret {
+			c.Check(err, C.Equals, nil)
+		} else {
+			c.Check(err, C.Not(C.Equals), nil)
+		}
+	}
+}

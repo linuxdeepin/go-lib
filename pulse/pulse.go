@@ -7,6 +7,7 @@ package pulse
 import "C"
 import "fmt"
 import "unsafe"
+import "runtime"
 
 type Callback func(eventType int, idx uint32)
 
@@ -34,12 +35,45 @@ type Context struct {
 	loop *C.pa_threaded_mainloop
 }
 
+func (c *Context) GetCardList() (r []*Card) {
+	ck := newCookie()
+
+	C.get_card_info_list(c.ctx, C.int64_t(ck.id))
+	for _, info := range ck.ReplyList() {
+		card := info.ToCard()
+		if card == nil {
+			continue
+		}
+		r = append(r, card)
+	}
+	return
+}
+
+func (c *Context) GetCard(index uint32) (*Card, error) {
+	ck := newCookie()
+	C.get_card_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	info := ck.Reply()
+	if info == nil {
+		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
+	}
+
+	card := info.ToCard()
+	if card == nil {
+		return nil, fmt.Errorf("'%d' not a valid card index", index)
+	}
+	return card, nil
+}
+
 func (c *Context) GetSinkList() (r []*Sink) {
 	ck := newCookie()
 
 	C.get_sink_info_list(c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
-		r = append(r, info.ToSink())
+		sink := info.ToSink()
+		if sink == nil {
+			continue
+		}
+		r = append(r, sink)
 	}
 	return
 }
@@ -51,7 +85,12 @@ func (c *Context) GetSink(index uint32) (*Sink, error) {
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
 	}
-	return info.ToSink(), nil
+
+	sink := info.ToSink()
+	if sink == nil {
+		return nil, fmt.Errorf("'%d' not a valid sink index", index)
+	}
+	return sink, nil
 }
 
 func (c *Context) GetSinkInputList() (r []*SinkInput) {
@@ -59,7 +98,11 @@ func (c *Context) GetSinkInputList() (r []*SinkInput) {
 
 	C.get_sink_input_info_list(c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
-		r = append(r, info.ToSinkInput())
+		si := info.ToSinkInput()
+		if si == nil {
+			continue
+		}
+		r = append(r, si)
 	}
 	return
 }
@@ -72,7 +115,12 @@ func (c *Context) GetSinkInput(index uint32) (*SinkInput, error) {
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
 	}
-	return info.ToSinkInput(), nil
+
+	si := info.ToSinkInput()
+	if si == nil {
+		return nil, fmt.Errorf("'%d' not a valid sinkinput index", index)
+	}
+	return si, nil
 }
 
 func (c *Context) GetSourceList() (r []*Source) {
@@ -80,7 +128,11 @@ func (c *Context) GetSourceList() (r []*Source) {
 
 	C.get_source_info_list(c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
-		r = append(r, info.ToSource())
+		source := info.ToSource()
+		if source == nil {
+			continue
+		}
+		r = append(r, source)
 	}
 	return
 }
@@ -93,7 +145,12 @@ func (c *Context) GetSource(index uint32) (*Source, error) {
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
 	}
-	return info.ToSource(), nil
+
+	source := info.ToSource()
+	if source == nil {
+		return nil, fmt.Errorf("'%d' not a valid source index", index)
+	}
+	return source, nil
 }
 
 func (c *Context) GetServer() (*Server, error) {
@@ -104,7 +161,12 @@ func (c *Context) GetServer() (*Server, error) {
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain the server instance.")
 	}
-	return info.ToServer(), nil
+
+	s := info.ToServer()
+	if s == nil {
+		return nil, fmt.Errorf("Not found valid server")
+	}
+	return s, nil
 }
 
 func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
@@ -112,15 +174,28 @@ func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
 
 	C.get_source_output_info_list(c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
-		r = append(r, info.ToSourceOutput())
+		so := info.ToSourceOutput()
+		if so == nil {
+			continue
+		}
+		r = append(r, so)
 	}
 	return
 }
 
-func (c *Context) GetSourceOutput(index uint32) *SourceOutput {
+func (c *Context) GetSourceOutput(index uint32) (*SourceOutput, error) {
 	ck := newCookie()
 	C.get_source_output_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
-	return ck.Reply().ToSourceOutput()
+	info := ck.Reply()
+	if info == nil {
+		return nil, fmt.Errorf("Can't obtain the this instance for: %v", index)
+	}
+
+	so := info.ToSourceOutput()
+	if so == nil {
+		return nil, fmt.Errorf("'%d' not a valid sourceoutput index", index)
+	}
+	return so, nil
 }
 
 func (c *Context) GetDefaultSource() string {
@@ -133,25 +208,26 @@ func (c *Context) SetDefaultSink(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.lock()
-	defer c.unlock()
-	C.pa_context_set_default_sink(c.ctx, cname, C.success_cb, nil)
+	c.SafeDo(func() {
+		C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
+	})
 }
 func (c *Context) SetDefaultSource(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.lock()
-	defer c.unlock()
-
-	C.pa_context_set_default_source(c.ctx, cname, C.success_cb, nil)
+	c.SafeDo(func() {
+		C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
+	})
 }
 
-func (c *Context) lock() {
+// SafeDo invoke an function with lock
+func (c *Context) SafeDo(fn func()) {
+	runtime.LockOSThread()
 	C.pa_threaded_mainloop_lock(c.loop)
-}
-func (c *Context) unlock() {
+	fn()
 	C.pa_threaded_mainloop_unlock(c.loop)
+	runtime.UnlockOSThread()
 }
 
 var __context *Context

@@ -7,7 +7,6 @@ extern void g_key_file_free(GKeyFile*);
 */
 import "C"
 import "unsafe"
-import "errors"
 
 const alot = 999999
 
@@ -26,6 +25,18 @@ type _GError struct {
 	domain uint32
 	code int32
 	message *C.char
+}
+func (e _GError) ToGError() GError {
+	return GError{e.domain, e.code, C.GoString(e.message)}
+}
+
+type GError struct {
+	Domain uint32
+	Code int32
+	Message string
+}
+func (e GError) Error() string {
+	return e.Message
 }
 
 func _GoStringToGString(x string) *C.char {
@@ -68,7 +79,637 @@ const (
 )
 // blacklisted: AsyncQueue (struct)
 const BigEndian = 4321
-// blacklisted: BookmarkFile (struct)
+type BookmarkFile struct {}
+func (this0 *BookmarkFile) AddApplication(uri0 string, name0 string, exec0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	exec1 = _GoStringToGString(exec0)
+	defer C.free(unsafe.Pointer(exec1))
+	C.g_bookmark_file_add_application(this1, uri1, name1, exec1)
+}
+func (this0 *BookmarkFile) AddGroup(uri0 string, group0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	C.g_bookmark_file_add_group(this1, uri1, group1)
+}
+func (this0 *BookmarkFile) Free() {
+	var this1 *C.GBookmarkFile
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	C.g_bookmark_file_free(this1)
+}
+func (this0 *BookmarkFile) GetAdded(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_added(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetAppInfo(uri0 string, name0 string) (string, uint32, int64, bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	var count1 C.uint32_t
+	var stamp1 C.int64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_get_app_info(this1, uri1, name1, &exec1, &count1, &stamp1, &err1)
+	var exec2 string
+	var count2 uint32
+	var stamp2 int64
+	var ret2 bool
+	var err2 error
+	exec2 = C.GoString(exec1)
+	C.g_free(unsafe.Pointer(exec1))
+	count2 = uint32(count1)
+	stamp2 = int64(stamp1)
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return exec2, count2, stamp2, ret2, err2
+}
+func (this0 *BookmarkFile) GetApplications(uri0 string) (uint64, []string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_applications(this1, uri1, &length1, &err1)
+	var length2 uint64
+	var ret2 []string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) GetDescription(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_description(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetGroups(uri0 string) (uint64, []string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_groups(this1, uri1, &length1, &err1)
+	var length2 uint64
+	var ret2 []string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) GetIcon(uri0 string) (string, string, bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var href1 *C.char
+	var mime_type1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_icon(this1, uri1, &href1, &mime_type1, &err1)
+	var href2 string
+	var mime_type2 string
+	var ret2 bool
+	var err2 error
+	href2 = C.GoString(href1)
+	C.g_free(unsafe.Pointer(href1))
+	mime_type2 = C.GoString(mime_type1)
+	C.g_free(unsafe.Pointer(mime_type1))
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return href2, mime_type2, ret2, err2
+}
+func (this0 *BookmarkFile) GetIsPrivate(uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_is_private(this1, uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetMimeType(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_mime_type(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetModified(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_modified(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetSize() int32 {
+	var this1 *C.GBookmarkFile
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_get_size(this1)
+	var ret2 int32
+	ret2 = int32(ret1)
+	return ret2
+}
+func (this0 *BookmarkFile) GetTitle(uri0 string) (string, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_title(this1, uri1, &err1)
+	var ret2 string
+	var err2 error
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) GetUris() (uint64, []string) {
+	var this1 *C.GBookmarkFile
+	var length1 C.uint64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_get_uris(this1, &length1)
+	var length2 uint64
+	var ret2 []string
+	length2 = uint64(length1)
+	ret2 = make([]string, length1)
+	for i := range ret2 {
+		ret2[i] = C.GoString((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i])
+		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
+	}
+	return length2, ret2
+}
+func (this0 *BookmarkFile) GetVisited(uri0 string) (int64, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_get_visited(this1, uri1, &err1)
+	var ret2 int64
+	var err2 error
+	ret2 = int64(ret1)
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasApplication(uri0 string, name0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_has_application(this1, uri1, name1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasGroup(uri0 string, group0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	ret1 := C.g_bookmark_file_has_group(this1, uri1, group1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) HasItem(uri0 string) bool {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_has_item(this1, uri1)
+	var ret2 bool
+	ret2 = ret1 != 0
+	return ret2
+}
+func (this0 *BookmarkFile) LoadFromData(data0 string, length0 uint64) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var data1 *C.char
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	data1 = _GoStringToGString(data0)
+	defer C.free(unsafe.Pointer(data1))
+	length1 = C.uint64_t(length0)
+	ret1 := C.g_bookmark_file_load_from_data(this1, data1, length1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) LoadFromDataDirs(file0 string, full_path0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var file1 *C.char
+	var full_path1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	file1 = _GoStringToGString(file0)
+	defer C.free(unsafe.Pointer(file1))
+	full_path1 = _GoStringToGString(full_path0)
+	defer C.free(unsafe.Pointer(full_path1))
+	ret1 := C.g_bookmark_file_load_from_data_dirs(this1, file1, full_path1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) LoadFromFile(filename0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_bookmark_file_load_from_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) MoveItem(old_uri0 string, new_uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var old_uri1 *C.char
+	var new_uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	old_uri1 = _GoStringToGString(old_uri0)
+	defer C.free(unsafe.Pointer(old_uri1))
+	new_uri1 = _GoStringToGString(new_uri0)
+	defer C.free(unsafe.Pointer(new_uri1))
+	ret1 := C.g_bookmark_file_move_item(this1, old_uri1, new_uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveApplication(uri0 string, name0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	ret1 := C.g_bookmark_file_remove_application(this1, uri1, name1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveGroup(uri0 string, group0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var group1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	group1 = _GoStringToGString(group0)
+	defer C.free(unsafe.Pointer(group1))
+	ret1 := C.g_bookmark_file_remove_group(this1, uri1, group1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) RemoveItem(uri0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	ret1 := C.g_bookmark_file_remove_item(this1, uri1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) SetAdded(uri0 string, added0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var added1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	added1 = C.int64_t(added0)
+	C.g_bookmark_file_set_added(this1, uri1, added1)
+}
+func (this0 *BookmarkFile) SetAppInfo(uri0 string, name0 string, exec0 string, count0 int32, stamp0 int64) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var name1 *C.char
+	var exec1 *C.char
+	var count1 C.int32_t
+	var stamp1 C.int64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	name1 = _GoStringToGString(name0)
+	defer C.free(unsafe.Pointer(name1))
+	exec1 = _GoStringToGString(exec0)
+	defer C.free(unsafe.Pointer(exec1))
+	count1 = C.int32_t(count0)
+	stamp1 = C.int64_t(stamp0)
+	ret1 := C.g_bookmark_file_set_app_info(this1, uri1, name1, exec1, count1, stamp1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *BookmarkFile) SetDescription(uri0 string, description0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var description1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	description1 = _GoStringToGString(description0)
+	defer C.free(unsafe.Pointer(description1))
+	C.g_bookmark_file_set_description(this1, uri1, description1)
+}
+func (this0 *BookmarkFile) SetGroups(uri0 string, groups0 string, length0 uint64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var groups1 *C.char
+	var length1 C.uint64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	groups1 = _GoStringToGString(groups0)
+	defer C.free(unsafe.Pointer(groups1))
+	length1 = C.uint64_t(length0)
+	C.g_bookmark_file_set_groups(this1, uri1, groups1, length1)
+}
+func (this0 *BookmarkFile) SetIcon(uri0 string, href0 string, mime_type0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var href1 *C.char
+	var mime_type1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	href1 = _GoStringToGString(href0)
+	defer C.free(unsafe.Pointer(href1))
+	mime_type1 = _GoStringToGString(mime_type0)
+	defer C.free(unsafe.Pointer(mime_type1))
+	C.g_bookmark_file_set_icon(this1, uri1, href1, mime_type1)
+}
+func (this0 *BookmarkFile) SetIsPrivate(uri0 string, is_private0 bool) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var is_private1 C.int
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	is_private1 = _GoBoolToCBool(is_private0)
+	C.g_bookmark_file_set_is_private(this1, uri1, is_private1)
+}
+func (this0 *BookmarkFile) SetMimeType(uri0 string, mime_type0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var mime_type1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	mime_type1 = _GoStringToGString(mime_type0)
+	defer C.free(unsafe.Pointer(mime_type1))
+	C.g_bookmark_file_set_mime_type(this1, uri1, mime_type1)
+}
+func (this0 *BookmarkFile) SetModified(uri0 string, modified0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var modified1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	modified1 = C.int64_t(modified0)
+	C.g_bookmark_file_set_modified(this1, uri1, modified1)
+}
+func (this0 *BookmarkFile) SetTitle(uri0 string, title0 string) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var title1 *C.char
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	title1 = _GoStringToGString(title0)
+	defer C.free(unsafe.Pointer(title1))
+	C.g_bookmark_file_set_title(this1, uri1, title1)
+}
+func (this0 *BookmarkFile) SetVisited(uri0 string, visited0 int64) {
+	var this1 *C.GBookmarkFile
+	var uri1 *C.char
+	var visited1 C.int64_t
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	uri1 = _GoStringToGString(uri0)
+	defer C.free(unsafe.Pointer(uri1))
+	visited1 = C.int64_t(visited0)
+	C.g_bookmark_file_set_visited(this1, uri1, visited1)
+}
+func (this0 *BookmarkFile) ToData() (uint64, string, error) {
+	var this1 *C.GBookmarkFile
+	var length1 C.uint64_t
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	ret1 := C.g_bookmark_file_to_data(this1, &length1, &err1)
+	var length2 uint64
+	var ret2 string
+	var err2 error
+	length2 = uint64(length1)
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return length2, ret2, err2
+}
+func (this0 *BookmarkFile) ToFile(filename0 string) (bool, error) {
+	var this1 *C.GBookmarkFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GBookmarkFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_bookmark_file_to_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func BookmarkFileErrorQuark() uint32 {
+	ret1 := C.g_bookmark_file_error_quark()
+	var ret2 uint32
+	ret2 = uint32(ret1)
+	return ret2
+}
 type BookmarkFileError C.uint32_t
 const (
 	BookmarkFileErrorInvalidUri BookmarkFileError = 0
@@ -82,7 +723,7 @@ const (
 )
 // blacklisted: ByteArray (struct)
 type Bytes struct {}
-func NewBytes(data0 []int) *Bytes {
+func NewBytes(data0 []uint8) *Bytes {
 	var data1 *C.uint8_t
 	var size1 C.uint64_t
 	data1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*data1)) * len(data0))))
@@ -96,7 +737,7 @@ func NewBytes(data0 []int) *Bytes {
 	ret2 = (*Bytes)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewBytesTake(data0 []int) *Bytes {
+func NewBytesTake(data0 []uint8) *Bytes {
 	var data1 *C.uint8_t
 	var size1 C.uint64_t
 	data1 = (*C.uint8_t)(C.malloc(C.size_t(int(unsafe.Sizeof(*data1)) * len(data0))))
@@ -110,14 +751,14 @@ func NewBytesTake(data0 []int) *Bytes {
 	ret2 = (*Bytes)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *Bytes) Compare(bytes20 *Bytes) int {
+func (this0 *Bytes) Compare(bytes20 *Bytes) int32 {
 	var this1 *C.GBytes
 	var bytes21 *C.GBytes
 	this1 = (*C.GBytes)(unsafe.Pointer(this0))
 	bytes21 = (*C.GBytes)(unsafe.Pointer(bytes20))
 	ret1 := C.g_bytes_compare(this1, bytes21)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *Bytes) Equal(bytes20 *Bytes) bool {
@@ -138,12 +779,12 @@ func (this0 *Bytes) GetSize() uint64 {
 	ret2 = uint64(ret1)
 	return ret2
 }
-func (this0 *Bytes) Hash() int {
+func (this0 *Bytes) Hash() uint32 {
 	var this1 *C.GBytes
 	this1 = (*C.GBytes)(unsafe.Pointer(this0))
 	ret1 := C.g_bytes_hash(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *Bytes) NewFromBytes(offset0 uint64, length0 uint64) *Bytes {
@@ -189,6 +830,7 @@ const (
 	ConvertErrorPartialInput ConvertError = 3
 	ConvertErrorBadUri ConvertError = 4
 	ConvertErrorNotAbsolutePath ConvertError = 5
+	ConvertErrorNoMemory ConvertError = 6
 )
 const DatalistFlagsMask = 3
 const DateBadDay = 0
@@ -222,7 +864,7 @@ const (
 	DateMonthDecember DateMonth = 12
 )
 type DateTime struct {}
-func NewDateTime(tz0 *TimeZone, year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+func NewDateTime(tz0 *TimeZone, year0 int32, month0 int32, day0 int32, hour0 int32, minute0 int32, seconds0 float64) *DateTime {
 	var tz1 *C.GTimeZone
 	var year1 C.int32_t
 	var month1 C.int32_t
@@ -274,7 +916,7 @@ func NewDateTimeFromUnixUtc(t0 int64) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewDateTimeLocal(year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+func NewDateTimeLocal(year0 int32, month0 int32, day0 int32, hour0 int32, minute0 int32, seconds0 float64) *DateTime {
 	var year1 C.int32_t
 	var month1 C.int32_t
 	var day1 C.int32_t
@@ -312,7 +954,7 @@ func NewDateTimeNowUtc() *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewDateTimeUtc(year0 int, month0 int, day0 int, hour0 int, minute0 int, seconds0 float64) *DateTime {
+func NewDateTimeUtc(year0 int32, month0 int32, day0 int32, hour0 int32, minute0 int32, seconds0 float64) *DateTime {
 	var year1 C.int32_t
 	var month1 C.int32_t
 	var day1 C.int32_t
@@ -340,7 +982,7 @@ func (this0 *DateTime) Add(timespan0 int64) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddDays(days0 int) *DateTime {
+func (this0 *DateTime) AddDays(days0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var days1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -350,7 +992,7 @@ func (this0 *DateTime) AddDays(days0 int) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddFull(years0 int, months0 int, days0 int, hours0 int, minutes0 int, seconds0 float64) *DateTime {
+func (this0 *DateTime) AddFull(years0 int32, months0 int32, days0 int32, hours0 int32, minutes0 int32, seconds0 float64) *DateTime {
 	var this1 *C.GDateTime
 	var years1 C.int32_t
 	var months1 C.int32_t
@@ -370,7 +1012,7 @@ func (this0 *DateTime) AddFull(years0 int, months0 int, days0 int, hours0 int, m
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddHours(hours0 int) *DateTime {
+func (this0 *DateTime) AddHours(hours0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var hours1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -380,7 +1022,7 @@ func (this0 *DateTime) AddHours(hours0 int) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddMinutes(minutes0 int) *DateTime {
+func (this0 *DateTime) AddMinutes(minutes0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var minutes1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -390,7 +1032,7 @@ func (this0 *DateTime) AddMinutes(minutes0 int) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddMonths(months0 int) *DateTime {
+func (this0 *DateTime) AddMonths(months0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var months1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -410,7 +1052,7 @@ func (this0 *DateTime) AddSeconds(seconds0 float64) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddWeeks(weeks0 int) *DateTime {
+func (this0 *DateTime) AddWeeks(weeks0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var weeks1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -420,7 +1062,7 @@ func (this0 *DateTime) AddWeeks(weeks0 int) *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) AddYears(years0 int) *DateTime {
+func (this0 *DateTime) AddYears(years0 int32) *DateTime {
 	var this1 *C.GDateTime
 	var years1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
@@ -452,68 +1094,68 @@ func (this0 *DateTime) Format(format0 string) string {
 	C.g_free(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *DateTime) GetDayOfMonth() int {
+func (this0 *DateTime) GetDayOfMonth() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_day_of_month(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetDayOfWeek() int {
+func (this0 *DateTime) GetDayOfWeek() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_day_of_week(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetDayOfYear() int {
+func (this0 *DateTime) GetDayOfYear() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_day_of_year(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetHour() int {
+func (this0 *DateTime) GetHour() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_hour(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetMicrosecond() int {
+func (this0 *DateTime) GetMicrosecond() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_microsecond(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetMinute() int {
+func (this0 *DateTime) GetMinute() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_minute(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetMonth() int {
+func (this0 *DateTime) GetMonth() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_month(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetSecond() int {
+func (this0 *DateTime) GetSecond() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_second(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *DateTime) GetSeconds() float64 {
@@ -540,43 +1182,43 @@ func (this0 *DateTime) GetUtcOffset() int64 {
 	ret2 = int64(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetWeekNumberingYear() int {
+func (this0 *DateTime) GetWeekNumberingYear() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_week_numbering_year(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetWeekOfYear() int {
+func (this0 *DateTime) GetWeekOfYear() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_week_of_year(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetYear() int {
+func (this0 *DateTime) GetYear() int32 {
 	var this1 *C.GDateTime
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	ret1 := C.g_date_time_get_year(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *DateTime) GetYmd() (int, int, int) {
+func (this0 *DateTime) GetYmd() (int32, int32, int32) {
 	var this1 *C.GDateTime
 	var year1 C.int32_t
 	var month1 C.int32_t
 	var day1 C.int32_t
 	this1 = (*C.GDateTime)(unsafe.Pointer(this0))
 	C.g_date_time_get_ymd(this1, &year1, &month1, &day1)
-	var year2 int
-	var month2 int
-	var day2 int
-	year2 = int(year1)
-	month2 = int(month1)
-	day2 = int(day1)
+	var year2 int32
+	var month2 int32
+	var day2 int32
+	year2 = int32(year1)
+	month2 = int32(month1)
+	day2 = int32(day1)
 	return year2, month2, day2
 }
 func (this0 *DateTime) IsDaylightSavings() bool {
@@ -631,14 +1273,14 @@ func (this0 *DateTime) ToUtc() *DateTime {
 	ret2 = (*DateTime)(unsafe.Pointer(ret1))
 	return ret2
 }
-func DateTimeCompare(dt10 unsafe.Pointer, dt20 unsafe.Pointer) int {
+func DateTimeCompare(dt10 unsafe.Pointer, dt20 unsafe.Pointer) int32 {
 	var dt11 unsafe.Pointer
 	var dt21 unsafe.Pointer
 	dt11 = unsafe.Pointer(dt10)
 	dt21 = unsafe.Pointer(dt20)
 	ret1 := C.g_date_time_compare(dt11, dt21)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func DateTimeEqual(dt10 unsafe.Pointer, dt20 unsafe.Pointer) bool {
@@ -651,12 +1293,12 @@ func DateTimeEqual(dt10 unsafe.Pointer, dt20 unsafe.Pointer) bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func DateTimeHash(datetime0 unsafe.Pointer) int {
+func DateTimeHash(datetime0 unsafe.Pointer) uint32 {
 	var datetime1 unsafe.Pointer
 	datetime1 = unsafe.Pointer(datetime0)
 	ret1 := C.g_date_time_hash(datetime1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 type DateWeekday C.uint32_t
@@ -758,7 +1400,7 @@ const GuintptrFormat = "lu"
 const HaveGint64 = 1
 const HaveGnucVarargs = 1
 const HaveGnucVisibility = 1
-const HaveGrowingStack = 1
+const HaveGrowingStack = 0
 const HaveInline = 1
 const HaveIsoVarargs = 1
 const Have__Inline = 1
@@ -888,7 +1530,7 @@ func (this0 *KeyFile) GetBoolean(group_name0 string, key0 string) (bool, error) 
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -914,7 +1556,7 @@ func (this0 *KeyFile) GetBooleanList(group_name0 string, key0 string) (uint64, [
 		ret2[i] = (*(*[999999]C.int)(unsafe.Pointer(ret1)))[i] != 0
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -935,7 +1577,7 @@ func (this0 *KeyFile) GetComment(group_name0 string, key0 string) (string, error
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -955,7 +1597,7 @@ func (this0 *KeyFile) GetDouble(group_name0 string, key0 string) (float64, error
 	var err2 error
 	ret2 = float64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -981,7 +1623,7 @@ func (this0 *KeyFile) GetDoubleList(group_name0 string, key0 string) (uint64, []
 		ret2[i] = float64((*(*[999999]C.double)(unsafe.Pointer(ret1)))[i])
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1016,12 +1658,12 @@ func (this0 *KeyFile) GetInt64(group_name0 string, key0 string) (int64, error) {
 	var err2 error
 	ret2 = int64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
 }
-func (this0 *KeyFile) GetInteger(group_name0 string, key0 string) (int, error) {
+func (this0 *KeyFile) GetInteger(group_name0 string, key0 string) (int32, error) {
 	var this1 *C.GKeyFile
 	var group_name1 *C.char
 	var key1 *C.char
@@ -1032,16 +1674,16 @@ func (this0 *KeyFile) GetInteger(group_name0 string, key0 string) (int, error) {
 	key1 = _GoStringToGString(key0)
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_key_file_get_integer(this1, group_name1, key1, &err1)
-	var ret2 int
+	var ret2 int32
 	var err2 error
-	ret2 = int(ret1)
+	ret2 = int32(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
 }
-func (this0 *KeyFile) GetIntegerList(group_name0 string, key0 string) (uint64, []int, error) {
+func (this0 *KeyFile) GetIntegerList(group_name0 string, key0 string) (uint64, []int32, error) {
 	var this1 *C.GKeyFile
 	var group_name1 *C.char
 	var key1 *C.char
@@ -1054,15 +1696,15 @@ func (this0 *KeyFile) GetIntegerList(group_name0 string, key0 string) (uint64, [
 	defer C.free(unsafe.Pointer(key1))
 	ret1 := C.g_key_file_get_integer_list(this1, group_name1, key1, &length1, &err1)
 	var length2 uint64
-	var ret2 []int
+	var ret2 []int32
 	var err2 error
 	length2 = uint64(length1)
-	ret2 = make([]int, length1)
+	ret2 = make([]int32, length1)
 	for i := range ret2 {
-		ret2[i] = int((*(*[999999]C.int32_t)(unsafe.Pointer(ret1)))[i])
+		ret2[i] = int32((*(*[999999]C.int32_t)(unsafe.Pointer(ret1)))[i])
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1086,7 +1728,7 @@ func (this0 *KeyFile) GetKeys(group_name0 string) (uint64, []string, error) {
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1110,7 +1752,7 @@ func (this0 *KeyFile) GetLocaleString(group_name0 string, key0 string, locale0 s
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1140,7 +1782,7 @@ func (this0 *KeyFile) GetLocaleStringList(group_name0 string, key0 string, local
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1170,7 +1812,7 @@ func (this0 *KeyFile) GetString(group_name0 string, key0 string) (string, error)
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1197,7 +1839,7 @@ func (this0 *KeyFile) GetStringList(group_name0 string, key0 string) (uint64, []
 		C.g_free(unsafe.Pointer((*(*[999999]*C.char)(unsafe.Pointer(ret1)))[i]))
 	}
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
@@ -1217,7 +1859,7 @@ func (this0 *KeyFile) GetUint64(group_name0 string, key0 string) (uint64, error)
 	var err2 error
 	ret2 = uint64(ret1)
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1238,7 +1880,7 @@ func (this0 *KeyFile) GetValue(group_name0 string, key0 string) (string, error) 
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1270,7 +1912,7 @@ func (this0 *KeyFile) LoadFromData(data0 string, length0 uint64, flags0 KeyFileF
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1293,7 +1935,7 @@ func (this0 *KeyFile) LoadFromDataDirs(file0 string, flags0 KeyFileFlags) (strin
 	C.g_free(unsafe.Pointer(full_path1))
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return full_path2, ret2, err2
@@ -1324,7 +1966,7 @@ func (this0 *KeyFile) LoadFromDirs(file0 string, search_dirs0 []string, flags0 K
 	C.g_free(unsafe.Pointer(full_path1))
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return full_path2, ret2, err2
@@ -1343,7 +1985,7 @@ func (this0 *KeyFile) LoadFromFile(file0 string, flags0 KeyFileFlags) (bool, err
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1363,7 +2005,7 @@ func (this0 *KeyFile) RemoveComment(group_name0 string, key0 string) (bool, erro
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1380,7 +2022,7 @@ func (this0 *KeyFile) RemoveGroup(group_name0 string) (bool, error) {
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1400,7 +2042,24 @@ func (this0 *KeyFile) RemoveKey(group_name0 string, key0 string) (bool, error) {
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
+		C.g_error_free(err1)
+	}
+	return ret2, err2
+}
+func (this0 *KeyFile) SaveToFile(filename0 string) (bool, error) {
+	var this1 *C.GKeyFile
+	var filename1 *C.char
+	var err1 *C.GError
+	this1 = (*C.GKeyFile)(unsafe.Pointer(this0))
+	filename1 = _GoStringToGString(filename0)
+	defer C.free(unsafe.Pointer(filename1))
+	ret1 := C.g_key_file_save_to_file(this1, filename1, &err1)
+	var ret2 bool
+	var err2 error
+	ret2 = ret1 != 0
+	if err1 != nil {
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1455,7 +2114,7 @@ func (this0 *KeyFile) SetComment(group_name0 string, key0 string, comment0 strin
 	var err2 error
 	ret2 = ret1 != 0
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
@@ -1505,7 +2164,7 @@ func (this0 *KeyFile) SetInt64(group_name0 string, key0 string, value0 int64) {
 	value1 = C.int64_t(value0)
 	C.g_key_file_set_int64(this1, group_name1, key1, value1)
 }
-func (this0 *KeyFile) SetInteger(group_name0 string, key0 string, value0 int) {
+func (this0 *KeyFile) SetInteger(group_name0 string, key0 string, value0 int32) {
 	var this1 *C.GKeyFile
 	var group_name1 *C.char
 	var key1 *C.char
@@ -1518,7 +2177,7 @@ func (this0 *KeyFile) SetInteger(group_name0 string, key0 string, value0 int) {
 	value1 = C.int32_t(value0)
 	C.g_key_file_set_integer(this1, group_name1, key1, value1)
 }
-func (this0 *KeyFile) SetIntegerList(group_name0 string, key0 string, list0 []int) {
+func (this0 *KeyFile) SetIntegerList(group_name0 string, key0 string, list0 []int32) {
 	var this1 *C.GKeyFile
 	var group_name1 *C.char
 	var key1 *C.char
@@ -1537,7 +2196,7 @@ func (this0 *KeyFile) SetIntegerList(group_name0 string, key0 string, list0 []in
 	length1 = C.uint64_t(len(list0))
 	C.g_key_file_set_integer_list(this1, group_name1, key1, list1, length1)
 }
-func (this0 *KeyFile) SetListSeparator(separator0 int) {
+func (this0 *KeyFile) SetListSeparator(separator0 int8) {
 	var this1 *C.GKeyFile
 	var separator1 C.int8_t
 	this1 = (*C.GKeyFile)(unsafe.Pointer(this0))
@@ -1660,15 +2319,15 @@ func (this0 *KeyFile) ToData() (uint64, string, error) {
 	ret2 = C.GoString(ret1)
 	C.g_free(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return length2, ret2, err2
 }
-func KeyFileErrorQuark() int {
+func KeyFileErrorQuark() uint32 {
 	ret1 := C.g_key_file_error_quark()
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 type KeyFileError C.uint32_t
@@ -1721,7 +2380,7 @@ const Minint16 = -32768
 const Minint32 = -2147483648
 const Minint64 = -9223372036854775808
 const Minint8 = -128
-const MinorVersion = 38
+const MinorVersion = 40
 const ModuleSuffix = "so"
 // blacklisted: MainContext (struct)
 // blacklisted: MainLoop (struct)
@@ -1751,6 +2410,7 @@ const (
 	MarkupParseFlagsDoNotUseThisUnsupportedFlag MarkupParseFlags = 1
 	MarkupParseFlagsTreatCdataAsText MarkupParseFlags = 2
 	MarkupParseFlagsPrefixErrorPosition MarkupParseFlags = 4
+	MarkupParseFlagsIgnoreQualified MarkupParseFlags = 8
 )
 // blacklisted: MarkupParser (struct)
 // blacklisted: MatchInfo (struct)
@@ -1969,6 +2629,8 @@ const SizeofSizeT = 8
 const SizeofSsizeT = 8
 const SizeofVoidP = 8
 // blacklisted: SList (struct)
+const SourceContinue = true
+const SourceRemove = false
 const Sqrt2 = 1.414214
 const StrDelimiters = "_-|> <."
 const SysdefAfInet = 2
@@ -2046,6 +2708,7 @@ const (
 	SpawnFlagsChildInheritsStdin SpawnFlags = 32
 	SpawnFlagsFileAndArgvZero SpawnFlags = 64
 	SpawnFlagsSearchPathFromEnvp SpawnFlags = 128
+	SpawnFlagsCloexecPipes SpawnFlags = 256
 )
 // blacklisted: StatBuf (struct)
 // blacklisted: String (struct)
@@ -2162,7 +2825,7 @@ func NewTimeZoneUtc() *TimeZone {
 	ret2 = (*TimeZone)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *TimeZone) AdjustTime(type0 TimeType, time_0 *int64) int {
+func (this0 *TimeZone) AdjustTime(type0 TimeType, time_0 *int64) int32 {
 	var this1 *C.GTimeZone
 	var type1 C.GTimeType
 	var time_1 *C.int64_t
@@ -2170,11 +2833,11 @@ func (this0 *TimeZone) AdjustTime(type0 TimeType, time_0 *int64) int {
 	type1 = C.GTimeType(type0)
 	time_1 = (*C.int64_t)(unsafe.Pointer(time_0))
 	ret1 := C.g_time_zone_adjust_time(this1, type1, time_1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *TimeZone) FindInterval(type0 TimeType, time_0 int64) int {
+func (this0 *TimeZone) FindInterval(type0 TimeType, time_0 int64) int32 {
 	var this1 *C.GTimeZone
 	var type1 C.GTimeType
 	var time_1 C.int64_t
@@ -2182,11 +2845,11 @@ func (this0 *TimeZone) FindInterval(type0 TimeType, time_0 int64) int {
 	type1 = C.GTimeType(type0)
 	time_1 = C.int64_t(time_0)
 	ret1 := C.g_time_zone_find_interval(this1, type1, time_1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *TimeZone) GetAbbreviation(interval0 int) string {
+func (this0 *TimeZone) GetAbbreviation(interval0 int32) string {
 	var this1 *C.GTimeZone
 	var interval1 C.int32_t
 	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
@@ -2196,17 +2859,17 @@ func (this0 *TimeZone) GetAbbreviation(interval0 int) string {
 	ret2 = C.GoString(ret1)
 	return ret2
 }
-func (this0 *TimeZone) GetOffset(interval0 int) int {
+func (this0 *TimeZone) GetOffset(interval0 int32) int32 {
 	var this1 *C.GTimeZone
 	var interval1 C.int32_t
 	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
 	interval1 = C.int32_t(interval0)
 	ret1 := C.g_time_zone_get_offset(this1, interval1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *TimeZone) IsDst(interval0 int) bool {
+func (this0 *TimeZone) IsDst(interval0 int32) bool {
 	var this1 *C.GTimeZone
 	var interval1 C.int32_t
 	this1 = (*C.GTimeZone)(unsafe.Pointer(this0))
@@ -2493,7 +3156,7 @@ func NewVariantBoolean(value0 bool) *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantByte(value0 int) *Variant {
+func NewVariantByte(value0 uint8) *Variant {
 	var value1 C.uint8_t
 	value1 = C.uint8_t(value0)
 	ret1 := C.g_variant_new_byte(value1)
@@ -2548,7 +3211,7 @@ func NewVariantFixedArray(element_type0 *VariantType, elements0 unsafe.Pointer, 
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantHandle(value0 int) *Variant {
+func NewVariantHandle(value0 int32) *Variant {
 	var value1 C.int32_t
 	value1 = C.int32_t(value0)
 	ret1 := C.g_variant_new_handle(value1)
@@ -2556,7 +3219,7 @@ func NewVariantHandle(value0 int) *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantInt16(value0 int) *Variant {
+func NewVariantInt16(value0 int16) *Variant {
 	var value1 C.int16_t
 	value1 = C.int16_t(value0)
 	ret1 := C.g_variant_new_int16(value1)
@@ -2564,7 +3227,7 @@ func NewVariantInt16(value0 int) *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantInt32(value0 int) *Variant {
+func NewVariantInt32(value0 int32) *Variant {
 	var value1 C.int32_t
 	value1 = C.int32_t(value0)
 	ret1 := C.g_variant_new_int32(value1)
@@ -2661,7 +3324,7 @@ func NewVariantTuple(children0 []*Variant) *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantUint16(value0 int) *Variant {
+func NewVariantUint16(value0 uint16) *Variant {
 	var value1 C.uint16_t
 	value1 = C.uint16_t(value0)
 	ret1 := C.g_variant_new_uint16(value1)
@@ -2669,7 +3332,7 @@ func NewVariantUint16(value0 int) *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func NewVariantUint32(value0 int) *Variant {
+func NewVariantUint32(value0 uint32) *Variant {
 	var value1 C.uint32_t
 	value1 = C.uint32_t(value0)
 	ret1 := C.g_variant_new_uint32(value1)
@@ -2722,27 +3385,27 @@ func (this0 *Variant) Classify() VariantClass {
 	ret2 = VariantClass(ret1)
 	return ret2
 }
-func (this0 *Variant) Compare(two0 *Variant) int {
+func (this0 *Variant) Compare(two0 *Variant) int32 {
 	var this1 *C.GVariant
 	var two1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	two1 = (*C.GVariant)(unsafe.Pointer(two0))
 	ret1 := C.g_variant_compare(this1, two1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *Variant) DupBytestring() (uint64, []int) {
+func (this0 *Variant) DupBytestring() (uint64, []uint8) {
 	var this1 *C.GVariant
 	var length1 C.uint64_t
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_dup_bytestring(this1, &length1)
 	var length2 uint64
-	var ret2 []int
+	var ret2 []uint8
 	length2 = uint64(length1)
-	ret2 = make([]int, length1)
+	ret2 = make([]uint8, length1)
 	for i := range ret2 {
-		ret2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(ret1)))[i])
+		ret2[i] = uint8((*(*[999999]C.uint8_t)(unsafe.Pointer(ret1)))[i])
 	}
 	return length2, ret2
 }
@@ -2821,22 +3484,22 @@ func (this0 *Variant) GetBoolean() bool {
 	ret2 = ret1 != 0
 	return ret2
 }
-func (this0 *Variant) GetByte() int {
+func (this0 *Variant) GetByte() uint8 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_byte(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint8
+	ret2 = uint8(ret1)
 	return ret2
 }
-func (this0 *Variant) GetBytestring() []int {
+func (this0 *Variant) GetBytestring() []uint8 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_bytestring(this1)
-	var ret2 []int
-	ret2 = make([]int, uint(C._array_length(unsafe.Pointer(ret1))))
+	var ret2 []uint8
+	ret2 = make([]uint8, uint(C._array_length(unsafe.Pointer(ret1))))
 	for i := range ret2 {
-		ret2[i] = int((*(*[999999]C.uint8_t)(unsafe.Pointer(ret1)))[i])
+		ret2[i] = uint8((*(*[999999]C.uint8_t)(unsafe.Pointer(ret1)))[i])
 	}
 	return ret2
 }
@@ -2877,28 +3540,28 @@ func (this0 *Variant) GetDouble() float64 {
 	ret2 = float64(ret1)
 	return ret2
 }
-func (this0 *Variant) GetHandle() int {
+func (this0 *Variant) GetHandle() int32 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_handle(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
-func (this0 *Variant) GetInt16() int {
+func (this0 *Variant) GetInt16() int16 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_int16(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int16
+	ret2 = int16(ret1)
 	return ret2
 }
-func (this0 *Variant) GetInt32() int {
+func (this0 *Variant) GetInt32() int32 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_int32(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 int32
+	ret2 = int32(ret1)
 	return ret2
 }
 func (this0 *Variant) GetInt64() int64 {
@@ -2988,20 +3651,20 @@ func (this0 *Variant) GetTypeString() string {
 	ret2 = C.GoString(ret1)
 	return ret2
 }
-func (this0 *Variant) GetUint16() int {
+func (this0 *Variant) GetUint16() uint16 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_uint16(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint16
+	ret2 = uint16(ret1)
 	return ret2
 }
-func (this0 *Variant) GetUint32() int {
+func (this0 *Variant) GetUint32() uint32 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_get_uint32(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *Variant) GetUint64() uint64 {
@@ -3020,12 +3683,12 @@ func (this0 *Variant) GetVariant() *Variant {
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	return ret2
 }
-func (this0 *Variant) Hash() int {
+func (this0 *Variant) Hash() uint32 {
 	var this1 *C.GVariant
 	this1 = (*C.GVariant)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_hash(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *Variant) IsContainer() bool {
@@ -3153,15 +3816,34 @@ func VariantParse(type0 *VariantType, text0 string, limit0 string, endptr0 strin
 	var err2 error
 	ret2 = (*Variant)(unsafe.Pointer(ret1))
 	if err1 != nil {
-		err2 = errors.New(C.GoString(((*_GError)(unsafe.Pointer(err1))).message))
+		err2 = ((*_GError)(unsafe.Pointer(err1))).ToGError()
 		C.g_error_free(err1)
 	}
 	return ret2, err2
 }
-func VariantParserGetErrorQuark() int {
+func VariantParseErrorPrintContext(error0 error, source_str0 string) string {
+	var error1 *C.GError
+	var source_str1 *C.char
+	//NOTEO: hasn't implemnt GSLIST/GHASH/GERROR convert.
+	
+	source_str1 = _GoStringToGString(source_str0)
+	defer C.free(unsafe.Pointer(source_str1))
+	ret1 := C.g_variant_parse_error_print_context(error1, source_str1)
+	var ret2 string
+	ret2 = C.GoString(ret1)
+	C.g_free(unsafe.Pointer(ret1))
+	return ret2
+}
+func VariantParseErrorQuark() uint32 {
+	ret1 := C.g_variant_parse_error_quark()
+	var ret2 uint32
+	ret2 = uint32(ret1)
+	return ret2
+}
+func VariantParserGetErrorQuark() uint32 {
 	ret1 := C.g_variant_parser_get_error_quark()
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 // blacklisted: VariantBuilder (struct)
@@ -3186,6 +3868,7 @@ const (
 	VariantClassTuple VariantClass = 40
 	VariantClassDictEntry VariantClass = 123
 )
+// blacklisted: VariantDict (struct)
 type VariantParseError C.uint32_t
 const (
 	VariantParseErrorFailed VariantParseError = 0
@@ -3313,12 +3996,12 @@ func (this0 *VariantType) GetStringLength() uint64 {
 	ret2 = uint64(ret1)
 	return ret2
 }
-func (this0 *VariantType) Hash() int {
+func (this0 *VariantType) Hash() uint32 {
 	var this1 *C.GVariantType
 	this1 = (*C.GVariantType)(unsafe.Pointer(this0))
 	ret1 := C.g_variant_type_hash(this1)
-	var ret2 int
-	ret2 = int(ret1)
+	var ret2 uint32
+	ret2 = uint32(ret1)
 	return ret2
 }
 func (this0 *VariantType) IsArray() bool {
@@ -3698,6 +4381,7 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: hostname_is_non_ascii (function)
 // blacklisted: hostname_to_ascii (function)
 // blacklisted: hostname_to_unicode (function)
+// blacklisted: iconv (function)
 // blacklisted: idle_add (function)
 // blacklisted: idle_remove_by_data (function)
 // blacklisted: idle_source_new (function)
@@ -3809,6 +4493,10 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: str_has_prefix (function)
 // blacklisted: str_has_suffix (function)
 // blacklisted: str_hash (function)
+// blacklisted: str_is_ascii (function)
+// blacklisted: str_match_string (function)
+// blacklisted: str_to_ascii (function)
+// blacklisted: str_tokenize_and_fold (function)
 // blacklisted: strcanon (function)
 // blacklisted: strcasecmp (function)
 // blacklisted: strchomp (function)
@@ -3969,6 +4657,8 @@ func GetUserSpecialDir(directory0 UserDirectory) string {
 // blacklisted: variant_is_object_path (function)
 // blacklisted: variant_is_signature (function)
 // blacklisted: variant_parse (function)
+// blacklisted: variant_parse_error_print_context (function)
+// blacklisted: variant_parse_error_quark (function)
 // blacklisted: variant_parser_get_error_quark (function)
 // blacklisted: variant_type_checked_ (function)
 // blacklisted: variant_type_string_is_valid (function)

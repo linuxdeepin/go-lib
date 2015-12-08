@@ -26,8 +26,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
-	"strings"
 )
 
 func SumStrMd5(str string) (string, bool) {
@@ -39,28 +37,8 @@ func SumFileMd5(filename string) (string, bool) {
 	if err != nil {
 		return "", false
 	}
+	defer f.Close()
 	h := md5.New()
 	io.Copy(h, f)
 	return fmt.Sprintf("%x", h.Sum(nil)), true
-}
-
-//SysMd5Sum will call sh to exec md5sum to get the md5 of file
-func SysMd5Sum(filename string) (string, bool) {
-	if !IsFileExist(filename) {
-		return "", false
-	}
-
-	cmdLine := "md5sum -b " + filename
-	cmd := exec.Command("/bin/sh", "-c", cmdLine)
-	out, err := cmd.Output()
-	if nil != err {
-		return "", false
-	}
-
-	md5Str := strings.Split(string(out), " ")[0]
-	if len(md5Str) < 32 {
-		return "", false
-	}
-
-	return md5Str, true
 }

@@ -23,9 +23,9 @@ package proxy
 
 import (
 	"os"
-	"pkg.linuxdeepin.com/lib/gio-2.0"
-	"pkg.linuxdeepin.com/lib/log"
-	"pkg.linuxdeepin.com/lib/utils"
+	"pkg.deepin.io/lib/gio-2.0"
+	"pkg.deepin.io/lib/log"
+	"pkg.deepin.io/lib/utils"
 )
 
 const (

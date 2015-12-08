@@ -24,6 +24,7 @@ package graphic
 import (
 	"image"
 	"os"
+	dutils "pkg.deepin.io/lib/utils"
 )
 
 // GetImageSize return image's width and height.
@@ -67,4 +68,22 @@ func IsSupportedImage(imgfile string) bool {
 		return false
 	}
 	return true
+}
+
+func GetImagesInDir(dir string) ([]string, error) {
+	files, err := dutils.GetFilesInDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var images []string
+	for _, file := range files {
+		if !IsSupportedImage(file) {
+			continue
+		}
+
+		images = append(images, file)
+	}
+
+	return images, nil
 }
