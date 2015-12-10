@@ -72,7 +72,7 @@ func QueryLang() string {
 	return QueryLangs()[0]
 }
 
-// QueryLangs return array of user lang, split by ",".
+// QueryLangs return array of user lang, split by ":".
 // the rule is document at man gettext(3)
 func QueryLangs() []string {
 	LC_ALL := os.Getenv("LC_ALL")
@@ -80,19 +80,31 @@ func QueryLangs() []string {
 	LANGUAGE := os.Getenv("LANGUAGE")
 	LANG := os.Getenv("LANG")
 
+	cutoff := func(s string) string {
+		for i, c := range s {
+			if c == '.' {
+				return s[:i]
+			}
+		}
+		return s
+	}
+
 	if LC_ALL != "C" && LANGUAGE != "" {
-		langs := strings.Split(LANGUAGE, ":")
-		return langs
+		var r []string
+		for _, lang := range strings.Split(LANGUAGE, ":") {
+			r = append(r, cutoff(lang))
+		}
+		return r
 	}
 
 	if LC_ALL != "" {
-		return []string{LC_ALL}
+		return []string{cutoff(LC_ALL)}
 	}
 	if LC_MESSAGE != "" {
-		return []string{LC_MESSAGE}
+		return []string{cutoff(LC_MESSAGE)}
 	}
 	if LANG != "" {
-		return []string{LANG}
+		return []string{cutoff(LANG)}
 	}
 	return []string{""}
 }

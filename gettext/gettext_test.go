@@ -66,3 +66,18 @@ func (*gettext) TestDNGettext(c *C.C) {
 	c.Check(DNGettext("test", "%d person", "%d persons", 1), C.Equals, "%d人")
 	c.Check(DNGettext("test", "%d person", "%d persons", 2), C.Equals, "%d人")
 }
+
+func (*gettext) TestQueryLang(c *C.C) {
+	os.Setenv("LC_ALL", "zh_CN.UTF-8")
+	os.Setenv("LC_MESSAGE", "zh_TW.")
+	os.Setenv("LANGUAGE", "en_US.12")
+	os.Setenv("LANG", "it")
+
+	c.Check(QueryLang(), C.Equals, "en_US")
+
+	os.Setenv("LANGUAGE", "")
+	c.Check(QueryLang(), C.Equals, "zh_CN")
+
+	os.Setenv("LC_ALL", "")
+	c.Check(QueryLang(), C.Equals, "zh_TW")
+}
