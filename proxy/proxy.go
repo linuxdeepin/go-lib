@@ -23,7 +23,7 @@ package proxy
 
 import (
 	"os"
-	"pkg.deepin.io/lib/gio-2.0"
+	"gir/gio-2.0"
 	"pkg.deepin.io/lib/log"
 	"pkg.deepin.io/lib/utils"
 )

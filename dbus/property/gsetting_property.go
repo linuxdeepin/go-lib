@@ -1,6 +1,6 @@
 package property
 
-import "pkg.deepin.io/lib/gio-2.0"
+import "gir/gio-2.0"
 import "pkg.deepin.io/lib/dbus"
 import "reflect"
 import "fmt"
