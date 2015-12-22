@@ -32,6 +32,10 @@ func (msg DMessage) GetSenderPID() (r uint32) {
 	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixProcessID", 0, msg.GetSender()).Store(&r)
 	return
 }
+func (msg DMessage) GetSenderUID() (r uint32) {
+	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixUser", 0, msg.GetSender()).Store(&r)
+	return
+}
 
 var (
 	dbusObject          DBusObject
