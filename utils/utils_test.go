@@ -251,9 +251,18 @@ func (*testWrapper) TestRandString(c *C.C) {
 }
 
 func (*testWrapper) TestIsInterfaceNil(c *C.C) {
+	c.Check(IsInterfaceNil(nil), C.Equals, true)
 	c.Check(IsInterfaceNil(1), C.Equals, false)
 	c.Check(IsInterfaceNil(true), C.Equals, false)
-	c.Check(IsInterfaceNil(nil), C.Equals, true)
-	var a []int = nil
-	c.Check(IsInterfaceNil(a), C.Equals, true)
+	c.Check(IsInterfaceNil(""), C.Equals, false)
+	c.Check(IsInterfaceNil("str"), C.Equals, false)
+
+	var a1 []int = nil
+	c.Check(IsInterfaceNil(a1), C.Equals, true)
+	var a2 []int = make([]int, 0)
+	c.Check(IsInterfaceNil(a2), C.Equals, false)
+
+	var ifcWrapper interface{}
+	ifcWrapper = "str"
+	c.Check(IsInterfaceNil(ifcWrapper), C.Equals, false)
 }

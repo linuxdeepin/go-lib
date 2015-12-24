@@ -84,5 +84,21 @@ func RandString(n int) string {
 
 func IsInterfaceNil(v interface{}) bool {
 	defer func() { recover() }()
-	return v == nil || reflect.ValueOf(v).IsNil()
+
+	if v == nil {
+		return true
+	}
+
+	value := reflect.ValueOf(v)
+
+	// Value.IsNil reports whether its argument v is nil. But the
+	// argument must be a chan, func, interface, map, pointer, or
+	// slice value; if it is not, Value.IsNil panics.
+	switch value.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
+		return value.IsNil()
+	}
+
+	// should be a not nil type for rest cases
+	return false
 }
