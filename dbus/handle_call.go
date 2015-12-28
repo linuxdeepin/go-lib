@@ -4,6 +4,7 @@ import "fmt"
 import "reflect"
 import "strings"
 import "unicode"
+import "runtime"
 
 var autoHandler = map[string]func(*Conn, *Message) error{
 	"org.freedesktop.DBus.Peer":           handlePeer,
@@ -169,6 +170,8 @@ func (conn *Conn) callUserMethod(msg *Message) ([]reflect.Value, error) {
 // handleCall handles the given method call (i.e. looks if it's one of the
 // pre-implemented ones and searches for a corresponding handler if not).
 func (conn *Conn) handleCall(msg *Message) {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 	name := msg.Headers[FieldMember].value.(string)
 	path := msg.Headers[FieldPath].value.(ObjectPath)
 	ifcName, _ := msg.Headers[FieldInterface].value.(string)
