@@ -1,6 +1,12 @@
-/*
- *	
- */
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 #include <math.h>
 #include "gaussianiir2d.h"
 
@@ -12,26 +18,26 @@
  * @numsteps number of timesteps, more steps implies better accuracy
  *
  * Implements the fast Gaussian convolution algorithm of Alvarez and Mazorra,
- * where the Gaussian is approximated by a cascade of first-order infinite 
+ * where the Gaussian is approximated by a cascade of first-order infinite
  * impulsive response (IIR) filters.  Boundaries are handled with half-sample
  * symmetric extension.
- * 
- * Gaussian convolution is approached as approximating the heat equation and 
+ *
+ * Gaussian convolution is approached as approximating the heat equation and
  * each timestep is performed with an efficient recursive computation.  Using
- * more steps yields a more accurate approximation of the Gaussian.  A 
+ * more steps yields a more accurate approximation of the Gaussian.  A
  * reasonable default value for \c numsteps is 4.
  *
  * The data is assumed to be ordered such that
  *   image[x + width*y] = pixel value at (x,y).
- * 
+ *
  * Reference:
  * Alvarez, Mazorra, "Signal and Image Restoration using Shock Filters and
- * Anisotropic Diffusion," SIAM J. on Numerical Analysis, vol. 31, no. 2, 
+ * Anisotropic Diffusion," SIAM J. on Numerical Analysis, vol. 31, no. 2,
  * pp. 590-605, 1994.
  */
-void 
-gaussianiir2d_f (double *image, 
-	         long width, long height, 
+void
+gaussianiir2d_f (double *image,
+	         long width, long height,
                  double sigma, long numsteps)
 {
     const long numpixels = width*height;
@@ -40,16 +46,16 @@ gaussianiir2d_f (double *image,
     double *ptr;
     long i, x, y;
     long step;
-    
+
     if(sigma <= 0 || numsteps < 0)
         return;
-    
+
     lambda = (sigma * sigma)/(2.0 * numsteps);
     dnu = (1.0 + 2.0 * lambda - sqrt (1.0 + 4.0 * lambda)) / (2.0 * lambda);
     nu = (double)dnu;
     boundaryscale = (double)(1.0 / (1.0 - dnu));
     postscale = (double)(pow (dnu / lambda, 2 * numsteps));
-    
+
     /* Filter horizontally along each row */
     for(y = 0; y < height; y++)
     {
@@ -57,19 +63,19 @@ gaussianiir2d_f (double *image,
         {
             ptr = image + width*y;
             ptr[0] *= boundaryscale;
-            
+
             /* Filter rightwards */
             for(x = 1; x < width; x++)
                 ptr[x] += nu * ptr[x - 1];
-            
+
             ptr[x = width - 1] *= boundaryscale;
-            
+
             /* Filter leftwards */
             for(; x > 0; x--)
                 ptr[x - 1] += nu * ptr[x];
         }
     }
-    
+
     /* Filter vertically along each column */
     for(x = 0; x < width; x++)
     {
@@ -77,28 +83,28 @@ gaussianiir2d_f (double *image,
         {
             ptr = image + x;
             ptr[0] *= boundaryscale;
-            
+
             /* Filter downwards */
             for(i = width; i < numpixels; i += width)
                 ptr[i] += nu * ptr[i - width];
-            
+
             ptr[i = numpixels - width] *= boundaryscale;
-            
+
             /* Filter upwards */
             for(; i > 0; i -= width)
                 ptr[i - width] += nu*ptr[i];
         }
     }
-    
+
     for(i = 0; i < numpixels; i++)
         image[i] *= postscale;
-    
+
     return;
 }
 
-void gaussianiir2d_pixbuf_c(unsigned char* image_data, 
+void gaussianiir2d_pixbuf_c(unsigned char* image_data,
 			    int width, int height,
-			    int rowstride, int n_channels, 
+			    int rowstride, int n_channels,
 			    double sigma, double numsteps)
 {
     //1. unsigned char* ----> float*
@@ -143,8 +149,8 @@ void gaussianiir2d_pixbuf_c(unsigned char* image_data,
     g_free (_image_f_blue);
 }
 #if 0
-void gaussianiir2d_c(unsigned char* image_c, 
-		     long width, long height, 
+void gaussianiir2d_c(unsigned char* image_c,
+		     long width, long height,
 		     double sigma, long numsteps)
 {
     guint32* _image_i = (guint32*)image_c;

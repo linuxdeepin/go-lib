@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 #include "dde-pulse.h"
 #include <string.h>
 #include <stdio.h>
@@ -82,4 +91,3 @@ pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, ui
     }
     return s;
 }
-
