@@ -1,3 +1,5 @@
+// +build ignore
+
 /**
  * Copyright (C) 2015 Deepin Technology Co., Ltd.
  *
@@ -7,25 +9,20 @@
  * (at your option) any later version.
  **/
 
-package profile_test
+package app
 
 import (
-	"pkg.deepin.io/lib/profile"
+	"os"
 )
 
-func ExampleCPUProfile() {
-	p := &profile.Config{CPUProfile: "test"}
-	if err := p.Start(); err != nil {
+func ExampleApp() {
+	app := New("test app", "this is a test app", "version 0.0.0")
+	subcmd := app.ParseCommandLine(os.Args[1:])
+	if app.StartProfile() != nil {
 		// error handle
 		return
 	}
-}
-
-func ExampleNoShutdownHook() {
-	p := &profile.Config{CPUProfile: "cpu.prof", NoShutdownHook: true}
-	if err := p.Start(); err != nil {
-		// error handle
-		return
+	switch subcmd {
+	// deal with subcmd
 	}
-	p.Stop()
 }
