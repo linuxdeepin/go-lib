@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 package dbus
 
 import "fmt"
@@ -30,6 +39,10 @@ func (msg DMessage) GetSender() string {
 
 func (msg DMessage) GetSenderPID() (r uint32) {
 	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixProcessID", 0, msg.GetSender()).Store(&r)
+	return
+}
+func (msg DMessage) GetSenderUID() (r uint32) {
+	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixUser", 0, msg.GetSender()).Store(&r)
 	return
 }
 

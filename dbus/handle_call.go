@@ -1,9 +1,19 @@
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 package dbus
 
 import "fmt"
 import "reflect"
 import "strings"
 import "unicode"
+import "runtime"
 
 var autoHandler = map[string]func(*Conn, *Message) error{
 	"org.freedesktop.DBus.Peer":           handlePeer,
@@ -169,6 +179,8 @@ func (conn *Conn) callUserMethod(msg *Message) ([]reflect.Value, error) {
 // handleCall handles the given method call (i.e. looks if it's one of the
 // pre-implemented ones and searches for a corresponding handler if not).
 func (conn *Conn) handleCall(msg *Message) {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 	name := msg.Headers[FieldMember].value.(string)
 	path := msg.Headers[FieldPath].value.(ObjectPath)
 	ifcName, _ := msg.Headers[FieldInterface].value.(string)

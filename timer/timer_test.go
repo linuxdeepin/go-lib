@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 package timer_test
 
 import (
@@ -19,10 +28,10 @@ func TestTimer(t *testing.T) {
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond, time.Second*2+time.Millisecond*2)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
 	})
 
 	Convey("stop and elapse", t, func() {

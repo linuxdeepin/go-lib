@@ -1,7 +1,16 @@
+/**
+ * Copyright (C) 2014 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 package property
 
 import "testing"
-import "pkg.deepin.io/lib/glib-2.0"
+import "gir/glib-2.0"
 
 func TestGVariant(t *testing.T) {
 	if glib.NewVariantByte(0).GetTypeString() != "y" {
