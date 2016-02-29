@@ -91,7 +91,7 @@ func (app *App) EnableNoShutdownHook(noShutdownHook bool) {
 
 // LogLevel returns the log level.
 func (app *App) LogLevel() log.Priority {
-	if *app.logLevel != "" && *app.verbose {
+	if *app.logLevel == "" && *app.verbose {
 		return log.LevelDebug
 	}
 	lv, _ := toLogLevel(*app.logLevel)
@@ -110,7 +110,7 @@ func (app *App) CpuProf() string {
 
 // New creates a new application according to name, description and version.
 // There are some default command line flag:
-// 	verbose(v for short): show much more message, shorthand for --loglevel debug which will be ignored if oglevel is specificed.
+// 	verbose(v for short): show much more message, shorthand for --loglevel debug which will be ignored if loglevel is specificed.
 // 	loglevel(l for short): set log level, possible value is error/warn/info/debug/no, info is default.
 // 	memprof: the file to save memory profile.
 // 	cpuprof: the file to save cpu profile.
