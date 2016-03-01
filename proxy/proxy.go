@@ -10,58 +10,105 @@
 package proxy
 
 import (
+	"fmt"
 	"gir/gio-2.0"
 	"os"
 	"pkg.deepin.io/lib/log"
 	"pkg.deepin.io/lib/utils"
+	"strconv"
+	"strings"
 )
 
+// Synchronize proxy gsettings to environment variables.
+//
+// Examples of proxy environment variables:
+// http_proxy="http://user:pass@127.0.0.1:8080/"
+// https_proxy="https://127.0.0.1:8080/"
+// ftp_proxy="ftp://127.0.0.1:8080/"
+// all_proxy="http://127.0.0.1:8080/"
+// SOCKS_SERVER=socks5://127.0.0.1:8000/
+// no_proxy="localhost,127.0.0.0/8,::1"
+
 const (
+	// general proxy environment variables, works for wget/curl/aria2c
 	envAutoProxy  = "auto_proxy"
 	envHttpProxy  = "http_proxy"
 	envHttpsProxy = "https_proxy"
 	envFtpProxy   = "ftp_proxy"
+	envAllProxy   = "all_proxy"
+	envNoProxy    = "no_proxy"
+
+	// special proxy environment variable for chrome
 	envSocksProxy = "SOCKS_SERVER"
 
-	gsettingsIdProxy = "com.deepin.dde.proxy"
-	gkeyProxyMethod  = "proxy-method"
+	gsettingsIdProxy = "com.deepin.wrap.gnome.system.proxy"
 
-	proxyMethodNone   = "none"
-	proxyMethodManual = "manual"
-	proxyMethodAuto   = "auto"
+	proxyTypeHttp  = "http"
+	proxyTypeHttps = "https"
+	proxyTypeFtp   = "ftp"
+	proxyTypeSocks = "socks5"
 
-	gkeyAutoProxy = "auto-proxy"
+	gkeyProxyMode   = "mode"
+	proxyModeNone   = "none"
+	proxyModeManual = "manual"
+	proxyModeAuto   = "auto"
 
-	gkeyHttpProxy  = "http-proxy"
-	gkeyHttpsProxy = "https-proxy"
-	gkeyFtpProxy   = "ftp-proxy"
-	gkeySocksProxy = "socks-proxy"
+	gkeyProxyAuto        = "autoconfig-url"
+	gkeyProxyIgnoreHosts = "ignore-hosts"
+	gkeyProxyHost        = "host"
+	gkeyProxyPort        = "port"
+
+	gchildProxyHttp  = "http"
+	gchildProxyHttps = "https"
+	gchildProxyFtp   = "ftp"
+	gchildProxySocks = "socks"
 )
 
 var (
-	proxySettings = gio.NewSettings(gsettingsIdProxy)
-	logger        = log.NewLogger("com.deepin.dlib.proxy")
+	logger                  = log.NewLogger("go-lib/proxy")
+	proxySettings           = gio.NewSettings(gsettingsIdProxy)
+	proxyChildSettingsHttp  *gio.Settings
+	proxyChildSettingsHttps *gio.Settings
+	proxyChildSettingsFtp   *gio.Settings
+	proxyChildSettingsSocks *gio.Settings
 )
 
 // SetupProxy setup system proxy, need followed with glib.StartLoop().
 func SetupProxy() {
+	proxyChildSettingsHttp = proxySettings.GetChild(gchildProxyHttp)
+	proxyChildSettingsHttps = proxySettings.GetChild(gchildProxyHttps)
+	proxyChildSettingsFtp = proxySettings.GetChild(gchildProxyFtp)
+	proxyChildSettingsSocks = proxySettings.GetChild(gchildProxySocks)
 	updateProxyEnvs()
 	listenProxyGsettings()
 }
 
 func listenProxyGsettings() {
 	proxySettings.Connect("changed", func(s *gio.Settings, key string) {
-		logger.Debug("proxy keys in gsettings changed", key, proxySettings.GetString(key))
+		updateProxyEnvs()
+	})
+	proxyChildSettingsHttp.Connect("changed", func(s *gio.Settings, key string) {
+		updateProxyEnvs()
+	})
+	proxyChildSettingsHttps.Connect("changed", func(s *gio.Settings, key string) {
+		updateProxyEnvs()
+	})
+	proxyChildSettingsFtp.Connect("changed", func(s *gio.Settings, key string) {
+		updateProxyEnvs()
+	})
+	proxyChildSettingsSocks.Connect("changed", func(s *gio.Settings, key string) {
 		updateProxyEnvs()
 	})
 }
 
 func showEnvs() {
-	showEnv(envAutoProxy)
 	showEnv(envHttpProxy)
 	showEnv(envHttpsProxy)
 	showEnv(envFtpProxy)
 	showEnv(envSocksProxy)
+	showEnv(envAllProxy)
+	showEnv(envAutoProxy)
+	showEnv(envNoProxy)
 }
 
 func showEnv(envName string) {
@@ -73,39 +120,71 @@ func showEnv(envName string) {
 }
 
 func updateProxyEnvs() {
-	utils.UnsetEnv(envAutoProxy)
+	logger.Debug("update proxy environment variables...")
+
 	utils.UnsetEnv(envHttpProxy)
 	utils.UnsetEnv(envHttpsProxy)
 	utils.UnsetEnv(envFtpProxy)
 	utils.UnsetEnv(envSocksProxy)
-	proxyMethod := proxySettings.GetString(gkeyProxyMethod)
-	switch proxyMethod {
-	case proxyMethodNone:
-	case proxyMethodAuto:
-		autoProxy := proxySettings.GetString(gkeyAutoProxy)
-		if len(autoProxy) > 0 {
-			os.Setenv(envAutoProxy, autoProxy)
-		}
-	case proxyMethodManual:
-		httpProxy := proxySettings.GetString(gkeyHttpProxy)
-		if len(httpProxy) > 0 {
-			os.Setenv(envHttpProxy, httpProxy)
-		}
+	utils.UnsetEnv(envAutoProxy)
+	utils.UnsetEnv(envAllProxy)
+	utils.UnsetEnv(envNoProxy)
+	proxyMode := proxySettings.GetString(gkeyProxyMode)
+	switch proxyMode {
+	case proxyModeNone:
+	case proxyModeAuto:
+		doSetEnv(envAutoProxy, proxySettings.GetString(gkeyProxyAuto))
+	case proxyModeManual:
+		doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp))
+		doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps))
+		doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp))
+		doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks))
 
-		httpsProxy := proxySettings.GetString(gkeyHttpsProxy)
-		if len(httpsProxy) > 0 {
-			os.Setenv(envHttpsProxy, httpsProxy)
-		}
+		arrayIgnoreHosts := proxySettings.GetStrv(gkeyProxyIgnoreHosts)
+		ignoreHosts := strings.Join(arrayIgnoreHosts, ",")
+		doSetEnv(envNoProxy, ignoreHosts)
 
-		ftpProxy := proxySettings.GetString(gkeyFtpProxy)
-		if len(ftpProxy) > 0 {
-			os.Setenv(envFtpProxy, ftpProxy)
-		}
-
-		socksProxy := proxySettings.GetString(gkeySocksProxy)
-		if len(socksProxy) > 0 {
-			os.Setenv(envSocksProxy, socksProxy)
+		// fallback socks proxy value to http to be compatible with Qt>=4.6
+		if utils.IsEnvExists(envSocksProxy) && !utils.IsEnvExists(envHttpProxy) {
+			doSetEnv(envHttpProxy, os.Getenv(envSocksProxy))
 		}
 	}
 	showEnvs()
+}
+
+func doSetEnv(env, value string) {
+	if len(value) > 0 {
+		os.Setenv(env, value)
+	}
+}
+
+func getProxyValue(proxyType string) (proxyValue string) {
+	childSettings, err := getProxyChildSettings(proxyType)
+	if err != nil {
+		return
+	}
+	host := childSettings.GetString(gkeyProxyHost)
+	if len(host) == 0 {
+		return
+	}
+	port := strconv.Itoa(int(childSettings.GetInt(gkeyProxyPort)))
+	proxyValue = fmt.Sprintf("%s://%s:%s", proxyType, host, port)
+	return
+}
+
+func getProxyChildSettings(proxyType string) (childSettings *gio.Settings, err error) {
+	switch proxyType {
+	case proxyTypeHttp:
+		childSettings = proxyChildSettingsHttp
+	case proxyTypeHttps:
+		childSettings = proxyChildSettingsHttps
+	case proxyTypeFtp:
+		childSettings = proxyChildSettingsFtp
+	case proxyTypeSocks:
+		childSettings = proxyChildSettingsSocks
+	default:
+		err = fmt.Errorf("not a valid proxy type: %s", proxyType)
+		logger.Error(err)
+	}
+	return
 }
