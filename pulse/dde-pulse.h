@@ -34,4 +34,7 @@ pa_context_success_cb_t get_success_cb();
 
 pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend);
 
+void suspend_sink_by_id(pa_context* ctx, uint32_t idx, int suspend);
+void suspend_source_by_id(pa_context* ctx, uint32_t idx, int suspend);
+
 #endif

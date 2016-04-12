@@ -282,6 +282,14 @@ func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
 	c.cbs[facility] = append(c.cbs[facility], cb)
 }
 
+func (c *Context) SuspendSinkById(idx uint32, suspend int) {
+	C.suspend_sink_by_id(c.ctx, C.uint32_t(idx), C.int(suspend))
+}
+
+func (c *Context) SuspendSourceById(idx uint32, suspend int) {
+	C.suspend_source_by_id(c.ctx, C.uint32_t(idx), C.int(suspend))
+}
+
 func (c *Context) handlePAEvent(facility, eventType int, idx uint32) {
 	if cb, ok := c.cbs[facility]; ok {
 		for _, c := range cb {
