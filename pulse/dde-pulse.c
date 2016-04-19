@@ -84,19 +84,27 @@ void dpa_context_subscribe_cb(pa_context *c, pa_subscription_event_type_t t, uin
     go_handle_changed(facility, event_type, idx);
 }
 
+static void
+dpa_context_state_cb(pa_context* ctx, void* userdata)
+{
+    int state = pa_context_get_state (ctx);
+    go_handle_state_changed(state);
+}
+
 void setup_monitor(pa_context *ctx)
 {
     pa_threaded_mainloop_lock(m);
+    pa_context_set_state_callback(ctx, dpa_context_state_cb, NULL);
     pa_context_set_subscribe_callback(ctx, dpa_context_subscribe_cb, NULL);
     pa_context_subscribe(ctx,
-	    PA_SUBSCRIPTION_MASK_CARD |
-	    PA_SUBSCRIPTION_MASK_SINK |
-	    PA_SUBSCRIPTION_MASK_SOURCE |
-	    PA_SUBSCRIPTION_MASK_SINK_INPUT |
-	    PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT |
-	    PA_SUBSCRIPTION_MASK_SAMPLE_CACHE,
-	    NULL,
-	    NULL);
+                         PA_SUBSCRIPTION_MASK_CARD |
+                         PA_SUBSCRIPTION_MASK_SINK |
+                         PA_SUBSCRIPTION_MASK_SOURCE |
+                         PA_SUBSCRIPTION_MASK_SINK_INPUT |
+                         PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT |
+                         PA_SUBSCRIPTION_MASK_SAMPLE_CACHE,
+                         NULL,
+                         NULL);
     pa_threaded_mainloop_unlock(m);
 }
 

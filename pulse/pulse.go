@@ -17,6 +17,7 @@ import "C"
 import "fmt"
 import "unsafe"
 import "runtime"
+import "sync"
 
 type Callback func(eventType int, idx uint32)
 
@@ -37,8 +38,19 @@ const (
 	FacilitySampleCache  = C.PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE
 )
 
+const (
+	ContextStateUnconnected = C.PA_CONTEXT_UNCONNECTED
+	ContextStateConnecting  = C.PA_CONTEXT_CONNECTING
+	ContextStateAuthorizing = C.PA_CONTEXT_AUTHORIZING
+	ContextStateSettingName = C.PA_CONTEXT_SETTING_NAME
+	ContextStateReady       = C.PA_CONTEXT_READY
+	ContextStateFailed      = C.PA_CONTEXT_FAILED
+	ContextStateTerminated  = C.PA_CONTEXT_TERMINATED
+)
+
 type Context struct {
-	cbs map[int][]Callback
+	cbs      map[int][]Callback
+	stateCbs map[int][]func()
 
 	ctx  *C.pa_context
 	loop *C.pa_threaded_mainloop
@@ -239,21 +251,52 @@ func (c *Context) SafeDo(fn func()) {
 	runtime.UnlockOSThread()
 }
 
-var __context *Context
+var (
+	__context   *Context
+	__ctxLocker sync.Mutex
+)
+
+func GetContextForced() *Context {
+	__ctxLocker.Lock()
+	if __context != nil {
+		__context.Free()
+		__context = nil
+	}
+	__ctxLocker.Unlock()
+	return GetContext()
+}
 
 func GetContext() *Context {
+	__ctxLocker.Lock()
+	defer __ctxLocker.Unlock()
 	if __context == nil {
 		loop := C.pa_threaded_mainloop_new()
 		C.pa_threaded_mainloop_start(loop)
 		ctx := C.pa_init(loop)
 
 		__context = &Context{
-			cbs:  make(map[int][]Callback),
-			ctx:  ctx,
-			loop: loop,
+			cbs:      make(map[int][]Callback),
+			stateCbs: make(map[int][]func()),
+			ctx:      ctx,
+			loop:     loop,
 		}
 	}
 	return __context
+}
+
+func (ctx *Context) Free() {
+	if ctx == nil {
+		return
+	}
+	if ctx.ctx != nil {
+		C.pa_context_unref(ctx.ctx)
+		ctx.ctx = nil
+	}
+	if ctx.loop != nil {
+		C.pa_threaded_mainloop_stop(ctx.loop)
+		C.pa_threaded_mainloop_free(ctx.loop)
+		ctx.loop = nil
+	}
 }
 
 //export receive_some_info
@@ -282,6 +325,10 @@ func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
 	c.cbs[facility] = append(c.cbs[facility], cb)
 }
 
+func (c *Context) ConnectStateChanged(state int, cb func()) {
+	c.stateCbs[state] = append(c.stateCbs[state], cb)
+}
+
 func (c *Context) SuspendSinkById(idx uint32, suspend int) {
 	C.suspend_sink_by_id(c.ctx, C.uint32_t(idx), C.int(suspend))
 }
@@ -303,4 +350,16 @@ func (c *Context) handlePAEvent(facility, eventType int, idx uint32) {
 //export go_handle_changed
 func go_handle_changed(facility int, event_type int, idx uint32) {
 	GetContext().handlePAEvent(facility, event_type, idx)
+}
+
+//export go_handle_state_changed
+func go_handle_state_changed(state int) {
+	cbs, ok := GetContext().stateCbs[state]
+	if !ok {
+		fmt.Println("Unregiste state:", state)
+	}
+
+	for _, cb := range cbs {
+		go cb()
+	}
 }
