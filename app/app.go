@@ -98,6 +98,10 @@ func (app *App) LogLevel() log.Priority {
 	return lv
 }
 
+func (app *App) IsLogLevelNone() bool {
+	return *app.verbose == false && *app.logLevel == ""
+}
+
 // MemProf returns memory profile's path.
 func (app *App) MemProf() string {
 	return *app.memprof
