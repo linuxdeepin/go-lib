@@ -242,6 +242,52 @@ func (c *Context) SetDefaultSource(name string) {
 	})
 }
 
+// MoveSinkInputsByName move sink-inputs to the special sink name
+func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
+	cname := C.CString(sinkName)
+	defer C.free(unsafe.Pointer(cname))
+
+	c.SafeDo(func() {
+		for _, idx := range sinkInputs {
+			C.pa_context_move_sink_input_by_name(c.ctx, C.uint32_t(idx), cname,
+				C.get_success_cb(), nil)
+		}
+	})
+}
+
+// MoveSinkInputsByIndex move sink-inputs to the special sink index
+func (c *Context) MoveSinkInputsByIndex(sinkInputs []uint32, sinkIdx uint32) {
+	c.SafeDo(func() {
+		for _, idx := range sinkInputs {
+			C.pa_context_move_sink_input_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sinkIdx),
+				C.get_success_cb(), nil)
+		}
+	})
+}
+
+// MoveSourceOutputsByName move source-outputs to the special source name
+func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName string) {
+	cname := C.CString(sourceName)
+	defer C.free(unsafe.Pointer(cname))
+
+	c.SafeDo(func() {
+		for _, idx := range sourceOutputs {
+			C.pa_context_move_source_output_by_name(c.ctx, C.uint32_t(idx), cname,
+				C.get_success_cb(), nil)
+		}
+	})
+}
+
+// MoveSourceOutputsByIndex move source-outputs to the special source index
+func (c *Context) MoveSourceOutputsByIndex(sourceOutputs []uint32, sourceIdx uint32) {
+	c.SafeDo(func() {
+		for _, idx := range sourceOutputs {
+			C.pa_context_move_source_output_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sourceIdx),
+				C.get_success_cb(), nil)
+		}
+	})
+}
+
 // SafeDo invoke an function with lock
 func (c *Context) SafeDo(fn func()) {
 	runtime.LockOSThread()
