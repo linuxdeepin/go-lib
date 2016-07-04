@@ -62,7 +62,7 @@ func (info *paInfo) ToSourceOutput() *SourceOutput {
 	return nil
 }
 
-func toProfiles(n uint32, c **C.pa_card_profile_info2) (r []ProfileInfo2) {
+func toProfiles(n uint32, c **C.pa_card_profile_info2) (r ProfileInfos2) {
 	if n > 0 {
 		pp := (*[1 << 10](*C.pa_card_profile_info2))(unsafe.Pointer(c))[:n:n]
 		for _, p := range pp {
@@ -103,6 +103,32 @@ func toPort(c *C.pa_sink_port_info) PortInfo {
 		Description: C.GoString(c.description),
 		Priority:    uint32(c.priority),
 		Available:   int(c.available),
+	}
+}
+
+func toCardPorts(n uint32, c **C.pa_card_port_info) (r CardPortInfos) {
+	if n > 0 {
+		pp := (*[1 << 10](*C.pa_card_port_info))(unsafe.Pointer(c))[:n:n]
+		for _, p := range pp {
+			r = append(r, toCardPort(p))
+		}
+	}
+	return
+}
+
+func toCardPort(c *C.pa_card_port_info) CardPortInfo {
+	if c == nil {
+		return CardPortInfo{}
+	}
+	return CardPortInfo{
+		PortInfo: PortInfo{
+			Name:        C.GoString(c.name),
+			Description: C.GoString(c.description),
+			Priority:    uint32(c.priority),
+			Available:   int(c.available),
+		},
+		Direction: int(c.direction),
+		Profiles:  toProfiles(uint32(c.n_profiles), c.profiles2),
 	}
 }
 

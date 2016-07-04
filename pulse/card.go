@@ -16,6 +16,18 @@ import "C"
 import "fmt"
 import "unsafe"
 
+const (
+	DirectionSink int = iota + 1
+	DirectionSource
+)
+
+type CardPortInfo struct {
+	PortInfo
+	Direction int
+	Profiles  ProfileInfos2
+}
+type CardPortInfos []CardPortInfo
+
 //typedef struct pa_card_info {
 //	uint32_t index;                      /**< Index of this card */
 //	const char *name;                    /**< Name of this card */
@@ -36,11 +48,10 @@ type Card struct {
 	OwnerModule uint32
 	Driver      string
 
-	// TODO
-	//Ports         []CardPortInfo
 	PropList      map[string]string
-	Profiles      []ProfileInfo2
+	Profiles      ProfileInfos2
 	ActiveProfile ProfileInfo2
+	Ports         CardPortInfos
 }
 
 func toCardInfo(info *C.pa_card_info) (c *Card) {
@@ -51,10 +62,9 @@ func toCardInfo(info *C.pa_card_info) (c *Card) {
 	c.OwnerModule = uint32(info.owner_module)
 	c.Driver = C.GoString(info.driver)
 	c.PropList = toProplist(info.proplist)
-	// TODO
-	//	c.Ports = toPorts(uint32(info.n_ports), info.ports)
 	c.Profiles = toProfiles(uint32(info.n_profiles), info.profiles2)
 	c.ActiveProfile = toProfile(info.active_profile2)
+	c.Ports = toCardPorts(uint32(info.n_ports), info.ports)
 	return
 }
 
@@ -68,4 +78,23 @@ func (card *Card) SetProfile(name string) {
 	c.SafeDo(func() {
 		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
 	})
+}
+
+func (infos CardPortInfos) TrySelectProfile(portName string) (string, error) {
+	for _, info := range infos {
+		if info.Name != portName {
+			continue
+		}
+		return info.Profiles.SelectProfile(), nil
+	}
+	return "", fmt.Errorf("Invalid card port name: %s", portName)
+}
+
+func (infos CardPortInfos) Get(name string, direction int) (CardPortInfo, error) {
+	for _, info := range infos {
+		if info.Name == name && info.Direction == direction {
+			return info, nil
+		}
+	}
+	return CardPortInfo{}, fmt.Errorf("Invalid card port name: %s", name)
 }

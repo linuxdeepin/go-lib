@@ -20,6 +20,12 @@ const (
 	VolumeUIMax = 99957.0 / C.PA_VOLUME_NORM // C.pa_sw_volume_from_dB(11.0)
 )
 
+const (
+	AvailableTypeNo int = iota
+	AvailableTypeUnknow
+	AvailableTypeYes
+)
+
 func toProplist(c *C.pa_proplist) map[string]string {
 	var ret = make(map[string]string)
 	var state unsafe.Pointer
@@ -38,12 +44,67 @@ type ProfileInfo2 struct {
 	NSources    uint32
 	Available   int
 }
+type ProfileInfos2 []ProfileInfo2
 
 type PortInfo struct {
 	Name        string
 	Description string
 	Priority    uint32
-	Available   int
+	Available   int // 0: No, 1: Unknow, 2: Yes
+}
+
+func (infos ProfileInfos2) Exists(name string) bool {
+	for _, info := range infos {
+		if info.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func (infos ProfileInfos2) SelectProfile() string {
+	if len(infos) == 0 {
+		return ""
+	}
+
+	profile := infos.selectByAvailable(AvailableTypeYes)
+	if len(profile.Name) != 0 {
+		return profile.Name
+	}
+
+	profile = infos.selectByAvailable(AvailableTypeUnknow)
+	if len(profile.Name) != 0 {
+		return profile.Name
+	}
+
+	profile = infos.selectByAvailable(AvailableTypeNo)
+	return profile.Name
+}
+
+func (infos ProfileInfos2) Len() int {
+	return len(infos)
+}
+
+func (infos ProfileInfos2) Less(i, j int) bool {
+	return infos[i].Priority > infos[j].Priority
+}
+
+func (infos ProfileInfos2) Swap(i, j int) {
+	infos[i], infos[j] = infos[j], infos[i]
+}
+
+func (infos ProfileInfos2) selectByAvailable(available int) ProfileInfo2 {
+	var profile ProfileInfo2
+	for _, info := range infos {
+		if info.Available != available {
+			continue
+		}
+
+		if profile.Priority < info.Priority {
+			profile = info
+		}
+	}
+	return profile
 }
 
 func toBool(v C.int) bool {
