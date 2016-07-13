@@ -42,7 +42,7 @@ func stringArrayC2Go(strArrC **C.char) *[]string {
 // It is a revised version of @stringArrayC2Go
 func stringArrayC2Go_2(strArrC **C.char) *[]string {
 	strArr := make([]string, 0)
-	arrIndex := (*[1 << 30]*C.char)(unsafe.Pointer(strArrC))
+	arrIndex := (*[1 << 10]*C.char)(unsafe.Pointer(strArrC))
 	for _, p := range arrIndex {
 		if p == nil {
 			break

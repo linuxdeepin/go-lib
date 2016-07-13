@@ -12,6 +12,7 @@ Deepin GoLang Library is a library containing many useful go routines for things
 * x11
 * gdk-pixbuf-2.0
 * libpulse
+* mobile-broadband-provider-info
 
 ## Installation
 
