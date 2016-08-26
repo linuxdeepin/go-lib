@@ -105,6 +105,8 @@ var newCookie, fetchCookie, deleteCookie = func() (func() *cookie,
 
 			return c
 		}, func(i int64) {
+			locker.Lock()
 			delete(cookies, i)
+			locker.Unlock()
 		}
 }()
