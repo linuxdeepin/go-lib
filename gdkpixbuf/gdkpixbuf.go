@@ -64,7 +64,7 @@ func FreePixbuf(pixbuf *C.GdkPixbuf) {
 // Save and Load
 
 func Save(pixbuf *C.GdkPixbuf, destFile string, f Format) (err error) {
-	defaultError := fmt.Errorf("render image to xpixmap failed, %s", destFile)
+	defaultError := fmt.Errorf("save image to xpixmap failed, %s", destFile)
 	cDestFile := C.CString(destFile)
 	defer C.free(unsafe.Pointer(cDestFile))
 	cFormat := C.CString(string(f))

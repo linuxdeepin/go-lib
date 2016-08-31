@@ -24,6 +24,11 @@ func (*testWrapper) TestGetCountryDatabase(c *C.C) {
 }
 
 func (*testWrapper) TestGetLocaleCountryInfo(c *C.C) {
+	cur := os.Getenv("LC_ALL")
+	if cur == "C" || cur == "POSIX" {
+		c.Skip("Unsupported locale")
+		return
+	}
 	oldLanguage := os.Getenv(envLanguage)
 	defer os.Setenv(envLanguage, oldLanguage)
 
@@ -34,6 +39,8 @@ func (*testWrapper) TestGetLocaleCountryInfo(c *C.C) {
 		{"en_US.UTF-8", "US", "United States"},
 	}
 	for _, d := range testData {
+		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
+		os.Setenv("LC_CTYPE", "en_US.UTF-8")
 		InitI18n()
 		os.Setenv(envLanguage, d.language)
 		code, _ := GetLocaleCountryCode()
@@ -67,6 +74,11 @@ func (*testWrapper) TestGetCountryCodeForLanguage(c *C.C) {
 }
 
 func (*testWrapper) TestGetCountryInfoForCode(c *C.C) {
+	cur := os.Getenv("LC_ALL")
+	if cur == "C" || cur == "POSIX" {
+		c.Skip("Unsupported locale")
+		return
+	}
 	oldLanguage := os.Getenv(envLanguage)
 	defer os.Setenv(envLanguage, oldLanguage)
 
@@ -81,6 +93,8 @@ func (*testWrapper) TestGetCountryInfoForCode(c *C.C) {
 		{"en_US.UTF-8", "cn", "China"},
 	}
 	for _, d := range testData {
+		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
+		os.Setenv("LC_CTYPE", "en_US.UTF-8")
 		InitI18n()
 		os.Setenv(envLanguage, d.language)
 		name, _ := GetCountryNameForCode(d.code)

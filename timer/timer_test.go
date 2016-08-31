@@ -40,7 +40,7 @@ func TestTimer(t *testing.T) {
 
 		time.Sleep(time.Second)
 		timer.Stop()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
 		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)

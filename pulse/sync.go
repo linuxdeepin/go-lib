@@ -93,10 +93,9 @@ var newCookie, fetchCookie, deleteCookie = func() (func() *cookie,
 	return func() *cookie {
 			locker.Lock()
 			id++
-			locker.Unlock()
-
 			c := NewCookie(id)
 			cookies[c.id] = c
+			locker.Unlock()
 			return c
 		}, func(i int64) *cookie {
 			locker.Lock()

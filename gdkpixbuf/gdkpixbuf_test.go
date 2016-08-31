@@ -105,6 +105,11 @@ func (*testWrapper) TestBlurImage(c *C.C) {
 }
 
 func (*testWrapper) TestBlurImageCache(c *C.C) {
+	err := InitGdk()
+	if err != nil {
+		c.Skip(err.Error())
+		return
+	}
 	resultFile, useCache, err := BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
 		c.Error(err)
@@ -256,6 +261,11 @@ func (*testWrapper) TestThumbnailImage(c *C.C) {
 }
 
 func (*testWrapper) TestScaleImageCache(c *C.C) {
+	err := InitGdk()
+	if err != nil {
+		c.Skip(err.Error())
+		return
+	}
 	resultFile, useCache, err := ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
@@ -274,6 +284,11 @@ func (*testWrapper) TestScaleImageCache(c *C.C) {
 }
 
 func (*testWrapper) TestScaleImagePreferCache(c *C.C) {
+	err := InitGdk()
+	if err != nil {
+		c.Skip(err.Error())
+		return
+	}
 	resultFile, useCache, err := ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
@@ -319,9 +334,13 @@ func (*testWrapper) TestRotateImageUpsizedown(c *C.C) {
 }
 
 func (*testWrapper) ManualTestScreenshotImage(c *C.C) {
-	InitGdk()
+	err := InitGdk()
+	if err != nil {
+		c.Skip(err.Error())
+		return
+	}
 	resultFile := "testdata/test_screenshot.png"
-	err := ScreenshotImage(resultFile, FormatPng)
+	err = ScreenshotImage(resultFile, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
