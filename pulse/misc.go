@@ -21,8 +21,8 @@ const (
 )
 
 const (
-	AvailableTypeNo int = iota
-	AvailableTypeUnknow
+	AvailableTypeUnknow int = iota
+	AvailableTypeNo
 	AvailableTypeYes
 )
 
@@ -50,7 +50,17 @@ type PortInfo struct {
 	Name        string
 	Description string
 	Priority    uint32
-	Available   int // 0: No, 1: Unknow, 2: Yes
+	Available   int // 0: Unknow, 1: No, 2: Yes
+}
+type PortInfos []PortInfo
+
+func (infos PortInfos) Get(name string) *PortInfo {
+	for _, info := range infos {
+		if info.Name == name {
+			return &info
+		}
+	}
+	return nil
 }
 
 func (infos ProfileInfos2) Exists(name string) bool {
