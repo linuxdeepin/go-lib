@@ -214,7 +214,6 @@ func handleSubpath(c *Conn, path ObjectPath) {
 			intro := parent[InterfaceIntrospectProxy]
 			if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
 				intro.(*IntrospectProxy).child[basepath] = true
-				fmt.Println("Added:", basepath)
 			}
 			return
 		}
