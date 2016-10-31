@@ -1,0 +1,19 @@
+[Desktop Entry]
+Categories=Graphics;GTK;
+Comment=Screen capturing application
+Exec=deepin-screenshot --icon
+GenericName=Screen capturing application
+Icon=deepin-screenshot
+Name=Deepin Screenshot
+StartupNotify=false
+Type=Application
+
+
+[Full_Screenshot Shortcut Group]
+Exec=deepin-screenshot -f
+Name=Full Screenshot
+
+[Delay_Screenshot Shortcut Group]
+Exec=deepin-screenshot -d 5
+Name=Delay Screenshot
+Name[zh_CN]=延时截图
