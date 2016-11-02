@@ -49,8 +49,10 @@ var xdgDataDirs []string
 var xdgAppDirs []string
 
 func init() {
-	xdgDataDirs = xdgdir.GetSystemDataDirs()
+	xdgDataDirs = make([]string, 0, 3)
 	xdgDataDirs = append(xdgDataDirs, xdgdir.GetUserDataDir())
+	sysDataDirs := xdgdir.GetSystemDataDirs()
+	xdgDataDirs = append(xdgDataDirs, sysDataDirs...)
 
 	xdgAppDirs = make([]string, len(xdgDataDirs))
 	for i, dir := range xdgDataDirs {
@@ -254,6 +256,9 @@ func (ai *DesktopAppInfo) ShouldShow() bool {
 	if ai.GetNoDisplay() {
 		return false
 	}
+	if ai.GetIsHiden() {
+		return false
+	}
 	return ai.GetShowIn(nil)
 }
 
@@ -264,6 +269,11 @@ func (ai *DesktopAppInfo) GetName() string {
 func (ai *DesktopAppInfo) GetGenericName() string {
 	gname, _ := ai.GetLocaleString(MainSection, KeyGenericName, "")
 	return gname
+}
+
+func (ai *DesktopAppInfo) GetComment() string {
+	comment, _ := ai.GetLocaleString(MainSection, KeyComment, "")
+	return comment
 }
 
 func (ai *DesktopAppInfo) GetDisplayName() string {
@@ -311,6 +321,27 @@ func (ai *DesktopAppInfo) GetTerminal() bool {
 
 func (ai *DesktopAppInfo) Launch(timestamp uint32, files []string) error {
 	return _launch(ai, ai.GetCommandline(), timestamp, files)
+}
+
+func (ai *DesktopAppInfo) GetExecutable() string {
+	cmdline := ai.GetCommandline()
+	if cmdline == "" {
+		return ""
+	}
+	parts, _ := splitExec(cmdline)
+	if len(parts) == 0 {
+		return ""
+	}
+	return parts[0]
+}
+
+func (ai *DesktopAppInfo) IsExecutableOk() bool {
+	exe := ai.GetExecutable()
+	if exe == "" {
+		return false
+	}
+	_, err := exec.LookPath(exe)
+	return err == nil
 }
 
 const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec $@`

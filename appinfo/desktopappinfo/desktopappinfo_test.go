@@ -212,6 +212,109 @@ func TestGetShowIn(t *testing.T) {
 	})
 }
 
+const desktopFileContent7 = `
+[Desktop Entry]
+Type=Application
+Name=shell
+Exec=sh
+`
+
+const desktopFileContent8 = `
+[Desktop Entry]
+Type=Application
+Name=shell
+Exec=sh $
+`
+
+const desktopFileContent9 = `
+[Desktop Entry]
+Type=Application
+Name=shell
+Exec=/bin/sh
+`
+
+const desktopFileContent10 = `
+[Desktop Entry]
+Type=Application
+Name=shell
+Exec=/bin/sh/notexist
+`
+
+const desktopFileContent11 = `
+[Desktop Entry]
+Type=Application
+Name=shell
+Exec=notexist
+`
+
+func TestGetExecutable(t *testing.T) {
+	Convey("GetExecutable Exec undefined", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent6))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "")
+		So(ai.IsExecutableOk(), ShouldBeFalse)
+	})
+
+	Convey("GetExecutable Exec=sh", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent7))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "sh")
+		So(ai.IsExecutableOk(), ShouldBeTrue)
+	})
+
+	Convey("GetExecutable Exec=sh $", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent8))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "")
+		So(ai.IsExecutableOk(), ShouldBeFalse)
+	})
+
+	Convey("GetExecutable Exec=/bin/sh", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent9))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "/bin/sh")
+		So(ai.IsExecutableOk(), ShouldBeTrue)
+	})
+
+	Convey("GetExecutable Exec=/bin/sh/notexist", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent10))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "/bin/sh/notexist")
+		So(ai.IsExecutableOk(), ShouldBeFalse)
+	})
+
+	Convey("GetExecutable Exec=notexist", t, func() {
+		kfile := keyfile.NewKeyFile()
+		err := kfile.LoadFromData([]byte(desktopFileContent11))
+		So(err, ShouldBeNil)
+		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+		So(err, ShouldBeNil)
+		So(ai, ShouldNotBeNil)
+		So(ai.GetExecutable(), ShouldEqual, "notexist")
+		So(ai.IsExecutableOk(), ShouldBeFalse)
+	})
+}
+
 func Test_splitExec(t *testing.T) {
 	Convey("splitExec", t, func() {
 		parts, err := splitExec(`abc def ghi`)
