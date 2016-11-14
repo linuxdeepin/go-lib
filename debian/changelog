@@ -1,0 +1,137 @@
+go-dlib (0.4.11-1) unstable; urgency=low
+
+  * Autobuild Tag 0.4.11 
+
+ -- TagBuilder <tagbuilder@deepin.com>  Fri, 22 Jul 2016 07:45:33 +0000
+
+go-dlib (0.4.10-1) unstable; urgency=low
+
+  * Autobuild Tag 0.4.10 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 23 May 2016 09:38:12 +0000
+
+go-dlib (0.4.8-3) stable; urgency=low
+
+  * Rebuild Version 0.4.8 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Thu, 21 Apr 2016 16:09:31 +0000
+
+go-dlib (0.4.8-2) stable; urgency=low
+
+  * Rebuild Version 0.4.8 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 22 Feb 2016 16:12:00 +0000
+
+go-dlib (0.4.8-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.8 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 22 Feb 2016 16:04:08 +0000
+
+go-dlib (0.4.7-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.7 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 22 Feb 2016 09:10:35 +0000
+
+go-dlib (0.4.6-5) stable; urgency=low
+
+  * Rebuild Version 0.4.6 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Tue, 26 Jan 2016 15:48:11 +0000
+
+go-dlib (0.4.6-4) stable; urgency=low
+
+  * Rebuild Version 0.4.6 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 25 Jan 2016 17:09:01 +0000
+
+go-dlib (0.4.6-3) stable; urgency=low
+
+  * Rebuild Version 0.4.6 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 25 Jan 2016 16:52:37 +0000
+
+go-dlib (0.4.6-2) stable; urgency=low
+
+  * Rebuild Version 0.4.6 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 25 Jan 2016 16:50:01 +0000
+
+go-dlib (0.4.6-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.6 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Tue, 29 Dec 2015 21:08:51 +0000
+
+go-dlib (0.4.5-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.5 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 28 Dec 2015 20:21:44 +0000
+
+go-dlib (0.4.4-2) stable; urgency=low
+
+  * Rebuild Version 0.4.4 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Sat, 19 Dec 2015 15:37:43 +0000
+
+go-dlib (0.4.4-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.4 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Sat, 19 Dec 2015 13:56:01 +0000
+
+go-dlib (0.4.3-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.3 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Wed, 09 Dec 2015 21:44:16 +0000
+
+go-dlib (0.4.2-2) stable; urgency=low
+
+  * Rebuild Version 0.4.2 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Wed, 09 Dec 2015 07:04:48 +0000
+
+go-dlib (0.4.2-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.2 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Fri, 20 Nov 2015 08:52:33 +0000
+
+go-dlib (0.4.1-2) stable; urgency=low
+
+  * Rebuild Version 0.4.1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Fri, 20 Nov 2015 08:30:12 +0000
+
+go-dlib (0.4.1-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Thu, 06 Aug 2015 10:03:13 +0000
+
+go-dlib (0.4.0-1) stable; urgency=low
+
+  * Autobuild Tag 0.4.0 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Thu, 06 Aug 2015 09:16:11 +0000
+
+go-dlib (0.3.0-1) stable; urgency=low
+
+  * Autobuild Tag 0.3.0-1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Wed, 01 Jul 2015 13:49:48 +0000
+
+go-dlib (2014.2-1) stable; urgency=low
+
+  * Autobuild Tag 2014.2-1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Tue, 30 Jun 2015 08:26:15 +0000
+
+go-dlib (0.0.0) unstable; urgency=medium
+
+  * Unstable release.
+
+ -- 宋文武 <songwenwu@linuxdeepin.com>  Wed, 12 Nov 2014 13:46:21 +0800
