@@ -198,7 +198,7 @@ func GetDominantColorOfImage(imgFile string) (h, s, v float64, err error) {
 }
 
 func GetDominantColor(pixbuf *C.GdkPixbuf) (h, s, v float64, err error) {
-	defaultError := fmt.Errorf("get dominant color of pixbuf failed,", pixbuf)
+	defaultError := fmt.Errorf("get dominant color of pixbuf failed, %v", pixbuf)
 	var r, g, b float64
 	ret := C.get_dominant_color(pixbuf, (*C.double)(&r), (*C.double)(&g), (*C.double)(&b))
 	if ret == 0 {

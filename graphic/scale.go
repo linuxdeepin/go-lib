@@ -142,7 +142,7 @@ func doScaleNearestNeighbor(img image.Image, newWidth, newHeight int) (newimg *i
 // image which with the same scale to reference width/heigh.
 func GetPreferScaleClipRect(refWidth, refHeight, imgWidth, imgHeight int) (x, y, w, h int, err error) {
 	if refWidth*refHeight == 0 || imgWidth*imgHeight == 0 {
-		err = fmt.Errorf("argument is invalid: ", refWidth, refHeight, imgWidth, imgHeight)
+		err = fmt.Errorf("argument is invalid: %d, %d, %d, %d", refWidth, refHeight, imgWidth, imgHeight)
 		return
 	}
 	scale := float32(refWidth) / float32(refHeight)

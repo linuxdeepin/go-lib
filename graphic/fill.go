@@ -64,7 +64,7 @@ func Fill(srcimg image.Image, width, height int, style FillStyle) (dstimg *image
 	case FillCenter:
 		dstimg = doFillImageInCenterStyle(srcimg, width, height)
 	default:
-		err = fmt.Errorf("unknown fill style", style)
+		err = fmt.Errorf("unknown fill style %v", style)
 		return
 	}
 	return
