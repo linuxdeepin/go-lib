@@ -1,6 +1,7 @@
 package keyfile
 
 import (
+	"bytes"
 	. "github.com/smartystreets/goconvey/convey"
 	"path/filepath"
 	"testing"
@@ -217,5 +218,91 @@ func TestGetString(t *testing.T) {
 
 		str, err = f.GetString("Test", "str5")
 		So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})
+	})
+}
+
+func TestSetString(t *testing.T) {
+	Convey("SetString", t, func() {
+		f := NewKeyFile()
+		const s0 = "space newline\ncarriage-return\rtab\tbackslash\\"
+		f.SetString("Test", "str0", s0)
+		str0, err := f.GetString("Test", "str0")
+		So(err, ShouldBeNil)
+		So(str0, ShouldEqual, s0)
+		val0, err := f.GetValue("Test", "str0")
+		So(err, ShouldBeNil)
+		So(val0, ShouldEqual, `space newline\ncarriage-return\rtab\tbackslash\\`)
+	})
+}
+
+func TestSetStringList(t *testing.T) {
+	Convey("SetStringList", t, func() {
+		f := NewKeyFile()
+		strlist := []string{"space ", "newline\n", "carriage\rreturn", "tab\t", "backslash\\", "List;Separator;"}
+		f.SetStringList("Test", "strlist", strlist)
+		strlist1, err := f.GetStringList("Test", "strlist")
+		So(err, ShouldBeNil)
+		So(strlist1, ShouldResemble, strlist)
+
+		strlistValue, err := f.GetValue("Test", "strlist")
+		So(err, ShouldBeNil)
+		So(strlistValue, ShouldEqual, `space\s;newline\n;carriage\rreturn;tab\t;backslash\\;List\;Separator\;;`)
+	})
+}
+
+func TestSetBoolList(t *testing.T) {
+	Convey("SetBoolList", t, func() {
+		f := NewKeyFile()
+		blist := []bool{true, true, false, false, true, false}
+		f.SetBoolList("Test", "blist", blist)
+		blist1, err := f.GetBoolList("Test", "blist")
+		So(err, ShouldBeNil)
+		So(blist1, ShouldResemble, blist)
+
+		blistStr, err := f.GetValue("Test", "blist")
+		So(err, ShouldBeNil)
+		So(blistStr, ShouldEqual, "true;true;false;false;true;false;")
+	})
+}
+
+func TestSetIntList(t *testing.T) {
+	Convey("SetIntList", t, func() {
+		f := NewKeyFile()
+		ints := []int{-345, -1, 0, 1, 3, 5, 7, 9, 11989}
+		f.SetIntList("Test", "ints", ints)
+		ints1, err := f.GetIntList("Test", "ints")
+		So(err, ShouldBeNil)
+		So(ints1, ShouldResemble, ints)
+
+		intsStr, err := f.GetValue("Test", "ints")
+		So(err, ShouldBeNil)
+		So(intsStr, ShouldResemble, "-345;-1;0;1;3;5;7;9;11989;")
+
+	})
+}
+
+const keyFileContent2 = `[Test]
+KeyA=aaaa
+KeyB=1234567890
+KeyC=true
+
+[Main]
+KeyD=keyfile
+
+`
+
+func TestSaveToWriter(t *testing.T) {
+	Convey("SaveToWriter", t, func() {
+		f := NewKeyFile()
+		f.SetValue("Test", "KeyA", "aaaa")
+		f.SetValue("Test", "KeyB", "1234567890")
+		f.SetValue("Test", "KeyC", "true")
+
+		f.SetValue("Main", "KeyD", "keyfile")
+
+		var buf bytes.Buffer
+		err := f.SaveToWriter(&buf)
+		So(err, ShouldBeNil)
+		So(buf.String(), ShouldEqual, keyFileContent2)
 	})
 }
