@@ -442,3 +442,41 @@ func (*testWrapper) TestGetIcons(c *C.C) {
 		}
 	}
 }
+
+func (*testWrapper) TestSniffImageFormat(c *C.C) {
+	var datas = []struct {
+		file       string
+		formatName string
+	}{
+		{
+			file:       "testdata/origin_1920x1080.jpg",
+			formatName: "jpeg",
+		},
+		{
+			file:       "testdata/origin_icon.bmp",
+			formatName: "bmp",
+		},
+		{
+			file:       "testdata/origin_icon.gif",
+			formatName: "gif",
+		},
+		{
+			file:       "testdata/origin_icon_1_48x48.png",
+			formatName: "png",
+		},
+		{
+			file:       "testdata/origin_not_image",
+			formatName: "",
+		},
+		{
+			file:       "testdata/sniff_format.tiff",
+			formatName: "tiff",
+		},
+	}
+
+	for _, data := range datas {
+		formatName, err := SniffImageFormat(data.file)
+		c.Check(err, C.Equals, nil)
+		c.Check(formatName, C.Equals, data.formatName)
+	}
+}
