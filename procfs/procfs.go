@@ -14,6 +14,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"pkg.deepin.io/lib/encoding/kv"
+	"strconv"
 	"strings"
 )
 
@@ -80,4 +82,58 @@ func (vars EnvVars) Lookup(key string) (string, bool) {
 func (vars EnvVars) Get(key string) string {
 	ret, _ := vars.Lookup(key)
 	return ret
+}
+
+type Status []*kv.Pair
+
+func (p Process) Status() (Status, error) {
+	statusFile := p.getFile("status")
+	f, err := os.Open(statusFile)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r := kv.NewReader(f)
+	r.Delim = ':'
+	r.TrimSpace = kv.TrimDelimRightSpace | kv.TrimTailingSpace
+
+	pairs, err := r.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	return Status(pairs), nil
+}
+
+func (st Status) lookup(key string) (string, error) {
+	for _, pair := range st {
+		if pair.Key == key {
+			return pair.Value, nil
+		}
+	}
+	return "", StatusFieldNotFoundErr{key}
+}
+
+type StatusFieldNotFoundErr struct {
+	Field string
+}
+
+func (err StatusFieldNotFoundErr) Error() string {
+	return fmt.Sprintf("field %s is not found in proc status file", err.Field)
+}
+
+func (st Status) Uids() ([]uint, error) {
+	uids := make([]uint, 0, 4)
+	value, err := st.lookup("Uid")
+	if err != nil {
+		return nil, err
+	}
+	for _, i := range strings.Split(value, "\t") {
+		v, err := strconv.ParseUint(i, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		uids = append(uids, uint(v))
+	}
+	return uids, nil
 }

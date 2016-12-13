@@ -112,3 +112,26 @@ func TestEnvion(t *testing.T) {
 		So(xxx, ShouldEqual, "")
 	})
 }
+
+func TestStatus(t *testing.T) {
+	Convey("Status", t, func() {
+		p := Process(os.Getpid())
+		status, err := p.Status()
+		So(err, ShouldBeNil)
+		So(status, ShouldNotBeEmpty)
+
+		// test lookup
+		val, err := status.lookup("XXX")
+		So(val, ShouldBeBlank)
+		So(err, ShouldResemble, StatusFieldNotFoundErr{"XXX"})
+		So(err.Error(), ShouldEqual, "field XXX is not found in proc status file")
+
+		// test Uids
+		uids, err := status.Uids()
+		So(err, ShouldBeNil)
+		t.Log("uids:", uids)
+		So(uids[0], ShouldEqual, uint(os.Getuid()))
+		So(uids[1], ShouldEqual, uint(os.Geteuid()))
+
+	})
+}
