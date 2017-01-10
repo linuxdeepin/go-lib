@@ -47,13 +47,10 @@ func GetAll(skipDirs map[string][]string) []*DesktopAppInfo {
 			if err != nil {
 				continue
 			}
-
-			if !ai.ShouldShow() {
-				continue
-			}
-
-			infos = append(infos, ai)
 			infoMap[appName] = 0
+			if ai.ShouldShow() {
+				infos = append(infos, ai)
+			}
 		}
 
 		count++
