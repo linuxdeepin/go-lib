@@ -2,10 +2,10 @@ package desktopappinfo
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
 	xdgdir "pkg.deepin.io/lib/xdg/basedir"
 	"strings"
@@ -319,8 +319,8 @@ func (ai *DesktopAppInfo) GetTerminal() bool {
 	return useTerminal
 }
 
-func (ai *DesktopAppInfo) Launch(timestamp uint32, files []string) error {
-	return _launch(ai, ai.GetCommandline(), timestamp, files)
+func (ai *DesktopAppInfo) Launch(files []string, launchContext *appinfo.AppLaunchContext) error {
+	return _launch(ai, ai.GetCommandline(), files, launchContext)
 }
 
 func (ai *DesktopAppInfo) GetExecutable() string {
@@ -346,7 +346,7 @@ func (ai *DesktopAppInfo) IsExecutableOk() bool {
 
 const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec $@`
 
-func _launch(ai *DesktopAppInfo, cmdline string, timestamp uint32, files []string) error {
+func _launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
 	if cmdline == "" {
 		return errors.New("command line is empty")
 	}
@@ -372,9 +372,10 @@ func _launch(ai *DesktopAppInfo, cmdline string, timestamp uint32, files []strin
 	cmd.Stdin = strings.NewReader(launchScript)
 	cmd.Env = append(os.Environ(), "GIO_LAUNCHED_DESKTOP_FILE="+ai.GetFileName())
 
+	var snId string
 	startupNotify := ai.GetStartupNotify()
-	if startupNotify && len(exeargs) > 0 {
-		snId := getStartupNotifyId(exeargs[0], timestamp)
+	if startupNotify {
+		snId, _ = launchContext.GetStartupNotifyId(ai, files)
 		cmd.Env = append(cmd.Env, "DESKTOP_STARTUP_ID="+snId)
 	}
 
@@ -413,27 +414,7 @@ type DesktopAction struct {
 	Exec   string
 }
 
-func (action *DesktopAction) Launch(timestamp uint32, files []string) error {
+func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLaunchContext) error {
 	ai := action.parent
-	return _launch(ai, action.Exec, timestamp, files)
-}
-
-func stringSliceContains(slice []string, str string) bool {
-	for _, v := range slice {
-		if str == v {
-			return true
-		}
-	}
-	return false
-}
-
-var launchCount uint32
-
-func getStartupNotifyId(exec string, timestamp uint32) string {
-	pid := os.Getpid()
-	prog := filepath.Base(os.Args[0])
-	hostname, _ := os.Hostname()
-	execBase := filepath.Base(exec)
-	launchCount++
-	return fmt.Sprintf("%s-%d-%s-%s-%d_TIME%d", prog, pid, hostname, execBase, launchCount, timestamp)
+	return _launch(ai, action.Exec, files, launchContext)
 }

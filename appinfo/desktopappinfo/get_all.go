@@ -126,3 +126,12 @@ func walk(root, name0 string, info os.FileInfo, walkFn WalkFunc) {
 }
 
 type WalkFunc func(name string, info os.FileInfo) bool
+
+func stringSliceContains(slice []string, str string) bool {
+	for _, v := range slice {
+		if str == v {
+			return true
+		}
+	}
+	return false
+}
