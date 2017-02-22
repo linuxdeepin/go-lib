@@ -16,4 +16,6 @@ type Format string
 const (
 	FormatPng  Format = "png"
 	FormatJpeg Format = "jpeg"
+	FormatBmp  Format = "bmp"
+	FormatTiff Format = "tiff"
 )
