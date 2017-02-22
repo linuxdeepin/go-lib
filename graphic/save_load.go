@@ -10,6 +10,8 @@
 package graphic
 
 import (
+	"golang.org/x/image/bmp"
+	"golang.org/x/image/tiff"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -44,6 +46,10 @@ func doSaveImage(w io.Writer, m image.Image, f Format) (err error) {
 		err = png.Encode(w, m)
 	case FormatJpeg:
 		err = jpeg.Encode(w, m, nil)
+	case FormatBmp:
+		err = bmp.Encode(w, m)
+	case FormatTiff:
+		err = tiff.Encode(w, m, nil)
 	default:
 		err = png.Encode(w, m)
 	}
