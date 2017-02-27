@@ -43,7 +43,7 @@ func TestTimer(t *testing.T) {
 		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 	})
 
 	Convey("stop and continue", t, func() {
@@ -51,17 +51,17 @@ func TestTimer(t *testing.T) {
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		timer.Stop()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
 		timer.Continue()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond, time.Second*2+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
 	})
 
 	Convey("reset", t, func() {
@@ -69,10 +69,10 @@ func TestTimer(t *testing.T) {
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		timer.Reset()
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond, time.Second+time.Millisecond)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 	})
 }
