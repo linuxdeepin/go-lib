@@ -165,9 +165,20 @@ func splitExec(exec string) ([]string, error) {
 	return outlist, nil
 }
 
-func pathToURI(filepath string) string {
-	u := url.URL{Path: filepath}
-	u.Scheme = "file"
+func pathToURI(path string) string {
+	var u *url.URL
+	if strings.HasPrefix(path, "/") {
+		u = &url.URL{
+			Path:   path,
+			Scheme: "file",
+		}
+	} else {
+		var err error
+		u, err = url.Parse(path)
+		if err != nil {
+			return ""
+		}
+	}
 	return u.String()
 }
 
