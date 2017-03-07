@@ -13,55 +13,7 @@ import "encoding/xml"
 import "bytes"
 import "fmt"
 import "reflect"
-import "sync"
 import "pkg.deepin.io/lib/dbus/introspect"
-
-const InterfaceLifeManager = "com.deepin.DBus.LifeManager"
-
-type LifeManager struct {
-	name        string
-	path        ObjectPath
-	count       int32
-	onDestroy   func()
-	countLocker sync.Mutex
-}
-
-func RegisterLifeManagerCallback(m DBusObject, cb func()) {
-	if con := detectConnByDBusObject(m); con != nil {
-		path := ObjectPath(m.GetDBusInfo().ObjectPath)
-		if infos, ok := con.handlers[path]; ok {
-			if i, ok := (infos[InterfaceLifeManager]).(*LifeManager); ok {
-				i.onDestroy = cb
-			}
-		}
-	}
-}
-
-func NewLifeManager(name string, path ObjectPath) *LifeManager {
-	return &LifeManager{name: name, path: path, count: 1}
-}
-
-func (ifc *LifeManager) InterfaceName() string {
-	return InterfaceLifeManager
-}
-
-func (ifc *LifeManager) Ref() {
-	ifc.countLocker.Lock()
-
-	ifc.count++
-
-	ifc.countLocker.Unlock()
-}
-func (ifc *LifeManager) Unref() {
-	ifc.countLocker.Lock()
-
-	ifc.count--
-	if ifc.count == 0 && ifc.onDestroy != nil {
-		ifc.onDestroy()
-	}
-
-	ifc.countLocker.Unlock()
-}
 
 const InterfaceIntrospectProxy = "org.freedesktop.DBus.Introspectable"
 

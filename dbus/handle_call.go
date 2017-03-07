@@ -18,7 +18,6 @@ import "runtime"
 var autoHandler = map[string]func(*Conn, *Message) error{
 	"org.freedesktop.DBus.Peer":           handlePeer,
 	"org.freedesktop.DBus.Introspectable": handleIntrospect,
-	//"org.freedesktop.DBus.LifeManager":    nil,
 	//"org.freedesktop.DBus.Properties":     nil,
 }
 
