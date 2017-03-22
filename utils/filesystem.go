@@ -27,9 +27,9 @@ func QueryFilesytemInfo(path string) (*FilesystemInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	total := buf.Blocks * uint64(buf.Bsize)
-	free := buf.Bfree * uint64(buf.Bsize)
-	avail := buf.Bavail * uint64(buf.Bsize)
+	total := uint64(buf.Blocks) * uint64(buf.Bsize)
+	free := uint64(buf.Bfree) * uint64(buf.Bsize)
+	avail := uint64(buf.Bavail) * uint64(buf.Bsize)
 	return &FilesystemInfo{
 		Type:      int64(buf.Type), // if in i386 it's int32
 		TotalSize: total,
