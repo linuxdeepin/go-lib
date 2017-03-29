@@ -344,7 +344,7 @@ func (ai *DesktopAppInfo) IsExecutableOk() bool {
 	return err == nil
 }
 
-const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec $@`
+const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec "$@"`
 
 func _launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
 	if cmdline == "" {

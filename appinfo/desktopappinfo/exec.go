@@ -165,7 +165,7 @@ func splitExec(exec string) ([]string, error) {
 	return outlist, nil
 }
 
-func pathToURI(path string) string {
+func toURL(path string) string {
 	var u *url.URL
 	if strings.HasPrefix(path, "/") {
 		u = &url.URL{
@@ -182,6 +182,17 @@ func pathToURI(path string) string {
 	return u.String()
 }
 
+func toLocalPath(in string) string {
+	u, err := url.Parse(in)
+	if err != nil {
+		return ""
+	}
+	if u.Scheme == "file" {
+		return u.Path
+	}
+	return in
+}
+
 func (ai *DesktopAppInfo) expandFieldCode(cmdline, files []string) ([]string, error) {
 	return expandFieldCode(cmdline, files, ai.GetName(), ai.GetIcon(), ai.GetFileName())
 }
@@ -189,6 +200,7 @@ func (ai *DesktopAppInfo) expandFieldCode(cmdline, files []string) ([]string, er
 var ErrBadFieldCode = errors.New("bad field code")
 
 func expandFieldCode(cmdline, files []string, translatedName, icon, desktopFile string) ([]string, error) {
+	// element of files can be local path (starts with /) or uri (starts with file:///)
 	var ret []string
 	for _, arg := range cmdline {
 		if len(arg) == 2 && arg[0] == '%' {
@@ -196,21 +208,23 @@ func expandFieldCode(cmdline, files []string, translatedName, icon, desktopFile 
 			case 'f':
 				// a single file name
 				if len(files) > 0 {
-					ret = append(ret, files[0])
+					ret = append(ret, toLocalPath(files[0]))
 				}
 			case 'F':
 				// a list of files
-				ret = append(ret, files...)
+				for _, file := range files {
+					ret = append(ret, toLocalPath(file))
+				}
 			case 'u':
 				// a single URL
 				if len(files) > 0 {
-					ret = append(ret, pathToURI(files[0]))
+					ret = append(ret, toURL(files[0]))
 				}
 
 			case 'U':
 				// a list of URLs
 				for _, file := range files {
-					ret = append(ret, pathToURI(file))
+					ret = append(ret, toURL(file))
 				}
 
 			case 'i':

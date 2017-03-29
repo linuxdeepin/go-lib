@@ -415,5 +415,11 @@ func Test_expandFieldCode(t *testing.T) {
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		So(err, ShouldBeNil)
 		So(parts, ShouldResemble, []string{"start", "%", "%abc", "end"})
+
+		files = []string{"file:///home/tp/2017%E5%B9%B403%E6%9C%88-%E6%B7%B1%E5%BA%A6%E9%9B%86%E7%BB%93-%E7%94%B5%E5%AD%90%E7%89%88.pdf"}
+		cmdline = []string{"/opt/Foxitreader/FoxitReader.sh", "%F"}
+		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+		So(err, ShouldBeNil)
+		So(parts, ShouldResemble, []string{"/opt/Foxitreader/FoxitReader.sh", "/home/tp/2017年03月-深度集结-电子版.pdf"})
 	})
 }
