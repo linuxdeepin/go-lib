@@ -21,13 +21,6 @@ func TestGetUserHomeDir(t *testing.T) {
 		os.Setenv("HOME", "/home/test")
 		dir := GetUserHomeDir()
 		So(dir, ShouldEqual, "/home/test")
-
-		os.Unsetenv("HOME")
-		dir = GetUserHomeDir()
-		// dir is a directory
-		dirFileInfo, err := os.Stat(dir)
-		So(err, ShouldBeNil)
-		So(dirFileInfo.IsDir(), ShouldBeTrue)
 	})
 }
 
