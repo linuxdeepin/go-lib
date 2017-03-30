@@ -16,6 +16,21 @@ import (
 	"testing"
 )
 
+func TestGetUserHomeDir(t *testing.T) {
+	Convey("GetUserHomeDir", t, func() {
+		os.Setenv("HOME", "/home/test")
+		dir := GetUserHomeDir()
+		So(dir, ShouldEqual, "/home/test")
+
+		os.Unsetenv("HOME")
+		dir = GetUserHomeDir()
+		// dir is a directory
+		dirFileInfo, err := os.Stat(dir)
+		So(err, ShouldBeNil)
+		So(dirFileInfo.IsDir(), ShouldBeTrue)
+	})
+}
+
 func TestGetUserDataDir(t *testing.T) {
 	Convey("GetUserDataDir", t, func() {
 		os.Setenv("HOME", "/home/test")

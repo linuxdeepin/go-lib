@@ -34,7 +34,7 @@ const (
 
 func parseUserDirsConfig(file string) (map[string]string, error) {
 	result := make(map[string]string)
-	homeDir := os.Getenv("HOME")
+	homeDir := basedir.GetUserHomeDir()
 
 	fh, err := os.Open(file)
 	if err != nil {
@@ -119,7 +119,7 @@ func Get(dir string) string {
 	if userDirsCache == nil {
 		cfg, err := parseUserDirsConfig(getUserDirsConfigFile())
 		if err != nil {
-			return filepath.Clean(os.Getenv("HOME"))
+			return basedir.GetUserHomeDir()
 		}
 		userDirsCache = cfg
 	}
@@ -127,7 +127,7 @@ func Get(dir string) string {
 	if dir, ok := userDirsCache["XDG_"+dir+"_DIR"]; ok {
 		return dir
 	} else {
-		return filepath.Clean(os.Getenv("HOME"))
+		return basedir.GetUserHomeDir()
 	}
 }
 

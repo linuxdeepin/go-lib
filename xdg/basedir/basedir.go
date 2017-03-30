@@ -14,15 +14,28 @@ package basedir
 import (
 	"errors"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
 )
 
+func GetUserHomeDir() string {
+	dir := os.Getenv("HOME")
+	if dir != "" {
+		return filepath.Clean(dir)
+	}
+	user, err := user.Current()
+	if err != nil {
+		return ""
+	}
+	return filepath.Clean(user.HomeDir)
+}
+
 func GetUserDataDir() string {
 	// default $HOME/.local/share
-	defaultDir := filepath.Join(os.Getenv("HOME"), ".local/share")
+	defaultDir := filepath.Join(GetUserHomeDir(), ".local/share")
 	return getUserDir("XDG_DATA_HOME", defaultDir)
 }
 
@@ -33,7 +46,7 @@ func GetSystemDataDirs() []string {
 
 func GetUserConfigDir() string {
 	// default $HOME/.config
-	defaultDir := filepath.Join(os.Getenv("HOME"), ".config")
+	defaultDir := filepath.Join(GetUserHomeDir(), ".config")
 	return getUserDir("XDG_CONFIG_HOME", defaultDir)
 }
 
@@ -43,7 +56,7 @@ func GetSystemConfigDirs() []string {
 }
 
 func GetUserCacheDir() string {
-	defaultDir := filepath.Join(os.Getenv("HOME"), ".cache")
+	defaultDir := filepath.Join(GetUserHomeDir(), ".cache")
 	return getUserDir("XDG_CACHE_HOME", defaultDir)
 }
 
