@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
-	xdgdir "pkg.deepin.io/lib/xdg/basedir"
+	"pkg.deepin.io/lib/xdg/basedir"
 	"strings"
 	"sync"
 )
@@ -50,8 +50,8 @@ var xdgAppDirs []string
 
 func init() {
 	xdgDataDirs = make([]string, 0, 3)
-	xdgDataDirs = append(xdgDataDirs, xdgdir.GetUserDataDir())
-	sysDataDirs := xdgdir.GetSystemDataDirs()
+	xdgDataDirs = append(xdgDataDirs, basedir.GetUserDataDir())
+	sysDataDirs := basedir.GetSystemDataDirs()
 	xdgDataDirs = append(xdgDataDirs, sysDataDirs...)
 
 	xdgAppDirs = make([]string, len(xdgDataDirs))
@@ -309,6 +309,11 @@ func (ai *DesktopAppInfo) GetCommandline() string {
 	return exec
 }
 
+func (ai *DesktopAppInfo) GetPath() string {
+	wd, _ := ai.GetString(MainSection, KeyPath)
+	return wd
+}
+
 func (ai *DesktopAppInfo) GetTryExec() string {
 	tryExec, _ := ai.GetString(MainSection, KeyTryExec)
 	return tryExec
@@ -351,6 +356,18 @@ func _launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *
 		return errors.New("command line is empty")
 	}
 
+	// get working dir
+	workingDir := ai.GetPath()
+	if workingDir == "" {
+		// fallback to user home dir
+		workingDir = basedir.GetUserHomeDir()
+
+		// fallback to fs root /
+		if workingDir == "" {
+			workingDir = "/"
+		}
+	}
+
 	exeargs, err := splitExec(cmdline)
 	if err != nil {
 		return err
@@ -374,9 +391,19 @@ func _launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *
 
 	var snId string
 	startupNotify := ai.GetStartupNotify()
-	if startupNotify {
+	if startupNotify && launchContext != nil {
 		snId, _ = launchContext.GetStartupNotifyId(ai, files)
 		cmd.Env = append(cmd.Env, "DESKTOP_STARTUP_ID="+snId)
+	}
+
+	oldWorkingDir, err := os.Getwd()
+	if err == nil {
+		defer os.Chdir(oldWorkingDir)
+	}
+
+	err = os.Chdir(workingDir)
+	if err != nil {
+		return err
 	}
 
 	err = cmd.Start()
