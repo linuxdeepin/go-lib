@@ -13,29 +13,29 @@ import (
 )
 
 const (
-	MainSection            = "Desktop Entry"
-	KeyType                = "Type"
-	KeyVersion             = "Version"
-	KeyName                = "Name"
-	KeyGenericName         = "GenericName"
-	KeyNoDisplay           = "NoDisplay"
-	KeyComment             = "Comment"
-	KeyIcon                = "Icon"
-	KeyHidden              = "Hidden"
-	KeyOnlyShowIn          = "OnlyShowIn"
-	KeyNotShowIn           = "NotShowIn"
-	KeyTryExec             = "TryExec"
-	KeyExec                = "Exec"
-	KeyPath                = "Path"
-	KeyTerminal            = "Terminal"
-	KeyMimeType            = "MimeType"
-	KeyCategories          = "Categories"
-	KeyKeywords            = "Keywords"
-	KeyStartupNotify       = "StartupNotify"
-	KeyStartupWMClass      = "StartupWMClass"
-	KeyURL                 = "URL"
-	KeyActions             = "Actions"
-	KeyDBusDBusActivatable = "DBusActivatable"
+	MainSection        = "Desktop Entry"
+	KeyType            = "Type"
+	KeyVersion         = "Version"
+	KeyName            = "Name"
+	KeyGenericName     = "GenericName"
+	KeyNoDisplay       = "NoDisplay"
+	KeyComment         = "Comment"
+	KeyIcon            = "Icon"
+	KeyHidden          = "Hidden"
+	KeyOnlyShowIn      = "OnlyShowIn"
+	KeyNotShowIn       = "NotShowIn"
+	KeyTryExec         = "TryExec"
+	KeyExec            = "Exec"
+	KeyPath            = "Path"
+	KeyTerminal        = "Terminal"
+	KeyMimeType        = "MimeType"
+	KeyCategories      = "Categories"
+	KeyKeywords        = "Keywords"
+	KeyStartupNotify   = "StartupNotify"
+	KeyStartupWMClass  = "StartupWMClass"
+	KeyURL             = "URL"
+	KeyActions         = "Actions"
+	KeyDBusActivatable = "DBusActivatable"
 
 	TypeApplication = "Application"
 	TypeLink        = "Link"
@@ -280,6 +280,11 @@ func (ai *DesktopAppInfo) GetDisplayName() string {
 	return ai.GetName()
 }
 
+func (ai *DesktopAppInfo) GetMimeTypes() []string {
+	mimeTypes, _ := ai.GetStringList(MainSection, KeyMimeType)
+	return mimeTypes
+}
+
 func (ai *DesktopAppInfo) GetCategories() []string {
 	categories, _ := ai.GetStringList(MainSection, KeyCategories)
 	return categories
@@ -314,9 +319,16 @@ func (ai *DesktopAppInfo) GetPath() string {
 	return wd
 }
 
+// TryExec is Path to an executable file on disk used to determine if the program is actually installed
 func (ai *DesktopAppInfo) GetTryExec() string {
 	tryExec, _ := ai.GetString(MainSection, KeyTryExec)
 	return tryExec
+}
+
+// DBusActivatable is a boolean value specifying if D-Bus activation is supported for this application
+func (ai *DesktopAppInfo) GetDBusActivatable() bool {
+	b, _ := ai.GetBool(MainSection, KeyDBusActivatable)
+	return b
 }
 
 func (ai *DesktopAppInfo) GetTerminal() bool {
@@ -341,6 +353,12 @@ func (ai *DesktopAppInfo) GetExecutable() string {
 }
 
 func (ai *DesktopAppInfo) IsExecutableOk() bool {
+	tryExec := ai.GetTryExec()
+	if tryExec != "" {
+		_, err := exec.LookPath(tryExec)
+		return err == nil
+	}
+
 	exe := ai.GetExecutable()
 	if exe == "" {
 		return false
