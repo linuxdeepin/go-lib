@@ -10,7 +10,7 @@
 package notify
 
 import (
-	dbusnotify "dbus/org/freedesktop/notifications"
+	"pkg.deepin.io/lib/notify/dbusnotify"
 )
 
 var (
