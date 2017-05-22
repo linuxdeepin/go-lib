@@ -16,7 +16,14 @@ import "C"
 
 import (
 	"fmt"
+	"os/exec"
 	"unsafe"
+)
+
+const (
+	PlayerLibcanberra = "libcanberra"
+	PlayerMPV         = "mpv"
+	PlayerPaplay      = "paplay"
 )
 
 // PlayThemeSound: play sound theme event
@@ -25,9 +32,21 @@ import (
 // @device: the special backend card, default: the current sound card
 // @driver: the special backend driver, as: 'pulse','alsa','null' ...
 //          default: 'pulse'
+// @player: the special sound play method, as: 'libcanberra','mpv','paplay'
+//          if empty or other value, just as 'libcanberra'
 //
 // return: the error message
-func PlayThemeSound(theme, event, device, driver string) error {
+func PlayThemeSound(theme, event, device, driver, player string) error {
+	switch player {
+	case PlayerPaplay, PlayerMPV:
+		file, err := findThemeFile(theme, event)
+		if err != nil {
+			return err
+		}
+		_, err = exec.Command(player, []string{file}...).Output()
+		return err
+	}
+
 	cTheme := C.CString(theme)
 	defer C.free(unsafe.Pointer(cTheme))
 	cEvent := C.CString(event)
@@ -51,9 +70,17 @@ func PlayThemeSound(theme, event, device, driver string) error {
 // @device: the special backend card, default: the current sound card
 // @driver: the special backend driver, as: 'pulse','alsa','null' ...
 //          default: 'pulse'
+// @player: the special sound play method, as: 'libcanberra','mpv','paplay'
+//          if empty or other value, just as 'libcanberra'
 //
 // return: the error message
-func PlaySoundFile(file, device, driver string) error {
+func PlaySoundFile(file, device, driver, player string) error {
+	switch player {
+	case PlayerPaplay, PlayerMPV:
+		_, err := exec.Command(player, []string{file}...).Output()
+		return err
+	}
+
 	cFile := C.CString(file)
 	defer C.free(unsafe.Pointer(cFile))
 	cDevice := C.CString(device)
