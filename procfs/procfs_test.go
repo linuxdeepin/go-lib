@@ -133,5 +133,10 @@ func TestStatus(t *testing.T) {
 		So(uids[0], ShouldEqual, uint(os.Getuid()))
 		So(uids[1], ShouldEqual, uint(os.Geteuid()))
 
+		// test PPid
+		ppid, err := status.PPid()
+		So(err, ShouldBeNil)
+		t.Log("ppid:", ppid)
+		So(ppid, ShouldBeGreaterThan, 0)
 	})
 }

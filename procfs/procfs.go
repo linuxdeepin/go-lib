@@ -137,3 +137,16 @@ func (st Status) Uids() ([]uint, error) {
 	}
 	return uids, nil
 }
+
+func (st Status) PPid() (uint, error) {
+	value, err := st.lookup("PPid")
+	if err != nil {
+		return 0, err
+	}
+
+	v, err := strconv.ParseUint(value, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint(v), nil
+}
