@@ -65,8 +65,20 @@ func list(dir string) (Controllers, error) {
 }
 
 func (cs Controllers) GetByEDID(edid []byte) *Controller {
+	if len(edid) == 0 {
+		return nil
+	}
 	for _, c := range cs {
 		if byteSliceEqual(c.DeviceEDID, edid) {
+			return c
+		}
+	}
+	return nil
+}
+
+func (cs Controllers) GetByName(name string) *Controller {
+	for _, c := range cs {
+		if c.Name == name {
 			return c
 		}
 	}
