@@ -108,7 +108,7 @@ connect_canberra_context(char* device, char* driver)
 
 	if (strlen(device) > 0) {
 		if (ca_context_change_device(ca, device) != 0) {
-			g_warning("Set '%s' as backend device failed");
+			g_warning("Set '%s' as backend device failed", device);
 			ca_context_destroy(ca);
 			return NULL;
 		}
