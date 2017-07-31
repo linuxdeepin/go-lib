@@ -10,8 +10,8 @@
 package utils
 
 import (
+	C "gopkg.in/check.v1"
 	"io/ioutil"
-	C "launchpad.net/gocheck"
 	"os"
 	"regexp"
 	"testing"

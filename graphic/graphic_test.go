@@ -10,7 +10,7 @@
 package graphic
 
 import (
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 	"pkg.deepin.io/lib/utils"
 	"testing"
 )

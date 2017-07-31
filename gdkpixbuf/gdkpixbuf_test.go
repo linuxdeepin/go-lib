@@ -11,7 +11,7 @@ package gdkpixbuf
 
 import (
 	"fmt"
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 	"os"
 	"pkg.deepin.io/lib/utils"
 	"testing"

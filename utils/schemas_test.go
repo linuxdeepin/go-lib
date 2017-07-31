@@ -9,7 +9,7 @@
 
 package utils
 
-import C "launchpad.net/gocheck"
+import C "gopkg.in/check.v1"
 
 type schemaTest struct {
 	schema string

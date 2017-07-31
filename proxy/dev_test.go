@@ -13,7 +13,7 @@ package proxy
 
 import (
 	"gir/glib-2.0"
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 	"pkg.deepin.io/lib/log"
 	"testing"
 )

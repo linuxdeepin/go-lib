@@ -10,7 +10,7 @@
 package utils
 
 import (
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 )
 
 type testConfig struct {

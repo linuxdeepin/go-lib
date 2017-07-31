@@ -10,7 +10,7 @@
 package iso
 
 import (
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 	"testing"
 )
 

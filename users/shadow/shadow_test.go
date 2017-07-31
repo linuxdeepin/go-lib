@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"testing"
 
-	C "launchpad.net/gocheck"
+	C "gopkg.in/check.v1"
 )
 
 type testWrapper struct{}

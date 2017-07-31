@@ -22,7 +22,7 @@ Install prerequisites
 $ go get github.com/smartystreets/goconvey
 $ go get github.com/BurntSushi/xgb
 $ go get github.com/howeyc/fsnotify
-$ go get launchpad.net/gocheck
+$ go get gopkg.in/check.v1
 ```
 
 Install
