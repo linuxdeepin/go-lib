@@ -2,6 +2,10 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: go-dlib
 Source: https://gitcafe.com/Deepin/go-lib.git
 
+Files: fsnotify/*
+Copyright: 2015 Chris Howey
+License: BSD 3
+
 Files: *
 Copyright: Deepin Technology Co., Ltd.
 License: GPL-3+

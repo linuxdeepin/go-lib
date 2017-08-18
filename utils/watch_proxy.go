@@ -10,7 +10,7 @@
 package utils
 
 import (
-	"github.com/howeyc/fsnotify"
+	"pkg.deepin.io/lib/fsnotify"
 	"sync"
 )
 
