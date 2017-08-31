@@ -111,6 +111,9 @@ void setup_monitor(pa_context *ctx)
 void __success_cb(pa_context *c, int success, void *userdata)
 {
 }
+
+static int init_state = 0; // O: unknown, 1: success, 2: failure
+
 pa_context* pa_init(pa_threaded_mainloop* ml)
 {
     m = ml;
@@ -124,18 +127,38 @@ pa_context* pa_init(pa_threaded_mainloop* ml)
 
     pa_threaded_mainloop_unlock(m);
 
+    init_state = 0;
     while(state != PA_CONTEXT_READY) {
-	pa_threaded_mainloop_lock(m);
-	state = pa_context_get_state(ctx);
-	pa_threaded_mainloop_unlock(m);
-	if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED) {
-	    fprintf(stderr, "Failed Connect to pulseaudio server");
-	    return NULL;
-	}
+        if (init_state != 0) {
+            break;
+        }
+        pa_threaded_mainloop_lock(m);
+        state = pa_context_get_state(ctx);
+        pa_threaded_mainloop_unlock(m);
+        if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED) {
+            init_state = 2;
+            fprintf(stderr, "Failed Connect to pulseaudio server");
+            return NULL;
+        }
     }
+
+    if (init_state == 2) {
+        fprintf(stderr, "Connect to pulseaudio timeout\n");
+        return NULL;
+    }
+    init_state = 1;
     success_cb = __success_cb;
     setup_monitor(ctx);
     return ctx;
+}
+
+void
+pa_finalize()
+{
+    if (init_state != 0) {
+        return;
+    }
+    init_state = 2;
 }
 
 // #define PA_INVALID_INDEX ((uint32_t) -1)
