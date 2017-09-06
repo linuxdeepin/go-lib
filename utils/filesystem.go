@@ -8,13 +8,15 @@
  **/
 
 package utils
-
-import (
-	"syscall"
-)
+/*
+#include <stdlib.h>
+#include <sys/statvfs.h>
+*/
+import "C"
+import "unsafe"
+import "errors"
 
 type FilesystemInfo struct {
-	Type      int64
 	TotalSize uint64 // byte
 	FreeSize  uint64
 	AvailSize uint64
@@ -22,16 +24,18 @@ type FilesystemInfo struct {
 }
 
 func QueryFilesytemInfo(path string) (*FilesystemInfo, error) {
-	var buf syscall.Statfs_t
-	err := syscall.Statfs(path, &buf)
-	if err != nil {
-		return nil, err
-	}
-	total := uint64(buf.Blocks) * uint64(buf.Bsize)
-	free := uint64(buf.Bfree) * uint64(buf.Bsize)
-	avail := uint64(buf.Bavail) * uint64(buf.Bsize)
+	buf := C.struct_statvfs{}
+	cpath := C.CString(path)
+	defer C.free(unsafe.Pointer(cpath))
+	if (C.statvfs(cpath, &buf) != 0){
+            return nil, errors.New("Statvfs error.")
+        }
+
+	total := uint64(buf.f_blocks) * uint64(buf.f_frsize)
+	free := uint64(buf.f_bfree) * uint64(buf.f_frsize)
+	//Get real avail size instead of free size.
+	avail := uint64(buf.f_bavail) * uint64(buf.f_frsize)
 	return &FilesystemInfo{
-		Type:      int64(buf.Type), // if in i386 it's int32
 		TotalSize: total,
 		FreeSize:  free,
 		AvailSize: avail,
