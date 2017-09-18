@@ -14,12 +14,14 @@ import "bytes"
 import "fmt"
 import "reflect"
 import "pkg.deepin.io/lib/dbus/introspect"
+import "sync"
 
 const InterfaceIntrospectProxy = "org.freedesktop.DBus.Introspectable"
 
 type IntrospectProxy struct {
-	infos map[string]interface{}
-	child map[string]bool
+	infos  map[string]interface{}
+	child  map[string]bool
+	locker sync.Mutex
 }
 
 func NewIntrospectProxy(infos map[string]interface{}) *IntrospectProxy {
@@ -34,6 +36,8 @@ func (ifc IntrospectProxy) InterfaceName() string {
 }
 
 func (ifc IntrospectProxy) Introspect() (string, error) {
+	ifc.locker.Lock()
+	defer ifc.locker.Unlock()
 	var node = new(introspect.NodeInfo)
 	for k, _ := range ifc.child {
 		node.Children = append(node.Children, introspect.NodeInfo{
