@@ -1,4 +1,4 @@
-# Deepin GoLang Library
+## Deepin GoLang Library
 
 Deepin GoLang Library is a library containing many useful go routines for things such as glib, gettext, archive, graphic,etc.
 
