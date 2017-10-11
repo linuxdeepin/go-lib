@@ -1,3 +1,5 @@
+// +build ignore
+
 // +build freebsd openbsd netbsd darwin linux
 
 // Copyright 2010 The Go Authors. All rights reserved.
