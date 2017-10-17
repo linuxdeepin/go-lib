@@ -231,9 +231,17 @@ func (c *Context) GetSourceOutput(index uint32) (*SourceOutput, error) {
 }
 
 func (c *Context) GetDefaultSource() string {
+	s, _ := c.GetServer()
+	if s != nil {
+		return s.DefaultSourceName
+	}
 	return ""
 }
 func (c *Context) GetDefaultSink() string {
+	s, _ := c.GetServer()
+	if s != nil {
+		return s.DefaultSinkName
+	}
 	return ""
 }
 func (c *Context) SetDefaultSink(name string) {
