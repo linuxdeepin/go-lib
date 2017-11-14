@@ -443,6 +443,7 @@ func (ai *DesktopAppInfo) GetActions() []DesktopAction {
 			name, _ := ai.GetLocaleString(section, KeyName, "")
 			exec, _ := ai.GetString(section, KeyExec)
 			action := DesktopAction{
+				Section: section,
 				Name:   name,
 				Exec:   exec,
 				parent: ai,
@@ -455,6 +456,8 @@ func (ai *DesktopAppInfo) GetActions() []DesktopAction {
 
 type DesktopAction struct {
 	parent *DesktopAppInfo
+
+	Section string
 	Name   string
 	Exec   string
 }
