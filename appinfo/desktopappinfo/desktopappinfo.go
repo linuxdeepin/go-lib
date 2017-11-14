@@ -79,6 +79,14 @@ func init() {
 	}
 }
 
+func SetDataDirs(dirs []string) {
+	xdgDataDirs = dirs
+	xdgAppDirs = make([]string, len(xdgDataDirs))
+	for i, dir := range xdgDataDirs {
+		xdgAppDirs[i] = filepath.Join(dir, "applications")
+	}
+}
+
 type DesktopAppInfo struct {
 	*keyfile.KeyFile
 	filename string
