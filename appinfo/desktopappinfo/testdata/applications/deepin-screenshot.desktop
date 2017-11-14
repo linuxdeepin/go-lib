@@ -12,6 +12,7 @@ Type=Application
 [Full_Screenshot Shortcut Group]
 Exec=deepin-screenshot -f
 Name=Full Screenshot
+Name[zh_CN]=全屏截图
 
 [Delay_Screenshot Shortcut Group]
 Exec=deepin-screenshot -d 5

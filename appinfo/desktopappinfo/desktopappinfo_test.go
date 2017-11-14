@@ -97,6 +97,18 @@ func TestNewDesktopAppInfo(t *testing.T) {
 	})
 }
 
+func TestGetActions(t *testing.T) {
+	Convey("DesktopAppInfo.GetActions", t, func() {
+		ai, err := NewDesktopAppInfoFromFile("testdata/applications/deepin-screenshot.desktop")
+		So(err, ShouldBeNil)
+		actions := ai.GetActions()
+		t.Log("actions:", actions)
+		So(actions, ShouldHaveLength, 2)
+		So(actions[0].Exec, ShouldEqual, "deepin-screenshot -f")
+		So(actions[1].Exec, ShouldEqual, "deepin-screenshot -d 5")
+	})
+}
+
 func init() {
 	os.Setenv(envDesktopEnv, "Deepin:GNOME")
 }
