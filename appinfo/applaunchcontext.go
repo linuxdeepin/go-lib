@@ -21,10 +21,12 @@ package appinfo
 
 import (
 	"fmt"
-	"github.com/BurntSushi/xgbutil"
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
+
+	"github.com/BurntSushi/xgbutil"
 )
 
 var (
@@ -40,9 +42,11 @@ func init() {
 }
 
 type AppLaunchContext struct {
+	sync.Mutex
 	xu        *xgbutil.XUtil
 	count     uint
 	timestamp uint32
+	cmdPrefixes []string
 }
 
 func NewAppLaunchContext(xu *xgbutil.XUtil) *AppLaunchContext {
@@ -53,6 +57,14 @@ func NewAppLaunchContext(xu *xgbutil.XUtil) *AppLaunchContext {
 
 func (ctx *AppLaunchContext) SetTimestamp(timestamp uint32) {
 	ctx.timestamp = timestamp
+}
+
+func (ctx *AppLaunchContext) SetCmdPrefixes(v []string) {
+	ctx.cmdPrefixes = v
+}
+
+func (ctx *AppLaunchContext) GetCmdPrefixes() []string {
+	return ctx.cmdPrefixes
 }
 
 func (ctx *AppLaunchContext) GetStartupNotifyId(appInfo AppInfo, files []string) (string, error) {
