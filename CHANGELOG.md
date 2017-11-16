@@ -1,13 +1,18 @@
 ## [Unreleased]
 
+## [1.2.1] - 2017-11-16
++ add field Section for DesktopAction
++ add SetDataDirs in desktopappinfo
+
+
 ## [1.2.0] - 2017-10-12
 ### Added
-- Add pulse init timeout
++ add pulse init timeout
 
 ### Changed
-- Update license
-- Replace syscall 'statfs' with 'statvfs'
-- Make transport endian aware
++ update license
++ replace syscall 'statfs' with 'statvfs'
++ make transport endian aware
 
 ### Fixed
-- Fix dbus introspection map concurrency
++ fix dbus introspection map concurrency
