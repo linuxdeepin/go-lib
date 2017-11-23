@@ -29,9 +29,9 @@ import "sync"
 const InterfaceIntrospectProxy = "org.freedesktop.DBus.Introspectable"
 
 type IntrospectProxy struct {
+	locker sync.RWMutex
 	infos  map[string]interface{}
 	child  map[string]bool
-	locker sync.Mutex
 }
 
 func NewIntrospectProxy(infos map[string]interface{}) *IntrospectProxy {
@@ -41,13 +41,19 @@ func NewIntrospectProxy(infos map[string]interface{}) *IntrospectProxy {
 	}
 }
 
-func (ifc IntrospectProxy) InterfaceName() string {
+func (ifc *IntrospectProxy) Enable(childPath string) {
+	ifc.locker.Lock()
+	ifc.child[childPath] = true
+	ifc.locker.Unlock()
+}
+
+func (ifc *IntrospectProxy) InterfaceName() string {
 	return InterfaceIntrospectProxy
 }
 
-func (ifc IntrospectProxy) Introspect() (string, error) {
-	ifc.locker.Lock()
-	defer ifc.locker.Unlock()
+func (ifc *IntrospectProxy) Introspect() (string, error) {
+	ifc.locker.RLock()
+	defer ifc.locker.RUnlock()
 	var node = new(introspect.NodeInfo)
 	for k, _ := range ifc.child {
 		node.Children = append(node.Children, introspect.NodeInfo{
@@ -70,6 +76,7 @@ func (ifc IntrospectProxy) Introspect() (string, error) {
 const InterfacePropertiesProxy = "org.freedesktop.DBus.Properties"
 
 type PropertiesProxy struct {
+	locker            sync.RWMutex
 	infos             map[string]interface{}
 	PropertiesChanged func(string, map[string]Variant, []string)
 }
@@ -80,11 +87,14 @@ func NewPropertiesProxy(infos map[string]interface{}) *PropertiesProxy {
 	}
 }
 
-func (PropertiesProxy) InterfaceName() string {
+func (*PropertiesProxy) InterfaceName() string {
 	return InterfacePropertiesProxy
 }
 
-func (propProxy PropertiesProxy) GetAll(ifcName string) (props map[string]Variant, err error) {
+func (propProxy *PropertiesProxy) GetAll(ifcName string) (props map[string]Variant, err error) {
+	propProxy.locker.RLock()
+	defer propProxy.locker.RUnlock()
+
 	props = make(map[string]Variant)
 	if ifc, ok := propProxy.infos[ifcName]; ok {
 		o_type := getTypeOf(ifc)
@@ -102,7 +112,10 @@ func (propProxy PropertiesProxy) GetAll(ifcName string) (props map[string]Varian
 	return
 }
 
-func (propProxy PropertiesProxy) Set(ifcName string, propName string, value Variant) error {
+func (propProxy *PropertiesProxy) Set(ifcName string, propName string, value Variant) error {
+	propProxy.locker.Lock()
+	defer propProxy.locker.Unlock()
+
 	if ifc, ok := propProxy.infos[ifcName]; ok {
 		ifc_t := getTypeOf(ifc)
 		t, ok := ifc_t.FieldByName(propName)
@@ -157,7 +170,10 @@ func (propProxy PropertiesProxy) Set(ifcName string, propName string, value Vari
 	}
 	return NewUnknowInterfaceError(ifcName)
 }
-func (propProxy PropertiesProxy) Get(ifcName string, propName string) (Variant, error) {
+func (propProxy *PropertiesProxy) Get(ifcName string, propName string) (Variant, error) {
+	propProxy.locker.RLock()
+	defer propProxy.locker.RUnlock()
+
 	if ifc, ok := propProxy.infos[ifcName]; ok {
 		t, ok := getTypeOf(ifc).FieldByName(propName)
 		if !ok || !isExportedStructField(t) {

@@ -223,9 +223,7 @@ func handleSubpath(c *Conn, path ObjectPath) {
 		if parent, ok := c.handlers[ObjectPath(parentpath)]; ok {
 			intro := parent[InterfaceIntrospectProxy]
 			if reflect.TypeOf(intro).AssignableTo(introspectProxyType) {
-				intro.(*IntrospectProxy).locker.Lock()
-				intro.(*IntrospectProxy).child[basepath] = true
-				intro.(*IntrospectProxy).locker.Unlock()
+				intro.(*IntrospectProxy).Enable(basepath)
 			}
 			return
 		}
@@ -251,7 +249,9 @@ func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error 
 		return err
 	}
 
+	c.handlersLck.Lock()
 	handleSubpath(c, path)
+	c.handlersLck.Unlock()
 
 	c.handlersLck.RLock()
 	ifcs := c.handlers[path]
