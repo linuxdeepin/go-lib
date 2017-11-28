@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+
+## [1.2.2] - 2017-11-28
++ fix concurrent access dbus PropertyProxy
++ add StartCommand method for DestkopAppInfo and DesktopAction
+
+
 ## [1.2.1] - 2017-11-16
 + add field Section for DesktopAction
 + add SetDataDirs in desktopappinfo
