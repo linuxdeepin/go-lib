@@ -20,9 +20,23 @@
 package dbus
 
 import "time"
+import "sync"
 
-var _HasNewMessage = false
 var quitTimer *time.Timer
+
+var hasNewMessage, markHasNewMessage = func() (func() bool, func(bool)) {
+	__v := false
+	var mux sync.RWMutex
+	return func() bool {
+			mux.RLock()
+			defer mux.RUnlock()
+			return __v
+		}, func(v bool) {
+			mux.Lock()
+			__v = v
+			mux.Unlock()
+		}
+}()
 
 func SetAutoDestroyHandler(d time.Duration, cb func() bool) {
 	if quitTimer != nil {
@@ -32,13 +46,13 @@ func SetAutoDestroyHandler(d time.Duration, cb func() bool) {
 		return
 	}
 	quitTimer = time.AfterFunc(d, func() {
-		if !_HasNewMessage {
+		if hasNewMessage() {
 			if cb == nil || cb() {
 				quit(nil)
 				return
 			}
 		}
-		_HasNewMessage = false
+		markHasNewMessage(false)
 		SetAutoDestroyHandler(d, cb)
 	})
 }

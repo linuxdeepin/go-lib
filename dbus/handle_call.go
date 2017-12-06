@@ -246,7 +246,7 @@ func (conn *Conn) handleCall(msg *Message) {
 		conn.outLck.RUnlock()
 	}
 
-	_HasNewMessage = true
+	markHasNewMessage(true)
 }
 
 func tryTranslateDBusObjectToObjectPath(con *Conn, value reflect.Value) reflect.Value {
