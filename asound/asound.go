@@ -255,6 +255,17 @@ func (pcm PCM) HwParamsSetRate(params PCMHwParams, val uint, dir int) error {
 	return newError("snd_pcm_hw_params_set_rate", ret)
 }
 
+func (pcm PCM) HwParamsSetRateNear(params PCMHwParams, val uint) (uint, int, error) {
+	cval := C.uint(val)
+	var dir C.int
+	ret := C.snd_pcm_hw_params_set_rate_near(pcm.native(), params.native(),
+		&cval, &dir)
+	if ret == 0 {
+		return uint(cval), int(dir), nil
+	}
+	return 0, 0, newError("snd_pcm_hw_params_set_rate_near", ret)
+}
+
 func (pcm PCM) HwParamsSetPeriodSize(params PCMHwParams, val PCMUFrames, dir int) error {
 	ret := C.snd_pcm_hw_params_set_period_size(pcm.native(), params.native(),
 		C.snd_pcm_uframes_t(val), C.int(dir))
@@ -291,6 +302,60 @@ func (params PCMHwParams) GetPeriodTime() (uint, int, error) {
 		return uint(val), int(dir), nil
 	}
 	return 0, 0, newError("snd_pcm_hw_params_get_period_time", ret)
+}
+
+const sizeOfPointer = unsafe.Sizeof(unsafe.Pointer(nil))
+
+func GetDeviceNameHints(card int, iface string) (DeviceNameHints, error) {
+	iface0 := C.CString(iface)
+	var hints *unsafe.Pointer
+	ret := C.snd_device_name_hint(C.int(card), iface0, &hints)
+	C.free(unsafe.Pointer(iface0))
+
+	if ret == 0 {
+		return DeviceNameHints{hints}, nil
+	}
+	return DeviceNameHints{}, newError("snd_device_name_hint", ret)
+}
+
+type DeviceNameHints struct {
+	// it pointer to a array of unsafe.Pointer, type in C is void**
+	Ptr *unsafe.Pointer
+}
+
+func (v DeviceNameHints) Free() {
+	C.snd_device_name_free_hint(v.Ptr)
+}
+
+func (v DeviceNameHints) Iter() *DeviceNameHintsIter {
+	return &DeviceNameHintsIter{
+		hints: v.Ptr,
+	}
+}
+
+type DeviceNameHintsIter struct {
+	hints, n *unsafe.Pointer
+}
+
+func (iter *DeviceNameHintsIter) Next() bool {
+	if iter.n == nil {
+		// init iter.n
+		iter.n = iter.hints
+	} else {
+		// same as iter.n++ in C
+		iter.n = (*unsafe.Pointer)(unsafe.Pointer(
+			uintptr(unsafe.Pointer(iter.n)) + sizeOfPointer,
+		))
+	}
+	return *iter.n != nil
+}
+
+func (iter DeviceNameHintsIter) Get(id string) string {
+	id0 := C.CString(id)
+	ret0 := C.snd_device_name_get_hint(*iter.n, id0)
+	ret := C.GoString(ret0)
+	C.free(unsafe.Pointer(ret0))
+	return ret
 }
 
 type Error struct {
