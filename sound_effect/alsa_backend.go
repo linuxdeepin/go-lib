@@ -53,8 +53,12 @@ func newALSAPlayBackend(device string, sampleSpec *SampleSpec) (pb PlayBackend, 
 		return
 	}
 
-	frameSize := channels * sampleSpec.pcmFormat.Size(1)
+	err = pcm.Prepare()
+	if err != nil {
+		return
+	}
 
+	frameSize := channels * sampleSpec.pcmFormat.Size(1)
 	return &ALSAPlayBackend{
 		pcm:       pcm,
 		frameSize: frameSize,
