@@ -48,14 +48,14 @@ func (format PCMFormat) Name() string {
 	return C.GoString(ret)
 }
 
-type PCMSubFormat C.snd_pcm_subformat_t
+type PCMSubformat C.snd_pcm_subformat_t
 
-func (subformat PCMSubFormat) Name() string {
+func (subformat PCMSubformat) Name() string {
 	ret := C.snd_pcm_subformat_name(C.snd_pcm_subformat_t(subformat))
 	return C.GoString(ret)
 }
 
-func (subformat PCMSubFormat) Desc() string {
+func (subformat PCMSubformat) Desc() string {
 	ret := C.snd_pcm_subformat_description(C.snd_pcm_subformat_t(subformat))
 	return C.GoString(ret)
 }
@@ -356,6 +356,198 @@ func (iter DeviceNameHintsIter) Get(id string) string {
 	ret := C.GoString(ret0)
 	C.free(unsafe.Pointer(ret0))
 	return ret
+}
+
+func CardNext(rcard *int) error {
+	rcard0 := C.int(*rcard)
+	ret := C.snd_card_next(&rcard0)
+	*rcard = int(rcard0)
+	return newError("snd_card_next", ret)
+}
+
+func CardLoad(card int) bool {
+	ret := C.snd_card_load(C.int(card))
+	if ret == 1 {
+		//driver is pressent
+		return true
+	}
+	// else 0, driver not pressent
+	return false
+}
+
+type CTL struct {
+	Ptr unsafe.Pointer
+}
+
+func wrapCTL(p *C.snd_ctl_t) CTL {
+	return CTL{
+		unsafe.Pointer(p),
+	}
+}
+
+func (v CTL) native() *C.snd_ctl_t {
+	return (*C.snd_ctl_t)(v.Ptr)
+}
+
+func CTLOpen(name string, mode int) (CTL, error) {
+	name0 := C.CString(name)
+	var ctlp *C.snd_ctl_t
+	ret := C.snd_ctl_open(&ctlp, name0, C.int(mode))
+	C.free(unsafe.Pointer(name0))
+
+	if ret == 0 {
+		return wrapCTL(ctlp), nil
+	}
+	return CTL{}, newError("snd_ctl_open", ret)
+}
+
+func (ctl CTL) Close() error {
+	ret := C.snd_ctl_close(ctl.native())
+	return newError("snd_ctl_close", ret)
+}
+
+func (ctl CTL) CardInfo(info CTLCardInfo) error {
+	ret := C.snd_ctl_card_info(ctl.native(), info.native())
+	return newError("snd_ctl_card_info", ret)
+}
+
+type PCMInfo struct {
+	Ptr unsafe.Pointer
+}
+
+func NewPCMInfo() PCMInfo {
+	p := make([]byte, C.snd_pcm_info_sizeof())
+	return PCMInfo{unsafe.Pointer(&p[0])}
+}
+
+func (v PCMInfo) native() *C.snd_pcm_info_t {
+	return (*C.snd_pcm_info_t)(v.Ptr)
+}
+
+//Set wanted device inside a PCM info container
+func (info PCMInfo) SetDevice(val uint) {
+	C.snd_pcm_info_set_device(info.native(), C.uint(val))
+}
+
+// Set wanted stream inside a PCM info container
+func (info PCMInfo) SetStream(val PCMStream) {
+	C.snd_pcm_info_set_stream(info.native(), C.snd_pcm_stream_t(val))
+}
+
+//Set wanted sub device inside a PCM info container
+func (info PCMInfo) SetSubdevice(val uint) {
+	C.snd_pcm_info_set_subdevice(info.native(), C.uint(val))
+}
+
+func (info PCMInfo) GetID() string {
+	ret := C.snd_pcm_info_get_id(info.native())
+	return C.GoString(ret)
+}
+
+func (info PCMInfo) GetName() string {
+	ret := C.snd_pcm_info_get_name(info.native())
+	return C.GoString(ret)
+}
+
+func (info PCMInfo) GetStream() PCMStream {
+	ret := C.snd_pcm_info_get_stream(info.native())
+	return PCMStream(ret)
+}
+
+type PCMSubclass C.snd_pcm_subclass_t
+
+func (info PCMInfo) GetSubclass() PCMSubclass {
+	ret := C.snd_pcm_info_get_subclass(info.native())
+	return PCMSubclass(ret)
+}
+
+func (info PCMInfo) GetSubdevice() uint {
+	ret := C.snd_pcm_info_get_subdevice(info.native())
+	return uint(ret)
+}
+
+func (info PCMInfo) GetSubdeviceName() string {
+	ret := C.snd_pcm_info_get_subdevice_name(info.native())
+	return C.GoString(ret)
+}
+
+// Get available subdevices count from a PCM info container.
+func (info PCMInfo) GetSubdevicesAvail() uint {
+	ret := C.snd_pcm_info_get_subdevices_avail(info.native())
+	return uint(ret)
+}
+
+func (info PCMInfo) GetSubdevicesCount() uint {
+	ret := C.snd_pcm_info_get_subdevices_count(info.native())
+	return uint(ret)
+}
+
+// Get next PCM device number.
+func (ctl CTL) PCMNextDevice(device *int) error {
+	device0 := C.int(*device)
+	ret := C.snd_ctl_pcm_next_device(ctl.native(), &device0)
+	*device = int(device0)
+	return newError("snd_ctl_pcm_next_device", ret)
+}
+
+// Get info about a PCM device.
+func (ctl CTL) PCMInfo(info PCMInfo) error {
+	ret := C.snd_ctl_pcm_info(ctl.native(), info.native())
+	return newError("snd_ctl_pcm_info", ret)
+}
+
+type CTLCardInfo struct {
+	Ptr unsafe.Pointer
+}
+
+func (v CTLCardInfo) native() *C.snd_ctl_card_info_t {
+	return (*C.snd_ctl_card_info_t)(v.Ptr)
+}
+
+func wrapCTLCardInfo(ptr *C.snd_ctl_card_info_t) CTLCardInfo {
+	return CTLCardInfo{
+		Ptr: unsafe.Pointer(ptr),
+	}
+}
+
+func NewCTLCardInfo() CTLCardInfo {
+	p := make([]byte, C.snd_ctl_card_info_sizeof())
+	return CTLCardInfo{unsafe.Pointer(&p[0])}
+}
+
+func (info CTLCardInfo) GetID() string {
+	ret := C.snd_ctl_card_info_get_id(info.native())
+	return C.GoString(ret)
+}
+
+func (info CTLCardInfo) GetCard() int {
+	ret := C.snd_ctl_card_info_get_card(info.native())
+	return int(ret)
+}
+
+func (info CTLCardInfo) GetComponents() string {
+	ret := C.snd_ctl_card_info_get_components(info.native())
+	return C.GoString(ret)
+}
+
+func (info CTLCardInfo) GetDriver() string {
+	ret := C.snd_ctl_card_info_get_driver(info.native())
+	return C.GoString(ret)
+}
+
+func (info CTLCardInfo) GetLongName() string {
+	ret := C.snd_ctl_card_info_get_longname(info.native())
+	return C.GoString(ret)
+}
+
+func (info CTLCardInfo) GetMixerName() string {
+	ret := C.snd_ctl_card_info_get_mixername(info.native())
+	return C.GoString(ret)
+}
+
+func (info CTLCardInfo) GetName() string {
+	ret := C.snd_ctl_card_info_get_name(info.native())
+	return C.GoString(ret)
 }
 
 type Error struct {
