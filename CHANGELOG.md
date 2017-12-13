@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [1.2.3] - 2017-12-13
+*   add some audio libs
+*   fix package golang-dlib-dev depends wrong
+*   fix: race condition on HasNewMessage
+*   asound: add method SetRateNear and GetDeviceNameHints
+
 
 ## [1.2.2] - 2017-11-28
 + fix concurrent access dbus PropertyProxy
