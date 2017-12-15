@@ -11,3 +11,7 @@ export DH_GOLANG_INSTALL_ALL := 1
 override_dh_auto_install:
 	dh_auto_install
 	find ${CURDIR}/debian/golang-dlib-dev -regex '.*\.git\|.*testdata\|.*LICENSE\|.*\.gitignore' | xargs rm -rf
+
+override_dh_fixperms:
+	dh_fixperms
+	find debian -name 'build_test_locale_data' -exec chmod 755 {} \;
