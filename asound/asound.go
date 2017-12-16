@@ -136,6 +136,15 @@ func (pcm PCM) Close() error {
 	return newError("snd_pcm_close", ret)
 }
 
+func (pcm PCM) Recover(err int, silent bool) error {
+	var silent0 C.int
+	if silent {
+		silent0 = 1
+	}
+	ret := C.snd_pcm_recover(pcm.native(), C.int(err), silent0)
+	return newError("snd_pcm_recover", ret)
+}
+
 func (pcm PCM) HwFree() error {
 	ret := C.snd_pcm_hw_free(pcm.native())
 	return newError("snd_pcm_hw_free", ret)
@@ -245,6 +254,21 @@ func (pcm PCM) HwParamsSetBufferSize(params PCMHwParams, val PCMUFrames) error {
 	return newError("snd_pcm_hw_params_set_buffer_size", ret)
 }
 
+// Extract maximum buffer time from a configuration space.
+// val	approximate maximum buffer duration in us
+func (params PCMHwParams) GetBufferTimeMax() (val uint, dir int, err error) {
+	var val0 C.uint
+	var dir0 C.int
+	ret := C.snd_pcm_hw_params_get_buffer_time_max(params.native(), &val0, &dir0)
+	err = newError("snd_pcm_hw_params_get_buffer_time_max", ret)
+	if err != nil {
+		return
+	}
+	val = uint(val0)
+	dir = int(dir0)
+	return
+}
+
 func (pcm PCM) HwParamsSetChannels(params PCMHwParams, val uint) error {
 	ret := C.snd_pcm_hw_params_set_channels(pcm.native(), params.native(), C.uint(val))
 	return newError("snd_pcm_hw_params_set_channels", ret)
@@ -264,6 +288,26 @@ func (pcm PCM) HwParamsSetRateNear(params PCMHwParams, val uint) (uint, int, err
 		return uint(cval), int(dir), nil
 	}
 	return 0, 0, newError("snd_pcm_hw_params_set_rate_near", ret)
+}
+
+func (pcm PCM) HwParamsSetPeriodTimeNear(params PCMHwParams, val uint) (uint, int, error) {
+	val0 := C.uint(val)
+	var dir0 C.int
+	ret := C.snd_pcm_hw_params_set_period_time_near(pcm.native(), params.native(), &val0, &dir0)
+	if ret == 0 {
+		return uint(val0), int(dir0), nil
+	}
+	return 0, 0, newError("snd_pcm_hw_params_set_period_time_near", ret)
+}
+
+func (pcm PCM) HwParamsSetBufferTimeNear(params PCMHwParams, val uint) (uint, int, error) {
+	val0 := C.uint(val)
+	var dir0 C.int
+	ret := C.snd_pcm_hw_params_set_buffer_time_near(pcm.native(), params.native(), &val0, &dir0)
+	if ret == 0 {
+		return uint(val0), int(dir0), nil
+	}
+	return 0, 0, newError("snd_pcm_hw_params_set_buffer_time_near", ret)
 }
 
 func (pcm PCM) HwParamsSetPeriodSize(params PCMHwParams, val PCMUFrames, dir int) error {

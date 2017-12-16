@@ -38,12 +38,35 @@ func newALSAPlayBackend(device string, sampleSpec *SampleSpec) (pb PlayBackend, 
 
 	channels := sampleSpec.channels
 	format := sampleSpec.pcmFormat
-	pcm.HwParamsSetAccess(params, asound.PCMAccessRWInterleaved)
-	pcm.HwParamsSetFormat(params, format)
-	pcm.HwParamsSetChannels(params, uint(channels))
+	err = pcm.HwParamsSetAccess(params, asound.PCMAccessRWInterleaved)
+	if err != nil {
+		return
+	}
+
+	err = pcm.HwParamsSetFormat(params, format)
+	if err != nil {
+		return
+	}
+
+	err = pcm.HwParamsSetChannels(params, uint(channels))
+	if err != nil {
+		return
+	}
 
 	sampleRate := sampleSpec.rate
 	err = pcm.HwParamsSetRate(params, uint(sampleRate), 0)
+	if err != nil {
+		return
+	}
+
+	var bufferTime uint = 60000 // 60ms
+	bufferTime, _, err = pcm.HwParamsSetBufferTimeNear(params, bufferTime)
+	if err != nil {
+		return
+	}
+
+	periodTime := bufferTime / 4
+	periodTime, _, err = pcm.HwParamsSetPeriodTimeNear(params, periodTime)
 	if err != nil {
 		return
 	}
