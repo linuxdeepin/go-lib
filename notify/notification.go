@@ -21,9 +21,12 @@ package notify
 
 import (
 	"errors"
+	"runtime"
+
+	"sync"
+
 	"pkg.deepin.io/lib/dbus"
 	"pkg.deepin.io/lib/event"
-	"runtime"
 )
 
 type ActionCallback func(n *Notification, action string)
@@ -37,6 +40,7 @@ type Notification struct {
 	Icon         string
 	Timeout      int32
 	closedReason ClosedReason
+	mu           sync.Mutex
 
 	actions   []string
 	actionMap map[string]ActionCallback
@@ -87,16 +91,10 @@ func (n *Notification) Destroy() {
 // Updates the notification text and icon.
 // This won't send the update out and display it on the screen.
 // For that, you will need to call Show()
-// return true, unless an invalid parameter was passed
-func (n *Notification) Update(summary, body, icon string) bool {
-	if summary == "" {
-		return false
-	}
-
+func (n *Notification) Update(summary, body, icon string) {
 	n.Summary = summary
 	n.Body = body
 	n.Icon = icon
-	return true
 }
 
 func (n *Notification) getAppName() string {
@@ -108,6 +106,8 @@ func (n *Notification) getAppName() string {
 
 // Tells the notification server to display the notification on the screen.
 func (n *Notification) Show() error {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	if n.actionInvokedConnectRet == nil {
 		n.actionInvokedConnectRet = notifier.ConnectActionInvoked(func(id uint32, action string) {
 			if n.id != id {
@@ -135,7 +135,6 @@ func (n *Notification) Show() error {
 	if err != nil {
 		return err
 	}
-
 	n.id = id
 	return nil
 }
@@ -164,7 +163,7 @@ func (n *Notification) ClearActions() {
 
 // Sets the category of this notification.
 // This can be used by the notification server to filter or display the data in a certain way.
-func (n *Notification) SetCategroy(category string) {
+func (n *Notification) SetCategory(category string) {
 	n.SetHint(HintCategory, category)
 }
 

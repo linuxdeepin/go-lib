@@ -23,8 +23,9 @@ package main
 
 import (
 	"log"
-	"pkg.deepin.io/lib/notify"
 	"time"
+
+	"pkg.deepin.io/lib/notify"
 )
 
 func init() {
@@ -39,14 +40,18 @@ func main() {
 	log.Printf("serverInfo: %#v\n", serverInfo)
 	caps, err := notify.GetServerCaps()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	log.Println("server caps:", caps)
 
-	n := notify.NewNotification("summary", "body", "deepin-music")
+	n := notify.NewNotification("s1", "b1", "deepin-music")
 	n.Show()
 
 	time.Sleep(time.Second * 2)
-	n.Update("xxxx", "yyyy", "deepin-terminal")
+	n.Update("s2", "b2", "deepin-terminal")
+	n.Show()
+
+	time.Sleep(time.Second * 2)
+	n.Update("s3", "b3", "deepin-terminal")
 	n.Show()
 }
