@@ -204,7 +204,7 @@ func (finder *Finder) lookup(theme *Theme, reqOutputProfile, reqName string) str
 }
 
 func getNames(name string, acc []string) []string {
-	idx := strings.LastIndexByte(name, '-')
+	idx := strings.LastIndex(name, "-")
 	if idx < 0 {
 		return append(acc, name)
 	} else {
