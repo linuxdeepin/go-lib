@@ -46,7 +46,7 @@ func SetAutoDestroyHandler(d time.Duration, cb func() bool) {
 		return
 	}
 	quitTimer = time.AfterFunc(d, func() {
-		if hasNewMessage() {
+		if !hasNewMessage() {
 			if cb == nil || cb() {
 				quit(nil)
 				return
