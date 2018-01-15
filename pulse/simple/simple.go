@@ -3,6 +3,7 @@ package simple
 /*
 #cgo pkg-config: libpulse-simple
 #include <pulse/simple.h>
+#include <pulse/error.h>
 #include <stdlib.h>
 */
 import "C"
@@ -127,7 +128,7 @@ type Error struct {
 }
 
 func newError(fn string, errCode C.int) error {
-	if errCode < 0 {
+	if errCode != 0 /*PA_OK*/ {
 		return Error{
 			Code: int(errCode),
 			Fn:   fn,
@@ -137,5 +138,6 @@ func newError(fn string, errCode C.int) error {
 }
 
 func (err Error) Error() string {
-	return fmt.Sprintf("%s: error code %d", err.Fn, err.Code)
+	errMsg := C.GoString(C.pa_strerror(C.int(err.Code)))
+	return fmt.Sprintf("%s: %s", err.Fn, errMsg)
 }

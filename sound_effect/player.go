@@ -98,11 +98,6 @@ func cacheItemOk(cacheItem *CacheItem, fileInfo os.FileInfo) bool {
 	return true
 }
 
-func newPaConn(eventName, device string, sampleSpec *paSimple.SampleSpec) (paSimple.Conn, error) {
-	return paSimple.NewConn("", "com.deepin.SoundEffect",
-		paSimple.StreamDirectionPlayback, device, eventName, sampleSpec)
-}
-
 func getDecoder(file string, fileInfo os.FileInfo) (Decoder, error) {
 	ext := filepath.Ext(file)
 	switch ext {
