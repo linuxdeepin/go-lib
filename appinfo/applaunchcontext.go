@@ -43,9 +43,9 @@ func init() {
 
 type AppLaunchContext struct {
 	sync.Mutex
-	xu        *xgbutil.XUtil
-	count     uint
-	timestamp uint32
+	xu          *xgbutil.XUtil
+	count       uint
+	timestamp   uint32
 	cmdPrefixes []string
 }
 
@@ -57,6 +57,10 @@ func NewAppLaunchContext(xu *xgbutil.XUtil) *AppLaunchContext {
 
 func (ctx *AppLaunchContext) SetTimestamp(timestamp uint32) {
 	ctx.timestamp = timestamp
+}
+
+func (ctx *AppLaunchContext) GetTimestamp() uint32 {
+	return ctx.timestamp
 }
 
 func (ctx *AppLaunchContext) SetCmdPrefixes(v []string) {

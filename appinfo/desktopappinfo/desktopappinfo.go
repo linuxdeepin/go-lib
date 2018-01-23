@@ -24,11 +24,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"sync"
+
 	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
 	"pkg.deepin.io/lib/xdg/basedir"
-	"strings"
-	"sync"
 )
 
 const (
@@ -441,7 +442,8 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 	var snId string
 	startupNotify := ai.GetStartupNotify()
-	if startupNotify && launchContext != nil {
+	if startupNotify && launchContext != nil &&
+		launchContext.GetTimestamp() != 0 {
 		snId, _ = launchContext.GetStartupNotifyId(ai, files)
 		cmd.Env = append(cmd.Env, "DESKTOP_STARTUP_ID="+snId)
 	}
@@ -537,9 +539,9 @@ func (ai *DesktopAppInfo) GetActions() []DesktopAction {
 			exec, _ := ai.GetString(section, KeyExec)
 			action := DesktopAction{
 				Section: section,
-				Name:   name,
-				Exec:   exec,
-				parent: ai,
+				Name:    name,
+				Exec:    exec,
+				parent:  ai,
 			}
 			actions = append(actions, action)
 		}
@@ -551,8 +553,8 @@ type DesktopAction struct {
 	parent *DesktopAppInfo
 
 	Section string
-	Name   string
-	Exec   string
+	Name    string
+	Exec    string
 }
 
 func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLaunchContext) error {
