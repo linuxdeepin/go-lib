@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+## [1.2.4] - 2018-01-24
+*   fix Adapt lintian
+*   asound: add more types and functions
+*   `sound_effect`: fix alsa play backend HWParams wrong
+*   notify: fix notification Update and Show
+*   `sound_effect`: fix can not compile with go 1.4
+*   dbus: fix SetAutoDestroyHandler
+*   add lib cgroup
+*   pulse/simple: fix wrong error handling
+*   appinfo: do not call GetStartupNotifyId if timestamp is 0
+
 ## [1.2.3] - 2017-12-13
 *   add some audio libs
 *   fix package golang-dlib-dev depends wrong
