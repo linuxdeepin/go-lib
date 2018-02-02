@@ -19,7 +19,10 @@
 
 package property
 
-import "gir/gio-2.0"
+import (
+	"gir/gio-2.0"
+	"pkg.deepin.io/lib/gsettings"
+)
 import "pkg.deepin.io/lib/dbus"
 import "reflect"
 import "fmt"
@@ -215,9 +218,12 @@ func newGSettingsProperty(sig string, obj dbus.DBusObject, propName string, s *g
 	default:
 		panic("GSettingsProperty didn't support gsettings key " + keyName)
 	}
-	s.Connect("changed::"+keyName, func(s *gio.Settings, name string) {
+	var schemaId string
+	s.GetProperty("schema-id", &schemaId)
+	gsettings.ConnectChanged(schemaId, keyName, func(key string) {
 		prop.Notify()
 	})
+
 	prop.ConnectChanged(func() {
 		dbus.NotifyChange(prop.core, prop.propName)
 	})
@@ -243,12 +249,10 @@ func (p _GSettingsProperty) SetValue(v interface{}) {
 		oldv, ok := p.getFn().([]string)
 		if ok && !strvEqual(strv, oldv) {
 			p.setFn(v)
-			dbus.NotifyChange(p.core, p.propName)
 		}
 	} else {
 		if v != p.getFn() {
 			p.setFn(v)
-			dbus.NotifyChange(p.core, p.propName)
 		}
 	}
 }

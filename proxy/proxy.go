@@ -21,12 +21,14 @@ package proxy
 
 import (
 	"fmt"
-	"gir/gio-2.0"
 	"os"
-	"pkg.deepin.io/lib/log"
-	"pkg.deepin.io/lib/utils"
 	"strconv"
 	"strings"
+
+	"gir/gio-2.0"
+	"pkg.deepin.io/lib/gsettings"
+	"pkg.deepin.io/lib/log"
+	"pkg.deepin.io/lib/utils"
 )
 
 // Synchronize proxy gsettings to environment variables.
@@ -94,21 +96,16 @@ func SetupProxy() {
 }
 
 func listenProxyGsettings() {
-	proxySettings.Connect("changed", func(s *gio.Settings, key string) {
+	changedHandler := func(key string) {
 		updateProxyEnvs()
-	})
-	proxyChildSettingsHttp.Connect("changed", func(s *gio.Settings, key string) {
-		updateProxyEnvs()
-	})
-	proxyChildSettingsHttps.Connect("changed", func(s *gio.Settings, key string) {
-		updateProxyEnvs()
-	})
-	proxyChildSettingsFtp.Connect("changed", func(s *gio.Settings, key string) {
-		updateProxyEnvs()
-	})
-	proxyChildSettingsSocks.Connect("changed", func(s *gio.Settings, key string) {
-		updateProxyEnvs()
-	})
+	}
+
+	const systemProxy = "system.proxy"
+	gsettings.ConnectChanged(systemProxy, "*", changedHandler)
+	gsettings.ConnectChanged(systemProxy+"."+gchildProxyHttp, "*", changedHandler)
+	gsettings.ConnectChanged(systemProxy+"."+gchildProxyHttps, "*", changedHandler)
+	gsettings.ConnectChanged(systemProxy+"."+gchildProxyFtp, "*", changedHandler)
+	gsettings.ConnectChanged(systemProxy+"."+gchildProxySocks, "*", changedHandler)
 }
 
 func showEnvs() {
