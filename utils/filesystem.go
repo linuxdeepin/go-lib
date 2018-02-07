@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 ~ 2017 Deepin Technology Co., Ltd.
+ * Copyright (C) 2017 ~ 2018 Deepin Technology Co., Ltd.
  *
  * Author:     jouyouyun <jouyouwen717@gmail.com>
  *
@@ -18,6 +18,7 @@
  */
 
 package utils
+
 /*
 #include <stdlib.h>
 #include <sys/statvfs.h>
@@ -37,9 +38,9 @@ func QueryFilesytemInfo(path string) (*FilesystemInfo, error) {
 	buf := C.struct_statvfs{}
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
-	if (C.statvfs(cpath, &buf) != 0){
-            return nil, errors.New("Statvfs error.")
-        }
+	if C.statvfs(cpath, &buf) != 0 {
+		return nil, errors.New("Statvfs error.")
+	}
 
 	total := uint64(buf.f_blocks) * uint64(buf.f_frsize)
 	free := uint64(buf.f_bfree) * uint64(buf.f_frsize)
