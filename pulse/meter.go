@@ -23,8 +23,10 @@ package pulse
 #include "dde-pulse.h"
 */
 import "C"
+import "sync"
 
 var sourceMeterCBs = make(map[uint32]func(float64))
+var sourceMeterLock sync.RWMutex
 
 type SourceMeter struct {
 	core        *C.pa_stream
@@ -37,17 +39,23 @@ func NewSourceMeter(c *Context, idx uint32) *SourceMeter {
 	return &SourceMeter{core, idx, nil}
 }
 func (s *SourceMeter) Destroy() {
+	sourceMeterLock.Lock()
 	delete(sourceMeterCBs, s.sourceIndex)
+	sourceMeterLock.Unlock()
 	C.pa_stream_disconnect(s.core)
 	C.pa_stream_unref(s.core)
 }
 func (s *SourceMeter) ConnectChanged(cb func(v float64)) {
+	sourceMeterLock.Lock()
 	sourceMeterCBs[s.sourceIndex] = cb
+	sourceMeterLock.Unlock()
 }
 
 //export go_update_volume_meter
 func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
+	sourceMeterLock.RLock()
 	if cb, ok := sourceMeterCBs[source_index]; ok && cb != nil {
+		sourceMeterLock.RUnlock()
 		cb(v)
 	}
 }
