@@ -26,11 +26,13 @@
 #include "_cgo_export.h" //convert int
 
 static pa_threaded_mainloop* m = NULL;
-static pa_context_success_cb_t success_cb = NULL;
 
+static inline void __empty_success_cb(pa_context *c, int success, void *userdata)
+{
+}
 pa_context_success_cb_t get_success_cb()
 {
-    return success_cb;
+  return __empty_success_cb;
 }
 
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
@@ -118,9 +120,6 @@ void setup_monitor(pa_context *ctx)
     pa_threaded_mainloop_unlock(m);
 }
 
-void __success_cb(pa_context *c, int success, void *userdata)
-{
-}
 
 static int init_state = 0; // O: unknown, 1: success, 2: failure
 
@@ -157,7 +156,6 @@ pa_context* pa_init(pa_threaded_mainloop* ml)
         return NULL;
     }
     init_state = 1;
-    success_cb = __success_cb;
     setup_monitor(ctx);
     return ctx;
 }
@@ -178,7 +176,7 @@ void
 suspend_sink_by_id(pa_context* ctx, uint32_t idx, int suspend)
 {
     pa_operation* o = pa_context_suspend_sink_by_index(ctx, idx, suspend,
-                                                       success_cb, NULL);
+                                                       get_success_cb(), NULL);
     if (!o) {
         fprintf(stderr, "Failed suspend sink %u\n", idx);
         return;
@@ -191,7 +189,7 @@ void
 suspend_source_by_id(pa_context* ctx, uint32_t idx, int suspend)
 {
     pa_operation* o = pa_context_suspend_source_by_index(ctx, idx, suspend,
-                                                       success_cb, NULL);
+                                                         get_success_cb(), NULL);
     if (!o) {
         fprintf(stderr, "Failed suspend sink %u\n", idx);
         return;
