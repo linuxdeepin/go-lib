@@ -42,13 +42,16 @@ type Reader struct {
 type TrimSpaceFlag uint
 
 const (
-	TrimLeadingSpace TrimSpaceFlag = iota + 1
+	TrimLeadingSpace TrimSpaceFlag = 1 << iota
 	TrimTailingSpace
 	TrimDelimLeftSpace
 	TrimDelimRightSpace
 )
-const TrimAllSpace TrimSpaceFlag = TrimLeadingSpace | TrimTailingSpace | TrimDelimLeftSpace | TrimDelimRightSpace
-const TrimLeadingTailingSpace TrimSpaceFlag = TrimLeadingSpace | TrimTailingSpace
+const (
+	TrimAllSpace = TrimLeadingSpace | TrimTailingSpace |
+		TrimDelimLeftSpace | TrimDelimRightSpace
+	TrimLeadingTailingSpace = TrimLeadingSpace | TrimTailingSpace
+)
 
 // NewReader returns a new Reader that reads from r.
 // The Delim field default to '=', the TrimSpace field default to TrimAllSpace.
