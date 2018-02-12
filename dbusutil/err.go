@@ -46,6 +46,9 @@ type DBusError interface {
 }
 
 func ToError(err error) *dbus.Error {
+	if err == nil {
+		return nil
+	}
 	err0, ok := err.(DBusError)
 	var name, msg string
 	if ok {

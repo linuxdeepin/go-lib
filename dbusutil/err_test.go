@@ -104,4 +104,8 @@ func TestToError(t *testing.T) {
 		t.Errorf("err expected %#v, but got %#v", expectedErr, err)
 	}
 
+	err = ToError(nil)
+	if err != nil {
+		t.Errorf("err expected nil, but got %#v", err)
+	}
 }
