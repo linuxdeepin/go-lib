@@ -100,7 +100,7 @@ func (s *Service) Export(v Exportable) error {
 	s.objectsMu.RUnlock()
 	if !ok {
 		// path not exist
-		obj = newObject(path, s.conn)
+		obj = newObject(path, s)
 
 		err := s.conn.Export(v, path, exportInfo.Interface)
 		if err != nil {

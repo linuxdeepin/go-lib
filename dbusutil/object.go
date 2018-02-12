@@ -21,16 +21,17 @@ type object struct {
 	children strv.Strv // node name of children
 }
 
-func newObject(path dbus.ObjectPath, conn *dbus.Conn) *object {
+func newObject(path dbus.ObjectPath, service *Service) *object {
 	obj := &object{
 		path:         path,
 		implementers: make(map[string]*implementer),
 
 		propertiesImpl: &propertiesImplementer{
-			conn: conn,
+			service: service,
 		},
 
 		introspectableImpl: &introspectableImplementer{
+			service:    service,
 			path:       path,
 			interfaces: make(map[string]introspect.Interface),
 		},

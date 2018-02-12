@@ -113,6 +113,7 @@ func (impl *implementer) checkPropertyValue(name string, value interface{}) erro
 }
 
 type introspectableImplementer struct {
+	service    *Service
 	path       dbus.ObjectPath
 	mu         sync.RWMutex
 	data       string
@@ -178,6 +179,7 @@ func (oi *introspectableImplementer) deleteChild(child string) {
 }
 
 func (oi *introspectableImplementer) Introspect() (string, *dbus.Error) {
+	oi.service.DelayAutoQuit()
 	oi.mu.RLock()
 	data := oi.data
 
@@ -216,12 +218,13 @@ func (oi *introspectableImplementer) getInterfaces() []introspect.Interface {
 }
 
 type propertiesImplementer struct {
-	object *object
-	conn   *dbus.Conn
+	object  *object
+	service *Service
 }
 
 func (p *propertiesImplementer) Get(sender dbus.Sender,
 	interfaceName, propertyName string) (dbus.Variant, *dbus.Error) {
+	p.service.DelayAutoQuit()
 
 	impl := p.object.getImplementer(interfaceName)
 	if impl == nil {
@@ -246,6 +249,8 @@ func (p *propertiesImplementer) Get(sender dbus.Sender,
 }
 
 func (p *propertiesImplementer) GetAll(sender dbus.Sender, interfaceName string) (map[string]dbus.Variant, *dbus.Error) {
+	p.service.DelayAutoQuit()
+
 	impl := p.object.getImplementer(interfaceName)
 	if impl == nil {
 		return nil, prop.ErrIfaceNotFound
@@ -270,6 +275,7 @@ func (p *propertiesImplementer) GetAll(sender dbus.Sender, interfaceName string)
 
 func (p *propertiesImplementer) Set(sender dbus.Sender, interfaceName, propertyName string,
 	newVar dbus.Variant) *dbus.Error {
+	p.service.DelayAutoQuit()
 
 	impl := p.object.getImplementer(interfaceName)
 	if impl == nil {
