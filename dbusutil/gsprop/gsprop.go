@@ -115,10 +115,9 @@ func newBaseProperty(sig string, s *gio.Settings, keyName string) *baseProperty 
 	default:
 		panic("GSettingsProperty didn't support gsettings key " + keyName)
 	}
-	var schemaId string
-	s.GetProperty("schema-id", &schemaId)
-
-	gsettings.ConnectChanged(schemaId, keyName, func(key string) {
+	var propPath string
+	s.GetProperty("path", &propPath)
+	gsettings.ConnectChanged(propPath, keyName, func(key string) {
 		prop.notifyChanged(prop.getFn())
 	})
 	return prop

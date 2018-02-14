@@ -33,20 +33,31 @@ type changedCallback struct {
 
 type ChangedCallbackFunc func(key string)
 
-func schemaToPath(schema string) string {
-	return "/" + strings.Replace(schema, ".", "/", -1)
+func toPath(schemaOrPath string) string {
+	if schemaOrPath[0] == '/' {
+		// is path
+		if schemaOrPath[len(schemaOrPath)-1] == '/' {
+			schemaOrPath = schemaOrPath[:len(schemaOrPath)-1]
+		}
+		return schemaOrPath
+	}
+	// is schema id
+	return "/" + strings.Replace(schemaOrPath, ".", "/", -1)
 }
 
 var changedCallbackMap map[string]*changedCallback
 var changedCallbackMapMu sync.RWMutex
 
-func ConnectChanged(schema, key string, fn ChangedCallbackFunc) {
+func ConnectChanged(schemaOrPath, key string, fn ChangedCallbackFunc) {
+	if schemaOrPath == "" || key == "" {
+		return
+	}
 	var all bool
 	if key == "*" {
 		all = true
 	}
 
-	keyPath := schemaToPath(schema)
+	keyPath := toPath(schemaOrPath)
 	if !all {
 		keyPath += "/" + key
 	}
