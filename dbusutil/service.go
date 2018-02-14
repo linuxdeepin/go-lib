@@ -57,7 +57,7 @@ func (s *Service) Conn() *dbus.Conn {
 func (s *Service) RequestName(name string) error {
 	reply, err := s.conn.RequestName(name, dbus.NameFlagDoNotQueue)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	if reply != dbus.RequestNameReplyPrimaryOwner {
 		return errors.New("name already taken")
