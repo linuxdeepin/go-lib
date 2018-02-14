@@ -399,6 +399,18 @@ func (s *Service) GetConnUID(name string) (uid uint32, err error) {
 	return
 }
 
+func (s *Service) GetNameOwner(name string) (owner string, err error) {
+	err = s.conn.BusObject().Call(orgFreedesktopDBus+".GetNameOwner",
+		0, name).Store(&owner)
+	return
+}
+
+func (s *Service) NameHasOwner(name string) (hasOwner bool, err error) {
+	err = s.conn.BusObject().Call(orgFreedesktopDBus+".NameHasOwner",
+		0, name).Store(&hasOwner)
+	return
+}
+
 func (s *Service) DumpProperties(v Exportable) (string, error) {
 	exportInfo := v.GetDBusExportInfo()
 	impl := s.getImplementer(exportInfo)

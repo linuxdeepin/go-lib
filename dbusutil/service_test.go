@@ -12,6 +12,49 @@ import (
 	"pkg.deepin.io/lib/dbus1"
 )
 
+func TestService_GetNameOwner(t *testing.T) {
+	service, err := NewSessionService()
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	ofdb := "org.freedesktop.DBus"
+	owner, err := service.GetNameOwner(ofdb)
+	if err != nil {
+		t.Error("Unexpected error calling GetNameOwner:", err)
+	}
+	if owner != ofdb {
+		t.Errorf("expected owner %q got %q", ofdb, owner)
+	}
+
+	_, err = service.GetNameOwner("xxx.yyy.zzz.123")
+	if err == nil {
+		t.Error("Expected error due to service xxx.yyy.zzz.123 not exist")
+	}
+}
+
+func TestService_NameHasOwner(t *testing.T) {
+	service, err := NewSessionService()
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	ofdb := "org.freedesktop.DBus"
+	hasOwner, err := service.NameHasOwner(ofdb)
+	if err != nil {
+		t.Error("Unexpected error calling NameHasOwner:", err)
+	}
+	if !hasOwner {
+		t.Error("hasOwner expected true")
+	}
+
+	hasOwner, err = service.NameHasOwner("xxx.yyy.zzz.123")
+	if err != nil {
+		t.Error("Unexpected error calling NameHasOwner:", err)
+	}
+	if hasOwner {
+		t.Error("hasOwner expected false")
+	}
+}
+
 func TestService_RequestName(t *testing.T) {
 	service, err := NewSessionService()
 	if err != nil {
