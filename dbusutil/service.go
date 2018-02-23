@@ -234,6 +234,9 @@ func (s *Service) getImplementer(exportInfo ExportInfo) *implementer {
 func (s *Service) Emit(v Exportable, signalName string, values ...interface{}) error {
 	exportInfo := v.GetDBusExportInfo()
 	impl := s.getImplementer(exportInfo)
+	if impl == nil {
+		return errors.New("v is not exported")
+	}
 	var signal introspect.Signal
 	for _, sig := range impl.signals {
 		if sig.Name == signalName {
@@ -261,6 +264,9 @@ func (s *Service) Emit(v Exportable, signalName string, values ...interface{}) e
 func (s *Service) EmitPropertyChanged(v Exportable, propertyName string, value interface{}) error {
 	exportInfo := v.GetDBusExportInfo()
 	impl := s.getImplementer(exportInfo)
+	if impl == nil {
+		return errors.New("v is not exported")
+	}
 	err := impl.checkPropertyValue(propertyName, value)
 	if err != nil {
 		return err
@@ -278,6 +284,9 @@ func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]inte
 
 	exportInfo := v.GetDBusExportInfo()
 	impl := s.getImplementer(exportInfo)
+	if impl == nil {
+		return errors.New("v is not exported")
+	}
 	objPath := dbus.ObjectPath(exportInfo.Path)
 	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	var changedProps map[string]dbus.Variant
