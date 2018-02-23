@@ -42,20 +42,20 @@ func (g *Generator) printf(format string, args ...interface{}) (int, error) {
 	return fmt.Fprintf(&g.buf, format, args...)
 }
 
-const propsMuField = "PropsMu"
+const propsMasterField = "PropsMaster"
 
 func (g *Generator) generate() {
 	g.printf("package %s\n", g.pkg.name)
 
-	g.printf("import (\n")
+	if len(g.pkg.extraImports) > 0 {
+		g.printf("import (\n")
 
-	for _, imp := range g.pkg.extraImports {
-		g.printf(imp + "\n")
+		for _, imp := range g.pkg.extraImports {
+			g.printf(imp + "\n")
+		}
+		// end import
+		g.printf(")\n\n")
 	}
-	g.printf("\"pkg.deepin.io/lib/dbusutil\"\n")
-
-	// end import
-	g.printf(")\n\n")
 
 	for typ, props := range g.pkg.typePropMap {
 		for _, prop := range props {
@@ -66,10 +66,10 @@ func (g *Generator) generate() {
 				returnVarType = "(changed bool)"
 			}
 
-			g.printf("func (v *%s) setProp%s(service *dbusutil.Service, value %s) %s {\n",
+			g.printf("func (v *%s) setProp%s(value %s) %s {\n",
 				typ, prop.Name, prop.Type, returnVarType)
 
-			g.printf("v.%s.Lock()\n", propsMuField)
+			g.printf("v.%s.Lock()\n", propsMasterField)
 
 			switch prop.Equal {
 			case "nil":
@@ -92,25 +92,25 @@ func (g *Generator) generate() {
 				g.printf("}\n")
 			}
 
-			g.printf("v.%s.Unlock()\n", propsMuField)
+			g.printf("v.%s.Unlock()\n", propsMasterField)
 
 			if prop.Equal != "nil" {
-				g.printf("if service != nil && changed {\n")
-				g.printf("    service.EmitPropertyChanged(v, \"%s\", value)\n", prop.Name)
+				g.printf("if v.service != nil && changed {\n")
+				g.printf("    v.PropsMaster.NotifyChanged(v, v.service, \"%s\", value)\n", prop.Name)
 				g.printf("}\n")
 				g.printf("return\n")
 			} else {
-				g.printf("if service != nil {\n")
-				g.printf("    service.NotifyChange(v, \"%s\", value)\n", prop.Name)
+				g.printf("if v.service != nil {\n")
+				g.printf("    v.PropsMaster.NotifyChanged(v, v.service, \"%s\", value)\n", prop.Name)
 				g.printf("}\n")
 			}
 			g.printf("}\n\n")
 
 			// get property method
 			g.printf("func (v *%s) getProp%s() %s {\n", typ, prop.Name, prop.Type)
-			g.printf("    v.%s.RLock()\n", propsMuField)
+			g.printf("    v.%s.RLock()\n", propsMasterField)
 			g.printf("    value := v.%s\n", prop.Name)
-			g.printf("    v.%s.RUnlock()\n", propsMuField)
+			g.printf("    v.%s.RUnlock()\n", propsMasterField)
 			g.printf("    return value\n")
 			g.printf("}\n\n")
 		}
@@ -265,7 +265,7 @@ func getProps(fs *token.FileSet, structType *ast.StructType) []Property {
 			prevField = field
 			continue
 		}
-		if fieldName == propsMuField {
+		if fieldName == propsMasterField {
 			prevField = field
 			continue
 		}
@@ -296,7 +296,8 @@ func getProps(fs *token.FileSet, structType *ast.StructType) []Property {
 			log.Fatal(err)
 		}
 
-		if fieldType == "sync.RWMutex" && len(prevField.Names) == 1 {
+		if fieldType == "sync.RWMutex" && prevField != nil &&
+			len(prevField.Names) == 1 {
 			prevFieldName := prevField.Names[0].Name
 			if prevFieldName+"Mu" == fieldName {
 				// ignore this field and prev field

@@ -70,14 +70,14 @@ func (e emitType) String() string {
 
 // struct field prop
 type fieldProp struct {
-	name      string
-	rValue    reflect.Value
-	rType     reflect.Type
-	signature dbus.Signature
-	hasStruct bool
-	emit      emitType
-	access    accessType
-	valueMu   *sync.RWMutex
+	name        string
+	rValue      reflect.Value
+	rType       reflect.Type
+	signature   dbus.Signature
+	hasStruct   bool
+	emit        emitType
+	access      accessType
+	valueLocker propLocker
 
 	cbMu       sync.Mutex
 	writeCb    PropertyWriteCallback
@@ -94,8 +94,8 @@ func (p *fieldProp) getValue(propRead *PropertyRead) (value interface{}, err *db
 		}
 	}
 
-	if p.valueMu != nil {
-		p.valueMu.RLock()
+	if p.valueLocker != nil {
+		p.valueLocker.RLock()
 	}
 
 	value = p.rValue.Interface()
@@ -103,8 +103,8 @@ func (p *fieldProp) getValue(propRead *PropertyRead) (value interface{}, err *db
 		value, err = propValue.GetValue()
 	}
 
-	if p.valueMu != nil {
-		p.valueMu.RUnlock()
+	if p.valueLocker != nil {
+		p.valueLocker.RUnlock()
 	}
 	return
 }
@@ -126,8 +126,8 @@ func (p *fieldProp) SetValue(propWrite *PropertyWrite) (changed bool, err *dbus.
 		}
 	}
 
-	if p.valueMu != nil {
-		p.valueMu.Lock()
+	if p.valueLocker != nil {
+		p.valueLocker.Lock()
 	}
 
 	newVal := propWrite.Value
@@ -155,8 +155,8 @@ func (p *fieldProp) SetValue(propWrite *PropertyWrite) (changed bool, err *dbus.
 		}
 	}
 
-	if p.valueMu != nil {
-		p.valueMu.Unlock()
+	if p.valueLocker != nil {
+		p.valueLocker.Unlock()
 	}
 	return
 }
@@ -211,22 +211,23 @@ func (p *fieldProp) notifyChanged(change *PropertyChanged) {
 
 // emit DBus signal Properties.PropertiesChanged
 func (p *fieldProp) emitChanged(conn *dbus.Conn, path dbus.ObjectPath, interfaceName string,
-	value interface{}) {
+	value interface{}) (err error) {
 	const signal = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	var changedProps map[string]dbus.Variant
 	switch p.emit {
 	case emitFalse:
 		// do nothing
 	case emitInvalidates:
-		conn.Emit(path, signal, interfaceName, changedProps, []string{p.name})
+		err = conn.Emit(path, signal, interfaceName, changedProps, []string{p.name})
 	case emitTrue:
 		changedProps = map[string]dbus.Variant{
 			p.name: dbus.MakeVariant(value),
 		}
-		conn.Emit(path, signal, interfaceName, changedProps, []string{})
+		err = conn.Emit(path, signal, interfaceName, changedProps, []string{})
 	default:
 		panic("invalid value for emitType")
 	}
+	return
 }
 
 func getPropsIntrospection(props map[string]*fieldProp) []introspect.Property {
@@ -297,14 +298,14 @@ func getSignals(structType reflect.Type) []introspect.Signal {
 	return signals
 }
 
-const propsMuField = "PropsMu"
+const propsMasterField = "PropsMaster"
 
-func getPropsMutex(structValue reflect.Value) *sync.RWMutex {
-	propsMuValue := structValue.FieldByName(propsMuField)
-	if !propsMuValue.IsValid() {
+func getCorePropsLocker(structValue reflect.Value) propLocker {
+	propsMasterRV := structValue.FieldByName(propsMasterField)
+	if !propsMasterRV.IsValid() {
 		return nil
 	}
-	return propsMuValue.Addr().Interface().(*sync.RWMutex)
+	return propsMasterRV.Addr().Interface().(*PropsMaster)
 }
 
 func getStructTypeValue(m interface{}) (reflect.Type, reflect.Value) {
@@ -336,7 +337,7 @@ func getProps(impl *implementer, structType reflect.Type,
 		field := structType.Field(i)
 		fieldValue := structValue.Field(i)
 
-		if field.Name == propsMuField {
+		if field.Name == propsMasterField {
 			prevField = field
 			continue
 		}
@@ -358,7 +359,7 @@ func getProps(impl *implementer, structType reflect.Type,
 			mu, ok := fieldValue.Addr().Interface().(*sync.RWMutex)
 			if ok {
 				// override prev fieldProp.mu
-				props[prevField.Name].valueMu = mu
+				props[prevField.Name].valueLocker = mu
 			}
 
 			prevField = field
@@ -427,10 +428,10 @@ func newFieldProp(field reflect.StructField, fieldValue reflect.Value, tag strin
 		})
 
 		rType = propValue.GetType()
-		p.valueMu = nil
+		p.valueLocker = nil
 	} else {
 		rType = field.Type
-		p.valueMu = impl.corePropsMu
+		p.valueLocker = impl.corePropsLocker
 	}
 	p.rType = rType
 	p.signature = dbus.SignatureOfType(rType)
@@ -637,4 +638,134 @@ func valueFromBus(src interface{}, valueRT reflect.Type) (reflect.Value, error) 
 		return reflect.Value{}, err
 	}
 	return newValueRV.Elem(), nil
+}
+
+type propLocker interface {
+	sync.Locker
+	RLock()
+	RUnlock()
+}
+
+type PropsMaster struct {
+	sync.RWMutex
+
+	mu      sync.Mutex
+	idx     int
+	changes []propsMasterChanged
+}
+
+type propsMasterChanged struct {
+	name  string
+	value interface{}
+}
+
+func (pm *PropsMaster) index() int {
+	return pm.idx - 1
+}
+
+func (pm *PropsMaster) NotifyChanged(v Exportable, service *Service, propName string, value interface{}) error {
+	if service == nil {
+		return nil
+	}
+	exportInfo := v.GetDBusExportInfo()
+	impl := service.getImplementer(exportInfo)
+
+	if impl == nil {
+		return nil
+	}
+
+	pm.mu.Lock()
+	if pm.index() < 0 {
+		pm.mu.Unlock()
+
+		prop0 := impl.getProperty(propName)
+		if prop0 == nil {
+			return errors.New("not found property")
+		}
+		return prop0.emitChanged(service.conn, impl.path, impl.interfaceName, value)
+	}
+	pm.addChanged(propName, value)
+	pm.mu.Unlock()
+	return nil
+}
+
+func (pm *PropsMaster) addChanged(propName string, value interface{}) {
+	index := pm.index()
+	if index > len(pm.changes) {
+		panic("pm.index out of range")
+	}
+
+	c := propsMasterChanged{propName, value}
+	for i := 0; i < index; i++ {
+		change := pm.changes[i]
+		if change.name == propName {
+			pm.changes[i] = c
+			return
+		}
+	}
+	if index+1 <= len(pm.changes) {
+		pm.changes[index] = c
+	} else {
+		pm.changes = append(pm.changes, c)
+	}
+	pm.idx++
+}
+
+func (pm *PropsMaster) Begin() {
+	pm.mu.Lock()
+	if pm.index() == -1 {
+		pm.idx = 1
+	} else {
+		panic("pm.index != -1")
+	}
+	pm.mu.Unlock()
+}
+
+func (pm *PropsMaster) End(v Exportable, service *Service) (err error) {
+	pm.mu.Lock()
+	defer func() {
+		pm.idx = 0
+		pm.mu.Unlock()
+	}()
+
+	if service == nil {
+		return nil
+	}
+	exportInfo := v.GetDBusExportInfo()
+	path := dbus.ObjectPath(exportInfo.Path)
+	impl := service.getImplementer(exportInfo)
+	if impl == nil {
+		// v is not exported
+		return nil
+	}
+
+	index := pm.index()
+	if index < 0 || index > len(pm.changes) {
+		panic("pm.index out of range")
+	}
+
+	var changedProps map[string]dbus.Variant
+	var invalidatedProps []string
+	if index > 0 {
+		changedProps = make(map[string]dbus.Variant)
+	}
+	for i := 0; i < index; i++ {
+		change := pm.changes[i]
+		p := impl.props[change.name]
+		switch p.emit {
+		case emitFalse:
+			// do nothing
+		case emitInvalidates:
+			invalidatedProps = append(invalidatedProps, change.name)
+		case emitTrue:
+			changedProps[change.name] = dbus.MakeVariant(change.value)
+		}
+	}
+
+	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
+	if len(changedProps)+len(invalidatedProps) > 0 {
+		err = service.conn.Emit(path, signalName, exportInfo.Interface,
+			changedProps, invalidatedProps)
+	}
+	return
 }

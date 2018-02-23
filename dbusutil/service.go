@@ -73,8 +73,8 @@ func (s *Service) ReleaseName(name string) error {
 func (s *Service) Export(v Exportable) error {
 	exportInfo := v.GetDBusExportInfo()
 	log.Println("service.Export", exportInfo)
-	path := dbus.ObjectPath(exportInfo.Path)
-	if !path.IsValid() {
+	objPath := dbus.ObjectPath(exportInfo.Path)
+	if !objPath.IsValid() {
 		return errors.New("path is invalid")
 	}
 
@@ -85,24 +85,24 @@ func (s *Service) Export(v Exportable) error {
 
 	implementer := &implementer{
 		service:       s,
-		path:          path,
+		path:          objPath,
 		interfaceName: exportInfo.Interface,
 		core:          v,
 	}
 
-	implementer.corePropsMu = getPropsMutex(structValue)
+	implementer.corePropsLocker = getCorePropsLocker(structValue)
 	implementer.props = getProps(implementer, structType, structValue)
 	implementer.methods = getMethods(v, getMethodDetailMap(structType))
 	implementer.signals = getSignals(structType)
 
 	s.objectsMu.RLock()
-	obj, ok := s.objects[path]
+	obj, ok := s.objects[objPath]
 	s.objectsMu.RUnlock()
 	if !ok {
 		// path not exist
-		obj = newObject(path, s)
+		obj = newObject(objPath, s)
 
-		err := s.conn.Export(v, path, exportInfo.Interface)
+		err := s.conn.Export(v, objPath, exportInfo.Interface)
 		if err != nil {
 			return err
 		}
@@ -118,12 +118,12 @@ func (s *Service) Export(v Exportable) error {
 		}
 
 		s.objectsMu.Lock()
-		s.objects[path] = obj
-		s.addPath(path)
+		s.objects[objPath] = obj
+		s.addPath(objPath)
 		s.objectsMu.Unlock()
 	} else {
 
-		err := s.conn.Export(v, path, exportInfo.Interface)
+		err := s.conn.Export(v, objPath, exportInfo.Interface)
 		if err != nil {
 			return err
 		}
@@ -134,14 +134,14 @@ func (s *Service) Export(v Exportable) error {
 }
 
 func (s *Service) StopExport(exportInfo ExportInfo) error {
-	path := dbus.ObjectPath(exportInfo.Path)
+	objPath := dbus.ObjectPath(exportInfo.Path)
 
 	s.objectsMu.RLock()
-	obj, ok := s.objects[path]
+	obj, ok := s.objects[objPath]
 	s.objectsMu.RUnlock()
 	if ok {
 		if obj.hasImplementer(exportInfo.Interface) {
-			err := s.conn.Export(nil, path, exportInfo.Interface)
+			err := s.conn.Export(nil, objPath, exportInfo.Interface)
 			if err != nil {
 				return err
 			}
@@ -157,8 +157,8 @@ func (s *Service) StopExport(exportInfo ExportInfo) error {
 				return err
 			}
 			s.objectsMu.Lock()
-			delete(s.objects, path)
-			s.removePath(path)
+			delete(s.objects, objPath)
+			s.removePath(objPath)
 			s.objectsMu.Unlock()
 		}
 	}
@@ -166,10 +166,10 @@ func (s *Service) StopExport(exportInfo ExportInfo) error {
 }
 
 func (s *Service) IsExported(exportInfo ExportInfo) bool {
-	path := dbus.ObjectPath(exportInfo.Path)
+	objPath := dbus.ObjectPath(exportInfo.Path)
 
 	s.objectsMu.RLock()
-	obj, ok := s.objects[path]
+	obj, ok := s.objects[objPath]
 	s.objectsMu.RUnlock()
 	if ok {
 		if obj.hasImplementer(exportInfo.Interface) {
@@ -266,11 +266,11 @@ func (s *Service) EmitPropertyChanged(v Exportable, propertyName string, value i
 		return err
 	}
 
-	path := dbus.ObjectPath(exportInfo.Path)
+	objPath := dbus.ObjectPath(exportInfo.Path)
 	signalName := orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	propMap := make(map[string]dbus.Variant)
 	propMap[propertyName] = dbus.MakeVariant(value)
-	return s.conn.Emit(path, signalName, exportInfo.Interface, propMap, []string{})
+	return s.conn.Emit(objPath, signalName, exportInfo.Interface, propMap, []string{})
 }
 
 func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]interface{},
@@ -278,8 +278,8 @@ func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]inte
 
 	exportInfo := v.GetDBusExportInfo()
 	impl := s.getImplementer(exportInfo)
-	path := dbus.ObjectPath(exportInfo.Path)
-	signalName := orgFreedesktopDBus + ".Properties.PropertiesChanged"
+	objPath := dbus.ObjectPath(exportInfo.Path)
+	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	var changedProps map[string]dbus.Variant
 	if len(propValMap) > 0 {
 		changedProps = make(map[string]dbus.Variant)
@@ -301,7 +301,7 @@ func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]inte
 			return err
 		}
 	}
-	return s.conn.Emit(path, signalName, exportInfo.Interface, changedProps, invalidatedProps)
+	return s.conn.Emit(objPath, signalName, exportInfo.Interface, changedProps, invalidatedProps)
 }
 
 func (s *Service) Quit() {
@@ -423,9 +423,10 @@ func (s *Service) DumpProperties(v Exportable) (string, error) {
 
 	for propName, fieldProp := range impl.props {
 		fmt.Fprintln(&buf, "property name:", propName)
-		fmt.Fprintf(&buf, "mu: %p\n", fieldProp.valueMu)
-		if fieldProp.valueMu != nil {
-			fmt.Fprintln(&buf, "mu is PropsMu?", fieldProp.valueMu == impl.corePropsMu)
+		fmt.Fprintf(&buf, "valueLocker: %#v\n", fieldProp.valueLocker)
+		if fieldProp.valueLocker != nil {
+			fmt.Fprintln(&buf, "valueLocker is corePropsLocker?",
+				fieldProp.valueLocker == impl.corePropsLocker)
 		}
 
 		fmt.Fprintln(&buf, "signature:", fieldProp.signature)

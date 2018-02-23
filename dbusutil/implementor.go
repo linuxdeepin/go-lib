@@ -12,11 +12,11 @@ import (
 )
 
 type implementer struct {
-	service       *Service
-	path          dbus.ObjectPath
-	interfaceName string
-	core          Exportable
-	corePropsMu   *sync.RWMutex // it pointer to core.PropsMu
+	service         *Service
+	path            dbus.ObjectPath
+	interfaceName   string
+	core            Exportable
+	corePropsLocker propLocker // it pointer to core.PropsMaster
 
 	methods []introspect.Method
 	props   map[string]*fieldProp

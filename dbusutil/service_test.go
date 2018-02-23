@@ -297,9 +297,9 @@ func TestService_Emit(t *testing.T) {
 }
 
 type srvObject3 struct {
-	PropsMu sync.RWMutex
-	Prop1   string
-	Prop2   uint32
+	PropsMaster PropsMaster
+	Prop1       string
+	Prop2       uint32
 }
 
 func (*srvObject3) GetDBusExportInfo() ExportInfo {
@@ -394,9 +394,9 @@ func TestService_EmitPropertyChanged(t *testing.T) {
 }
 
 type srvObject4 struct {
-	PropsMu sync.RWMutex
-	Prop1   string
-	Prop2   uint32
+	PropsMaster PropsMaster
+	Prop1       string
+	Prop2       uint32
 }
 
 func (*srvObject4) GetDBusExportInfo() ExportInfo {
@@ -1250,7 +1250,7 @@ func TestService_StructProp(t *testing.T) {
 }
 
 type srvObject11 struct {
-	PropsMu sync.RWMutex
+	PropsMaster PropsMaster
 
 	Prop1 uint32
 	Prop2 uint64
@@ -1288,7 +1288,7 @@ func (srvObject11) GetDBusExportInfo() ExportInfo {
 	}
 }
 
-func TestService_PropsMutex(t *testing.T) {
+func TestService_DumpProperties(t *testing.T) {
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
