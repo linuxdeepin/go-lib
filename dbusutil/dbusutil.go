@@ -649,9 +649,10 @@ type propLocker interface {
 type PropsMaster struct {
 	sync.RWMutex
 
-	mu      sync.Mutex
-	idx     int
-	changes []propsMasterChanged
+	mu          sync.Mutex
+	delayModeMu sync.Mutex
+	idx         int
+	changes     []propsMasterChanged
 }
 
 type propsMasterChanged struct {
@@ -711,7 +712,9 @@ func (pm *PropsMaster) addChanged(propName string, value interface{}) {
 	pm.idx++
 }
 
+// Begin enter delay mode
 func (pm *PropsMaster) Begin() {
+	pm.delayModeMu.Lock()
 	pm.mu.Lock()
 	if pm.index() == -1 {
 		pm.idx = 1
@@ -721,11 +724,13 @@ func (pm *PropsMaster) Begin() {
 	pm.mu.Unlock()
 }
 
+// End quit delay mode
 func (pm *PropsMaster) End(v Exportable, service *Service) (err error) {
 	pm.mu.Lock()
 	defer func() {
 		pm.idx = 0
 		pm.mu.Unlock()
+		pm.delayModeMu.Unlock()
 	}()
 
 	if service == nil {
