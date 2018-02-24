@@ -2,7 +2,7 @@ package dbusutil
 
 import (
 	"errors"
-	"log"
+	"strings"
 	"sync"
 
 	"pkg.deepin.io/lib/dbus1"
@@ -119,7 +119,6 @@ type introspectableImplementer struct {
 	data       string
 	interfaces map[string]introspect.Interface
 	//              ^interfaceName
-	children strv.Strv // node name of children
 }
 
 var peerIntrospectData = introspect.Interface{
@@ -164,18 +163,42 @@ func (oi *introspectableImplementer) deleteImplementer(interfaceName string) {
 	oi.mu.Unlock()
 }
 
-func (oi *introspectableImplementer) addChild(child string) {
+func (oi *introspectableImplementer) clearCache() {
 	oi.mu.Lock()
-	oi.children, _ = oi.children.Add(child)
 	oi.data = ""
 	oi.mu.Unlock()
 }
 
-func (oi *introspectableImplementer) deleteChild(child string) {
-	oi.mu.Lock()
-	oi.children, _ = oi.children.Delete(child)
-	oi.data = ""
-	oi.mu.Unlock()
+func (oi *introspectableImplementer) getChildren() (children strv.Strv) {
+	var target string
+	if oi.path == "/" {
+		target = "/"
+	} else {
+		target = string(oi.path) + "/"
+	}
+	for objPath := range oi.service.objects {
+		if objPath == oi.path {
+			continue
+		}
+
+		if strings.HasPrefix(string(objPath), target) {
+			tail := string(objPath[len(target):])
+			idx := strings.Index(tail, "/")
+			var child string
+			if idx == -1 {
+				child = tail
+			} else {
+				child = tail[:idx]
+			}
+
+			if child == "" {
+				continue
+			} else {
+				children, _ = children.Add(child)
+			}
+		}
+	}
+	return
 }
 
 func (oi *introspectableImplementer) Introspect() (string, *dbus.Error) {
@@ -192,7 +215,7 @@ func (oi *introspectableImplementer) Introspect() (string, *dbus.Error) {
 		Interfaces: oi.getInterfaces(),
 	}
 
-	for _, child := range oi.children {
+	for _, child := range oi.getChildren() {
 		node.Children = append(node.Children, introspect.Node{Name: child})
 	}
 	oi.mu.RUnlock()
@@ -203,7 +226,6 @@ func (oi *introspectableImplementer) Introspect() (string, *dbus.Error) {
 	oi.mu.Lock()
 	oi.data = newData
 	oi.mu.Unlock()
-	log.Println("encoding xml", oi.path)
 	return newData, nil
 }
 

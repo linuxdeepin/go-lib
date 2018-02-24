@@ -184,10 +184,7 @@ func (s *Service) addPath(p dbus.ObjectPath) {
 		parentPath := dbus.ObjectPath(path.Dir(string(p)))
 		parentObj, ok := s.objects[parentPath]
 		if ok {
-			child := path.Base(string(p))
-			log.Println("parent", parentPath, "add child", child)
-			intro := parentObj.introspectableImpl
-			intro.addChild(child)
+			parentObj.introspectableImpl.clearCache()
 			break
 		}
 		p = parentPath
@@ -200,10 +197,7 @@ func (s *Service) removePath(p dbus.ObjectPath) {
 		parentObj, ok := s.objects[parentPath]
 		if ok {
 			if !s.pathInUse(p) {
-				child := path.Base(string(p))
-				intro := parentObj.introspectableImpl
-				log.Println("parent", parentPath, "delete child", child)
-				intro.deleteChild(child)
+				parentObj.introspectableImpl.clearCache()
 			}
 
 			break
@@ -213,8 +207,9 @@ func (s *Service) removePath(p dbus.ObjectPath) {
 }
 
 func (s *Service) pathInUse(p dbus.ObjectPath) bool {
+	target := string(p) + "/"
 	for p0 := range s.objects {
-		if strings.HasPrefix(string(p0), string(p)+"/") {
+		if strings.HasPrefix(string(p0), target) {
 			return true
 		}
 	}
