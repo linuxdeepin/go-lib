@@ -90,7 +90,7 @@ func (s *Service) Export(v Exportable) error {
 		core:          v,
 	}
 
-	implementer.corePropsLocker = getCorePropsLocker(structValue)
+	implementer.corePropsMu = getCorePropsMu(structValue)
 	implementer.props = getProps(implementer, structType, structValue)
 	implementer.methods = getMethods(v, getMethodDetailMap(structType))
 	implementer.signals = getSignals(structType)
@@ -262,16 +262,19 @@ func (s *Service) EmitPropertyChanged(v Exportable, propertyName string, value i
 	if impl == nil {
 		return errors.New("v is not exported")
 	}
-	err := impl.checkPropertyValue(propertyName, value)
-	if err != nil {
-		return err
-	}
+	return impl.emitPropChanged(propertyName, value)
+}
 
-	objPath := dbus.ObjectPath(exportInfo.Path)
-	signalName := orgFreedesktopDBus + ".Properties.PropertiesChanged"
-	propMap := make(map[string]dbus.Variant)
-	propMap[propertyName] = dbus.MakeVariant(value)
-	return s.conn.Emit(objPath, signalName, exportInfo.Interface, propMap, []string{})
+func (s *Service) DelayEmitPropertyChanged(v Exportable) func() error {
+	exportInfo := v.GetDBusExportInfo()
+	impl := s.getImplementer(exportInfo)
+	if impl == nil {
+		return nil
+	}
+	impl.delayEmitPropChanged()
+	return func() error {
+		return impl.stopDelayEmitPropChanged()
+	}
 }
 
 func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]interface{},
@@ -427,10 +430,10 @@ func (s *Service) DumpProperties(v Exportable) (string, error) {
 
 	for propName, fieldProp := range impl.props {
 		fmt.Fprintln(&buf, "property name:", propName)
-		fmt.Fprintf(&buf, "valueLocker: %#v\n", fieldProp.valueLocker)
-		if fieldProp.valueLocker != nil {
-			fmt.Fprintln(&buf, "valueLocker is corePropsLocker?",
-				fieldProp.valueLocker == impl.corePropsLocker)
+		fmt.Fprintf(&buf, "valueMu: %#v\n", fieldProp.valueMu)
+		if fieldProp.valueMu != nil {
+			fmt.Fprintln(&buf, "valueMu is corePropsMu?",
+				fieldProp.valueMu == impl.corePropsMu)
 		}
 
 		fmt.Fprintln(&buf, "signature:", fieldProp.signature)

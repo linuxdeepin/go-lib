@@ -42,7 +42,7 @@ func (g *Generator) printf(format string, args ...interface{}) (int, error) {
 	return fmt.Fprintf(&g.buf, format, args...)
 }
 
-const propsMasterField = "PropsMaster"
+const propsMuField = "PropsMu"
 
 func (g *Generator) generate() {
 	g.printf("package %s\n", g.pkg.name)
@@ -59,26 +59,25 @@ func (g *Generator) generate() {
 
 	for typ, props := range g.pkg.typePropMap {
 		for _, prop := range props {
-
 			// set property method
-			returnVarType := ""
-			if prop.Equal != "nil" {
-				returnVarType = "(changed bool)"
+			returnVarType := "(changed bool)"
+			if prop.Equal == "nil" {
+				returnVarType = ""
 			}
-
 			g.printf("func (v *%s) setProp%s(value %s) %s {\n",
 				typ, prop.Name, prop.Type, returnVarType)
-
-			g.printf("v.%s.Lock()\n", propsMasterField)
 
 			switch prop.Equal {
 			case "nil":
 				g.printf("v.%s = value\n", prop.Name)
+				g.printf("v.emitPropChanged%s(value)\n", prop.Name)
 			case "":
 				g.printf("if v.%s != value {\n", prop.Name)
-				g.printf("v.%s = value\n", prop.Name)
-				g.printf("changed = true\n")
+				g.printf("    v.%s = value\n", prop.Name)
+				g.printf("    v.emitPropChanged%s(value)\n", prop.Name)
+				g.printf("    return true\n")
 				g.printf("}\n")
+				g.printf("return false\n")
 			default:
 				expr := fmt.Sprintf("%s(v.%s, value)", prop.Equal, prop.Name)
 				if strings.HasPrefix(prop.Equal, "method:") {
@@ -87,31 +86,19 @@ func (g *Generator) generate() {
 				}
 
 				g.printf("if !%s {\n", expr)
-				g.printf("v.%s = value\n", prop.Name)
-				g.printf("changed = true\n")
+				g.printf("    v.%s = value\n", prop.Name)
+				g.printf("    v.emitPropChanged%s(value)\n", prop.Name)
+				g.printf("    return true\n")
 				g.printf("}\n")
-			}
-
-			g.printf("v.%s.Unlock()\n", propsMasterField)
-
-			if prop.Equal != "nil" {
-				g.printf("if v.service != nil && changed {\n")
-				g.printf("    v.PropsMaster.NotifyChanged(v, v.service, \"%s\", value)\n", prop.Name)
-				g.printf("}\n")
-				g.printf("return\n")
-			} else {
-				g.printf("if v.service != nil {\n")
-				g.printf("    v.PropsMaster.NotifyChanged(v, v.service, \"%s\", value)\n", prop.Name)
-				g.printf("}\n")
+				g.printf("return false\n")
 			}
 			g.printf("}\n\n")
 
-			// get property method
-			g.printf("func (v *%s) getProp%s() %s {\n", typ, prop.Name, prop.Type)
-			g.printf("    v.%s.RLock()\n", propsMasterField)
-			g.printf("    value := v.%s\n", prop.Name)
-			g.printf("    v.%s.RUnlock()\n", propsMasterField)
-			g.printf("    return value\n")
+			// method emitPropChangedXXX
+			g.printf("func(v *%s) emitPropChanged%s(value %s) error {\n",
+				typ, prop.Name, prop.Type)
+			g.printf("    return v.service.EmitPropertyChanged(v, \"%s\", value)\n",
+				prop.Name)
 			g.printf("}\n\n")
 		}
 	}
@@ -201,7 +188,6 @@ func main() {
 	flag.Parse()
 
 	types := strv.Strv(strings.Split(typeNames, ","))
-	//goFile := os.Getenv("GOFILE")
 	goPackage := os.Getenv("GOPACKAGE")
 
 	files := flag.Args()
@@ -265,7 +251,7 @@ func getProps(fs *token.FileSet, structType *ast.StructType) []Property {
 			prevField = field
 			continue
 		}
-		if fieldName == propsMasterField {
+		if fieldName == propsMuField {
 			prevField = field
 			continue
 		}

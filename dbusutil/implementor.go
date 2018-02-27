@@ -12,33 +12,28 @@ import (
 )
 
 type implementer struct {
-	service         *Service
-	path            dbus.ObjectPath
-	interfaceName   string
-	core            Exportable
-	corePropsLocker propLocker // it pointer to core.PropsMaster
+	service       *Service
+	path          dbus.ObjectPath
+	interfaceName string
+	core          Exportable
+	corePropsMu   *sync.RWMutex // it pointer to core.PropsMu
 
-	methods []introspect.Method
-	props   map[string]*fieldProp
-	propsMu sync.RWMutex
-
-	signals []introspect.Signal
+	methods     []introspect.Method
+	signals     []introspect.Signal
+	props       map[string]*fieldProp
+	propsMu     sync.RWMutex
+	propChanges *propChanges
 }
 
-func (impl *implementer) Service() *Service {
-	return impl.service
+type propChanges struct {
+	mu        sync.Mutex
+	delayMode bool
+	items     []implPropChanged
 }
 
-func (impl *implementer) Path() dbus.ObjectPath {
-	return impl.path
-}
-
-func (impl *implementer) Interface() string {
-	return impl.interfaceName
-}
-
-func (impl *implementer) Core() Exportable {
-	return impl.core
+type implPropChanged struct {
+	name  string
+	value interface{}
 }
 
 func (impl *implementer) setWriteCallback(propertyName string, cb PropertyWriteCallback) error {
@@ -66,15 +61,6 @@ func (impl *implementer) connectChanged(propertyName string, cb PropertyChangedC
 	}
 
 	prop0.connectChanged(cb)
-	return nil
-}
-
-func (impl *implementer) NotifyChanged(propertyName string, value interface{}) error {
-	prop0 := impl.getProperty(propertyName)
-	if prop0 == nil {
-		return errors.New("not found property")
-	}
-	impl.notifyChanged(prop0, value)
 	return nil
 }
 
@@ -110,6 +96,95 @@ func (impl *implementer) checkPropertyValue(name string, value interface{}) erro
 	}
 
 	return nil
+}
+
+func (impl *implementer) delayEmitPropChanged() {
+	impl.propsMu.Lock()
+	defer impl.propsMu.Unlock()
+
+	if impl.propChanges == nil {
+		impl.propChanges = &propChanges{}
+	}
+
+	impl.propChanges.mu.Lock()
+	impl.propChanges.delayMode = true
+}
+
+func (impl *implementer) emitPropChanged(propName string, value interface{}) (err error) {
+	impl.propsMu.Lock()
+	defer impl.propsMu.Unlock()
+
+	fieldProp, ok := impl.props[propName]
+	if !ok {
+		return errors.New("property not found")
+	}
+	if fieldProp.signature != dbus.SignatureOf(value) {
+		return errors.New("property signature not equal")
+	}
+
+	if impl.propChanges != nil && impl.propChanges.delayMode {
+		// in delay mode
+		items := impl.propChanges.items
+		found := false
+		for i := 0; i < len(items); i++ {
+			item := &items[i]
+			if item.name == propName {
+				item.value = value
+				found = true
+				break
+			}
+		}
+		if !found {
+			impl.propChanges.items = append(items, implPropChanged{
+				name:  propName,
+				value: value,
+			})
+		}
+
+	} else {
+		// not in delay mode
+		err = fieldProp.emitChanged(impl.service.conn, impl.path, impl.interfaceName, value)
+	}
+	return
+}
+
+func (impl *implementer) stopDelayEmitPropChanged() (err error) {
+	impl.propsMu.Lock()
+	defer impl.propsMu.Unlock()
+
+	if impl.propChanges == nil {
+		panic("failed to assert impl.propChanges != nil")
+	}
+
+	var changedProps map[string]dbus.Variant
+	var invalidatedProps []string
+	items := impl.propChanges.items
+	if len(items) > 0 {
+		changedProps = make(map[string]dbus.Variant)
+	}
+
+	for _, change := range items {
+		p := impl.props[change.name]
+		switch p.emit {
+		case emitFalse:
+			// do nothing
+		case emitInvalidates:
+			invalidatedProps = append(invalidatedProps, change.name)
+		case emitTrue:
+			changedProps[change.name] = dbus.MakeVariant(change.value)
+		}
+	}
+
+	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
+	if len(changedProps)+len(invalidatedProps) > 0 {
+		err = impl.service.conn.Emit(impl.path, signalName, impl.interfaceName,
+			changedProps, invalidatedProps)
+	}
+
+	impl.propChanges.items = nil
+	impl.propChanges.delayMode = false
+	impl.propChanges.mu.Unlock()
+	return
 }
 
 type introspectableImplementer struct {
