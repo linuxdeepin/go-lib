@@ -3,7 +3,6 @@ package dbusutil
 import (
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -420,9 +419,19 @@ func newFieldProp(field reflect.StructField, fieldValue reflect.Value, tag strin
 		emit:   emit,
 	}
 	var rType reflect.Type
-	propValue, ok := fieldValue.Interface().(Property)
-	if ok {
-		log.Printf("propValue %T %#v\n", propValue, propValue)
+
+	propValue, isProp := fieldValue.Interface().(Property)
+	if !isProp {
+		// try fieldValue.Addr
+		if field.Type.Kind() == reflect.Struct {
+			propValue, isProp = fieldValue.Addr().Interface().(Property)
+			if isProp {
+				p.rValue = fieldValue.Addr()
+			}
+		}
+	}
+
+	if isProp {
 		propValue.SetNotifyChangedFunc(func(val interface{}) {
 			impl.notifyChanged(p, val)
 		})
@@ -433,6 +442,7 @@ func newFieldProp(field reflect.StructField, fieldValue reflect.Value, tag strin
 		rType = field.Type
 		p.valueMu = impl.corePropsMu
 	}
+
 	p.rType = rType
 	p.signature = dbus.SignatureOfType(rType)
 	if strings.Contains(p.signature.String(), "(") {
