@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"path"
 	"strings"
 	"sync"
@@ -72,7 +71,7 @@ func (s *Service) ReleaseName(name string) error {
 
 func (s *Service) Export(v Exportable) error {
 	exportInfo := v.GetDBusExportInfo()
-	log.Println("service.Export", exportInfo)
+	logger.Println("service.Export", exportInfo)
 	objPath := dbus.ObjectPath(exportInfo.Path)
 	if !objPath.IsValid() {
 		return errors.New("path is invalid")
@@ -134,6 +133,7 @@ func (s *Service) Export(v Exportable) error {
 }
 
 func (s *Service) StopExport(exportInfo ExportInfo) error {
+	logger.Println("service.StopExport", exportInfo)
 	objPath := dbus.ObjectPath(exportInfo.Path)
 
 	s.objectsMu.RLock()
@@ -329,6 +329,7 @@ func (s *Service) Wait() {
 					s.hasCallMu.Lock()
 					hasCall := s.hasCall
 					s.hasCallMu.Unlock()
+					logger.Println("Service.Wait tick hasCall:", hasCall)
 
 					if !hasCall {
 						if s.canQuit == nil || s.canQuit() {

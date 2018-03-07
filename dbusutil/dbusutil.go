@@ -3,6 +3,9 @@ package dbusutil
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"reflect"
 	"strings"
 	"sync"
@@ -10,6 +13,17 @@ import (
 	"pkg.deepin.io/lib/dbus1"
 	"pkg.deepin.io/lib/dbus1/introspect"
 )
+
+var logger *log.Logger
+
+func init() {
+	// setup logger
+	logOut := ioutil.Discard
+	if os.Getenv("DEBUG_DBUSUTIL") == "1" {
+		logOut = os.Stderr
+	}
+	logger = log.New(logOut, "[dbusutil]", log.Lshortfile)
+}
 
 const orgFreedesktopDBus = "org.freedesktop.DBus"
 
