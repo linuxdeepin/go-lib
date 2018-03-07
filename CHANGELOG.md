@@ -1,5 +1,29 @@
 ## [Unreleased]
 
+## [1.2.5] - 2018-03-07
+*   feat(dbusutil): hide log output
+*   feat(dbusutil): allow field type pointer implements the Property interface
+*   feat(dbusutil): delay emit property changed
+*   doc: add document about dbusutil
+*   feat(dbusutil): improves object introspection
+*   fix(dbusutil): PropsMaster Begin and End
+*   fix(dbusutil): no check impl is nil
+*   feat(dbusutil): add PropsMaster
+*   fix(dbusutil): method RequestName panic
+*   feat(dbusutil) add method NameHasOwenr and GetNameOwner
+*   fix(dbusutil/gsprop): use path property to connect changed
+*   fix(dbusutil): auto quit
+*   fix(dbusutil): ToError panic if param err is nil
+*   feat: add lib dbusutil
+*   fix(encoding/kv): constants value wrong
+*   refactor: reduce global `success_cb` variable
+*   fix: protect global variable "sourceMeterCBs"
+*   chore: update license
+*   feat: lib dbus/property and proxy use new lib gsettings
+*   feat: add lib gsettings
+*   fix(dbus1): test SystemBus failed in build env
+*   add lib dbus1
+
 ## [1.2.4] - 2018-01-24
 *   fix Adapt lintian
 *   asound: add more types and functions
