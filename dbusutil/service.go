@@ -4,32 +4,37 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"path"
-	"strings"
+	"sort"
 	"sync"
 	"time"
+	"unsafe"
 
 	"pkg.deepin.io/lib/dbus1"
 	"pkg.deepin.io/lib/dbus1/introspect"
 )
 
 type Service struct {
-	conn      *dbus.Conn
-	objects   map[dbus.ObjectPath]*object
-	objectsMu sync.RWMutex
+	conn *dbus.Conn
+	mu   sync.RWMutex
 
-	hasCall   bool
-	hasCallMu sync.Mutex
+	hasCall bool
 
 	quit              chan struct{}
 	canQuit           func() bool
 	quitCheckInterval time.Duration
+
+	objMap        map[dbus.ObjectPath]*ServerObject
+	implStaticMap map[string]*implementerStatic
+	//                ^interface name
+	implObjMap map[unsafe.Pointer]*ServerObject
 }
 
 func NewService(conn *dbus.Conn) *Service {
 	return &Service{
-		conn:    conn,
-		objects: make(map[dbus.ObjectPath]*object),
+		conn:          conn,
+		objMap:        make(map[dbus.ObjectPath]*ServerObject),
+		implStaticMap: make(map[string]*implementerStatic),
+		implObjMap:    make(map[unsafe.Pointer]*ServerObject),
 	}
 }
 
@@ -69,176 +74,111 @@ func (s *Service) ReleaseName(name string) error {
 	return err
 }
 
-func (s *Service) Export(v Exportable) error {
-	exportInfo := v.GetDBusExportInfo()
-	logger.Println("service.Export", exportInfo)
-	objPath := dbus.ObjectPath(exportInfo.Path)
-	if !objPath.IsValid() {
-		return errors.New("path is invalid")
+func (s *Service) NewServerObject(path dbus.ObjectPath,
+	implementers ...Implementer) (*ServerObject, error) {
+
+	if !path.IsValid() {
+		return nil, errors.New("path invalid")
 	}
 
-	structType, structValue := getStructTypeValue(v)
-	if structType == nil {
-		return errors.New("v is not a struct pointer")
+	if len(implementers) == 0 {
+		return nil, errors.New("no implementer")
 	}
 
-	implementer := &implementer{
-		service:       s,
-		path:          objPath,
-		interfaceName: exportInfo.Interface,
-		core:          v,
-	}
+	implMap := make(map[string]Implementer)
+	implSlice := make([]*implementer, 0, len(implementers))
 
-	implementer.corePropsMu = getCorePropsMu(structValue)
-	implementer.props = getProps(implementer, structType, structValue)
-	implementer.methods = getMethods(v, getMethodDetailMap(structType))
-	implementer.signals = getSignals(structType)
-
-	s.objectsMu.RLock()
-	obj, ok := s.objects[objPath]
-	s.objectsMu.RUnlock()
-	if !ok {
-		// path not exist
-		obj = newObject(objPath, s)
-
-		err := s.conn.Export(v, objPath, exportInfo.Interface)
-		if err != nil {
-			return err
-		}
-
-		err = obj.exportProperties(s.conn)
-		if err != nil {
-			return err
-		}
-
-		err = obj.exportIntrospectable(s.conn)
-		if err != nil {
-			return err
-		}
-
-		s.objectsMu.Lock()
-		s.objects[objPath] = obj
-		s.addPath(objPath)
-		s.objectsMu.Unlock()
-	} else {
-
-		err := s.conn.Export(v, objPath, exportInfo.Interface)
-		if err != nil {
-			return err
-		}
-	}
-	obj.addImplementer(implementer)
-
-	return nil
-}
-
-func (s *Service) StopExport(exportInfo ExportInfo) error {
-	logger.Println("service.StopExport", exportInfo)
-	objPath := dbus.ObjectPath(exportInfo.Path)
-
-	s.objectsMu.RLock()
-	obj, ok := s.objects[objPath]
-	s.objectsMu.RUnlock()
-	if ok {
-		if obj.hasImplementer(exportInfo.Interface) {
-			err := s.conn.Export(nil, objPath, exportInfo.Interface)
-			if err != nil {
-				return err
-			}
-			obj.deleteImplementer(exportInfo.Interface)
-		}
-		if obj.numImplementer() == 0 {
-			err := obj.stopExportIntrospectable(s.conn)
-			if err != nil {
-				return err
-			}
-			err = obj.stopExportProperties(s.conn)
-			if err != nil {
-				return err
-			}
-			s.objectsMu.Lock()
-			delete(s.objects, objPath)
-			s.removePath(objPath)
-			s.objectsMu.Unlock()
-		}
-	}
-	return nil
-}
-
-func (s *Service) IsExported(exportInfo ExportInfo) bool {
-	objPath := dbus.ObjectPath(exportInfo.Path)
-
-	s.objectsMu.RLock()
-	obj, ok := s.objects[objPath]
-	s.objectsMu.RUnlock()
-	if ok {
-		if obj.hasImplementer(exportInfo.Interface) {
-			return true
-		}
-	}
-	return false
-}
-
-func (s *Service) addPath(p dbus.ObjectPath) {
-	for p != "/" {
-		parentPath := dbus.ObjectPath(path.Dir(string(p)))
-		parentObj, ok := s.objects[parentPath]
+	for _, implCore := range implementers {
+		ifcName := implCore.GetInterfaceName()
+		_, ok := implMap[ifcName]
 		if ok {
-			parentObj.introspectableImpl.clearCache()
-			break
+			return nil, errors.New("interface duplicated")
 		}
-		p = parentPath
-	}
-}
 
-func (s *Service) removePath(p dbus.ObjectPath) {
-	for p != "/" {
-		parentPath := dbus.ObjectPath(path.Dir(string(p)))
-		parentObj, ok := s.objects[parentPath]
-		if ok {
-			if !s.pathInUse(p) {
-				parentObj.introspectableImpl.clearCache()
-			}
-
-			break
+		impl, err := newImplementer(implCore, s, path)
+		if err != nil {
+			return nil, err
 		}
-		p = parentPath
+		implSlice = append(implSlice, impl)
+		implMap[ifcName] = implCore
 	}
+
+	obj := &ServerObject{
+		service:      s,
+		path:         path,
+		implementers: implSlice,
+	}
+
+	return obj, nil
 }
 
-func (s *Service) pathInUse(p dbus.ObjectPath) bool {
-	target := string(p) + "/"
-	for p0 := range s.objects {
-		if strings.HasPrefix(string(p0), target) {
-			return true
-		}
-	}
-	return false
+func (s *Service) GetServerObject(impl Implementer) *ServerObject {
+	ptr := getImplementerPointer(impl)
+	s.mu.RLock()
+	so := s.implObjMap[ptr]
+	s.mu.RUnlock()
+	return so
 }
 
-func (s *Service) getImplementer(exportInfo ExportInfo) *implementer {
-	s.objectsMu.RLock()
-	obj := s.objects[dbus.ObjectPath(exportInfo.Path)]
-	s.objectsMu.RUnlock()
-	if obj == nil {
-		return nil
-	}
-	return obj.getImplementer(exportInfo.Interface)
+func (s *Service) GetServerObjectByPath(path dbus.ObjectPath) *ServerObject {
+	s.mu.RLock()
+	so := s.objMap[path]
+	s.mu.RUnlock()
+	return so
 }
 
-func (s *Service) Emit(v Exportable, signalName string, values ...interface{}) error {
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
+func (s *Service) Export(path dbus.ObjectPath, implements ...Implementer) error {
+	so, err := s.NewServerObject(path, implements...)
+	if err != nil {
+		return err
+	}
+	return so.Export()
+}
+
+func (s *Service) StopExport(impl Implementer) error {
+	so := s.GetServerObject(impl)
+	if so == nil {
+		return errors.New("server object not found")
+	}
+	return so.StopExport()
+}
+
+func (s *Service) StopExportByPath(path dbus.ObjectPath) error {
+	so := s.GetServerObjectByPath(path)
+	if so == nil {
+		return errors.New("server object not found")
+	}
+	return so.StopExport()
+}
+
+func (s *Service) IsExported(impl Implementer) bool {
+	so := s.GetServerObject(impl)
+	return so != nil
+}
+
+func (s *Service) getImplementerStatic(impl Implementer) *implementerStatic {
+	ifcName := impl.GetInterfaceName()
+	s.mu.RLock()
+	implStatic := s.implStaticMap[ifcName]
+	s.mu.RUnlock()
+	return implStatic
+}
+
+func (s *Service) Emit(v Implementer, signalName string, values ...interface{}) error {
+	so := s.GetServerObject(v)
+	if so == nil {
 		return errors.New("v is not exported")
 	}
+	implStatic := s.getImplementerStatic(v)
+
 	var signal introspect.Signal
-	for _, sig := range impl.signals {
+	for _, sig := range implStatic.introspectInterface.Signals {
 		if sig.Name == signalName {
 			signal = sig
 			break
 		}
 	}
+
 	if signal.Name == "" {
 		return errors.New("not found signal")
 	}
@@ -252,47 +192,61 @@ func (s *Service) Emit(v Exportable, signalName string, values ...interface{}) e
 		}
 	}
 
-	return s.conn.Emit(dbus.ObjectPath(exportInfo.Path),
-		exportInfo.Interface+"."+signalName, values...)
+	return s.conn.Emit(so.path,
+		v.GetInterfaceName()+"."+signalName, values...)
 }
 
-func (s *Service) EmitPropertyChanged(v Exportable, propertyName string, value interface{}) error {
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
+func (s *Service) EmitPropertyChanged(v Implementer, propertyName string, value interface{}) error {
+	so := s.GetServerObject(v)
+	if so == nil {
 		return errors.New("v is not exported")
 	}
-	return impl.emitPropChanged(propertyName, value)
+
+	impl := so.getImplementer(v.GetInterfaceName())
+
+	implStatic := s.getImplementerStatic(v)
+
+	err := implStatic.checkPropertyValue(propertyName, value)
+	if err != nil {
+		return err
+	}
+
+	return impl.emitPropChanged(s, so.path, propertyName, value)
 }
 
-func (s *Service) DelayEmitPropertyChanged(v Exportable) func() error {
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
+func (s *Service) DelayEmitPropertyChanged(v Implementer) func() error {
+	so := s.GetServerObject(v)
+	if so == nil {
+		return nil
+	}
+
+	impl := so.getImplementer(v.GetInterfaceName())
 	if impl == nil {
 		return nil
 	}
+
 	impl.delayEmitPropChanged()
 	return func() error {
-		return impl.stopDelayEmitPropChanged()
+		return impl.stopDelayEmitPropChanged(s, so.path)
 	}
 }
 
-func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]interface{},
+func (s *Service) EmitPropertiesChanged(v Implementer, propValMap map[string]interface{},
 	invalidatedProps ...string) error {
-
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
+	so := s.GetServerObject(v)
+	if so == nil {
 		return errors.New("v is not exported")
 	}
-	objPath := dbus.ObjectPath(exportInfo.Path)
+
+	implStatic := s.getImplementerStatic(v)
+
 	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	var changedProps map[string]dbus.Variant
 	if len(propValMap) > 0 {
 		changedProps = make(map[string]dbus.Variant)
 	}
 	for propName, val := range propValMap {
-		err := impl.checkPropertyValue(propName, val)
+		err := implStatic.checkPropertyValue(propName, val)
 		if err != nil {
 			return err
 		}
@@ -303,12 +257,12 @@ func (s *Service) EmitPropertiesChanged(v Exportable, propValMap map[string]inte
 			return errors.New("property appears in both propValMap and invalidateProps")
 		}
 
-		err := impl.checkProperty(propName)
+		err := implStatic.checkProperty(propName)
 		if err != nil {
 			return err
 		}
 	}
-	return s.conn.Emit(objPath, signalName, exportInfo.Interface, changedProps, invalidatedProps)
+	return s.conn.Emit(so.path, signalName, v.GetInterfaceName(), changedProps, invalidatedProps)
 }
 
 func (s *Service) Quit() {
@@ -326,9 +280,9 @@ func (s *Service) Wait() {
 				case <-s.quit:
 					return
 				case <-ticker.C:
-					s.hasCallMu.Lock()
+					s.mu.RLock()
 					hasCall := s.hasCall
-					s.hasCallMu.Unlock()
+					s.mu.RUnlock()
 					logger.Println("Service.Wait tick hasCall:", hasCall)
 
 					if !hasCall {
@@ -337,9 +291,9 @@ func (s *Service) Wait() {
 							return
 						}
 					} else {
-						s.hasCallMu.Lock()
+						s.mu.Lock()
 						s.hasCall = false
-						s.hasCallMu.Unlock()
+						s.mu.Unlock()
 					}
 				}
 			}
@@ -349,50 +303,14 @@ func (s *Service) Wait() {
 }
 
 func (s *Service) DelayAutoQuit() {
-	s.hasCallMu.Lock()
+	s.mu.Lock()
 	s.hasCall = true
-	s.hasCallMu.Unlock()
+	s.mu.Unlock()
 }
 
 func (s *Service) SetAutoQuitHandler(interval time.Duration, canQuit func() bool) {
 	s.quitCheckInterval = interval
 	s.canQuit = canQuit
-}
-
-func (s *Service) SetWriteCallback(v Exportable, propertyName string,
-	cb PropertyWriteCallback) error {
-
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
-		return errors.New("not exported")
-	}
-
-	return impl.setWriteCallback(propertyName, cb)
-}
-
-func (s *Service) SetReadCallback(v Exportable, propertyName string,
-	cb PropertyReadCallback) error {
-
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
-		return errors.New("not exported")
-	}
-
-	return impl.setReadCallback(propertyName, cb)
-}
-
-func (s *Service) ConnectChanged(v Exportable, propertyName string,
-	cb PropertyChangedCallback) error {
-
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
-		return errors.New("not exported")
-	}
-
-	return impl.connectChanged(propertyName, cb)
 }
 
 func (s *Service) GetConnPID(name string) (pid uint32, err error) {
@@ -419,31 +337,35 @@ func (s *Service) NameHasOwner(name string) (hasOwner bool, err error) {
 	return
 }
 
-func (s *Service) DumpProperties(v Exportable) (string, error) {
-	exportInfo := v.GetDBusExportInfo()
-	impl := s.getImplementer(exportInfo)
-	if impl == nil {
+func (s *Service) DumpProperties(v Implementer) (string, error) {
+	so := s.GetServerObject(v)
+	if so == nil {
 		return "", errors.New("not exported")
 	}
 
+	impl := so.getImplementer(v.GetInterfaceName())
+	implStatic := impl.getStatic(s)
+
 	var buf bytes.Buffer
-	impl.propsMu.RLock()
 
-	for propName, fieldProp := range impl.props {
-		fmt.Fprintln(&buf, "property name:", propName)
-		fmt.Fprintf(&buf, "valueMu: %#v\n", fieldProp.valueMu)
-		if fieldProp.valueMu != nil {
-			fmt.Fprintln(&buf, "valueMu is corePropsMu?",
-				fieldProp.valueMu == impl.corePropsMu)
-		}
+	var propNames []string
+	for name := range impl.props {
+		propNames = append(propNames, name)
+	}
+	sort.Strings(propNames)
 
-		fmt.Fprintln(&buf, "signature:", fieldProp.signature)
-		fmt.Fprintln(&buf, "access:", fieldProp.access)
-		fmt.Fprintln(&buf, "emit:", fieldProp.emit)
+	for _, name := range propNames {
+		p := impl.props[name]
+		fmt.Fprintln(&buf, "property name:", name)
+		fmt.Fprintf(&buf, "valueMu: %p\n", p.valueMu)
+
+		propStatic := implStatic.props[name]
+		fmt.Fprintln(&buf, "signature:", propStatic.signature)
+		fmt.Fprintln(&buf, "access:", propStatic.access)
+		fmt.Fprintln(&buf, "emit:", propStatic.emit)
+
 		buf.WriteString("\n")
 	}
-
-	impl.propsMu.RUnlock()
 
 	return buf.String(), nil
 }

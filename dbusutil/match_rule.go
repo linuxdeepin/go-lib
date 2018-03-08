@@ -94,18 +94,18 @@ func (b *MatchRuleBuilder) ArgNamespace(idx int, namespace string) *MatchRuleBui
 	return b
 }
 
-func (b *MatchRuleBuilder) ExtPropertiesChanged(exportInfo ExportInfo) *MatchRuleBuilder {
+func (b *MatchRuleBuilder) ExtPropertiesChanged(path, interfaceName string) *MatchRuleBuilder {
 	return b.Type("signal").
-		Path(string(exportInfo.Path)).
+		Path(path).
 		Interface(orgFreedesktopDBus+".Properties").
 		Member("PropertiesChanged").
-		ArgNamespace(0, exportInfo.Interface)
+		ArgNamespace(0, interfaceName)
 }
 
-func (b *MatchRuleBuilder) ExtSignal(exportInfo ExportInfo, name string) *MatchRuleBuilder {
+func (b *MatchRuleBuilder) ExtSignal(path, interfaceName, name string) *MatchRuleBuilder {
 	return b.Type("signal").
-		Path(string(exportInfo.Path)).
-		Interface(exportInfo.Interface).
+		Path(path).
+		Interface(interfaceName).
 		Member(name)
 }
 

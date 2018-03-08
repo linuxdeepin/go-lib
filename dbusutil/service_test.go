@@ -17,13 +17,12 @@ func TestService_GetNameOwner(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
-	ofdb := "org.freedesktop.DBus"
-	owner, err := service.GetNameOwner(ofdb)
+	owner, err := service.GetNameOwner(orgFreedesktopDBus)
 	if err != nil {
 		t.Error("Unexpected error calling GetNameOwner:", err)
 	}
-	if owner != ofdb {
-		t.Errorf("expected owner %q got %q", ofdb, owner)
+	if owner != orgFreedesktopDBus {
+		t.Errorf("expected owner %q got %q", orgFreedesktopDBus, owner)
 	}
 
 	_, err = service.GetNameOwner("xxx.yyy.zzz.123")
@@ -37,8 +36,7 @@ func TestService_NameHasOwner(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
-	ofdb := "org.freedesktop.DBus"
-	hasOwner, err := service.NameHasOwner(ofdb)
+	hasOwner, err := service.NameHasOwner(orgFreedesktopDBus)
 	if err != nil {
 		t.Error("Unexpected error calling NameHasOwner:", err)
 	}
@@ -79,11 +77,8 @@ type srvObject1 struct {
 	}
 }
 
-func (*srvObject1) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object1",
-		Interface: "com.deepin.lib.Object1",
-	}
+func (*srvObject1) GetInterfaceName() string {
+	return "com.deepin.lib.Object1"
 }
 
 func (*srvObject1) Method1() (int, *dbus.Error) {
@@ -92,20 +87,14 @@ func (*srvObject1) Method1() (int, *dbus.Error) {
 
 type srvObject12 struct{}
 
-func (srvObject12) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object12",
-		Interface: "com.deepin.lib.Object12",
-	}
+func (srvObject12) GetInterfaceName() string {
+	return "com.deepin.lib.Object12"
 }
 
 type srvString string
 
-func (srvString) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/String",
-		Interface: "com.deepin.lib.String",
-	}
+func (srvString) GetInterfaceName() string {
+	return "com.deepin.lib.String"
 }
 
 func TestService_Export(t *testing.T) {
@@ -114,7 +103,7 @@ func TestService_Export(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj1 := &srvObject1{}
-	err = service.Export(srvObj1)
+	err = service.Export("/com/deepin/lib/Object1", srvObj1)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj1:", err)
 	}
@@ -135,24 +124,24 @@ func TestService_Export(t *testing.T) {
 		t.Errorf("expect 1 but got %d", num)
 	}
 
-	if !service.IsExported(srvObj1.GetDBusExportInfo()) {
+	if !service.IsExported(srvObj1) {
 		t.Error("IsExported expected true")
 	}
 
-	service.StopExport(srvObj1.GetDBusExportInfo())
+	service.StopExport(srvObj1)
 
-	if service.IsExported(srvObj1.GetDBusExportInfo()) {
+	if service.IsExported(srvObj1) {
 		t.Error("IsExported expected false")
 	}
 
 	srvObj12 := srvObject12{}
-	err = service.Export(srvObj12)
+	err = service.Export("/com/deepin/lib/Object12", srvObj12)
 	if err == nil {
 		t.Error("Expected error due to srvObj12 is not a struct pointer")
 	}
 
 	srvStr := srvString("hello")
-	err = service.Export(srvStr)
+	err = service.Export("/com/deepin/lib/String", srvStr)
 	if err == nil {
 		t.Error("Expected error due to srvStr is not a struct pointer")
 	}
@@ -168,11 +157,8 @@ type srvObject2 struct {
 	}
 }
 
-func (*srvObject2) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object2",
-		Interface: "com.deepin.lib.Object2",
-	}
+func (*srvObject2) GetInterfaceName() string {
+	return "com.deepin.lib.Object2"
 }
 
 func processSignal(conn *dbus.Conn, fn func(signal *dbus.Signal) bool) {
@@ -195,14 +181,15 @@ func TestService_Emit(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj2 := &srvObject2{}
-	err = service.Export(srvObj2)
+	const srvObj2Path = "/com/deepin/lib/Object2"
+	err = service.Export(srvObj2Path, srvObj2)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj2:", err)
 	}
 
 	// Test Signal1
 	// rule for watch Signal1
-	ruleSig1 := NewMatchRuleBuilder().ExtSignal(srvObj2.GetDBusExportInfo(), "Signal1").Build()
+	ruleSig1 := NewMatchRuleBuilder().ExtSignal(srvObj2Path, srvObj2.GetInterfaceName(), "Signal1").Build()
 	err = ruleSig1.AddTo(service.conn)
 	if err != nil {
 		t.Error("unaxpected error adding match rule:", err)
@@ -241,7 +228,7 @@ func TestService_Emit(t *testing.T) {
 
 	// Test Signal2
 	// rule for watch Signal2
-	ruleSig2 := NewMatchRuleBuilder().ExtSignal(srvObj2.GetDBusExportInfo(), "Signal2").Build()
+	ruleSig2 := NewMatchRuleBuilder().ExtSignal(srvObj2Path, srvObj2.GetInterfaceName(), "Signal2").Build()
 	err = ruleSig2.AddTo(service.conn)
 	if err != nil {
 		t.Error("unaxpected error adding match rule:", err)
@@ -302,11 +289,8 @@ type srvObject3 struct {
 	Prop2   uint32
 }
 
-func (*srvObject3) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object3",
-		Interface: "com.deepin.lib.Object3",
-	}
+func (*srvObject3) GetInterfaceName() string {
+	return "com.deepin.lib.Object3"
 }
 
 var serviceEmitPropertyChangedTests = []struct {
@@ -337,13 +321,15 @@ func TestService_EmitPropertyChanged(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj3 := &srvObject3{}
-	err = service.Export(srvObj3)
+	const srvObj3Path = "/com/deepin/lib/Object3"
+	err = service.Export(srvObj3Path, srvObj3)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj3:", err)
 	}
 
 	// rule for watch PropertiesChanged signal
-	rule := NewMatchRuleBuilder().ExtPropertiesChanged(srvObj3.GetDBusExportInfo()).Build()
+	rule := NewMatchRuleBuilder().ExtPropertiesChanged(srvObj3Path,
+		srvObj3.GetInterfaceName()).Build()
 	err = rule.AddTo(service.conn)
 	if err != nil {
 		t.Error("Unexpected error adding match rule:", err)
@@ -399,11 +385,8 @@ type srvObject4 struct {
 	Prop2   uint32
 }
 
-func (*srvObject4) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object4",
-		Interface: "com.deepin.lib.Object4",
-	}
+func (*srvObject4) GetInterfaceName() string {
+	return "com.deepin.lib.Object4"
 }
 
 var serviceEmitPropertiesChangedTest = []struct {
@@ -480,7 +463,7 @@ func TestService_EmitPropertiesChanged(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj4 := &srvObject4{}
-	err = service.Export(srvObj4)
+	err = service.Export("/com/deepin/lib/Object4", srvObj4)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj4:", err)
 	}
@@ -504,11 +487,8 @@ type srvObject5 struct {
 	s *Service
 }
 
-func (*srvObject5) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object5",
-		Interface: "com.deepin.lib.Object5",
-	}
+func (*srvObject5) GetInterfaceName() string {
+	return "com.deepin.lib.Object5"
 }
 
 func (obj *srvObject5) Method1() *dbus.Error {
@@ -537,7 +517,7 @@ func TestService_AutoQuit(t *testing.T) {
 	srvObj5 := &srvObject5{
 		s: service,
 	}
-	err = service.Export(srvObj5)
+	err = service.Export("/com/deepin/lib/Object5", srvObj5)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj5:", err)
 	}
@@ -611,11 +591,8 @@ type srvObject6 struct {
 	prop1ReadCount int
 }
 
-func (*srvObject6) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object6",
-		Interface: "com.deepin.lib.Object6",
-	}
+func (*srvObject6) GetInterfaceName() string {
+	return "com.deepin.lib.Object6"
 }
 
 func TestService_SetReadCallback(t *testing.T) {
@@ -628,12 +605,12 @@ func TestService_SetReadCallback(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	err = service.Export(srvObj6)
+	serverObject6, err := service.NewServerObject("/com/deepin/lib/Object6", srvObj6)
 	if err != nil {
-		t.Error("Unexpected error exporting srvObj6:", err)
+		t.Error("Unexpected error:", err)
 	}
 
-	err = service.SetReadCallback(srvObj6, "Prop1",
+	err = serverObject6.SetReadCallback(srvObj6, "Prop1",
 		func(read *PropertyRead) *dbus.Error {
 			srvObj6.prop1ReadCount++
 			return nil
@@ -641,6 +618,11 @@ func TestService_SetReadCallback(t *testing.T) {
 
 	if err != nil {
 		t.Error("Unexpected error set read callabck for Prop1:", err)
+	}
+
+	err = serverObject6.Export()
+	if err != nil {
+		t.Error("Unexpected error exporting srvObj6:", err)
 	}
 
 	err = service.RequestName("com.deepin.lib.Object6")
@@ -670,7 +652,7 @@ func TestService_SetReadCallback(t *testing.T) {
 		t.Errorf("prop1ReadCount expected 1, got %d", srvObj6.prop1ReadCount)
 	}
 
-	err = service.SetReadCallback(srvObj6, "Prop1",
+	err = serverObject6.SetReadCallback(srvObj6, "Prop1",
 		func(read *PropertyRead) *dbus.Error {
 			srvObj6.prop1ReadCount++
 			return dbus.MakeFailedError(errors.New("xxx err msg"))
@@ -691,11 +673,8 @@ type srvObject7 struct {
 	prop1WriteCount int
 }
 
-func (*srvObject7) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object7",
-		Interface: "com.deepin.lib.Object7",
-	}
+func (*srvObject7) GetInterfaceName() string {
+	return "com.deepin.lib.Object7"
 }
 
 func TestService_SetWriteCallback(t *testing.T) {
@@ -708,12 +687,12 @@ func TestService_SetWriteCallback(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	err = service.Export(srvObj7)
+	serverObject7, err := service.NewServerObject("/com/deepin/lib/Object7", srvObj7)
 	if err != nil {
-		t.Error("Unexpected error exporting srvObj7:", err)
+		t.Error("Unexpected error:", err)
 	}
 
-	err = service.SetWriteCallback(srvObj7, "Prop1",
+	err = serverObject7.SetWriteCallback(srvObj7, "Prop1",
 		func(write *PropertyWrite) *dbus.Error {
 			srvObj7.prop1WriteCount++
 			return nil
@@ -721,6 +700,11 @@ func TestService_SetWriteCallback(t *testing.T) {
 
 	if err != nil {
 		t.Error("Unexpected error set write callabck for Prop1:", err)
+	}
+
+	err = serverObject7.Export()
+	if err != nil {
+		t.Error("Unexpected error exporting srvObj7:", err)
 	}
 
 	err = service.RequestName("com.deepin.lib.Object7")
@@ -744,7 +728,7 @@ func TestService_SetWriteCallback(t *testing.T) {
 		t.Errorf("prop1 expected %q, got %q", "orange", srvObj7.Prop1)
 	}
 
-	err = service.SetWriteCallback(srvObj7, "Prop1",
+	err = serverObject7.SetWriteCallback(srvObj7, "Prop1",
 		func(write *PropertyWrite) *dbus.Error {
 			srvObj7.prop1WriteCount++
 			return dbus.MakeFailedError(errors.New("xxx err msg"))
@@ -776,11 +760,8 @@ type srvObject8 struct {
 	changedCountB int
 }
 
-func (*srvObject8) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object8",
-		Interface: "com.deepin.lib.Object8",
-	}
+func (*srvObject8) GetInterfaceName() string {
+	return "com.deepin.lib.Object8"
 }
 
 func TestService_ConnectChanged(t *testing.T) {
@@ -793,22 +774,32 @@ func TestService_ConnectChanged(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	err = service.Export(srvObj8)
+	serverObject8, err := service.NewServerObject("/com/deepin/lib/Object8", srvObj8)
 	if err != nil {
-		t.Error("Unexpected error exporting srvObj8:", err)
+		t.Error("Unexpected error:", err)
 	}
 
-	err = service.ConnectChanged(srvObj8, "Prop1",
+	err = serverObject8.ConnectChanged(srvObj8, "Prop1",
 		func(change *PropertyChanged) {
 			srvObj8.changedCountA++
 		})
-	err = service.ConnectChanged(srvObj8, "Prop1",
+
+	if err != nil {
+		t.Error("Unexpected error set write callabck for Prop1:", err)
+	}
+
+	err = serverObject8.ConnectChanged(srvObj8, "Prop1",
 		func(change *PropertyChanged) {
 			srvObj8.changedCountB += 2
 		})
 
 	if err != nil {
 		t.Error("Unexpected error set write callabck for Prop1:", err)
+	}
+
+	err = serverObject8.Export()
+	if err != nil {
+		t.Error("Unexpected error exporting srvObj8:", err)
 	}
 
 	err = service.RequestName("com.deepin.lib.Object8")
@@ -862,11 +853,8 @@ type srvObject9 struct {
 	Prop6 int32 `prop:"access:rw,emit:false"`
 }
 
-func (*srvObject9) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object9",
-		Interface: "com.deepin.lib.Object9",
-	}
+func (*srvObject9) GetInterfaceName() string {
+	return "com.deepin.lib.Object9"
 }
 
 func TestService_PropTag(t *testing.T) {
@@ -881,8 +869,9 @@ func TestService_PropTag(t *testing.T) {
 		Prop2: 2,
 		Prop3: 3,
 	}
+	const srvObj9Path = "/com/deepin/lib/Object9"
 
-	err = service.Export(srvObj9)
+	err = service.Export(srvObj9Path, srvObj9)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj9:", err)
 	}
@@ -963,7 +952,7 @@ func TestService_PropTag(t *testing.T) {
 	}
 
 	// rule for watch PropertiesChanged signal
-	rulePC := NewMatchRuleBuilder().ExtPropertiesChanged(srvObj9.GetDBusExportInfo()).Build()
+	rulePC := NewMatchRuleBuilder().ExtPropertiesChanged(srvObj9Path, srvObj9.GetInterfaceName()).Build()
 	rulePC.AddTo(service.conn)
 	// Test Prop4 emit: true
 
@@ -1113,11 +1102,8 @@ type srvObject10 struct {
 	prop4ChangedCount int
 }
 
-func (*srvObject10) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object10",
-		Interface: "com.deepin.lib.Object10",
-	}
+func (*srvObject10) GetInterfaceName() string {
+	return "com.deepin.lib.Object10"
 }
 
 func TestService_StructProp(t *testing.T) {
@@ -1130,26 +1116,28 @@ func TestService_StructProp(t *testing.T) {
 		Prop1: rect{1, 2, 3, 4},
 	}
 
-	err = service.Export(srvObj10)
-	if err != nil {
-		t.Error("Unexpected error exporting srvObj10:", err)
-	}
+	serverObject10, err := service.NewServerObject("/com/deepin/lib/Object10", srvObj10)
 
-	service.ConnectChanged(srvObj10, "Prop1", func(change *PropertyChanged) {
+	serverObject10.ConnectChanged(srvObj10, "Prop1", func(change *PropertyChanged) {
 		srvObj10.prop1ChangedCount++
 	})
 
-	service.ConnectChanged(srvObj10, "Prop2", func(change *PropertyChanged) {
+	serverObject10.ConnectChanged(srvObj10, "Prop2", func(change *PropertyChanged) {
 		srvObj10.prop2ChangedCount++
 	})
 
-	service.ConnectChanged(srvObj10, "Prop3", func(change *PropertyChanged) {
+	serverObject10.ConnectChanged(srvObj10, "Prop3", func(change *PropertyChanged) {
 		srvObj10.prop3ChangedCount++
 	})
 
-	service.ConnectChanged(srvObj10, "Prop4", func(change *PropertyChanged) {
+	serverObject10.ConnectChanged(srvObj10, "Prop4", func(change *PropertyChanged) {
 		srvObj10.prop4ChangedCount++
 	})
+
+	err = serverObject10.Export()
+	if err != nil {
+		t.Error("Unexpected error exporting srvObj10:", err)
+	}
 
 	service.RequestName("com.deepin.lib.Object10")
 	if err != nil {
@@ -1262,6 +1250,10 @@ type srvObject11 struct {
 	Prop5 *customProperty
 }
 
+func (*srvObject11) GetInterfaceName() string {
+	return "com.deepin.lib.Object11"
+}
+
 type customProperty struct {
 	value int32
 }
@@ -1281,13 +1273,6 @@ func (cp *customProperty) GetType() reflect.Type {
 	return reflect.TypeOf(cp.value)
 }
 
-func (srvObject11) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object11",
-		Interface: "com.deepin.lib.Object11",
-	}
-}
-
 func TestService_DumpProperties(t *testing.T) {
 	service, err := NewSessionService()
 	if err != nil {
@@ -1297,7 +1282,7 @@ func TestService_DumpProperties(t *testing.T) {
 	srvObj11 := &srvObject11{
 		Prop5: &customProperty{5},
 	}
-	err = service.Export(srvObj11)
+	err = service.Export("/com/deepin/lib/Object11", srvObj11)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj11:", err)
 	}
@@ -1306,6 +1291,8 @@ func TestService_DumpProperties(t *testing.T) {
 		t.Error("Unexpected error dumping properties info:", err)
 	}
 	t.Log(propsInfo)
+	t.Logf("PropsMu: %p", &srvObj11.PropsMu)
+	t.Logf("Prop4Mu: %p", &srvObj11.Prop4Mu)
 }
 
 type integers struct {
@@ -1324,11 +1311,8 @@ type srvObject13 struct {
 	prop3ChangedCount int
 }
 
-func (*srvObject13) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/com/deepin/lib/Object13",
-		Interface: "com.deepin.lib.Object13",
-	}
+func (*srvObject13) GetInterfaceName() string {
+	return "com.deepin.lib.Object13"
 }
 
 func TestService_IntUintProp(t *testing.T) {
@@ -1343,22 +1327,27 @@ func TestService_IntUintProp(t *testing.T) {
 		Prop3: integers{3, 4},
 	}
 
-	err = service.Export(srvObj13)
+	serverObject13, err := service.NewServerObject("/com/deepin/lib/Object13", srvObj13)
 	if err != nil {
-		t.Error("Unexpected error exporting srvObj13:", err)
+		t.Error("Unexpected error:", err)
 	}
 
-	service.ConnectChanged(srvObj13, "Prop1", func(change *PropertyChanged) {
+	serverObject13.ConnectChanged(srvObj13, "Prop1", func(change *PropertyChanged) {
 		srvObj13.prop1ChangedCount++
 	})
 
-	service.ConnectChanged(srvObj13, "Prop2", func(change *PropertyChanged) {
+	serverObject13.ConnectChanged(srvObj13, "Prop2", func(change *PropertyChanged) {
 		srvObj13.prop2ChangedCount++
 	})
 
-	service.ConnectChanged(srvObj13, "Prop3", func(change *PropertyChanged) {
+	serverObject13.ConnectChanged(srvObj13, "Prop3", func(change *PropertyChanged) {
 		srvObj13.prop3ChangedCount++
 	})
+
+	err = serverObject13.Export()
+	if err != nil {
+		t.Error("Unexpected error exporting srvObj13:", err)
+	}
 
 	service.RequestName("com.deepin.lib.Object13")
 	if err != nil {

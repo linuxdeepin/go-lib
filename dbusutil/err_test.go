@@ -7,18 +7,15 @@ import (
 	"pkg.deepin.io/lib/dbus1"
 )
 
-type exportable1 struct {
+type impl1 struct {
 }
 
-func (*exportable1) GetDBusExportInfo() ExportInfo {
-	return ExportInfo{
-		Path:      "/",
-		Interface: "com.deepin.lib.Exportable1",
-	}
+func (*impl1) GetInterfaceName() string {
+	return "com.deepin.lib.Exportable1"
 }
 
 func TestMakeError(t *testing.T) {
-	err := MakeError(&exportable1{}, "Err1", "abc", 123)
+	err := MakeError(&impl1{}, "Err1", "abc", 123)
 	expectedErr := &dbus.Error{
 		Name: "com.deepin.lib.Exportable1.Error.Err1",
 		Body: []interface{}{"abc123"},
@@ -29,7 +26,7 @@ func TestMakeError(t *testing.T) {
 }
 
 func TestMakeErrorf(t *testing.T) {
-	err := MakeErrorf(&exportable1{}, "Err2", "name: %s, num: %d", "abc", 123)
+	err := MakeErrorf(&impl1{}, "Err2", "name: %s, num: %d", "abc", 123)
 	expectedErr := &dbus.Error{
 		Name: "com.deepin.lib.Exportable1.Error.Err2",
 		Body: []interface{}{"name: abc, num: 123"},
@@ -44,7 +41,7 @@ func TestMakeErrorJSON(t *testing.T) {
 		Name string `json:"name"`
 		Num  int    `json:"num"`
 	}{"abc", 123}
-	err := MakeErrorJSON(&exportable1{}, "Err3", detail)
+	err := MakeErrorJSON(&impl1{}, "Err3", detail)
 
 	expectedErr := &dbus.Error{
 		Name: "com.deepin.lib.Exportable1.Error.Err3",
@@ -60,16 +57,16 @@ func TestMakeErrorJSON(t *testing.T) {
 	}{
 		nil,
 	}
-	err = MakeErrorJSON(&exportable1{}, "Err3", detail1)
+	err = MakeErrorJSON(&impl1{}, "Err3", detail1)
 	// do not panic
 	if err == nil {
 		t.Errorf("Expected error due to detail1 has chan type field")
 	}
 }
 
-type unamedError struct{}
+type unnamedError struct{}
 
-func (err unamedError) Error() string {
+func (err unnamedError) Error() string {
 	return "xxx err msg"
 }
 
@@ -84,7 +81,7 @@ func (err namedError) Name() string {
 }
 
 func TestToError(t *testing.T) {
-	err := ToError(unamedError{})
+	err := ToError(unnamedError{})
 	expectedErr := &dbus.Error{
 		Name: "com.deepin.DBus.Error.Unnamed",
 		Body: []interface{}{"xxx err msg"},
