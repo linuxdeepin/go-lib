@@ -74,7 +74,7 @@ DEFINE(PA_SUBSCRIPTION_EVENT_SAMPLE_CACHE, sample, _by_index);
 void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userdata)
 {
     if (i == NULL) {
-	return;
+      return;
     }
     pa_server_info *info = NULL;
     info = malloc(sizeof(pa_server_info));

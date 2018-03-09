@@ -69,7 +69,7 @@ func (s *Sink) SetPort(name string) {
 	defer C.free(unsafe.Pointer(cname))
 
 	c := GetContext()
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_sink_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
 	})
 
@@ -81,7 +81,7 @@ func (s *Sink) SetMute(mute bool) {
 		_mute = 1
 	}
 	c := GetContext()
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_sink_mute_by_index(c.ctx, C.uint32_t(s.Index), C.int(_mute), C.get_success_cb(), nil)
 	})
 }
@@ -90,7 +90,7 @@ func (s *Sink) SetVolume(v CVolume) {
 	s.Volume = v
 
 	c := GetContext()
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_sink_volume_by_index(c.ctx, C.uint32_t(s.Index), &v.core, C.get_success_cb(), nil)
 	})
 }

@@ -248,7 +248,7 @@ func (c *Context) SetDefaultSink(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
 	})
 }
@@ -256,7 +256,7 @@ func (c *Context) SetDefaultSource(name string) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
 	})
 }
@@ -266,7 +266,7 @@ func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
 	cname := C.CString(sinkName)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		for _, idx := range sinkInputs {
 			C.pa_context_move_sink_input_by_name(c.ctx, C.uint32_t(idx), cname,
 				C.get_success_cb(), nil)
@@ -276,7 +276,7 @@ func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
 
 // MoveSinkInputsByIndex move sink-inputs to the special sink index
 func (c *Context) MoveSinkInputsByIndex(sinkInputs []uint32, sinkIdx uint32) {
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		for _, idx := range sinkInputs {
 			C.pa_context_move_sink_input_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sinkIdx),
 				C.get_success_cb(), nil)
@@ -289,7 +289,7 @@ func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName str
 	cname := C.CString(sourceName)
 	defer C.free(unsafe.Pointer(cname))
 
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		for _, idx := range sourceOutputs {
 			C.pa_context_move_source_output_by_name(c.ctx, C.uint32_t(idx), cname,
 				C.get_success_cb(), nil)
@@ -299,7 +299,7 @@ func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName str
 
 // MoveSourceOutputsByIndex move source-outputs to the special source index
 func (c *Context) MoveSourceOutputsByIndex(sourceOutputs []uint32, sourceIdx uint32) {
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		for _, idx := range sourceOutputs {
 			C.pa_context_move_source_output_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sourceIdx),
 				C.get_success_cb(), nil)
@@ -307,8 +307,8 @@ func (c *Context) MoveSourceOutputsByIndex(sourceOutputs []uint32, sourceIdx uin
 	})
 }
 
-// SafeDo invoke an function with lock
-func (c *Context) SafeDo(fn func()) {
+// safeDo invoke an function with lock
+func (c *Context) safeDo(fn func()) {
 	runtime.LockOSThread()
 	C.pa_threaded_mainloop_lock(c.loop)
 	fn()
@@ -327,7 +327,7 @@ var PulseInitTimeout = time.Duration(20)
 func GetContextForced() *Context {
 	__ctxLocker.Lock()
 	if __context != nil {
-		__context.Free()
+		__context.free()
 		__context = nil
 	}
 	__ctxLocker.Unlock()
@@ -360,7 +360,7 @@ func GetContext() *Context {
 	return __context
 }
 
-func (ctx *Context) Free() {
+func (ctx *Context) free() {
 	if ctx == nil {
 		return
 	}
@@ -391,9 +391,6 @@ func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, status i
 	case status < 0:
 		c.Failed()
 	}
-}
-
-func (c *Context) ConnectPeekDetect(cb func(idx int, v float64)) {
 }
 
 func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {

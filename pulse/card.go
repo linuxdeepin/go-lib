@@ -85,7 +85,7 @@ func (card *Card) SetProfile(name string) {
 	defer C.free(unsafe.Pointer(pname))
 
 	c := GetContext()
-	c.SafeDo(func() {
+	c.safeDo(func() {
 		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
 	})
 }
