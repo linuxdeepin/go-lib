@@ -25,8 +25,6 @@
 
 #include "_cgo_export.h" //convert int
 
-static pa_threaded_mainloop* m = NULL;
-
 static inline void __empty_success_cb(pa_context *c, int success, void *userdata)
 {
 }
@@ -36,7 +34,7 @@ pa_context_success_cb_t get_success_cb()
 }
 
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
-void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
+  void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
 {\
     receive_some_info((int64_t)userdata, ID, (void*)i, eol); \
     if (eol < 0) { \
@@ -48,17 +46,17 @@ void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void
 	return;\
     }\
 }\
-void get_##TYPE##_info(pa_context *c, int64_t cookie, uint32_t index) \
+  void get_##TYPE##_info(pa_threaded_mainloop* loop, pa_context *c, int64_t cookie, uint32_t index) \
 {\
-    pa_threaded_mainloop_lock(m);\
+    pa_threaded_mainloop_lock(loop);\
     pa_operation_unref(pa_context_get_##TYPE##_info##PA_FUNC_SUFFIX(c, index, receive_##TYPE##_cb, (void*)cookie)); \
-    pa_threaded_mainloop_unlock(m);\
+    pa_threaded_mainloop_unlock(loop);\
 }\
-void get_##TYPE##_info_list(pa_context* ctx, int64_t cookie) \
+  void get_##TYPE##_info_list(pa_threaded_mainloop* loop, pa_context* ctx, int64_t cookie) \
 {\
-    pa_threaded_mainloop_lock(m);\
+    pa_threaded_mainloop_lock(loop);\
     pa_context_get_##TYPE##_info_list(ctx, receive_##TYPE##_cb, (void*)cookie);\
-    pa_threaded_mainloop_unlock(m);\
+    pa_threaded_mainloop_unlock(loop);\
 }
 
 DEFINE(PA_SUBSCRIPTION_EVENT_SINK, sink, _by_index);
@@ -81,11 +79,11 @@ void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userda
     memcpy(info, i, sizeof(pa_server_info));
     receive_some_info((int64_t)userdata, PA_SUBSCRIPTION_EVENT_SERVER, (void*)info, 0);
 }
-void get_server_info(pa_context *c, int64_t cookie)
+void get_server_info(pa_threaded_mainloop* loop, pa_context *c, int64_t cookie)
 {
-    pa_threaded_mainloop_lock(m);
+    pa_threaded_mainloop_lock(loop);
     pa_operation_unref(pa_context_get_server_info(c, receive_server_info_cb, (void*)cookie));
-    pa_threaded_mainloop_unlock(m);
+    pa_threaded_mainloop_unlock(loop);
 }
 
 void dpa_context_subscribe_cb(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
@@ -103,7 +101,7 @@ dpa_context_state_cb(pa_context* ctx, void* userdata)
     go_handle_state_changed(state);
 }
 
-void setup_monitor(pa_context *ctx)
+void setup_monitor(pa_threaded_mainloop* m, pa_context *ctx)
 {
     pa_threaded_mainloop_lock(m);
     pa_context_set_state_callback(ctx, dpa_context_state_cb, NULL);
@@ -123,10 +121,8 @@ void setup_monitor(pa_context *ctx)
 
 static int init_state = 0; // O: unknown, 1: success, 2: failure
 
-pa_context* pa_init(pa_threaded_mainloop* ml)
+pa_context* new_pa_context(pa_threaded_mainloop* m)
 {
-    m = ml;
-
     pa_threaded_mainloop_lock(m);
     pa_mainloop_api* mlapi = pa_threaded_mainloop_get_api(m);
     pa_context* ctx = pa_context_new(mlapi, "go-pulseaudio");
@@ -156,7 +152,7 @@ pa_context* pa_init(pa_threaded_mainloop* ml)
         return NULL;
     }
     init_state = 1;
-    setup_monitor(ctx);
+    setup_monitor(m, ctx);
     return ctx;
 }
 

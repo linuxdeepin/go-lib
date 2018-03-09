@@ -23,8 +23,8 @@
 #include <pulse/pulseaudio.h>
 
 #define DECLARE(TYPE) \
-void get_##TYPE##_info(pa_context*, int64_t, uint32_t);\
-void get_##TYPE##_info_list(pa_context*, int64_t);
+  void get_##TYPE##_info(pa_threaded_mainloop*, pa_context*, int64_t, uint32_t); \
+  void get_##TYPE##_info_list(pa_threaded_mainloop*, pa_context*, int64_t);
 
 DECLARE(sink);
 DECLARE(sink_input);
@@ -35,9 +35,9 @@ DECLARE(card);
 DECLARE(module);
 DECLARE(sample);
 
-void get_server_info(pa_context *c, int64_t cookie);
+void get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
 
-pa_context* pa_init(pa_threaded_mainloop* ml);
+pa_context* new_pa_context(pa_threaded_mainloop* ml);
 void pa_finalize();
 
 // Fixed gccgo(1.4) compile failed, becase of 'success_cb' duplicate definition

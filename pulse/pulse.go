@@ -70,7 +70,7 @@ type Context struct {
 func (c *Context) GetCardList() (r []*Card) {
 	ck := newCookie()
 
-	C.get_card_info_list(c.ctx, C.int64_t(ck.id))
+	C.get_card_info_list(c.loop, c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
 		card := info.ToCard()
 		if card == nil {
@@ -83,7 +83,7 @@ func (c *Context) GetCardList() (r []*Card) {
 
 func (c *Context) GetCard(index uint32) (*Card, error) {
 	ck := newCookie()
-	C.get_card_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	C.get_card_info(c.loop, c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 	info := ck.Reply()
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
@@ -99,7 +99,7 @@ func (c *Context) GetCard(index uint32) (*Card, error) {
 func (c *Context) GetSinkList() (r []*Sink) {
 	ck := newCookie()
 
-	C.get_sink_info_list(c.ctx, C.int64_t(ck.id))
+	C.get_sink_info_list(c.loop, c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
 		sink := info.ToSink()
 		if sink == nil {
@@ -112,7 +112,7 @@ func (c *Context) GetSinkList() (r []*Sink) {
 
 func (c *Context) GetSink(index uint32) (*Sink, error) {
 	ck := newCookie()
-	C.get_sink_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	C.get_sink_info(c.loop, c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 	info := ck.Reply()
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain this instance for: %v", index)
@@ -128,7 +128,7 @@ func (c *Context) GetSink(index uint32) (*Sink, error) {
 func (c *Context) GetSinkInputList() (r []*SinkInput) {
 	ck := newCookie()
 
-	C.get_sink_input_info_list(c.ctx, C.int64_t(ck.id))
+	C.get_sink_input_info_list(c.loop, c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
 		si := info.ToSinkInput()
 		if si == nil {
@@ -141,7 +141,7 @@ func (c *Context) GetSinkInputList() (r []*SinkInput) {
 
 func (c *Context) GetSinkInput(index uint32) (*SinkInput, error) {
 	ck := newCookie()
-	C.get_sink_input_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	C.get_sink_input_info(c.loop, c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 
 	info := ck.Reply()
 	if info == nil {
@@ -158,7 +158,7 @@ func (c *Context) GetSinkInput(index uint32) (*SinkInput, error) {
 func (c *Context) GetSourceList() (r []*Source) {
 	ck := newCookie()
 
-	C.get_source_info_list(c.ctx, C.int64_t(ck.id))
+	C.get_source_info_list(c.loop, c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
 		source := info.ToSource()
 		if source == nil {
@@ -171,7 +171,7 @@ func (c *Context) GetSourceList() (r []*Source) {
 
 func (c *Context) GetSource(index uint32) (*Source, error) {
 	ck := newCookie()
-	C.get_source_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	C.get_source_info(c.loop, c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 
 	info := ck.Reply()
 	if info == nil {
@@ -187,7 +187,7 @@ func (c *Context) GetSource(index uint32) (*Source, error) {
 
 func (c *Context) GetServer() (*Server, error) {
 	ck := newCookie()
-	C.get_server_info(c.ctx, C.int64_t(ck.id))
+	C.get_server_info(c.loop, c.ctx, C.int64_t(ck.id))
 
 	info := ck.Reply()
 	if info == nil {
@@ -204,7 +204,7 @@ func (c *Context) GetServer() (*Server, error) {
 func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
 	ck := newCookie()
 
-	C.get_source_output_info_list(c.ctx, C.int64_t(ck.id))
+	C.get_source_output_info_list(c.loop, c.ctx, C.int64_t(ck.id))
 	for _, info := range ck.ReplyList() {
 		so := info.ToSourceOutput()
 		if so == nil {
@@ -217,7 +217,7 @@ func (c *Context) GetSourceOutputList() (r []*SourceOutput) {
 
 func (c *Context) GetSourceOutput(index uint32) (*SourceOutput, error) {
 	ck := newCookie()
-	C.get_source_output_info(c.ctx, C.int64_t(ck.id), C.uint32_t(index))
+	C.get_source_output_info(c.loop, c.ctx, C.int64_t(ck.id), C.uint32_t(index))
 	info := ck.Reply()
 	if info == nil {
 		return nil, fmt.Errorf("Can't obtain the this instance for: %v", index)
@@ -344,7 +344,7 @@ func GetContext() *Context {
 			fmt.Println("Connect to pulseaudio timeout, terminate")
 			C.pa_finalize()
 		})
-		ctx := C.pa_init(loop)
+		ctx := C.new_pa_context(loop)
 		if ctx == nil {
 			fmt.Println("Failed to init pulseaudio")
 			return nil
