@@ -119,6 +119,7 @@ void setup_monitor(pa_threaded_mainloop* m, pa_context *ctx)
 }
 
 
+//TODO: the init_state should be protect by lock
 static int init_state = 0; // O: unknown, 1: success, 2: failure
 
 pa_context* new_pa_context(pa_threaded_mainloop* m)
