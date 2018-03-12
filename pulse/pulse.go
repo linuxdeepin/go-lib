@@ -22,6 +22,9 @@ package pulse
 /*
 #include "dde-pulse.h"
 #cgo pkg-config: libpulse glib-2.0
+//enable below flags in test environment
+//#cgo CFLAGS: -fsanitize=thread
+//#cgo LDFLAGS: -ltsan
 */
 import "C"
 import "fmt"
@@ -339,7 +342,6 @@ func GetContext() *Context {
 	defer __ctxLocker.Unlock()
 	if __context == nil {
 		loop := C.pa_threaded_mainloop_new()
-		C.pa_threaded_mainloop_start(loop)
 		time.AfterFunc(time.Second*PulseInitTimeout, func() {
 			fmt.Println("Connect to pulseaudio timeout, terminate")
 			C.pa_finalize()

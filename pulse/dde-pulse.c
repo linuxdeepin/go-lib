@@ -124,6 +124,8 @@ static int init_state = 0; // O: unknown, 1: success, 2: failure
 pa_context* new_pa_context(pa_threaded_mainloop* m)
 {
     pa_threaded_mainloop_lock(m);
+    pa_threaded_mainloop_start(m);
+
     pa_mainloop_api* mlapi = pa_threaded_mainloop_get_api(m);
     pa_context* ctx = pa_context_new(mlapi, "go-pulseaudio");
 
