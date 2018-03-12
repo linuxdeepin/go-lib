@@ -173,6 +173,39 @@ func (u *Uint) Bind(gs *gio.Settings, key string) {
 	u.bind(gs, key, u.GetValue)
 }
 
+type Uint64 struct {
+	base
+}
+
+func (u *Uint64) SetValue(val interface{}) (changed bool, err *dbus.Error) {
+	err = checkSet(u.Set(val.(uint64)))
+	return
+}
+
+func (u *Uint64) GetValue() (val interface{}, err *dbus.Error) {
+	val = u.Get()
+	return
+}
+
+func (*Uint64) GetType() reflect.Type {
+	return reflect.TypeOf(uint64(0))
+}
+
+func (u *Uint64) Get() uint64 {
+	return u.gs.GetUint64(u.key)
+}
+
+func (u *Uint64) Set(val uint64) bool {
+	if u.Get() != val {
+		return u.gs.SetUint64(u.key, val)
+	}
+	return true
+}
+
+func (u *Uint64) Bind(gs *gio.Settings, key string) {
+	u.bind(gs, key, u.GetValue)
+}
+
 type Double struct {
 	base
 }
