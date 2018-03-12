@@ -329,8 +329,13 @@ var PulseInitTimeout = time.Duration(20)
 
 func GetContextForced() *Context {
 	__ctxLocker.Lock()
-	if __context != nil {
-		__context.free()
+	ctx := __context
+	if ctx != nil {
+		C.pa_threaded_mainloop_stop(ctx.loop)
+		C.pa_context_unref(ctx.ctx)
+		C.pa_threaded_mainloop_free(ctx.loop)
+		ctx.loop = nil
+		ctx.ctx = nil
 		__context = nil
 	}
 	__ctxLocker.Unlock()
@@ -360,21 +365,6 @@ func GetContext() *Context {
 		}
 	}
 	return __context
-}
-
-func (ctx *Context) free() {
-	if ctx == nil {
-		return
-	}
-	if ctx.ctx != nil {
-		C.pa_context_unref(ctx.ctx)
-		ctx.ctx = nil
-	}
-	if ctx.loop != nil {
-		C.pa_threaded_mainloop_stop(ctx.loop)
-		C.pa_threaded_mainloop_free(ctx.loop)
-		ctx.loop = nil
-	}
 }
 
 //export receive_some_info
