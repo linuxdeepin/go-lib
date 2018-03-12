@@ -7,8 +7,8 @@ import (
 	"pkg.deepin.io/lib/dbus1"
 )
 
-func MakeError(v Exportable, name string, args ...interface{}) *dbus.Error {
-	errName := v.GetDBusExportInfo().Interface + ".Error." + name
+func MakeError(v Implementer, name string, args ...interface{}) *dbus.Error {
+	errName := v.GetInterfaceName() + ".Error." + name
 	msg := fmt.Sprint(args...)
 	return &dbus.Error{
 		Name: errName,
@@ -16,8 +16,8 @@ func MakeError(v Exportable, name string, args ...interface{}) *dbus.Error {
 	}
 }
 
-func MakeErrorf(v Exportable, name, format string, args ...interface{}) *dbus.Error {
-	errName := v.GetDBusExportInfo().Interface + ".Error." + name
+func MakeErrorf(v Implementer, name, format string, args ...interface{}) *dbus.Error {
+	errName := v.GetInterfaceName() + ".Error." + name
 	msg := fmt.Sprintf(format, args...)
 	return &dbus.Error{
 		Name: errName,
@@ -25,9 +25,9 @@ func MakeErrorf(v Exportable, name, format string, args ...interface{}) *dbus.Er
 	}
 }
 
-func MakeErrorJSON(v Exportable, name string, detail interface{}) *dbus.Error {
+func MakeErrorJSON(v Implementer, name string, detail interface{}) *dbus.Error {
 	var msg string
-	errName := v.GetDBusExportInfo().Interface + ".Error." + name
+	errName := v.GetInterfaceName() + ".Error." + name
 	data, err := json.Marshal(detail)
 	if err != nil {
 		msg = "failed to marshal json"

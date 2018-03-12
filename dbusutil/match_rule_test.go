@@ -23,14 +23,15 @@ func TestMatchRuleBuilder(t *testing.T) {
 		t.Errorf("ruleStr expected %q got %q", ruleExpected, ruleStr)
 	}
 
-	ruleStr = NewMatchRuleBuilder().ExtSignal(ExportInfo{Path: "/a/b/c", Interface: "a.b.c"}, "Sig1").BuildStr()
+	ruleStr = NewMatchRuleBuilder().ExtSignal("/a/b/c", "a.b.c", "Sig1").BuildStr()
 
 	ruleExpected = "type='signal',path='/a/b/c',interface='a.b.c',member='Sig1'"
 	if ruleStr != ruleExpected {
 		t.Errorf("ruleStr expected %q got %q", ruleExpected, ruleStr)
 	}
 
-	ruleStr = NewMatchRuleBuilder().ExtPropertiesChanged(ExportInfo{Path: "/a/b/c", Interface: "a.b.c"}).BuildStr()
+	ruleStr = NewMatchRuleBuilder().ExtPropertiesChanged("/a/b/c",
+		"a.b.c").BuildStr()
 
 	ruleExpected = "type='signal',path='/a/b/c',interface='org.freedesktop.DBus.Properties',member='PropertiesChanged',arg0namespace='a.b.c'"
 	if ruleStr != ruleExpected {

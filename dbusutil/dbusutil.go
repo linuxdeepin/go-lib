@@ -27,18 +27,6 @@ func init() {
 
 const orgFreedesktopDBus = "org.freedesktop.DBus"
 
-type ExportInfo struct {
-	Path, Interface string
-}
-
-func (ei ExportInfo) String() string {
-	return fmt.Sprintf("<ExportInfo Path=%q Interface=%q>", ei.Path, ei.Interface)
-}
-
-type Exportable interface {
-	GetDBusExportInfo() ExportInfo
-}
-
 type accessType uint
 
 const (
@@ -83,14 +71,8 @@ func (e emitType) String() string {
 
 // struct field prop
 type fieldProp struct {
-	name      string
-	rValue    reflect.Value
-	rType     reflect.Type
-	signature dbus.Signature
-	hasStruct bool
-	emit      emitType
-	access    accessType
-	valueMu   *sync.RWMutex
+	rValue  reflect.Value
+	valueMu *sync.RWMutex
 
 	cbMu       sync.Mutex
 	writeCb    PropertyWriteCallback
@@ -98,8 +80,26 @@ type fieldProp struct {
 	changedCbs []PropertyChangedCallback
 }
 
+type fieldPropStatic struct {
+	name      string
+	rType     reflect.Type
+	valueType fieldPropValueType
+	signature dbus.Signature
+	hasStruct bool
+	emit      emitType
+	access    accessType
+}
+
+type fieldPropValueType uint
+
+const (
+	fieldPropValueNotProp fieldPropValueType = iota
+	fieldPropValueImplProp
+	fieldPropValuePtrImplProp
+)
+
 func (p *fieldProp) getValue(propRead *PropertyRead) (value interface{}, err *dbus.Error) {
-	readCb := p.ReadCallback()
+	readCb := p.getReadCallback()
 	if readCb != nil {
 		err = readCb(propRead)
 		if err != nil {
@@ -122,16 +122,18 @@ func (p *fieldProp) getValue(propRead *PropertyRead) (value interface{}, err *db
 	return
 }
 
-func (p *fieldProp) GetValueVariant(propRead *PropertyRead) (dbus.Variant, *dbus.Error) {
+func (p *fieldProp) GetValueVariant(propRead *PropertyRead,
+	signature dbus.Signature) (dbus.Variant, *dbus.Error) {
+
 	value, err := p.getValue(propRead)
 	if err != nil {
 		return dbus.Variant{}, err
 	}
-	return dbus.MakeVariantWithSignature(value, p.signature), nil
+	return dbus.MakeVariantWithSignature(value, signature), nil
 }
 
 func (p *fieldProp) SetValue(propWrite *PropertyWrite) (changed bool, err *dbus.Error) {
-	writeCb := p.WriteCallback()
+	writeCb := p.getWriteCallback()
 	if writeCb != nil {
 		err = writeCb(propWrite)
 		if err != nil {
@@ -174,14 +176,14 @@ func (p *fieldProp) SetValue(propWrite *PropertyWrite) (changed bool, err *dbus.
 	return
 }
 
-func (p *fieldProp) WriteCallback() PropertyWriteCallback {
+func (p *fieldProp) getWriteCallback() PropertyWriteCallback {
 	p.cbMu.Lock()
 	cb := p.writeCb
 	p.cbMu.Unlock()
 	return cb
 }
 
-func (p *fieldProp) ReadCallback() PropertyReadCallback {
+func (p *fieldProp) getReadCallback() PropertyReadCallback {
 	p.cbMu.Lock()
 	cb := p.readCb
 	p.cbMu.Unlock()
@@ -223,18 +225,18 @@ func (p *fieldProp) notifyChanged(change *PropertyChanged) {
 }
 
 // emit DBus signal Properties.PropertiesChanged
-func (p *fieldProp) emitChanged(conn *dbus.Conn, path dbus.ObjectPath, interfaceName string,
-	value interface{}) (err error) {
+func emitPropertiesChanged(conn *dbus.Conn, path dbus.ObjectPath, interfaceName string,
+	propName string, value interface{}, emit emitType) (err error) {
 	const signal = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	var changedProps map[string]dbus.Variant
-	switch p.emit {
+	switch emit {
 	case emitFalse:
 		// do nothing
 	case emitInvalidates:
-		err = conn.Emit(path, signal, interfaceName, changedProps, []string{p.name})
+		err = conn.Emit(path, signal, interfaceName, changedProps, []string{propName})
 	case emitTrue:
 		changedProps = map[string]dbus.Variant{
-			p.name: dbus.MakeVariant(value),
+			propName: dbus.MakeVariant(value),
 		}
 		err = conn.Emit(path, signal, interfaceName, changedProps, []string{})
 	default:
@@ -243,7 +245,7 @@ func (p *fieldProp) emitChanged(conn *dbus.Conn, path dbus.ObjectPath, interface
 	return
 }
 
-func getPropsIntrospection(props map[string]*fieldProp) []introspect.Property {
+func getPropsIntrospection(props map[string]*fieldPropStatic) []introspect.Property {
 	var result = make([]introspect.Property, len(props))
 	idx := 0
 	for _, p := range props {
@@ -321,28 +323,27 @@ func getCorePropsMu(structValue reflect.Value) *sync.RWMutex {
 	return propsMasterRV.Addr().Interface().(*sync.RWMutex)
 }
 
-func getStructTypeValue(m interface{}) (reflect.Type, reflect.Value) {
+func getStructValue(m interface{}) (reflect.Value, bool) {
 	type0 := reflect.TypeOf(m)
 	value0 := reflect.ValueOf(m)
 
 	if type0.Kind() != reflect.Ptr {
-		return nil, reflect.Value{}
+		return reflect.Value{}, false
 	}
 
 	elemType := type0.Elem()
 	elemValue := value0.Elem()
 
 	if elemType.Kind() != reflect.Struct {
-		return nil, reflect.Value{}
+		return reflect.Value{}, false
 	}
-
-	return elemType, elemValue
+	return elemValue, true
 }
 
-func getProps(impl *implementer, structType reflect.Type,
-	structValue reflect.Value) map[string]*fieldProp {
+func getFieldPropStaticMap(structType reflect.Type,
+	structValue reflect.Value) map[string]*fieldPropStatic {
 
-	props := make(map[string]*fieldProp)
+	props := make(map[string]*fieldPropStatic)
 
 	var prevField reflect.StructField
 	numField := structType.NumField()
@@ -366,12 +367,41 @@ func getProps(impl *implementer, structType reflect.Type,
 			continue
 		}
 
-		// prev field: Prop1
-		// this field: Prop1Mu
 		if prevField.Name+"Mu" == field.Name {
+			prevField = field
+			continue
+		}
+
+		prop0 := newFieldPropStatic(field, fieldValue, tag)
+		props[field.Name] = prop0
+		prevField = field
+	}
+	return props
+}
+
+func getFieldPropMap(impl *implementer, implStatic *implementerStatic,
+	structValue reflect.Value, s *Service, path dbus.ObjectPath) map[string]*fieldProp {
+
+	structType := structValue.Type()
+	props := make(map[string]*fieldProp)
+
+	corePropsMu := getCorePropsMu(structValue)
+
+	numField := structType.NumField()
+	var prevField reflect.StructField
+	for i := 0; i < numField; i++ {
+		field := structType.Field(i)
+		fieldValue := structValue.Field(i)
+
+		// ex:
+		// prevField: Prop1
+		// current Field: Prop1Mu
+		if prevField.Name+"Mu" == field.Name &&
+			props[prevField.Name] != nil {
+
 			mu, ok := fieldValue.Addr().Interface().(*sync.RWMutex)
 			if ok {
-				// override prev fieldProp.mu
+				// override prev fieldProp.ValueMu
 				props[prevField.Name].valueMu = mu
 			}
 
@@ -379,8 +409,37 @@ func getProps(impl *implementer, structType reflect.Type,
 			continue
 		}
 
-		prop0 := newFieldProp(field, fieldValue, tag, impl)
-		props[field.Name] = prop0
+		propStatic, ok := implStatic.props[field.Name]
+		if !ok {
+			prevField = field
+			continue
+		}
+
+		p := &fieldProp{
+			rValue: fieldValue,
+		}
+
+		var propValue Property
+		switch propStatic.valueType {
+		case fieldPropValueNotProp:
+			p.valueMu = corePropsMu
+
+		case fieldPropValueImplProp:
+			propValue = fieldValue.Interface().(Property)
+
+		case fieldPropValuePtrImplProp:
+			fieldValuePtr := fieldValue.Addr()
+			propValue = fieldValuePtr.Interface().(Property)
+			p.rValue = fieldValuePtr
+		}
+
+		if propValue != nil {
+			propValue.SetNotifyChangedFunc(func(val interface{}) {
+				impl.notifyChanged(s, path, p, propStatic, val)
+			})
+		}
+
+		props[field.Name] = p
 		prevField = field
 	}
 	return props
@@ -422,39 +481,39 @@ func parsePropTag(tag string) (accessType, emitType) {
 	return access, emit
 }
 
-func newFieldProp(field reflect.StructField, fieldValue reflect.Value, tag string,
-	impl *implementer) *fieldProp {
+func toProperty(value reflect.Value) (Property, fieldPropValueType) {
+	propValue, ok := value.Interface().(Property)
+	if ok {
+		return propValue, fieldPropValueImplProp
+	}
+
+	// try value.Addr
+	if value.Kind() == reflect.Struct {
+		propValue, ok = value.Addr().Interface().(Property)
+		if ok {
+			return propValue, fieldPropValuePtrImplProp
+		}
+	}
+	return nil, fieldPropValueNotProp
+}
+
+func newFieldPropStatic(field reflect.StructField, fieldValue reflect.Value,
+	tag string) *fieldPropStatic {
 
 	access, emit := parsePropTag(tag)
-	p := &fieldProp{
+	p := &fieldPropStatic{
 		name:   field.Name,
-		rValue: fieldValue,
 		access: access,
 		emit:   emit,
 	}
 	var rType reflect.Type
 
-	propValue, isProp := fieldValue.Interface().(Property)
-	if !isProp {
-		// try fieldValue.Addr
-		if field.Type.Kind() == reflect.Struct {
-			propValue, isProp = fieldValue.Addr().Interface().(Property)
-			if isProp {
-				p.rValue = fieldValue.Addr()
-			}
-		}
-	}
-
-	if isProp {
-		propValue.SetNotifyChangedFunc(func(val interface{}) {
-			impl.notifyChanged(p, val)
-		})
-
-		rType = propValue.GetType()
-		p.valueMu = nil
-	} else {
+	propValue, valueType := toProperty(fieldValue)
+	p.valueType = valueType
+	if valueType == fieldPropValueNotProp {
 		rType = field.Type
-		p.valueMu = impl.corePropsMu
+	} else {
+		rType = propValue.GetType()
 	}
 
 	p.rType = rType
@@ -613,13 +672,15 @@ type PropertyRead struct {
 	PropertyAccess
 }
 
-func newPropertyRead(name string, impl *implementer, sender dbus.Sender) *PropertyRead {
+func newPropertyRead(sender dbus.Sender, so *ServerObject,
+	interfaceName, name string) *PropertyRead {
+
 	pr := new(PropertyRead)
 	pr.Sender = sender
-	pr.service = impl.service
+	pr.service = so.service
 	pr.Name = name
-	pr.Interface = impl.interfaceName
-	pr.Path = impl.path
+	pr.Interface = interfaceName
+	pr.Path = so.path
 	return pr
 }
 
@@ -628,15 +689,15 @@ type PropertyWrite struct {
 	Value interface{} // new value
 }
 
-func newPropertyWrite(name string, impl *implementer, value interface{},
-	sender dbus.Sender) *PropertyWrite {
+func newPropertyWrite(sender dbus.Sender, so *ServerObject,
+	interfaceName, name string, value interface{}) *PropertyWrite {
 
 	pw := new(PropertyWrite)
 	pw.Sender = sender
-	pw.service = impl.service
+	pw.service = so.service
 	pw.Name = name
-	pw.Interface = impl.interfaceName
-	pw.Path = impl.path
+	pw.Interface = interfaceName
+	pw.Path = so.path
 	pw.Value = value
 	return pw
 }
@@ -646,11 +707,12 @@ type PropertyChanged struct {
 	Value interface{} // new value
 }
 
-func newPropertyChanged(name string, impl *implementer, value interface{}) *PropertyChanged {
+func newPropertyChanged(path dbus.ObjectPath, interfaceName, name string,
+	value interface{}) *PropertyChanged {
 	pc := new(PropertyChanged)
 	pc.Name = name
-	pc.Interface = impl.interfaceName
-	pc.Path = impl.path
+	pc.Interface = interfaceName
+	pc.Path = path
 	pc.Value = value
 	return pc
 }

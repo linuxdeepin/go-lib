@@ -1,95 +1,147 @@
 package dbusutil
 
 import (
-	"sync"
+	"errors"
 
 	"pkg.deepin.io/lib/dbus1"
-	"pkg.deepin.io/lib/dbus1/introspect"
-	"pkg.deepin.io/lib/strv"
 )
 
-type object struct {
-	path dbus.ObjectPath
-
-	implementers map[string]*implementer
-	//                ^interfaceName
-	implementersMu sync.RWMutex
-
-	propertiesImpl     *propertiesImplementer
-	introspectableImpl *introspectableImplementer
-
-	children strv.Strv // node name of children
+type ServerObject struct {
+	service      *Service
+	path         dbus.ObjectPath
+	implementers []*implementer
 }
 
-func newObject(path dbus.ObjectPath, service *Service) *object {
-	obj := &object{
-		path:         path,
-		implementers: make(map[string]*implementer),
+func (so *ServerObject) Path() dbus.ObjectPath {
+	return so.path
+}
 
-		propertiesImpl: &propertiesImplementer{
-			service: service,
-		},
+func (so *ServerObject) Export() error {
+	s := so.service
+	conn := s.conn
+	path := so.path
 
-		introspectableImpl: &introspectableImplementer{
-			service:    service,
-			path:       path,
-			interfaces: make(map[string]introspect.Interface),
-		},
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.objMap[path]
+	if ok {
+		return errors.New("server object is exported")
 	}
 
-	obj.propertiesImpl.object = obj
-	return obj
+	for _, impl := range so.implementers {
+		core := impl.core
+		corePtr := getImplementerPointer(core)
+		_, ok := s.implObjMap[corePtr]
+		if ok {
+			return errors.New("implementer is exported")
+		}
+
+		err := conn.Export(core, so.path, core.GetInterfaceName())
+		if err != nil {
+			return err
+		}
+
+		s.implObjMap[corePtr] = so
+	}
+
+	methodTable := make(map[string]interface{}, 3)
+	methodTable["Introspect"] = so.introspectableIntrospect
+
+	err := conn.ExportMethodTable(methodTable, so.path,
+		orgFreedesktopDBus+".Introspectable")
+	if err != nil {
+		return err
+	}
+
+	delete(methodTable, "Introspect")
+	methodTable["Get"] = so.propertiesGet
+	methodTable["GetAll"] = so.propertiesGetAll
+	methodTable["Set"] = so.propertiesSet
+
+	err = conn.ExportMethodTable(methodTable, so.path,
+		orgFreedesktopDBus+".Properties")
+	if err != nil {
+		return err
+	}
+
+	s.objMap[so.path] = so
+	return nil
 }
 
-func (obj *object) addImplementer(impl *implementer) {
-	obj.implementersMu.Lock()
-	obj.implementers[impl.interfaceName] = impl
-	obj.implementersMu.Unlock()
+func (so *ServerObject) StopExport() error {
+	s := so.service
+	conn := s.conn
+	path := so.path
 
-	obj.introspectableImpl.addImplementer(impl)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.objMap[path]
+	if !ok {
+		return errors.New("server object is not exported")
+	}
+
+	err := conn.Export(nil, path, orgFreedesktopDBus+".Properties")
+	if err != nil {
+		return err
+	}
+
+	err = conn.Export(nil, path, orgFreedesktopDBus+".Introspectable")
+	if err != nil {
+		return err
+	}
+
+	for _, impl := range so.implementers {
+		core := impl.core
+		err := conn.Export(nil, so.path, core.GetInterfaceName())
+		if err != nil {
+			return err
+		}
+		corePtr := getImplementerPointer(core)
+		delete(s.implObjMap, corePtr)
+	}
+
+	delete(s.objMap, path)
+	return nil
 }
 
-func (obj *object) deleteImplementer(interfaceName string) {
-	obj.implementersMu.Lock()
-	delete(obj.implementers, interfaceName)
-	obj.implementersMu.Unlock()
-
-	obj.introspectableImpl.deleteImplementer(interfaceName)
+func (so *ServerObject) getImplementer(interfaceName string) *implementer {
+	for _, impl := range so.implementers {
+		if impl.core.GetInterfaceName() == interfaceName {
+			return impl
+		}
+	}
+	return nil
 }
 
-func (obj *object) numImplementer() int {
-	obj.implementersMu.RLock()
-	n := len(obj.implementers)
-	obj.implementersMu.RUnlock()
-	return n
+func (so *ServerObject) SetWriteCallback(v Implementer, propertyName string,
+	cb PropertyWriteCallback) error {
+	impl := so.getImplementer(v.GetInterfaceName())
+	if impl == nil {
+		return errors.New("not exported")
+	}
+
+	return impl.setWriteCallback(propertyName, cb)
 }
 
-func (obj *object) hasImplementer(interfaceName string) bool {
-	obj.implementersMu.RLock()
-	_, ok := obj.implementers[interfaceName]
-	obj.implementersMu.RUnlock()
-	return ok
+func (so *ServerObject) SetReadCallback(v Implementer, propertyName string,
+	cb PropertyReadCallback) error {
+	impl := so.getImplementer(v.GetInterfaceName())
+	if impl == nil {
+		return errors.New("not exported")
+	}
+
+	return impl.setReadCallback(propertyName, cb)
 }
 
-func (obj *object) getImplementer(interfaceName string) *implementer {
-	obj.implementersMu.RLock()
-	impl := obj.implementers[interfaceName]
-	obj.implementersMu.RUnlock()
-	return impl
-}
+func (so *ServerObject) ConnectChanged(v Implementer, propertyName string,
+	cb PropertyChangedCallback) error {
 
-func (obj *object) exportProperties(conn *dbus.Conn) error {
-	return conn.Export(obj.propertiesImpl, obj.path, orgFreedesktopDBus+".Properties")
-}
+	impl := so.getImplementer(v.GetInterfaceName())
+	if impl == nil {
+		return errors.New("not exported")
+	}
 
-func (obj *object) stopExportProperties(conn *dbus.Conn) error {
-	return conn.Export(nil, obj.path, orgFreedesktopDBus+".Properties")
-}
-
-func (obj *object) exportIntrospectable(conn *dbus.Conn) error {
-	return conn.Export(obj.introspectableImpl, obj.path, orgFreedesktopDBus+".Introspectable")
-}
-
-func (obj *object) stopExportIntrospectable(conn *dbus.Conn) error {
-	return conn.Export(nil, obj.path, orgFreedesktopDBus+".Introspectable")
+	return impl.connectChanged(propertyName, cb)
 }
