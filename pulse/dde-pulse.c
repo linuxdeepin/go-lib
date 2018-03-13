@@ -33,31 +33,32 @@ pa_context_success_cb_t get_success_cb()
   return __empty_success_cb;
 }
 
-#define DEFINE(ID, TYPE, PA_FUNC_SUFFIX) \
+#define DEFINE(ID, TYPE, PA_FUNC_SUFFIX)                                \
   void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
-{\
-    receive_some_info((int64_t)userdata, ID, (void*)i, eol); \
-    if (eol < 0) { \
-	if (pa_context_errno(c) == PA_ERR_NOENTITY) {\
-	    fprintf(stderr, "errno == PA_ERR_NOENTITY"); \
-	    return;\
-	}\
-	fprintf(stderr, "receive info failed");\
-	return;\
-    }\
-}\
+  {                                                                     \
+    if (i == 0) { return; }                                             \
+    receive_some_info((int64_t)userdata, ID, (void*)i, eol);            \
+    if (eol < 0) {                                                      \
+      if (pa_context_errno(c) == PA_ERR_NOENTITY) {                     \
+        fprintf(stderr, "errno == PA_ERR_NOENTITY");                    \
+        return;                                                         \
+      }                                                                 \
+      fprintf(stderr, "receive info failed");                           \
+      return;                                                           \
+    }                                                                   \
+  }                                                                     \
   void get_##TYPE##_info(pa_threaded_mainloop* loop, pa_context *c, int64_t cookie, uint32_t index) \
-{\
-    pa_threaded_mainloop_lock(loop);\
+  {                                                                     \
+    pa_threaded_mainloop_lock(loop);                                    \
     pa_operation_unref(pa_context_get_##TYPE##_info##PA_FUNC_SUFFIX(c, index, receive_##TYPE##_cb, (void*)cookie)); \
-    pa_threaded_mainloop_unlock(loop);\
-}\
+    pa_threaded_mainloop_unlock(loop);                                  \
+  }                                                                     \
   void get_##TYPE##_info_list(pa_threaded_mainloop* loop, pa_context* ctx, int64_t cookie) \
-{\
-    pa_threaded_mainloop_lock(loop);\
-    pa_context_get_##TYPE##_info_list(ctx, receive_##TYPE##_cb, (void*)cookie);\
-    pa_threaded_mainloop_unlock(loop);\
-}
+  {                                                                     \
+    pa_threaded_mainloop_lock(loop);                                    \
+    pa_operation_unref(pa_context_get_##TYPE##_info_list(ctx, receive_##TYPE##_cb, (void*)cookie)); \
+    pa_threaded_mainloop_unlock(loop);                                  \
+  }
 
 DEFINE(PA_SUBSCRIPTION_EVENT_SINK, sink, _by_index);
 DEFINE(PA_SUBSCRIPTION_EVENT_SOURCE, source, _by_index);
