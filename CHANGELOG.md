@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [1.2.6] - 2018-03-19
+*   perf: unref the `pa_operation` in macro "DEFINE"
+*   feat: dbusutil/gsprop add Uint64 type
+*   fix(pulse): data race on pulse.Context.free
+*   refactor(pulse): hold lock when starting mainloop
+*   feat(dbusutil): new api
+*   refactor(pulse): remove global variable of `pa_threaded_mainloop`
+*   refactor(pulse): hide internal functions
+
 ## [1.2.5] - 2018-03-07
 *   feat(dbusutil): hide log output
 *   feat(dbusutil): allow field type pointer implements the Property interface
