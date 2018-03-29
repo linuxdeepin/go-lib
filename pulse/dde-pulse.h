@@ -21,7 +21,8 @@
 #define DDE_PULSE_H
 
 /*
-  ANY function touch a _pa_context_ must hold the pa_threaded_mainloop look !!!!!!
+  ANY function touch a _pa_context_ must hold the pa_threaded_mainloop lock !!!!!!
+  And may object created by pa_context, like pa_stream_new also need hold the lock.
  */
 
 #include <pulse/pulseaudio.h>

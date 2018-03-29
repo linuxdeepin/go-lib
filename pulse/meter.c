@@ -86,7 +86,6 @@ pa_stream* createMonitorStreamForSource(pa_threaded_mainloop* loop, pa_context* 
         fprintf(stderr, "Failed to create monitoring stream");
         return NULL;
     }
-    pa_threaded_mainloop_unlock(loop);
 
     if (stream_idx != (uint32_t) -1)
         pa_stream_set_monitor_stream(s, stream_idx);
@@ -100,7 +99,9 @@ pa_stream* createMonitorStreamForSource(pa_threaded_mainloop* loop, pa_context* 
     if (pa_stream_connect_record(s, t, &attr, flags) < 0) {
         fprintf(stderr, "Failed to connect monitoring stream");
         pa_stream_unref(s);
+        pa_threaded_mainloop_unlock(loop);
         return NULL;
     }
+    pa_threaded_mainloop_unlock(loop);
     return s;
 }

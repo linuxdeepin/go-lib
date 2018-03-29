@@ -32,18 +32,23 @@ type SourceMeter struct {
 	core        *C.pa_stream
 	sourceIndex uint32
 	cb          func()
+
+	ctx *Context
 }
 
 func NewSourceMeter(c *Context, idx uint32) *SourceMeter {
 	core := C.createMonitorStreamForSource(c.loop, c.ctx, C.uint32_t(idx), 0, 0)
-	return &SourceMeter{core, idx, nil}
+	return &SourceMeter{core, idx, nil, c}
 }
 func (s *SourceMeter) Destroy() {
 	sourceMeterLock.Lock()
 	delete(sourceMeterCBs, s.sourceIndex)
 	sourceMeterLock.Unlock()
-	C.pa_stream_disconnect(s.core)
-	C.pa_stream_unref(s.core)
+
+	s.ctx.safeDo(func() {
+		C.pa_stream_disconnect(s.core)
+		C.pa_stream_unref(s.core)
+	})
 }
 func (s *SourceMeter) ConnectChanged(cb func(v float64)) {
 	sourceMeterLock.Lock()
