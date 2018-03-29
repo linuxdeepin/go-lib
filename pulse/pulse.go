@@ -331,8 +331,13 @@ func GetContextForced() *Context {
 	__ctxLocker.Lock()
 	ctx := __context
 	if ctx != nil {
-		C.pa_threaded_mainloop_stop(ctx.loop)
+		C.pa_threaded_mainloop_lock(ctx.loop)
+		// The pa_context_unref must be protected.
+		// This operation will cancel all pending operations which will touch  mainloop object.
 		C.pa_context_unref(ctx.ctx)
+		C.pa_threaded_mainloop_unlock(ctx.loop)
+
+		// There no need to call pa_threaded_mainloop_stop.
 		C.pa_threaded_mainloop_free(ctx.loop)
 		ctx.loop = nil
 		ctx.ctx = nil
