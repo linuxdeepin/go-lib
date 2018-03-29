@@ -35,7 +35,7 @@ type SourceMeter struct {
 }
 
 func NewSourceMeter(c *Context, idx uint32) *SourceMeter {
-	core := C.createMonitorStreamForSource(c.ctx, C.uint32_t(idx), 0, 0)
+	core := C.createMonitorStreamForSource(c.loop, c.ctx, C.uint32_t(idx), 0, 0)
 	return &SourceMeter{core, idx, nil}
 }
 func (s *SourceMeter) Destroy() {

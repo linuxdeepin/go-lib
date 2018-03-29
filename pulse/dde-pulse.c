@@ -172,10 +172,13 @@ pa_finalize()
 //
 // If idx is PA_INVALID_INDEX, all sinks will be suspended.
 void
-suspend_sink_by_id(pa_context* ctx, uint32_t idx, int suspend)
+suspend_sink_by_id(pa_threaded_mainloop *loop, pa_context* ctx, uint32_t idx, int suspend)
 {
+    pa_threaded_mainloop_lock(loop);
     pa_operation* o = pa_context_suspend_sink_by_index(ctx, idx, suspend,
                                                        get_success_cb(), NULL);
+    pa_threaded_mainloop_unlock(loop);
+
     if (!o) {
         fprintf(stderr, "Failed suspend sink %u\n", idx);
         return;
@@ -185,10 +188,13 @@ suspend_sink_by_id(pa_context* ctx, uint32_t idx, int suspend)
 
 // If idx is PA_INVALID_INDEX, all sources will be suspended.
 void
-suspend_source_by_id(pa_context* ctx, uint32_t idx, int suspend)
+suspend_source_by_id(pa_threaded_mainloop *loop, pa_context* ctx, uint32_t idx, int suspend)
 {
+    pa_threaded_mainloop_lock(loop);
     pa_operation* o = pa_context_suspend_source_by_index(ctx, idx, suspend,
                                                          get_success_cb(), NULL);
+    pa_threaded_mainloop_unlock(loop);
+
     if (!o) {
         fprintf(stderr, "Failed suspend sink %u\n", idx);
         return;

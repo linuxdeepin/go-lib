@@ -60,7 +60,7 @@ static void read_callback(pa_stream *s, size_t length, void *userdata) {
 }
 
 
-pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend)
+pa_stream* createMonitorStreamForSource(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend)
 {
     stream_idx = -1;
 
@@ -80,10 +80,13 @@ pa_stream* createMonitorStreamForSource(pa_context* ctx, uint32_t source_idx, ui
 
     snprintf(t, sizeof(t), "%u", source_idx);
 
+    pa_threaded_mainloop_lock(loop);
     if (!(s = pa_stream_new(ctx, "Peak detect", &ss, NULL))) {
+        pa_threaded_mainloop_unlock(loop);
         fprintf(stderr, "Failed to create monitoring stream");
         return NULL;
     }
+    pa_threaded_mainloop_unlock(loop);
 
     if (stream_idx != (uint32_t) -1)
         pa_stream_set_monitor_stream(s, stream_idx);

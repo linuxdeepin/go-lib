@@ -400,11 +400,11 @@ func (c *Context) ConnectStateChanged(state int, cb func()) {
 }
 
 func (c *Context) SuspendSinkById(idx uint32, suspend int) {
-	C.suspend_sink_by_id(c.ctx, C.uint32_t(idx), C.int(suspend))
+	C.suspend_sink_by_id(c.loop, c.ctx, C.uint32_t(idx), C.int(suspend))
 }
 
 func (c *Context) SuspendSourceById(idx uint32, suspend int) {
-	C.suspend_source_by_id(c.ctx, C.uint32_t(idx), C.int(suspend))
+	C.suspend_source_by_id(c.loop, c.ctx, C.uint32_t(idx), C.int(suspend))
 }
 
 func (c *Context) handlePAEvent(facility, eventType int, idx uint32) {
