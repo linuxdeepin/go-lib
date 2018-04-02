@@ -19,6 +19,7 @@ type Object struct {
 
 type objectSignalExt struct {
 	sigLoop         *dbusutil.SignalLoop
+	ruleAuto        bool
 	ruleHandlersMap map[string][]dbusutil.SignalHandlerId
 	//                  ^rule  ^handler ids
 	propChangedHandlerId dbusutil.SignalHandlerId
@@ -83,52 +84,59 @@ func (o *Object) getMatchRulePropertiesChanged() string {
 		"member='PropertiesChanged',path='%s',sender='%s'", o.obj.Path(), o.obj.Destination())
 }
 
+func (o *Object) propChangedHandler(sig *dbus.Signal) {
+	var interfaceName string
+	var changedProps map[string]dbus.Variant
+	var invalidatedProps []string
+
+	err := dbus.Store(sig.Body, &interfaceName, &changedProps, &invalidatedProps)
+	if err != nil {
+		return
+	}
+	for propName, variant := range changedProps {
+		key := propChangedKey{interfaceName, propName}
+		o.mu.Lock()
+		callbacks := o.propChangedCallbacks[key]
+		o.mu.Unlock()
+
+		for _, callback := range callbacks {
+			callback(true, variant.Value())
+		}
+	}
+
+	for _, propName := range invalidatedProps {
+		key := propChangedKey{interfaceName, propName}
+		o.mu.Lock()
+		callbacks := o.propChangedCallbacks[key]
+		o.mu.Unlock()
+
+		for _, callback := range callbacks {
+			callback(false, nil)
+		}
+	}
+}
+
 func (o *Object) initPropertiesChangedHandler() error {
 	o.checkSignalExt()
 	if o.propChangedHandlerId != 0 {
 		return nil
 	}
-	rule := o.getMatchRulePropertiesChanged()
-	err := o.addMatch(rule)
-	if err != nil {
-		return err
-	}
-
-	handlerId := o.sigLoop.AddHandler(&dbusutil.SignalRule{
+	var handlerId dbusutil.SignalHandlerId
+	sigRule := &dbusutil.SignalRule{
 		Path: o.obj.Path(),
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-	}, func(sig *dbus.Signal) {
-		var interfaceName string
-		var changedProps map[string]dbus.Variant
-		var invalidatedProps []string
-
-		err := dbus.Store(sig.Body, &interfaceName, &changedProps, &invalidatedProps)
+	}
+	if o.ruleAuto {
+		rule := o.getMatchRulePropertiesChanged()
+		err := o.addMatch(rule)
 		if err != nil {
-			return
+			return err
 		}
-		for propName, variant := range changedProps {
-			key := propChangedKey{interfaceName, propName}
-			o.mu.Lock()
-			callbacks := o.propChangedCallbacks[key]
-			o.mu.Unlock()
-
-			for _, callback := range callbacks {
-				callback(true, variant.Value())
-			}
-		}
-
-		for _, propName := range invalidatedProps {
-			key := propChangedKey{interfaceName, propName}
-			o.mu.Lock()
-			callbacks := o.propChangedCallbacks[key]
-			o.mu.Unlock()
-
-			for _, callback := range callbacks {
-				callback(false, nil)
-			}
-		}
-	})
-	o.addRuleHandlerId(rule, handlerId)
+		handlerId = o.sigLoop.AddHandler(sigRule, o.propChangedHandler)
+		o.addRuleHandlerId(rule, handlerId)
+	} else {
+		handlerId = o.sigLoop.AddHandler(sigRule, o.propChangedHandler)
+	}
 	o.propChangedHandlerId = handlerId
 	return nil
 }
@@ -153,7 +161,7 @@ func (o *Object) ConnectPropertyChanged_(interfaceName, propName string, callbac
 
 func (o *Object) checkSignalExt() {
 	if o.objectSignalExt == nil {
-		panic(fmt.Sprintf("you should call %T.SetSignalLoop() first", o))
+		panic(fmt.Sprintf("you should call %T.InitSignalExt() first", o))
 	}
 }
 
@@ -208,6 +216,13 @@ func (o *Object) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, cb db
 	defer o.mu.Unlock()
 
 	o.checkSignalExt()
+	return o.connectSignal(rule, sigRule, cb)
+}
+
+func (o *Object) connectSignal(rule string, sigRule *dbusutil.SignalRule, cb dbusutil.SignalHandlerFunc) (dbusutil.SignalHandlerId, error) {
+	if !o.ruleAuto {
+		return o.sigLoop.AddHandler(sigRule, cb), nil
+	}
 	err := o.addMatch(rule)
 	if err != nil {
 		return 0, err
@@ -220,17 +235,17 @@ func (o *Object) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, cb db
 
 // Object public methods:
 
-func (o *Object) SetSignalLoop(sigLoop *dbusutil.SignalLoop) {
+func (o *Object) InitSignalExt(sigLoop *dbusutil.SignalLoop, ruleAuto bool) {
 	if o.conn != sigLoop.Conn() {
 		panic("dbus conn not same")
 	}
 	o.mu.Lock()
-
 	if o.objectSignalExt == nil {
-		o.objectSignalExt = &objectSignalExt{}
-		o.sigLoop = sigLoop
+		o.objectSignalExt = &objectSignalExt{
+			sigLoop:  sigLoop,
+			ruleAuto: ruleAuto,
+		}
 	}
-
 	o.mu.Unlock()
 }
 
@@ -259,9 +274,17 @@ func (o *Object) ConnectPropertiesChanged(
 	if cb == nil {
 		return 0, errors.New("nil callback")
 	}
+	var rule string
 
-	rule := o.getMatchRulePropertiesChanged()
-	return o.ConnectSignal_(rule, &dbusutil.SignalRule{
+	o.mu.Lock()
+	defer o.mu.Unlock()
+
+	o.checkSignalExt()
+	if o.ruleAuto {
+		rule = o.getMatchRulePropertiesChanged()
+	}
+
+	return o.connectSignal(rule, &dbusutil.SignalRule{
 		Path: o.obj.Path(),
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
 	}, func(sig *dbus.Signal) {
