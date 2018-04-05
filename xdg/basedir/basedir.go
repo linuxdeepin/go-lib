@@ -23,6 +23,7 @@ package basedir
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -52,6 +53,32 @@ func GetUserDataDir() string {
 func GetSystemDataDirs() []string {
 	defaultDirs := []string{"/usr/local/share", "/usr/share"}
 	return getSystemDirs("XDG_DATA_DIRS", defaultDirs)
+}
+
+func FindDirInDataDirs(dir string) (string, error) {
+	dirs := []string{GetUserDataDir()}
+	dirs = append(dirs, GetSystemDataDirs()...)
+	for _, subdir := range dirs {
+		needle := filepath.Join(subdir, dir)
+		if stat, err := os.Stat(needle); err == nil && stat.IsDir() {
+			return needle, nil
+		}
+
+	}
+	return "", fmt.Errorf("Unable to locate \"%s\"", dir)
+}
+
+func FindFileInDataDirs(dir string) (string, error) {
+	dirs := []string{GetUserDataDir()}
+	dirs = append(dirs, GetSystemDataDirs()...)
+	for _, subdir := range dirs {
+		needle := filepath.Join(subdir, dir)
+		if _, err := os.Stat(needle); err == nil {
+			return needle, nil
+		}
+
+	}
+	return "", fmt.Errorf("Unable to locate \"%s\"", dir)
 }
 
 func GetUserConfigDir() string {
