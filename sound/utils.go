@@ -21,9 +21,8 @@ package sound
 
 import (
 	"fmt"
-	"os"
 	"path"
-	"pkg.deepin.io/lib/utils"
+	xdg "pkg.deepin.io/lib/xdg/basedir"
 )
 
 var (
@@ -31,24 +30,22 @@ var (
 )
 
 func findThemeFile(theme, event string) (string, error) {
-	var home = os.Getenv("HOME")
-	var themeDirs = []string{
-		path.Join(home, ".local/share/sounds"),
-		"/usr/local/share/sounds",
-		"/usr/share/sounds",
+	// TODO: fix non ogg/oga event
+	// TODO: handle sound theme 'index.theme'
+	var pattern = path.Join("sounds", theme, "stereo", event, ".%s")
+	needle := fmt.Sprintf(pattern, "ogg")
+	file, err := xdg.FindFileInDataDirs(needle)
+
+	if err == nil {
+		return file, nil
 	}
 
-	for _, dir := range themeDirs {
-		// TODO: fix non ogg/oga event
-		// TODO: handle sound theme 'index.theme'
-		file := path.Join(dir, theme, "stereo", event+".ogg")
-		if utils.IsFileExist(file) {
-			return file, nil
-		}
-		file = path.Join(dir, theme, "stereo", event+".oga")
-		if utils.IsFileExist(file) {
-			return file, nil
-		}
+	needle = fmt.Sprintf(pattern, "oga")
+	file, err = xdg.FindFileInDataDirs(needle)
+
+	if err == nil {
+		return file, nil
 	}
+
 	return "", errInvalidEvent
 }
