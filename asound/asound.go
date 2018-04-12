@@ -9,6 +9,7 @@ package asound
 import "C"
 import (
 	"errors"
+	"fmt"
 	"unsafe"
 )
 
@@ -58,6 +59,54 @@ func (subformat PCMSubformat) Name() string {
 func (subformat PCMSubformat) Desc() string {
 	ret := C.snd_pcm_subformat_description(C.snd_pcm_subformat_t(subformat))
 	return C.GoString(ret)
+}
+
+type Output struct {
+	Ptr unsafe.Pointer
+}
+
+func (v Output) native() *C.snd_output_t {
+	return (*C.snd_output_t)(v.Ptr)
+}
+
+func OpenOutput(file, mode string) (Output, error) {
+	file0 := C.CString(file)
+	mode0 := C.CString(mode)
+	var outputPtr *C.snd_output_t
+	ret := C.snd_output_stdio_open(&outputPtr, file0, mode0)
+	C.free(unsafe.Pointer(file0))
+	C.free(unsafe.Pointer(mode0))
+	if ret == 0 {
+		return Output{unsafe.Pointer(outputPtr)}, nil
+	}
+	return Output{}, newError("snd_output_stdio_open", ret)
+}
+
+func (o Output) Flush() error {
+	ret := C.snd_output_flush(o.native())
+	return newError("snd_output_flush", ret)
+}
+
+func (o Output) WriteString(str string) error {
+	str0 := C.CString(str)
+	ret := C.snd_output_puts(o.native(), str0)
+	C.free(unsafe.Pointer(str0))
+	return newError("snd_output_puts", ret)
+}
+
+func (o Output) Println(a ...interface{}) error {
+	str := fmt.Sprintln(a...)
+	return o.WriteString(str)
+}
+
+func (o Output) Printf(format string, a ...interface{}) error {
+	str := fmt.Sprintf(format, a...)
+	return o.WriteString(str)
+}
+
+func (o Output) Close() error {
+	ret := C.snd_output_close(o.native())
+	return newError("snd_output_close", ret)
 }
 
 type PCM struct {
@@ -165,6 +214,26 @@ func (pcm PCM) Reset() error {
 	return newError("snd_pcm_reset", ret)
 }
 
+func (pcm PCM) DumpHwSetup(out Output) error {
+	ret := C.snd_pcm_dump_hw_setup(pcm.native(), out.native())
+	return newError("snd_pcm_dump_hw_setup", ret)
+}
+
+func (pcm PCM) DumpSwSetup(out Output) error {
+	ret := C.snd_pcm_dump_sw_setup(pcm.native(), out.native())
+	return newError("snd_pcm_dump_sw_setup", ret)
+}
+
+func (pcm PCM) DumpSetup(out Output) error {
+	ret := C.snd_pcm_dump_setup(pcm.native(), out.native())
+	return newError("snd_pcm_dump_setup", ret)
+}
+
+func (pcm PCM) Dump(out Output) error {
+	ret := C.snd_pcm_dump(pcm.native(), out.native())
+	return newError("snd_pcm_dump", ret)
+}
+
 type PCMState C.snd_pcm_state_t
 
 func (pcm PCM) State() PCMState {
@@ -210,6 +279,11 @@ func NewPCMHwParams() (PCMHwParams, error) {
 
 func (params PCMHwParams) Free() {
 	C.snd_pcm_hw_params_free(params.native())
+}
+
+func (params PCMHwParams) Dump(out Output) error {
+	ret := C.snd_pcm_hw_params_dump(params.native(), out.native())
+	return newError("snd_pcm_hw_params_dump", ret)
 }
 
 type PCMAccess C.snd_pcm_access_t

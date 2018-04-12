@@ -59,18 +59,6 @@ func newALSAPlayBackend(device string, sampleSpec *SampleSpec) (pb PlayBackend, 
 		return
 	}
 
-	var bufferTime uint = 60000 // 60ms
-	bufferTime, _, err = pcm.HwParamsSetBufferTimeNear(params, bufferTime)
-	if err != nil {
-		return
-	}
-
-	periodTime := bufferTime / 4
-	periodTime, _, err = pcm.HwParamsSetPeriodTimeNear(params, periodTime)
-	if err != nil {
-		return
-	}
-
 	err = pcm.HwParams(params)
 	if err != nil {
 		return
