@@ -365,7 +365,7 @@ func (ai *DesktopAppInfo) GetTerminal() bool {
 }
 
 func (ai *DesktopAppInfo) Launch(files []string, launchContext *appinfo.AppLaunchContext) error {
-	return _launch(ai, ai.GetCommandline(), files, launchContext)
+	return launch(ai, ai.GetCommandline(), files, launchContext)
 }
 
 func (ai *DesktopAppInfo) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
@@ -432,13 +432,16 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		exeargs = append([]string{termExec, termExecArg}, exeargs...)
 	}
 
-	cmdPrefixes := launchContext.GetCmdPrefixes()
-	exeargs = append(cmdPrefixes, exeargs...)
+	if launchContext != nil {
+		cmdPrefixes := launchContext.GetCmdPrefixes()
+		exeargs = append(cmdPrefixes, exeargs...)
+	}
 
 	shellArgs := append([]string{"/dev/stdin"}, exeargs...)
 	cmd := exec.Command("/bin/sh", shellArgs...)
 	cmd.Stdin = strings.NewReader(launchScript)
 	cmd.Env = append(os.Environ(), "GIO_LAUNCHED_DESKTOP_FILE="+ai.GetFileName())
+	cmd.Dir = workingDir
 
 	var snId string
 	startupNotify := ai.GetStartupNotify()
@@ -448,78 +451,14 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		cmd.Env = append(cmd.Env, "DESKTOP_STARTUP_ID="+snId)
 	}
 
-	oldWorkingDir, err := os.Getwd()
-	if err == nil {
-		defer os.Chdir(oldWorkingDir)
-	}
-
-	err = os.Chdir(workingDir)
-	if err != nil {
-		return nil, err
-	}
-
 	err = cmd.Start()
 	return cmd, err
 }
 
 const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec "$@"`
 
-func _launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
-	if cmdline == "" {
-		return errors.New("command line is empty")
-	}
-
-	// get working dir
-	workingDir := ai.GetPath()
-	if workingDir == "" {
-		// fallback to user home dir
-		workingDir = basedir.GetUserHomeDir()
-
-		// fallback to fs root /
-		if workingDir == "" {
-			workingDir = "/"
-		}
-	}
-
-	exeargs, err := splitExec(cmdline)
-	if err != nil {
-		return err
-	}
-
-	exeargs, err = ai.expandFieldCode(exeargs, files)
-	if err != nil {
-		return err
-	}
-
-	useTerminal := ai.GetTerminal()
-	if useTerminal {
-		termExec, termExecArg := getDefaultTerminal()
-		exeargs = append([]string{termExec, termExecArg}, exeargs...)
-	}
-
-	shellArgs := append([]string{"/dev/stdin"}, exeargs...)
-	cmd := exec.Command("/bin/sh", shellArgs...)
-	cmd.Stdin = strings.NewReader(launchScript)
-	cmd.Env = append(os.Environ(), "GIO_LAUNCHED_DESKTOP_FILE="+ai.GetFileName())
-
-	var snId string
-	startupNotify := ai.GetStartupNotify()
-	if startupNotify && launchContext != nil {
-		snId, _ = launchContext.GetStartupNotifyId(ai, files)
-		cmd.Env = append(cmd.Env, "DESKTOP_STARTUP_ID="+snId)
-	}
-
-	oldWorkingDir, err := os.Getwd()
-	if err == nil {
-		defer os.Chdir(oldWorkingDir)
-	}
-
-	err = os.Chdir(workingDir)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.Start()
+func launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
+	cmd, err := startCommand(ai, cmdline, files, launchContext)
 	go cmd.Wait()
 	return err
 }
@@ -559,7 +498,7 @@ type DesktopAction struct {
 
 func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLaunchContext) error {
 	ai := action.parent
-	return _launch(ai, action.Exec, files, launchContext)
+	return launch(ai, action.Exec, files, launchContext)
 }
 
 func (action *DesktopAction) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
