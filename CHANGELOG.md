@@ -1,5 +1,17 @@
 ## [Unreleased]
 
+## [1.2.7] - 2018-04-17
+*   fix(desktopappinfo): incorrect use of os.Chdir to set working directory of cmd
+*   fix(sound_effect): fix alsa backend play failed
+*   chore(debian): add dependency on libpam0g-dev
+*   feat(pam): add lib pam
+*   Merge "feat(dbusutil): proxy.Object can choose not to use auto rule"
+*   feat(dbusutil): proxy.Object can choose not to use auto rule
+*   fix(pulse): protect pa_stream
+*   fix(pulse): protect sink_suspend and meter
+*   fix(pulse): protect pa_context_unref
+*   feat(dbusutil): add support for auto generate code
+
 ## [1.2.6] - 2018-03-19
 *   perf: unref the `pa_operation` in macro "DEFINE"
 *   feat: dbusutil/gsprop add Uint64 type
