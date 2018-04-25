@@ -30,7 +30,6 @@ import "C"
 import "fmt"
 import "unsafe"
 import "sync"
-import "time"
 
 type Callback func(eventType int, idx uint32)
 
@@ -314,9 +313,6 @@ var (
 	__ctxLocker sync.Mutex
 )
 
-// PulseInitTimeout set pa_init timeout, if timeout return nil
-var PulseInitTimeout = time.Duration(20)
-
 func GetContextForced() *Context {
 	__ctxLocker.Lock()
 	ctx := __context
@@ -328,17 +324,17 @@ func GetContextForced() *Context {
 	return GetContext()
 }
 
+var PulseInitTimeout = 20
+
 func GetContext() *Context {
 	__ctxLocker.Lock()
 	defer __ctxLocker.Unlock()
 	if __context == nil {
 		loop := C.pa_threaded_mainloop_new()
-		time.AfterFunc(time.Second*PulseInitTimeout, func() {
-			fmt.Println("Connect to pulseaudio timeout, terminate")
-			C.pa_finalize()
-		})
-		ctx := C.new_pa_context(loop)
+
+		ctx := C.new_pa_context(loop, C.int(PulseInitTimeout))
 		if ctx == nil {
+			//TODO: Free loop
 			fmt.Println("Failed to init pulseaudio")
 			return nil
 		}

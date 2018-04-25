@@ -22,6 +22,7 @@
 #include "dde-pulse.h"
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "_cgo_export.h" //convert int
 
@@ -119,10 +120,7 @@ void setup_monitor(pa_threaded_mainloop* m, pa_context *ctx)
 }
 
 
-//TODO: the init_state should be protect by lock
-static int init_state = 0; // O: unknown, 1: success, 2: failure
-
-pa_context* new_pa_context(pa_threaded_mainloop* m)
+pa_context* new_pa_context(pa_threaded_mainloop* m, int timeout_in_seconds)
 {
     pa_threaded_mainloop_lock(m);
     pa_threaded_mainloop_start(m);
@@ -135,37 +133,32 @@ pa_context* new_pa_context(pa_threaded_mainloop* m)
 
     pa_threaded_mainloop_unlock(m);
 
-    init_state = 0;
+    struct timespec tstart;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &tstart);
+
     while(state != PA_CONTEXT_READY) {
-        if (init_state != 0) {
-            break;
-        }
         pa_threaded_mainloop_lock(m);
         state = pa_context_get_state(ctx);
         pa_threaded_mainloop_unlock(m);
         if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED) {
-            init_state = 2;
-            fprintf(stderr, "Failed Connect to pulseaudio server");
+            fprintf(stderr, "Failed Connect to pulseaudio server\n");
             return NULL;
         }
-    }
 
-    if (init_state == 2) {
-        fprintf(stderr, "Connect to pulseaudio timeout\n");
-        return NULL;
+        {
+          // TODO use pa_threaded_mainloop_wait to handle timeout
+          struct timespec now;
+          clock_gettime(CLOCK_MONOTONIC_RAW, &now);
+          int elapse = now.tv_sec - tstart.tv_sec;
+          if (elapse > timeout_in_seconds) {
+            fprintf(stderr, "Failed Connect to pulseaudio server timeout %d seconds\n",
+                    timeout_in_seconds);
+            return NULL;
+          }
+        }
     }
-    init_state = 1;
     setup_monitor(m, ctx);
     return ctx;
-}
-
-void
-pa_finalize()
-{
-    if (init_state != 0) {
-        return;
-    }
-    init_state = 2;
 }
 
 // #define PA_INVALID_INDEX ((uint32_t) -1)

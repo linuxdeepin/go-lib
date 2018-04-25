@@ -42,8 +42,7 @@ DECLARE(sample);
 
 void get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
 
-pa_context* new_pa_context(pa_threaded_mainloop* ml);
-void pa_finalize();
+pa_context* new_pa_context(pa_threaded_mainloop* ml, int timeout_in_seconds);
 
 // Fixed gccgo(1.4) compile failed, becase of 'success_cb' duplicate definition
 pa_context_success_cb_t get_success_cb();
