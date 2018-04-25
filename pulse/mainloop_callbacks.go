@@ -1,9 +1,12 @@
 package pulse
 
+//#include "dde-pulse.h"
 import "C"
+import "runtime"
 import "fmt"
 import "unsafe"
 
+// ONLY C file and below function can use C.pa_threaded_mainloop_lock/unlock
 var pendingCallback = make(chan func(), 10)
 
 func startHandleCallbacks() {
@@ -17,6 +20,33 @@ func startHandleCallbacks() {
 func init() {
 	// TODO: encapsulate the logic to Context and adding Start/Stop logic.
 	go startHandleCallbacks()
+}
+
+func freeContext(ctx *Context) {
+	runtime.LockOSThread()
+	C.pa_threaded_mainloop_lock(ctx.loop)
+	// The pa_context_unref must be protected.
+	// This operation will cancel all pending operations which will touch  mainloop object.
+	C.pa_context_unref(ctx.ctx)
+	C.pa_threaded_mainloop_unlock(ctx.loop)
+	// There no need to call pa_threaded_mainloop_stop.
+	C.pa_threaded_mainloop_free(ctx.loop)
+	runtime.UnlockOSThread()
+
+	ctx.loop = nil
+	ctx.ctx = nil
+}
+
+// safeDo invoke an function with lock
+func (c *Context) safeDo(fn func()) {
+	runtime.LockOSThread()
+	C.pa_threaded_mainloop_lock(c.loop)
+	// NOTE: fn() can't hold any lock except the c.loop,
+	//  Otherwise there will be a deadlock situation.
+	// See also mainloop_callbacks.go
+	fn()
+	C.pa_threaded_mainloop_unlock(c.loop)
+	runtime.UnlockOSThread()
 }
 
 // ALL of below functions are invoked from pulse's mainloop thread.
