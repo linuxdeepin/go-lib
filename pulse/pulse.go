@@ -372,24 +372,6 @@ func GetContext() *Context {
 	return __context
 }
 
-//export receive_some_info
-func receive_some_info(cookie int64, infoType int, info unsafe.Pointer, status int) {
-	c := fetchCookie(cookie)
-	if c == nil {
-		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, status)
-		return
-	}
-
-	switch {
-	case status == 1:
-		c.EndOfList()
-	case status == 0:
-		c.Feed(infoType, info)
-	case status < 0:
-		c.Failed()
-	}
-}
-
 func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
 	// sink sinkinput source sourceoutput
 	c.cbs[facility] = append(c.cbs[facility], cb)
@@ -405,31 +387,4 @@ func (c *Context) SuspendSinkById(idx uint32, suspend int) {
 
 func (c *Context) SuspendSourceById(idx uint32, suspend int) {
 	C.suspend_source_by_id(c.loop, c.ctx, C.uint32_t(idx), C.int(suspend))
-}
-
-func (c *Context) handlePAEvent(facility, eventType int, idx uint32) {
-	if cb, ok := c.cbs[facility]; ok {
-		for _, c := range cb {
-			go c(eventType, idx)
-		}
-	} else {
-		fmt.Println("unknow event", facility, eventType, idx)
-	}
-}
-
-//export go_handle_changed
-func go_handle_changed(facility int, event_type int, idx uint32) {
-	GetContext().handlePAEvent(facility, event_type, idx)
-}
-
-//export go_handle_state_changed
-func go_handle_state_changed(state int) {
-	cbs, ok := GetContext().stateCbs[state]
-	if !ok {
-		fmt.Println("Unregiste state:", state)
-	}
-
-	for _, cb := range cbs {
-		go cb()
-	}
 }

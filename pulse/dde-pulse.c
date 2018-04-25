@@ -36,7 +36,7 @@ pa_context_success_cb_t get_success_cb()
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX)                                \
   void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *i, int eol, void *userdata) \
   {                                                                     \
-    receive_some_info((int64_t)userdata, ID, (void*)i, eol);            \
+    go_receive_some_info((int64_t)userdata, ID, (void*)i, eol);            \
     if (eol < 0) {                                                      \
       if (pa_context_errno(c) == PA_ERR_NOENTITY) {                     \
         fprintf(stderr, "errno == PA_ERR_NOENTITY");                    \
@@ -77,7 +77,7 @@ void receive_server_info_cb(pa_context *c, const pa_server_info *i, void *userda
     pa_server_info *info = NULL;
     info = malloc(sizeof(pa_server_info));
     memcpy(info, i, sizeof(pa_server_info));
-    receive_some_info((int64_t)userdata, PA_SUBSCRIPTION_EVENT_SERVER, (void*)info, 0);
+    go_receive_some_info((int64_t)userdata, PA_SUBSCRIPTION_EVENT_SERVER, (void*)info, 0);
 }
 void get_server_info(pa_threaded_mainloop* loop, pa_context *c, int64_t cookie)
 {

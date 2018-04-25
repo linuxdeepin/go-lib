@@ -34,6 +34,9 @@ type paInfo struct {
 }
 
 func NewPaInfo(data unsafe.Pointer, Type int) *paInfo {
+	if data == nil {
+		return nil
+	}
 	info := &paInfo{Type: Type}
 	switch Type {
 	case C.PA_SUBSCRIPTION_EVENT_SINK:
@@ -76,8 +79,7 @@ func (c *cookie) ReplyList() []*paInfo {
 	return infos
 }
 
-func (c *cookie) Feed(infoType int, info unsafe.Pointer) {
-	paInfo := NewPaInfo(info, infoType)
+func (c *cookie) Feed(paInfo *paInfo) {
 	if paInfo == nil {
 		return
 	}

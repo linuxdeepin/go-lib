@@ -55,12 +55,3 @@ func (s *SourceMeter) ConnectChanged(cb func(v float64)) {
 	sourceMeterCBs[s.sourceIndex] = cb
 	sourceMeterLock.Unlock()
 }
-
-//export go_update_volume_meter
-func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
-	sourceMeterLock.RLock()
-	if cb, ok := sourceMeterCBs[source_index]; ok && cb != nil {
-		sourceMeterLock.RUnlock()
-		cb(v)
-	}
-}
