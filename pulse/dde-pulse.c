@@ -28,6 +28,13 @@
 
 static inline void __empty_success_cb(pa_context *c, int success, void *userdata)
 {
+  if (!success) {
+    int en = pa_context_errno(c);
+    printf("go-lib/pulse operation failed: %s. %p %p\n",
+           pa_strerror(en),
+           c,
+           userdata);
+  }
 }
 pa_context_success_cb_t get_success_cb()
 {
