@@ -65,8 +65,9 @@ func (s *Source) SetPort(name string) {
 	c := GetContext()
 	c.safeDo(func() {
 		cname := C.CString(name)
-		C.pa_context_set_source_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
+		op := C.pa_context_set_source_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
 		C.free(unsafe.Pointer(cname))
+		C.pa_operation_unref(op)
 	})
 }
 
@@ -75,7 +76,8 @@ func (s *Source) SetVolume(v CVolume) {
 	c := GetContext()
 
 	c.safeDo(func() {
-		C.pa_context_set_source_volume_by_index(c.ctx, C.uint32_t(s.Index), &s.Volume.core, C.get_success_cb(), nil)
+		op := C.pa_context_set_source_volume_by_index(c.ctx, C.uint32_t(s.Index), &s.Volume.core, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 	})
 }
 
@@ -88,7 +90,8 @@ func (s *Source) SetMute(mute bool) {
 	c := GetContext()
 
 	c.safeDo(func() {
-		C.pa_context_set_source_mute_by_index(c.ctx, C.uint32_t(s.Index), C.int(_mute), C.get_success_cb(), nil)
+		op := C.pa_context_set_source_mute_by_index(c.ctx, C.uint32_t(s.Index), C.int(_mute), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 	})
 }
 

@@ -56,7 +56,8 @@ func (s *SinkInput) SetVolume(v CVolume) {
 	s.Volume = v
 	c := GetContext()
 	c.safeDo(func() {
-		C.pa_context_set_sink_input_volume(c.ctx, C.uint32_t(s.Index), &v.core, C.get_success_cb(), nil)
+		op := C.pa_context_set_sink_input_volume(c.ctx, C.uint32_t(s.Index), &v.core, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 	})
 
 }
@@ -67,7 +68,8 @@ func (sink *SinkInput) SetMute(mute bool) {
 	}
 	c := GetContext()
 	c.safeDo(func() {
-		C.pa_context_set_sink_input_mute(c.ctx, C.uint32_t(sink.Index), C.int(_mute), C.get_success_cb(), nil)
+		op := C.pa_context_set_sink_input_mute(c.ctx, C.uint32_t(sink.Index), C.int(_mute), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 	})
 }
 

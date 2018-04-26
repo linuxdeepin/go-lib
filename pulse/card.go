@@ -83,9 +83,10 @@ func (card *Card) SetProfile(name string) {
 	c.safeDo(func() {
 		cname := C.CString(fmt.Sprint(card.Index))
 		pname := C.CString(name)
-		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
+		op := C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
 		C.free(unsafe.Pointer(cname))
 		C.free(unsafe.Pointer(pname))
+		C.pa_operation_unref(op)
 	})
 }
 

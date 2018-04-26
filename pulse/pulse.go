@@ -274,14 +274,16 @@ func (c *Context) GetDefaultSink() string {
 func (c *Context) SetDefaultSink(name string) {
 	c.safeDo(func() {
 		cname := C.CString(name)
-		C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
+		op := C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 		C.free(unsafe.Pointer(cname))
 	})
 }
 func (c *Context) SetDefaultSource(name string) {
 	c.safeDo(func() {
 		cname := C.CString(name)
-		C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
+		op := C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
 		C.free(unsafe.Pointer(cname))
 	})
 }
@@ -291,8 +293,9 @@ func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
 	c.safeDo(func() {
 		cname := C.CString(sinkName)
 		for _, idx := range sinkInputs {
-			C.pa_context_move_sink_input_by_name(c.ctx, C.uint32_t(idx), cname,
+			op := C.pa_context_move_sink_input_by_name(c.ctx, C.uint32_t(idx), cname,
 				C.get_success_cb(), nil)
+			C.pa_operation_unref(op)
 		}
 		C.free(unsafe.Pointer(cname))
 	})
@@ -302,8 +305,9 @@ func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
 func (c *Context) MoveSinkInputsByIndex(sinkInputs []uint32, sinkIdx uint32) {
 	c.safeDo(func() {
 		for _, idx := range sinkInputs {
-			C.pa_context_move_sink_input_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sinkIdx),
+			op := C.pa_context_move_sink_input_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sinkIdx),
 				C.get_success_cb(), nil)
+			C.pa_operation_unref(op)
 		}
 	})
 }
@@ -313,8 +317,14 @@ func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName str
 	c.safeDo(func() {
 		cname := C.CString(sourceName)
 		for _, idx := range sourceOutputs {
-			C.pa_context_move_source_output_by_name(c.ctx, C.uint32_t(idx), cname,
-				C.get_success_cb(), nil)
+			op := C.pa_context_move_source_output_by_name(
+				c.ctx,
+				C.uint32_t(idx),
+				cname,
+				C.get_success_cb(),
+				nil,
+			)
+			C.pa_operation_unref(op)
 		}
 		C.free(unsafe.Pointer(cname))
 	})
@@ -324,8 +334,14 @@ func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName str
 func (c *Context) MoveSourceOutputsByIndex(sourceOutputs []uint32, sourceIdx uint32) {
 	c.safeDo(func() {
 		for _, idx := range sourceOutputs {
-			C.pa_context_move_source_output_by_index(c.ctx, C.uint32_t(idx), C.uint32_t(sourceIdx),
-				C.get_success_cb(), nil)
+			op := C.pa_context_move_source_output_by_index(
+				c.ctx,
+				C.uint32_t(idx),
+				C.uint32_t(sourceIdx),
+				C.get_success_cb(),
+				nil,
+			)
+			C.pa_operation_unref(op)
 		}
 	})
 }
