@@ -7,12 +7,16 @@ import "fmt"
 import "unsafe"
 
 // ONLY C file and below function can use C.pa_threaded_mainloop_lock/unlock
-var pendingCallback = make(chan func(), 10)
+
+// It Must not be send any fn to pendingCallback in the callback,
+// otherwise DEADLOCK.
+// This means at least don't run any unknown code which passed from user.
+var pendingCallback = make(chan func())
 
 func startHandleCallbacks() {
-	for fn := range pendingCallback {
-		if fn != nil {
-			fn()
+	for fnWithOutPendingCode := range pendingCallback {
+		if fnWithOutPendingCode != nil {
+			fnWithOutPendingCode()
 		}
 	}
 }
@@ -69,7 +73,7 @@ func go_handle_changed(facility int, event_type int, idx uint32) {
 		}
 
 		for _, cb := range cbs {
-			cb(event_type, idx)
+			go cb(event_type, idx)
 		}
 	}
 }
@@ -83,7 +87,7 @@ func go_handle_state_changed(state int) {
 		}
 
 		for _, cb := range cbs {
-			cb()
+			go cb()
 		}
 	}
 }
@@ -96,7 +100,7 @@ func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
 		sourceMeterLock.RUnlock()
 
 		if ok && cb != nil {
-			cb(v)
+			go cb(v)
 		}
 	}
 }
