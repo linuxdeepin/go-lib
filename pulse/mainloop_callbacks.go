@@ -105,20 +105,21 @@ func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
 func go_receive_some_info(cookie int64, infoType int, info unsafe.Pointer, status int) {
 	paInfo := NewPaInfo(info, infoType)
 
-	pendingCallback <- func() {
-		c := fetchCookie(cookie)
-		if c == nil {
-			fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, status)
-			return
-		}
+	ck := fetchCookie(cookie)
+	if ck == nil {
+		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, status)
+		return
+	}
 
-		switch {
-		case status == 1:
-			c.EndOfList()
-		case status == 0:
-			c.Feed(paInfo)
-		case status < 0:
-			c.Failed()
-		}
+	switch {
+	case status == 1:
+		ck.EndOfList()
+	case status == 0:
+		// 1. the Feed will be blocked until the ck creator received.
+		// 2. the creator of ck may be invoked under PendingCallback
+		// so this must not be moved to PendingCallback.
+		ck.Feed(paInfo)
+	case status < 0:
+		ck.Failed()
 	}
 }
