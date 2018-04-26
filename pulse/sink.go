@@ -65,12 +65,11 @@ type Sink struct {
 }
 
 func (s *Sink) SetPort(name string) {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
-
 	c := GetContext()
 	c.safeDo(func() {
+		cname := C.CString(name)
 		C.pa_context_set_sink_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cname))
 	})
 
 }

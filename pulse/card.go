@@ -79,14 +79,13 @@ func toCardInfo(info *C.pa_card_info) (c *Card) {
 }
 
 func (card *Card) SetProfile(name string) {
-	cname := C.CString(fmt.Sprint(card.Index))
-	defer C.free(unsafe.Pointer(cname))
-	pname := C.CString(name)
-	defer C.free(unsafe.Pointer(pname))
-
 	c := GetContext()
 	c.safeDo(func() {
+		cname := C.CString(fmt.Sprint(card.Index))
+		pname := C.CString(name)
 		C.pa_context_set_card_profile_by_name(c.ctx, cname, pname, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cname))
+		C.free(unsafe.Pointer(pname))
 	})
 }
 

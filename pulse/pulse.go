@@ -246,32 +246,29 @@ func (c *Context) GetDefaultSink() string {
 	return ""
 }
 func (c *Context) SetDefaultSink(name string) {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
-
 	c.safeDo(func() {
+		cname := C.CString(name)
 		C.pa_context_set_default_sink(c.ctx, cname, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cname))
 	})
 }
 func (c *Context) SetDefaultSource(name string) {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
-
 	c.safeDo(func() {
+		cname := C.CString(name)
 		C.pa_context_set_default_source(c.ctx, cname, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cname))
 	})
 }
 
 // MoveSinkInputsByName move sink-inputs to the special sink name
 func (c *Context) MoveSinkInputsByName(sinkInputs []uint32, sinkName string) {
-	cname := C.CString(sinkName)
-	defer C.free(unsafe.Pointer(cname))
-
 	c.safeDo(func() {
+		cname := C.CString(sinkName)
 		for _, idx := range sinkInputs {
 			C.pa_context_move_sink_input_by_name(c.ctx, C.uint32_t(idx), cname,
 				C.get_success_cb(), nil)
 		}
+		C.free(unsafe.Pointer(cname))
 	})
 }
 
@@ -287,14 +284,13 @@ func (c *Context) MoveSinkInputsByIndex(sinkInputs []uint32, sinkIdx uint32) {
 
 // MoveSourceOutputsByName move source-outputs to the special source name
 func (c *Context) MoveSourceOutputsByName(sourceOutputs []uint32, sourceName string) {
-	cname := C.CString(sourceName)
-	defer C.free(unsafe.Pointer(cname))
-
 	c.safeDo(func() {
+		cname := C.CString(sourceName)
 		for _, idx := range sourceOutputs {
 			C.pa_context_move_source_output_by_name(c.ctx, C.uint32_t(idx), cname,
 				C.get_success_cb(), nil)
 		}
+		C.free(unsafe.Pointer(cname))
 	})
 }
 
