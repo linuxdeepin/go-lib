@@ -121,24 +121,26 @@ func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
 }
 
 //export go_receive_some_info
-func go_receive_some_info(cookie int64, infoType int, info unsafe.Pointer, status int) {
-	paInfo := NewPaInfo(info, infoType)
-
+func go_receive_some_info(cookie int64, infoType int, info unsafe.Pointer, eol int) {
 	ck := fetchCookie(cookie)
 	if ck == nil {
-		fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info, status)
+		if eol == 0 {
+			// Sometimes pulseaudio will send eol=1 to pa_context_get_*_by_index/name.
+			fmt.Println("Warning: recieve_some_info with nil cookie", cookie, infoType, info)
+		}
 		return
 	}
 
 	switch {
-	case status == 1:
+	case eol == 1:
 		ck.EndOfList()
-	case status == 0:
+	case eol == 0:
 		// 1. the Feed will be blocked until the ck creator received.
 		// 2. the creator of ck may be invoked under PendingCallback
 		// so this must not be moved to PendingCallback.
+		paInfo := NewPaInfo(info, infoType)
 		ck.Feed(paInfo)
-	case status < 0:
+	case eol < 0:
 		ck.Failed()
 	}
 }
