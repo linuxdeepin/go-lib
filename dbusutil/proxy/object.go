@@ -68,8 +68,8 @@ func storeGetProperty(call *dbus.Call, value interface{}) error {
 
 func (o *Object) SetProperty_(flags dbus.Flags, interfaceName, propName string,
 	value interface{}) error {
-	return o.obj.Call("org.freedesktop.DBus.Properties.Set", flags, interfaceName, propName,
-		value).Err
+	return o.obj.Call("org.freedesktop.DBus.Properties.Set", flags, interfaceName,
+		propName, dbus.MakeVariant(value)).Err
 }
 
 func (o *Object) addRuleHandlerId(rule string, handlerId dbusutil.SignalHandlerId) {
