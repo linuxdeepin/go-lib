@@ -13,6 +13,13 @@ import "unsafe"
 // This means at least don't run any unknown code which passed from user.
 var pendingCallback = make(chan func())
 
+type safeDoCtx struct {
+	fn   func()
+	loop *C.pa_threaded_mainloop
+}
+
+var pendingSafeDo = make(chan safeDoCtx)
+
 func startHandleCallbacks() {
 	for fnWithOutPendingCode := range pendingCallback {
 		if fnWithOutPendingCode != nil {
@@ -21,9 +28,24 @@ func startHandleCallbacks() {
 	}
 }
 
+func startHandleSafeDo() {
+	// Move all safeDo fn to here to avoid creating too many OS Thread.
+	// Because GOMAXPROC only apply to go-runtime.
+	for c := range pendingSafeDo {
+		if c.fn != nil {
+			runtime.LockOSThread()
+			C.pa_threaded_mainloop_lock(c.loop)
+			c.fn()
+			C.pa_threaded_mainloop_unlock(c.loop)
+			runtime.UnlockOSThread()
+		}
+	}
+}
+
 func init() {
 	// TODO: encapsulate the logic to Context and adding Start/Stop logic.
 	go startHandleCallbacks()
+	go startHandleSafeDo()
 }
 
 func freeContext(ctx *Context) {
@@ -43,14 +65,7 @@ func freeContext(ctx *Context) {
 
 // safeDo invoke an function with lock
 func (c *Context) safeDo(fn func()) {
-	runtime.LockOSThread()
-	C.pa_threaded_mainloop_lock(c.loop)
-	// NOTE: fn() can't hold any lock except the c.loop,
-	//  Otherwise there will be a deadlock situation.
-	// See also mainloop_callbacks.go
-	fn()
-	C.pa_threaded_mainloop_unlock(c.loop)
-	runtime.UnlockOSThread()
+	pendingSafeDo <- safeDoCtx{fn, c.loop}
 }
 
 // ALL of below functions are invoked from pulse's mainloop thread.

@@ -63,9 +63,6 @@ type cookie struct {
 	data chan *paInfo
 }
 
-func NewCookie(id int64) *cookie {
-	return &cookie{int64(id), make(chan *paInfo)}
-}
 func (c *cookie) Reply() *paInfo {
 	defer deleteCookie(c.id)
 	return <-c.data
@@ -105,7 +102,7 @@ var newCookie, fetchCookie, deleteCookie = func() (func() *cookie,
 	return func() *cookie {
 			locker.Lock()
 			id++
-			c := NewCookie(id)
+			c := &cookie{int64(id), make(chan *paInfo)}
 			cookies[c.id] = c
 			locker.Unlock()
 			return c

@@ -28,8 +28,8 @@
 #include <pulse/pulseaudio.h>
 
 #define DECLARE(TYPE) \
-  void get_##TYPE##_info(pa_threaded_mainloop*, pa_context*, int64_t, uint32_t); \
-  void get_##TYPE##_info_list(pa_threaded_mainloop*, pa_context*, int64_t);
+  void _get_##TYPE##_info(pa_threaded_mainloop*, pa_context*, int64_t, uint32_t); \
+  void _get_##TYPE##_info_list(pa_threaded_mainloop*, pa_context*, int64_t);
 
 DECLARE(sink);
 DECLARE(sink_input);
@@ -40,7 +40,7 @@ DECLARE(card);
 DECLARE(module);
 DECLARE(sample);
 
-void get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
+void _get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
 
 pa_context* new_pa_context(pa_threaded_mainloop* ml, int timeout_in_seconds);
 
@@ -49,7 +49,7 @@ pa_context_success_cb_t get_success_cb();
 
 pa_stream* createMonitorStreamForSource(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend);
 
-void suspend_sink_by_id(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t idx, int suspend);
-void suspend_source_by_id(pa_threaded_mainloop*  loop, pa_context* ctx, uint32_t idx, int suspend);
+void _suspend_sink_by_id(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t idx, int suspend);
+void _suspend_source_by_id(pa_threaded_mainloop*  loop, pa_context* ctx, uint32_t idx, int suspend);
 
 #endif
