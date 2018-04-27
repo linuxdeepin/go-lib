@@ -2,11 +2,9 @@
 #include <security/pam_appl.h>
 #include <string.h>
 
-int cb_pam_conv(
-	int num_msg,
-	const struct pam_message **msg,
-	struct pam_response **resp,
-	void *appdata_ptr)
+int cb_pam_conv(int num_msg,
+		const struct pam_message **msg,
+		struct pam_response **resp, void *appdata_ptr)
 {
 	*resp = calloc(num_msg, sizeof **resp);
 	if (num_msg <= 0 || num_msg > PAM_MAX_NUM_MSG) {
@@ -15,18 +13,20 @@ int cb_pam_conv(
 	if (!*resp) {
 		return PAM_BUF_ERR;
 	}
+	char *resp_str = NULL;
 	for (size_t i = 0; i < num_msg; ++i) {
-		struct cbPAMConv_return result = cbPAMConv(
-				msg[i]->msg_style,
-				(char *)msg[i]->msg,
-				(long)appdata_ptr);
-		if (result.r1 != PAM_SUCCESS) {
+		int result = cbPAMConv(msg[i]->msg_style,
+				       (char *)msg[i]->msg,
+				       (long)appdata_ptr,
+				       &resp_str);
+		if (result != PAM_SUCCESS) {
 			goto error;
 		}
-		(*resp)[i].resp = result.r0;
+		(*resp)[i].resp = resp_str;
+		(*resp)[i].resp_retcode = 0;
 	}
 	return PAM_SUCCESS;
-error:
+ error:
 	for (size_t i = 0; i < num_msg; ++i) {
 		if ((*resp)[i].resp) {
 			memset((*resp)[i].resp, 0, strlen((*resp)[i].resp));

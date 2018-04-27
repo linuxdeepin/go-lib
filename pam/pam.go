@@ -280,13 +280,14 @@ func (h *Transaction) GetEnvList() map[string]string {
 
 // cbPAMConv is a wrapper for the conversation callback function.
 //export cbPAMConv
-func cbPAMConv(s C.int, msg *C.char, c int) (*C.char, C.int) {
+func cbPAMConv(style C.int, msg *C.char, id C.long, resp **C.char) C.int {
 	var r string
 	var err error
-	handler := getHandler(handlerId(c))
-	r, err = handler.RespondPAM(Style(s), C.GoString(msg))
+	handler := getHandler(handlerId(id))
+	r, err = handler.RespondPAM(Style(style), C.GoString(msg))
 	if err != nil {
-		return nil, C.PAM_CONV_ERR
+		return C.PAM_CONV_ERR
 	}
-	return C.CString(r), C.PAM_SUCCESS
+	*resp = C.CString(r)
+	return C.PAM_SUCCESS
 }
