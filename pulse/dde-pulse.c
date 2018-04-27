@@ -28,13 +28,16 @@
 
 static inline void __empty_success_cb(pa_context *c, int success, void *userdata)
 {
-  if (!success) {
-    int en = pa_context_errno(c);
-    printf("go-lib/pulse operation failed: %s. %p %p\n",
-           pa_strerror(en),
-           c,
-           userdata);
+  if (success) {
+    return;
   }
+
+  int en = pa_context_errno(c);
+  fprintf(stderr, "go-lib/pulse operation failed: %s. %p %p\n",
+          pa_strerror(en),
+          c,
+          userdata);
+
 }
 pa_context_success_cb_t get_success_cb()
 {
@@ -117,43 +120,54 @@ void setup_monitor(pa_threaded_mainloop* m, pa_context *ctx)
 }
 
 
+static void
+_wait_context_state_change(pa_context* ctx, void* userdata)
+{
+  pa_threaded_mainloop* loop = userdata;
+  pa_threaded_mainloop_signal(loop, 0);
+}
+
 pa_context* new_pa_context(pa_threaded_mainloop* m, int timeout_in_seconds)
 {
     pa_threaded_mainloop_lock(m);
     pa_threaded_mainloop_start(m);
-
     pa_mainloop_api* mlapi = pa_threaded_mainloop_get_api(m);
     pa_context* ctx = pa_context_new(mlapi, "go-pulseaudio");
-
-    pa_context_connect(ctx, NULL, PA_CONTEXT_NOFAIL, NULL);
-    int	state = pa_context_get_state(ctx);
-
     pa_threaded_mainloop_unlock(m);
 
     struct timespec tstart;
     clock_gettime(CLOCK_MONOTONIC_RAW, &tstart);
 
-    while(state != PA_CONTEXT_READY) {
-        pa_threaded_mainloop_lock(m);
-        state = pa_context_get_state(ctx);
-        pa_threaded_mainloop_unlock(m);
+    pa_threaded_mainloop_lock(m);
+    pa_context_set_state_callback(ctx, _wait_context_state_change, m);
+    pa_context_connect(ctx, NULL, PA_CONTEXT_NOFAIL, NULL);
+    int state = pa_context_get_state(ctx);
+    while (state != PA_CONTEXT_READY) {
+        // Exit condition one.
         if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED) {
-            fprintf(stderr, "Failed Connect to pulseaudio server\n");
-            return NULL;
+          pa_threaded_mainloop_unlock(m);
+          fprintf(stderr, "Failed Connect to pulseaudio server\n");
+          return NULL;
         }
 
-        {
-          // TODO use pa_threaded_mainloop_wait to handle timeout
-          struct timespec now;
-          clock_gettime(CLOCK_MONOTONIC_RAW, &now);
-          int elapse = now.tv_sec - tstart.tv_sec;
-          if (elapse > timeout_in_seconds) {
-            fprintf(stderr, "Failed Connect to pulseaudio server timeout %d seconds\n",
-                    timeout_in_seconds);
-            return NULL;
-          }
+        // Exit condition two.
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC_RAW, &now);
+        int elapse = now.tv_sec - tstart.tv_sec;
+        if (elapse > timeout_in_seconds) {
+          pa_threaded_mainloop_unlock(m);
+          fprintf(stderr, "Failed Connect to pulseaudio server timeout %d seconds\n",
+                  timeout_in_seconds);
+          return NULL;
         }
+
+        // It must be the last line of while loop.
+        // wait for connect state changed.
+        pa_threaded_mainloop_wait(m);
+        state = pa_context_get_state(ctx);
     }
+    pa_threaded_mainloop_unlock(m);
+
     setup_monitor(m, ctx);
     return ctx;
 }
