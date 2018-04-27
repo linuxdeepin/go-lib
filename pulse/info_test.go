@@ -13,7 +13,8 @@ func TestQueryInfo(t *testing.T) {
 		t.Skip("Can't connect to pulseaudio.")
 		return
 	}
-	if len(ctx.GetCardList()) == 0 {
-		t.Fatal("Can't query sound card")
+	_, err := ctx.GetServer()
+	if err != nil {
+		t.Fatal("Can't query server info", err)
 	}
 }
