@@ -1,5 +1,22 @@
 ## [Unreleased]
 
+## [1.2.8] - 2018-05-14
+*   feat(dbusutil): dbusutil-gen add do not edit header
+*   fix(pam): cbPAMConv return two values
+*   fix(dbus1): test failed
+*   fix(dbusutil): failed to set property of object
+*   refactor(pulse): ignore pulseaudio's strange behavior
+*   fix(pulse): memory leak about pa_operation
+*   perf(pulse): remove useless memcpy
+*   fix(pulse): unity all mainloop_lock to safeDo
+*   fix(pulse): deadlock on pendingCallback
+*   fix(pulse): block on ck.Feed
+*   refactor(pulse): print info about failed pulse operation
+*   fix(pulse): too early free C.String
+*   refactor(pulse): erase magic number about PA init State
+*   refactor(pulse): move all pa_threaded_mainloop_lock to one file
+*   fix(pulse): move all callback out of mainloop thread
+
 ## [1.2.7] - 2018-04-17
 *   fix(desktopappinfo): incorrect use of os.Chdir to set working directory of cmd
 *   fix(sound_effect): fix alsa backend play failed
