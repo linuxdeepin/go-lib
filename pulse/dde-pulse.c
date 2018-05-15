@@ -52,7 +52,6 @@ pa_context_success_cb_t get_success_cb()
       fprintf(stderr, "receive_%s_cb failed: %s\n",                     \
               #TYPE,                                                    \
               pa_strerror(en));                                         \
-      return;                                                           \
     }                                                                   \
     go_receive_some_info((int64_t)userdata, ID, (void*)info, eol);      \
   }                                                                     \
