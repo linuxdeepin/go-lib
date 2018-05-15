@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.2.9] - 2018-05-15
+*   fix(pulse): event error should handle in  go space
+*   perf(pulse): avoid wasting CPU time to poll connect state
+
 ## [1.2.8] - 2018-05-14
 *   feat(dbusutil): dbusutil-gen add do not edit header
 *   fix(pam): cbPAMConv return two values
