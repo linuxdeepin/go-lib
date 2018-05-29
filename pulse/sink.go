@@ -64,6 +64,7 @@ type Sink struct {
 	//formats
 }
 
+// TODO: remove
 func (s *Sink) SetPort(name string) {
 	c := GetContext()
 	c.safeDo(func() {
@@ -75,6 +76,7 @@ func (s *Sink) SetPort(name string) {
 
 }
 
+// TODO: remove
 func (s *Sink) SetMute(mute bool) {
 	_mute := 0
 	if mute {
@@ -87,6 +89,7 @@ func (s *Sink) SetMute(mute bool) {
 	})
 }
 
+// TODO: remove
 func (s *Sink) SetVolume(v CVolume) {
 	s.Volume = v
 

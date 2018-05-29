@@ -407,3 +407,84 @@ func (c *Context) SuspendSourceById(idx uint32, suspend int) {
 		C._suspend_source_by_id(c.loop, c.ctx, C.uint32_t(idx), C.int(suspend))
 	})
 }
+
+func (c *Context) SetSinkPortByIndex(sinkIndex uint32, portName string) {
+	c.safeDo(func() {
+		cPortName := C.CString(portName)
+		op := C.pa_context_set_sink_port_by_index(c.ctx, C.uint32_t(sinkIndex),
+			cPortName, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cPortName))
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSinkMuteByIndex(sinkIndex uint32, mute bool) {
+	muteInt := 0
+	if mute {
+		muteInt = 1
+	}
+	c.safeDo(func() {
+		op := C.pa_context_set_sink_mute_by_index(c.ctx, C.uint32_t(sinkIndex),
+			C.int(muteInt), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSinkVolumeByIndex(sinkIndex uint32, v CVolume) {
+	c.safeDo(func() {
+		op := C.pa_context_set_sink_volume_by_index(c.ctx, C.uint32_t(sinkIndex),
+			&v.core, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSourcePortByIndex(sourceIndex uint32, portName string) {
+	c.safeDo(func() {
+		cPortName := C.CString(portName)
+		op := C.pa_context_set_source_port_by_index(c.ctx, C.uint32_t(sourceIndex),
+			cPortName, C.get_success_cb(), nil)
+		C.free(unsafe.Pointer(cPortName))
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSourceVolumeByIndex(sourceIndex uint32, v CVolume) {
+	c.safeDo(func() {
+		op := C.pa_context_set_source_volume_by_index(c.ctx, C.uint32_t(sourceIndex),
+			&v.core, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSourceMuteByIndex(sourceIndex uint32, mute bool) {
+	muteInt := 0
+	if mute {
+		muteInt = 1
+	}
+
+	c.safeDo(func() {
+		op := C.pa_context_set_source_mute_by_index(c.ctx, C.uint32_t(sourceIndex),
+			C.int(muteInt), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSinkInputVolume(sinkInputIndex uint32, v CVolume) {
+	c.safeDo(func() {
+		op := C.pa_context_set_sink_input_volume(c.ctx, C.uint32_t(sinkInputIndex),
+			&v.core, C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+func (c *Context) SetSinkInputMute(sinkInputIndex uint32, mute bool) {
+	muteInt := 0
+	if mute {
+		muteInt = 1
+	}
+	c.safeDo(func() {
+		op := C.pa_context_set_sink_input_mute(c.ctx, C.uint32_t(sinkInputIndex),
+			C.int(muteInt), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}

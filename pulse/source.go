@@ -61,6 +61,7 @@ type Source struct {
 	//formats
 }
 
+// TODO: remove
 func (s *Source) SetPort(name string) {
 	c := GetContext()
 	c.safeDo(func() {
@@ -71,6 +72,7 @@ func (s *Source) SetPort(name string) {
 	})
 }
 
+// TODO: remove
 func (s *Source) SetVolume(v CVolume) {
 	s.Volume = v
 	c := GetContext()
@@ -81,6 +83,7 @@ func (s *Source) SetVolume(v CVolume) {
 	})
 }
 
+// TODO: remove
 func (s *Source) SetMute(mute bool) {
 	_mute := 0
 	if mute {

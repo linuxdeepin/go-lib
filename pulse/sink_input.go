@@ -52,6 +52,7 @@ type SinkInput struct {
 	//format
 }
 
+// TODO: remove
 func (s *SinkInput) SetVolume(v CVolume) {
 	s.Volume = v
 	c := GetContext()
@@ -61,6 +62,8 @@ func (s *SinkInput) SetVolume(v CVolume) {
 	})
 
 }
+
+// TODO: remove
 func (sink *SinkInput) SetMute(mute bool) {
 	_mute := 0
 	if mute {
