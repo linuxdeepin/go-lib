@@ -107,6 +107,7 @@ void setup_monitor(pa_threaded_mainloop* m, pa_context *ctx)
     pa_context_set_state_callback(ctx, dpa_context_state_cb, NULL);
     pa_context_set_subscribe_callback(ctx, dpa_context_subscribe_cb, NULL);
     pa_context_subscribe(ctx,
+                         PA_SUBSCRIPTION_MASK_SERVER |
                          PA_SUBSCRIPTION_MASK_CARD |
                          PA_SUBSCRIPTION_MASK_SINK |
                          PA_SUBSCRIPTION_MASK_SOURCE |
