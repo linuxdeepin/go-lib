@@ -63,6 +63,7 @@ const (
 type Context struct {
 	cbs      map[int][]Callback
 	stateCbs map[int][]func()
+	mu       sync.Mutex
 
 	ctx  *C.pa_context
 	loop *C.pa_threaded_mainloop
@@ -389,11 +390,15 @@ func GetContext() *Context {
 
 func (c *Context) Connect(facility int, cb func(eventType int, idx uint32)) {
 	// sink sinkinput source sourceoutput
+	c.mu.Lock()
 	c.cbs[facility] = append(c.cbs[facility], cb)
+	c.mu.Unlock()
 }
 
 func (c *Context) ConnectStateChanged(state int, cb func()) {
+	c.mu.Lock()
 	c.stateCbs[state] = append(c.stateCbs[state], cb)
+	c.mu.Unlock()
 }
 
 func (c *Context) SuspendSinkById(idx uint32, suspend int) {

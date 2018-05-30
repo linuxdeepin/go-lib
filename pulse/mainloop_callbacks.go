@@ -81,7 +81,10 @@ func (c *Context) safeDo(fn func()) {
 //export go_handle_changed
 func go_handle_changed(facility int, event_type int, idx uint32) {
 	pendingCallback <- func() {
-		cbs, ok := GetContext().cbs[facility]
+		ctx := GetContext()
+		ctx.mu.Lock()
+		cbs, ok := ctx.cbs[facility]
+		ctx.mu.Unlock()
 		if !ok {
 			fmt.Println("unknow event", facility, event_type, idx)
 			return
@@ -96,7 +99,10 @@ func go_handle_changed(facility int, event_type int, idx uint32) {
 //export go_handle_state_changed
 func go_handle_state_changed(state int) {
 	pendingCallback <- func() {
-		cbs, ok := GetContext().stateCbs[state]
+		ctx := GetContext()
+		ctx.mu.Lock()
+		cbs, ok := ctx.stateCbs[state]
+		ctx.mu.Unlock()
 		if !ok {
 			fmt.Println("Unregiste state:", state)
 		}
