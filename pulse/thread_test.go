@@ -19,9 +19,10 @@
 
 package pulse
 
-import "testing"
-
-import "math/rand"
+import (
+	"math/rand"
+	"testing"
+)
 
 func BenchmarkTheadSafe(b *testing.B) {
 	ctx := GetContext()
@@ -30,8 +31,8 @@ func BenchmarkTheadSafe(b *testing.B) {
 		old := s.Volume
 		for i := 0; i < b.N; i++ {
 			v := s.Volume.SetAvg(rand.Float64())
-			s.SetVolume(v)
+			ctx.SetSinkVolumeByIndex(s.Index, v)
 		}
-		s.SetVolume(old)
+		ctx.SetSinkVolumeByIndex(s.Index, old)
 	}
 }

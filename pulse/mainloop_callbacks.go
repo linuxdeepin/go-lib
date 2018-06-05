@@ -2,16 +2,14 @@ package pulse
 
 //#include "dde-pulse.h"
 import "C"
-import "runtime"
-import "fmt"
-import "unsafe"
+
+import (
+	"fmt"
+	"runtime"
+	"unsafe"
+)
 
 // ONLY C file and below function can use C.pa_threaded_mainloop_lock/unlock
-
-// It Must not be send any fn to pendingCallback in the callback,
-// otherwise DEADLOCK.
-// This means at least don't run any unknown code which passed from user.
-var pendingCallback = make(chan func())
 
 type safeDoCtx struct {
 	fn   func()
@@ -19,14 +17,6 @@ type safeDoCtx struct {
 }
 
 var pendingSafeDo = make(chan safeDoCtx)
-
-func startHandleCallbacks() {
-	for fnWithOutPendingCode := range pendingCallback {
-		if fnWithOutPendingCode != nil {
-			fnWithOutPendingCode()
-		}
-	}
-}
 
 func startHandleSafeDo() {
 	// Move all safeDo fn to here to avoid creating too many OS Thread.
@@ -44,7 +34,6 @@ func startHandleSafeDo() {
 
 func init() {
 	// TODO: encapsulate the logic to Context and adding Start/Stop logic.
-	go startHandleCallbacks()
 	go startHandleSafeDo()
 }
 
@@ -68,6 +57,42 @@ func (c *Context) safeDo(fn func()) {
 	pendingSafeDo <- safeDoCtx{fn, c.loop}
 }
 
+func (c *Context) AddEventChan(ch chan<- *Event) {
+	c.mu.Lock()
+	c.eventChanList = append(c.eventChanList, ch)
+	c.mu.Unlock()
+}
+
+func (c *Context) RemoveEventChan(ch chan<- *Event) {
+	c.mu.Lock()
+	var newList []chan<- *Event
+	for _, ch0 := range c.eventChanList {
+		if ch0 != ch {
+			newList = append(newList, ch0)
+		}
+	}
+	c.eventChanList = newList
+	c.mu.Unlock()
+}
+
+func (c *Context) AddStateChan(ch chan<- int) {
+	c.mu.Lock()
+	c.stateChanList = append(c.stateChanList, ch)
+	c.mu.Unlock()
+}
+
+func (c *Context) RemoveStateChan(ch chan<- int) {
+	c.mu.Lock()
+	var newList []chan<- int
+	for _, ch0 := range c.stateChanList {
+		if ch0 != ch {
+			newList = append(newList, ch0)
+		}
+	}
+	c.stateChanList = newList
+	c.mu.Unlock()
+}
+
 // ALL of below functions are invoked from pulse's mainloop thread.
 // So
 //   1. Don't hold go-runtime lock in current thread.
@@ -80,49 +105,49 @@ func (c *Context) safeDo(fn func()) {
 
 //export go_handle_changed
 func go_handle_changed(facility int, event_type int, idx uint32) {
-	pendingCallback <- func() {
-		ctx := GetContext()
-		ctx.mu.Lock()
-		cbs, ok := ctx.cbs[facility]
-		ctx.mu.Unlock()
-		if !ok {
-			fmt.Println("unknow event", facility, event_type, idx)
-			return
-		}
 
-		for _, cb := range cbs {
-			go cb(event_type, idx)
+	event := &Event{
+		Facility: facility,
+		Type:     event_type,
+		Index:    idx,
+	}
+
+	ctx := GetContext()
+	ctx.mu.Lock()
+
+	for _, eventChan := range ctx.eventChanList {
+		select {
+		case eventChan <- event:
+		default:
 		}
 	}
+
+	ctx.mu.Unlock()
 }
 
 //export go_handle_state_changed
 func go_handle_state_changed(state int) {
-	pendingCallback <- func() {
-		ctx := GetContext()
-		ctx.mu.Lock()
-		cbs, ok := ctx.stateCbs[state]
-		ctx.mu.Unlock()
-		if !ok {
-			fmt.Println("Unregiste state:", state)
-		}
+	ctx := GetContext()
+	ctx.mu.Lock()
 
-		for _, cb := range cbs {
-			go cb()
+	for _, stateChan := range ctx.stateChanList {
+		select {
+		case stateChan <- state:
+		default:
 		}
 	}
+
+	ctx.mu.Unlock()
 }
 
 //export go_update_volume_meter
 func go_update_volume_meter(source_index uint32, sink_index uint32, v float64) {
-	pendingCallback <- func() {
-		sourceMeterLock.RLock()
-		cb, ok := sourceMeterCBs[source_index]
-		sourceMeterLock.RUnlock()
+	sourceMeterLock.RLock()
+	cb, ok := sourceMeterCBs[source_index]
+	sourceMeterLock.RUnlock()
 
-		if ok && cb != nil {
-			go cb(v)
-		}
+	if ok && cb != nil {
+		cb(v)
 	}
 }
 

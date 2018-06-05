@@ -23,7 +23,6 @@ package pulse
 #include "dde-pulse.h"
 */
 import "C"
-import "unsafe"
 
 type Source struct {
 	Index uint32
@@ -59,43 +58,6 @@ type Source struct {
 
 	//n_formats
 	//formats
-}
-
-// TODO: remove
-func (s *Source) SetPort(name string) {
-	c := GetContext()
-	c.safeDo(func() {
-		cname := C.CString(name)
-		op := C.pa_context_set_source_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
-		C.free(unsafe.Pointer(cname))
-		C.pa_operation_unref(op)
-	})
-}
-
-// TODO: remove
-func (s *Source) SetVolume(v CVolume) {
-	s.Volume = v
-	c := GetContext()
-
-	c.safeDo(func() {
-		op := C.pa_context_set_source_volume_by_index(c.ctx, C.uint32_t(s.Index), &s.Volume.core, C.get_success_cb(), nil)
-		C.pa_operation_unref(op)
-	})
-}
-
-// TODO: remove
-func (s *Source) SetMute(mute bool) {
-	_mute := 0
-	if mute {
-		_mute = 1
-	}
-
-	c := GetContext()
-
-	c.safeDo(func() {
-		op := C.pa_context_set_source_mute_by_index(c.ctx, C.uint32_t(s.Index), C.int(_mute), C.get_success_cb(), nil)
-		C.pa_operation_unref(op)
-	})
 }
 
 func toSourceInfo(info *C.pa_source_info) *Source {

@@ -23,7 +23,6 @@ package pulse
 #include "dde-pulse.h"
 */
 import "C"
-import "unsafe"
 
 type Sink struct {
 	Index uint32
@@ -62,42 +61,6 @@ type Sink struct {
 
 	//n_formats
 	//formats
-}
-
-// TODO: remove
-func (s *Sink) SetPort(name string) {
-	c := GetContext()
-	c.safeDo(func() {
-		cname := C.CString(name)
-		op := C.pa_context_set_sink_port_by_index(c.ctx, C.uint32_t(s.Index), cname, C.get_success_cb(), nil)
-		C.free(unsafe.Pointer(cname))
-		C.pa_operation_unref(op)
-	})
-
-}
-
-// TODO: remove
-func (s *Sink) SetMute(mute bool) {
-	_mute := 0
-	if mute {
-		_mute = 1
-	}
-	c := GetContext()
-	c.safeDo(func() {
-		op := C.pa_context_set_sink_mute_by_index(c.ctx, C.uint32_t(s.Index), C.int(_mute), C.get_success_cb(), nil)
-		C.pa_operation_unref(op)
-	})
-}
-
-// TODO: remove
-func (s *Sink) SetVolume(v CVolume) {
-	s.Volume = v
-
-	c := GetContext()
-	c.safeDo(func() {
-		op := C.pa_context_set_sink_volume_by_index(c.ctx, C.uint32_t(s.Index), &v.core, C.get_success_cb(), nil)
-		C.pa_operation_unref(op)
-	})
 }
 
 func toSinkInfo(info *C.pa_sink_info) *Sink {

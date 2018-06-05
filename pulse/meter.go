@@ -31,14 +31,16 @@ var sourceMeterLock sync.RWMutex
 type SourceMeter struct {
 	core        *C.pa_stream
 	sourceIndex uint32
-	cb          func()
-
-	ctx *Context
+	ctx         *Context
 }
 
 func NewSourceMeter(c *Context, idx uint32) *SourceMeter {
 	core := C.createMonitorStreamForSource(c.loop, c.ctx, C.uint32_t(idx), 0, 0)
-	return &SourceMeter{core, idx, nil, c}
+	return &SourceMeter{
+		core:        core,
+		sourceIndex: idx,
+		ctx:         c,
+	}
 }
 func (s *SourceMeter) Destroy() {
 	sourceMeterLock.Lock()
@@ -50,6 +52,7 @@ func (s *SourceMeter) Destroy() {
 		C.pa_stream_unref(s.core)
 	})
 }
+
 func (s *SourceMeter) ConnectChanged(cb func(v float64)) {
 	sourceMeterLock.Lock()
 	sourceMeterCBs[s.sourceIndex] = cb
