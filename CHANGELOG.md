@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [1.2.11] 2018-06-07
+*   fix(pulse): no subscribe server event
+*   fix(pulse): Context data race
+*   fix(dbus1): exportedObj data race
+*   refactor(pulse): Context add some methods
+
 ## [1.2.10] 2018-05-23
 *   chore: update dbus1
 
