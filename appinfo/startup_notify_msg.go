@@ -21,12 +21,9 @@ package appinfo
 
 import (
 	"bytes"
-	"github.com/BurntSushi/xgb/xproto"
-	"github.com/BurntSushi/xgbutil"
-	"github.com/BurntSushi/xgbutil/xevent"
-	"github.com/BurntSushi/xgbutil/xprop"
-	"github.com/BurntSushi/xgbutil/xwindow"
 	"io"
+
+	"github.com/linuxdeepin/go-x11-client"
 )
 
 type StartupNotifyMessage struct {
@@ -61,52 +58,48 @@ func (msg *StartupNotifyMessage) fillBuffer() *bytes.Buffer {
 	return &buf
 }
 
-var _atomMsgType, _atomMsgTypeBegin xproto.Atom
-
-func getAtomMsgType(xu *xgbutil.XUtil) xproto.Atom {
-	if _atomMsgType != 0 {
-		return _atomMsgType
-	}
-	_atomMsgType, _ = xprop.Atm(xu, "_NET_STARTUP_INFO")
-	return _atomMsgType
-}
-
-func getAtomMsgTypeBegin(xu *xgbutil.XUtil) xproto.Atom {
-	if _atomMsgTypeBegin != 0 {
-		return _atomMsgTypeBegin
-	}
-	_atomMsgTypeBegin, _ = xprop.Atm(xu, "_NET_STARTUP_INFO_BEGIN")
-	return _atomMsgTypeBegin
-}
-
-func (msg *StartupNotifyMessage) Broadcast(xu *xgbutil.XUtil) error {
-	return broadcastXMessage(xu, getAtomMsgType(xu), getAtomMsgTypeBegin(xu), msg.fillBuffer())
-}
-
-func broadcastXMessage(xu *xgbutil.XUtil, atomMsgType, atomMsgTypeBegin xproto.Atom, msgReader io.Reader) error {
-	// create window
-	win, err := xwindow.Generate(xu)
+func (msg *StartupNotifyMessage) Broadcast(conn *x.Conn) error {
+	atomMsgType, err := conn.GetAtom("_NET_STARTUP_INFO")
 	if err != nil {
 		return err
 	}
-	win.Create(xu.RootWin(), // parent
-		-100, -100, 1, 1, // x, y, width, height
-		xproto.CwOverrideRedirect|xproto.CwEventMask, // value mask
-		1, xproto.EventMaskPropertyChange|xproto.EventMaskStructureNotify) // value list
+	atomMsgTypeBegin, err := conn.GetAtom("_NET_STARTUP_INFO_BEGIN")
+	if err != nil {
+		return err
+	}
+	return broadcastXMessage(conn, atomMsgType, atomMsgTypeBegin, msg.fillBuffer())
+}
+
+func broadcastXMessage(conn *x.Conn, atomMsgType, atomMsgTypeBegin x.Atom, msgReader io.Reader) error {
+	// create window
+	xid, err := conn.AllocID()
+	if err != nil {
+		return err
+	}
+	defer conn.FreeID(xid)
+
+	win := x.Window(xid)
+	root := conn.GetDefaultScreen().Root
+	err = x.CreateWindowChecked(conn, 0, win, root, 0, 0, 1, 1,
+		0, x.WindowClassInputOnly, x.CopyFromParent,
+		x.CWOverrideRedirect|x.CWEventMask,
+		[]uint32{1, x.EventMaskPropertyChange | x.EventMaskStructureNotify}).Check(conn)
+	if err != nil {
+		return err
+	}
 
 	// send x message
-	ev := &xproto.ClientMessageEvent{
+	ev := x.ClientMessageEvent{
 		Format: 8,
-		Window: win.Id,
+		Window: win,
 		Type:   atomMsgTypeBegin,
 	}
 
-	const bufLen = 20
-	buf := make([]byte, bufLen)
+	var buf [20]byte
 	var readDone bool
 
 	for !readDone {
-		n, err := msgReader.Read(buf)
+		n, err := msgReader.Read(buf[:])
 		if err != nil {
 			// EOF
 			readDone = true
@@ -114,17 +107,16 @@ func broadcastXMessage(xu *xgbutil.XUtil, atomMsgType, atomMsgTypeBegin xproto.A
 		if n == 0 {
 			break
 		}
-		ev.Data = xproto.ClientMessageDataUnion{Data8: buf}
-
-		err = xevent.SendRootEvent(xu, ev, xproto.EventMaskPropertyChange)
-		if err != nil {
-			return err
-		}
-
+		ev.Data = x.ClientMessageData{}
+		ev.Data.SetData8(&buf)
+		w := x.NewWriter()
+		x.WriteClientMessageEvent(w, &ev)
+		x.SendEvent(conn, false, root,
+			x.EventMaskPropertyChange, w.Bytes())
 		ev.Type = atomMsgType
 	}
 
-	win.Destroy()
-
+	x.DestroyWindow(conn, win)
+	conn.Flush()
 	return nil
 }

@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/BurntSushi/xgbutil"
+	"github.com/linuxdeepin/go-x11-client"
 )
 
 var (
@@ -43,15 +43,15 @@ func init() {
 
 type AppLaunchContext struct {
 	sync.Mutex
-	xu          *xgbutil.XUtil
+	conn        *x.Conn
 	count       uint
 	timestamp   uint32
 	cmdPrefixes []string
 }
 
-func NewAppLaunchContext(xu *xgbutil.XUtil) *AppLaunchContext {
+func NewAppLaunchContext(conn *x.Conn) *AppLaunchContext {
 	return &AppLaunchContext{
-		xu: xu,
+		conn: conn,
 	}
 }
 
@@ -76,7 +76,7 @@ func (ctx *AppLaunchContext) GetStartupNotifyId(appInfo AppInfo, files []string)
 	snId := fmt.Sprintf("%s-%d-%s-%s-%d_TIME%d", prog, pid, hostname, execBase, ctx.count, ctx.timestamp)
 	ctx.count++
 
-	screenStr := strconv.Itoa(ctx.xu.Conn().DefaultScreen)
+	screenStr := strconv.Itoa(ctx.conn.ScreenNumber)
 	// send new msg
 	msg := &StartupNotifyMessage{
 		Type: "new",
@@ -91,7 +91,7 @@ func (ctx *AppLaunchContext) GetStartupNotifyId(appInfo AppInfo, files []string)
 		msg.KeyValues["WMCLASS"] = startupWMClass
 	}
 
-	err := msg.Broadcast(ctx.xu)
+	err := msg.Broadcast(ctx.conn)
 	if err != nil {
 		return "", err
 	}
@@ -106,5 +106,5 @@ func (ctx *AppLaunchContext) LaunchFailed(startupNotifyId string) error {
 			"ID": startupNotifyId,
 		},
 	}
-	return msg.Broadcast(ctx.xu)
+	return msg.Broadcast(ctx.conn)
 }
