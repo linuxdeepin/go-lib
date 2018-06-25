@@ -23,6 +23,7 @@ $ go get github.com/smartystreets/goconvey
 $ go get github.com/BurntSushi/xgb
 $ go get github.com/howeyc/fsnotify
 $ go get gopkg.in/check.v1
+$ go get github.com/linuxdeepin/go-x11-client
 ```
 
 Install
