@@ -1,19 +1,20 @@
 package sound_effect
 
 import (
+	"errors"
 	"os"
 
-	"errors"
 	"github.com/cryptix/wav"
 	"pkg.deepin.io/lib/asound"
 	paSimple "pkg.deepin.io/lib/pulse/simple"
 )
 
 type WavDecoder struct {
-	reader     *wav.Reader
-	f          *os.File
-	sampleSpec *SampleSpec
-	bufSize    int
+	reader        *wav.Reader
+	f             *os.File
+	sampleSpec    *SampleSpec
+	bufSize       int
+	bytesPerFrame int
 }
 
 func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
@@ -39,12 +40,14 @@ func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
 		channels:  int(wavFile.Channels),
 	}
 
-	bufSize := int(wavFile.SampleRate/8) * int(wavFile.Channels) * int(wavFile.SignificantBits/8)
+	bytesPerFrame := int(wavFile.Channels) * int(wavFile.SignificantBits/8)
+	bufSize := int(wavFile.SampleRate/8) * bytesPerFrame
 	return &WavDecoder{
-		f:          f,
-		reader:     wavReader,
-		sampleSpec: sampleSpec,
-		bufSize:    bufSize,
+		f:             f,
+		reader:        wavReader,
+		sampleSpec:    sampleSpec,
+		bufSize:       bufSize,
+		bytesPerFrame: bytesPerFrame,
 	}, nil
 }
 
@@ -67,25 +70,20 @@ func (d *WavDecoder) GetSampleSpec() *SampleSpec {
 
 func (d *WavDecoder) Decode() ([]byte, error) {
 	buf := make([]byte, d.bufSize)
-	n, err := wavRead(d.reader, buf)
-	var data []byte
-	if n > 0 {
-		data = buf[:n]
-	}
-	return data, err
+	n, err := d.read(buf)
+	return buf[:n], err
 }
 
-// return num of bytes
-func wavRead(wavReader *wav.Reader, buf []byte) (int, error) {
-	var i int
-	for i < len(buf) {
-		data, err := wavReader.ReadRawSample()
+func (d *WavDecoder) read(buf []byte) (int, error) {
+	var n int
+	for n < len(buf) {
+		sample, err := d.reader.ReadRawSample()
 		if err != nil {
-			return i, err
+			return n - (n % d.bytesPerFrame), err
 		}
-		i += copy(buf[i:], data)
+		n += copy(buf[n:], sample)
 	}
-	return i, nil
+	return n, nil
 }
 
 func (d *WavDecoder) Close() error {

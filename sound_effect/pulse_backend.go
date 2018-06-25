@@ -1,8 +1,9 @@
 package sound_effect
 
 import (
-	paSimple "pkg.deepin.io/lib/pulse/simple"
 	"unsafe"
+
+	paSimple "pkg.deepin.io/lib/pulse/simple"
 )
 
 type PulseAudioPlayBackend struct {
