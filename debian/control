@@ -3,7 +3,6 @@ Section: devel
 Priority: extra
 Maintainer: Deepin Packages Builder <packages@deepin.com>
 Build-Depends: debhelper (>= 9), dh-golang, golang-go,
- golang-github-burntsushi-xgb-dev,
  golang-github-linuxdeepin-go-x11-client-dev,
  golang-gopkg-check.v1-dev, golang-github-smartystreets-goconvey-dev, golang-golang-x-image-dev,
  golang-gir-gobject-2.0-dev, golang-gir-gio-2.0-dev, golang-gir-glib-2.0-dev, golang-github-cryptix-wav-dev,
@@ -15,7 +14,6 @@ Homepage: http://www.deepin.org
 Package: golang-dlib-dev
 Architecture: all
 Depends: ${misc:Depends},
- golang-github-burntsushi-xgb-dev,
  golang-github-linuxdeepin-go-x11-client-dev,
  golang-github-cryptix-wav-dev,
  golang-golang-x-image-dev, golang-gir-gobject-2.0-dev, golang-gir-gio-2.0-dev,  golang-gir-glib-2.0-dev,

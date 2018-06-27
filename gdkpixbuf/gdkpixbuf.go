@@ -24,11 +24,12 @@ package gdkpixbuf
 // #include <stdlib.h>
 // #include "gdk_pixbuf_utils.h"
 import "C"
-import "unsafe"
 
 import (
 	"fmt"
-	"github.com/BurntSushi/xgb/xproto"
+	"unsafe"
+
+	x "github.com/linuxdeepin/go-x11-client"
 	"pkg.deepin.io/lib/utils"
 )
 
@@ -437,7 +438,7 @@ func RotateSimple(srcPixbuf *C.GdkPixbuf, angle GdkPixbufRotation) (destPixbuf *
 // XLib
 
 // ConvertImageToXpixmap convert image file to x pixmap.
-func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
+func ConvertImageToXpixmap(imgFile string) (xpixmap x.Pixmap, err error) {
 	pixbuf, err := NewPixbufFromFile(imgFile)
 	defer FreePixbuf(pixbuf)
 	if err != nil {
@@ -447,9 +448,9 @@ func ConvertImageToXpixmap(imgFile string) (xpixmap xproto.Pixmap, err error) {
 	return
 }
 
-func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err error) {
+func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap x.Pixmap, err error) {
 	defaultError := fmt.Errorf("convert pixbuf to xpixmap failed, %v", pixbuf)
-	xpixmap = xproto.Pixmap(C.convert_pixbuf_to_xpixmap(pixbuf))
+	xpixmap = x.Pixmap(C.convert_pixbuf_to_xpixmap(pixbuf))
 	if xpixmap == 0 {
 		err = defaultError
 		return
@@ -457,9 +458,9 @@ func ConvertPixbufToXpixmap(pixbuf *C.GdkPixbuf) (xpixmap xproto.Pixmap, err err
 	return
 }
 
-func ConvertXpixmapToPixbuf(xpixmap xproto.Pixmap, width, heigth int) (pixbuf *C.GdkPixbuf, err error) {
+func ConvertXpixmapToPixbuf(xpixmap x.Pixmap, width, height int) (pixbuf *C.GdkPixbuf, err error) {
 	defaultError := fmt.Errorf("convert xpixmap to pixbuf failed, %v", xpixmap)
-	pixbuf = C.convert_xpixmap_to_pixbuf(C.Pixmap(xpixmap), C.int(width), C.int(heigth))
+	pixbuf = C.convert_xpixmap_to_pixbuf(C.Pixmap(xpixmap), C.int(width), C.int(height))
 	if pixbuf == nil {
 		err = defaultError
 		return
