@@ -64,7 +64,7 @@ func (s *Service) RequestName(name string) error {
 		return err
 	}
 	if reply != dbus.RequestNameReplyPrimaryOwner {
-		return errors.New("name already taken")
+		return fmt.Errorf("name %s already taken", name)
 	}
 	return nil
 }
