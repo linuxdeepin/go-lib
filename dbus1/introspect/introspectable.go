@@ -2,9 +2,10 @@ package introspect
 
 import (
 	"encoding/xml"
-	"pkg.deepin.io/lib/dbus1"
 	"reflect"
 	"strings"
+
+	"pkg.deepin.io/lib/dbus1"
 )
 
 // Introspectable implements org.freedesktop.Introspectable.

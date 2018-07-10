@@ -2,8 +2,9 @@ package introspect
 
 import (
 	"encoding/xml"
-	"pkg.deepin.io/lib/dbus1"
 	"strings"
+
+	"pkg.deepin.io/lib/dbus1"
 )
 
 // Call calls org.freedesktop.Introspectable.Introspect on a remote object

@@ -1,9 +1,10 @@
 package dbus
 
 import (
-	"golang.org/x/net/context"
 	"testing"
 	"time"
+
+	"golang.org/x/net/context"
 )
 
 type objectGoContextServer struct {

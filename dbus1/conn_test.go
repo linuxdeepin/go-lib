@@ -16,9 +16,7 @@ func TestSessionBus(t *testing.T) {
 }
 
 func TestSystemBus(t *testing.T) {
-	// patch start
-	t.Skip("do not call SystemDBus")
-	// patch end
+	t.Skip("do not call SystemBus")
 	_, err := SystemBus()
 	if err != nil {
 		t.Error(err)

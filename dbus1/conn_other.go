@@ -29,4 +29,3 @@ func getSessionBusPlatformAddress() (string, error) {
 
 	return addr, nil
 }
-

@@ -3,9 +3,10 @@
 package prop
 
 import (
+	"sync"
+
 	"pkg.deepin.io/lib/dbus1"
 	"pkg.deepin.io/lib/dbus1/introspect"
-	"sync"
 )
 
 // EmitType controls how org.freedesktop.DBus.Properties.PropertiesChanged is

@@ -1,9 +1,10 @@
 package dbus
 
 import (
-	"golang.org/x/net/context"
 	"errors"
 	"strings"
+
+	"golang.org/x/net/context"
 )
 
 // BusObject is the interface of a remote object on which methods can be
