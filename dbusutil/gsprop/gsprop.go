@@ -3,6 +3,7 @@ package gsprop
 import (
 	"errors"
 	"reflect"
+	"sync"
 
 	"gir/gio-2.0"
 	"pkg.deepin.io/lib/dbus1"
@@ -11,6 +12,7 @@ import (
 )
 
 type base struct {
+	mu            sync.Mutex
 	gs            *gio.Settings
 	key           string
 	notifyChanged func(val interface{})
@@ -60,12 +62,18 @@ func (b *Bool) GetValue() (val interface{}, err *dbus.Error) {
 }
 
 func (b *Bool) Get() bool {
-	return b.gs.GetBoolean(b.key)
+	b.mu.Lock()
+	v := b.gs.GetBoolean(b.key)
+	b.mu.Unlock()
+	return v
 }
 
 func (b *Bool) Set(val bool) bool {
 	if b.Get() != val {
-		return b.gs.SetBoolean(b.key, val)
+		b.mu.Lock()
+		ok := b.gs.SetBoolean(b.key, val)
+		b.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -98,13 +106,19 @@ func (*Int) GetType() reflect.Type {
 
 func (i *Int) Set(val int32) bool {
 	if i.Get() != val {
-		return i.gs.SetInt(i.key, val)
+		i.mu.Lock()
+		ok := i.gs.SetInt(i.key, val)
+		i.mu.Unlock()
+		return ok
 	}
 	return true
 }
 
 func (i *Int) Get() int32 {
-	return i.gs.GetInt(i.key)
+	i.mu.Lock()
+	v := i.gs.GetInt(i.key)
+	i.mu.Unlock()
+	return v
 }
 
 type Enum struct {
@@ -130,12 +144,18 @@ func (e *Enum) Bind(gs *gio.Settings, key string) {
 }
 
 func (e *Enum) Get() int32 {
-	return e.gs.GetEnum(e.key)
+	e.mu.Lock()
+	v := e.gs.GetEnum(e.key)
+	e.mu.Unlock()
+	return v
 }
 
 func (e *Enum) Set(val int32) bool {
 	if e.Get() != val {
-		return e.gs.SetEnum(e.key, val)
+		e.mu.Lock()
+		ok := e.gs.SetEnum(e.key, val)
+		e.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -159,12 +179,18 @@ func (*Uint) GetType() reflect.Type {
 }
 
 func (u *Uint) Get() uint32 {
-	return u.gs.GetUint(u.key)
+	u.mu.Lock()
+	v := u.gs.GetUint(u.key)
+	u.mu.Unlock()
+	return v
 }
 
 func (u *Uint) Set(val uint32) bool {
 	if u.Get() != val {
-		return u.gs.SetUint(u.key, val)
+		u.mu.Lock()
+		ok := u.gs.SetUint(u.key, val)
+		u.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -192,12 +218,18 @@ func (*Uint64) GetType() reflect.Type {
 }
 
 func (u *Uint64) Get() uint64 {
-	return u.gs.GetUint64(u.key)
+	u.mu.Lock()
+	v := u.gs.GetUint64(u.key)
+	u.mu.Unlock()
+	return v
 }
 
 func (u *Uint64) Set(val uint64) bool {
 	if u.Get() != val {
-		return u.gs.SetUint64(u.key, val)
+		u.mu.Lock()
+		ok := u.gs.SetUint64(u.key, val)
+		u.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -225,12 +257,18 @@ func (*Double) GetType() reflect.Type {
 }
 
 func (d *Double) Get() float64 {
-	return d.gs.GetDouble(d.key)
+	d.mu.Lock()
+	v := d.gs.GetDouble(d.key)
+	d.mu.Unlock()
+	return v
 }
 
 func (d *Double) Set(val float64) bool {
 	if d.Get() != val {
-		return d.gs.SetDouble(d.key, val)
+		d.mu.Lock()
+		ok := d.gs.SetDouble(d.key, val)
+		d.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -258,12 +296,18 @@ func (*String) GetType() reflect.Type {
 }
 
 func (s *String) Get() string {
-	return s.gs.GetString(s.key)
+	s.mu.Lock()
+	v := s.gs.GetString(s.key)
+	s.mu.Unlock()
+	return v
 }
 
 func (s *String) Set(val string) bool {
 	if s.Get() != val {
-		return s.gs.SetString(s.key, val)
+		s.mu.Lock()
+		ok := s.gs.SetString(s.key, val)
+		s.mu.Unlock()
+		return ok
 	}
 	return true
 }
@@ -291,12 +335,18 @@ func (*Strv) GetType() reflect.Type {
 }
 
 func (s *Strv) Get() []string {
-	return s.gs.GetStrv(s.key)
+	s.mu.Lock()
+	v := s.gs.GetStrv(s.key)
+	s.mu.Unlock()
+	return v
 }
 
 func (s *Strv) Set(val []string) bool {
 	if !strvEqual(s.Get(), val) {
-		return s.gs.SetStrv(s.key, val)
+		s.mu.Lock()
+		ok := s.gs.SetStrv(s.key, val)
+		s.mu.Unlock()
+		return ok
 	}
 	return true
 }
