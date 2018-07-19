@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.2.13] 2018-07-19
+*   fix: test failed
+
 ## [1.2.12] 2018-07-19
 *   chore(dbusutil): gsprop add mutex prevent data race
 *   chore(dbus1): update to the latest upstream code
