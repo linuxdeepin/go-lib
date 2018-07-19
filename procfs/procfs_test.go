@@ -20,13 +20,11 @@
 package procfs
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"os"
-	"strings"
 	"testing"
-)
 
-const packagePath = "/pkg.deepin.io/lib/procfs/"
+	. "github.com/smartystreets/goconvey/convey"
+)
 
 func TestGetFile(t *testing.T) {
 	Convey("getFile", t, func() {
@@ -49,7 +47,6 @@ func TestCmdline(t *testing.T) {
 		So(err, ShouldBeNil)
 		t.Log("cmdline:", cmdline)
 		So(len(cmdline) > 0, ShouldBeTrue)
-		So(strings.Contains(cmdline[0], packagePath), ShouldBeTrue)
 	})
 }
 
@@ -72,7 +69,7 @@ func TestExe(t *testing.T) {
 		exe, err := p.Exe()
 		So(err, ShouldBeNil)
 		t.Log("exe:", exe)
-		So(strings.Contains(exe, packagePath), ShouldBeTrue)
+		So(len(exe) > 0, ShouldBeTrue)
 	})
 }
 
