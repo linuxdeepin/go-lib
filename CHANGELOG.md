@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+## [1.2.12] 2018-07-19
+*   chore(dbusutil): gsprop add mutex prevent data race
+*   chore(dbus1): update to the latest upstream code
+*   chore(dbusutil): request name error include name
+*   chore: remove polkit
+*   chore(gdkpixbuf): use go-x11-client
+*   fix: play wav file with pulseaudio get error
+*   chore(debian): update debian control
+*   chore(appinfo): use go-x11-client
+*   feat(audio): improve event handling
+
 ## [1.2.11] 2018-06-07
 *   fix(pulse): no subscribe server event
 *   fix(pulse): Context data race
