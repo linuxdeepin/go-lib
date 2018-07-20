@@ -78,7 +78,7 @@ const (
 
 var (
 	logger                  = log.NewLogger("go-lib/proxy")
-	proxySettings           = gio.NewSettings(gsettingsIdProxy)
+	proxySettings           *gio.Settings
 	proxyChildSettingsHttp  *gio.Settings
 	proxyChildSettingsHttps *gio.Settings
 	proxyChildSettingsFtp   *gio.Settings
@@ -87,6 +87,7 @@ var (
 
 // SetupProxy setup system proxy, need followed with glib.StartLoop().
 func SetupProxy() {
+	proxySettings = gio.NewSettings(gsettingsIdProxy)
 	proxyChildSettingsHttp = proxySettings.GetChild(gchildProxyHttp)
 	proxyChildSettingsHttps = proxySettings.GetChild(gchildProxyHttps)
 	proxyChildSettingsFtp = proxySettings.GetChild(gchildProxyFtp)
