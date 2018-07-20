@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.2.14] 2018-07-20
+*   chore(proxy): defer proxySettings init
+
 ## [1.2.13] 2018-07-19
 *   fix: test failed
 
