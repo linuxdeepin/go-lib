@@ -24,8 +24,9 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"pkg.deepin.io/lib/utils"
 	"strings"
+
+	"pkg.deepin.io/lib/utils"
 )
 
 func getDefaultTerminal() (exec string, execArg string) {
@@ -221,56 +222,73 @@ var ErrBadFieldCode = errors.New("bad field code")
 func expandFieldCode(cmdline, files []string, translatedName, icon, desktopFile string) ([]string, error) {
 	// element of files can be local path (starts with /) or uri (starts with file:///)
 	var ret []string
+	var buf bytes.Buffer
+	submitBuf := func() {
+		ret = append(ret, buf.String())
+		buf.Reset()
+	}
+
 	for _, arg := range cmdline {
-		if len(arg) == 2 && arg[0] == '%' {
-			switch arg[1] {
-			case 'f':
-				// a single file name
-				if len(files) > 0 {
-					ret = append(ret, toLocalPath(files[0]))
-				}
-			case 'F':
-				// a list of files
-				for _, file := range files {
-					ret = append(ret, toLocalPath(file))
-				}
-			case 'u':
-				// a single URL
-				if len(files) > 0 {
-					ret = append(ret, toURL(files[0]))
-				}
-
-			case 'U':
-				// a list of URLs
-				for _, file := range files {
-					ret = append(ret, toURL(file))
-				}
-
-			case 'i':
-				// icon
-				if icon != "" {
-					ret = append(ret, "--icon", icon)
-				}
-
-			case 'c':
-				//  translated name
-				ret = append(ret, translatedName)
-
-			case 'k':
-				// location of desktop file or URI
-				ret = append(ret, desktopFile)
-
-			case 'd', 'D', 'n', 'N', 'v', 'm':
-				// Deprecated
-
-			case '%':
-				ret = append(ret, "%")
-
-			default:
-				return nil, ErrBadFieldCode
+		argR := strings.NewReader(arg)
+		for {
+			c, err := argR.ReadByte()
+			if err != nil {
+				break
 			}
-		} else {
-			ret = append(ret, arg)
+			if c == '%' {
+				fieldCode, err := argR.ReadByte()
+				if err != nil {
+					break
+				}
+				switch fieldCode {
+				case 'f':
+					// a single file name
+					if len(files) > 0 {
+						buf.WriteString(toLocalPath(files[0]))
+					}
+				case 'F':
+					// a list of files
+					for _, file := range files {
+						buf.WriteString(toLocalPath(file))
+						submitBuf()
+					}
+				case 'u':
+					// a single URL
+					if len(files) > 0 {
+						buf.WriteString(toURL(files[0]))
+					}
+				case 'U':
+					// a list of URLs
+					for _, file := range files {
+						buf.WriteString(toURL(file))
+						submitBuf()
+					}
+				case 'i':
+					// icon
+					if icon != "" {
+						buf.WriteString("--icon")
+						submitBuf()
+						buf.WriteString(icon)
+					}
+				case 'c':
+					//  translated name
+					buf.WriteString(translatedName)
+				case 'k':
+					// location of desktop file or URI
+					buf.WriteString(desktopFile)
+				case '%':
+					buf.WriteByte('%')
+				case 'd', 'D', 'n', 'N', 'v', 'm':
+					// Deprecated
+				default:
+					return nil, ErrBadFieldCode
+				}
+			} else {
+				buf.WriteByte(c)
+			}
+		}
+		if len(buf.Bytes()) > 0 {
+			submitBuf()
 		}
 	}
 	return ret, nil
