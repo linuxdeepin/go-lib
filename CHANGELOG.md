@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.2.15] 2018-07-31
+*   fix(desktopappinfo): expandFieldCode
+
 ## [1.2.14] 2018-07-20
 *   chore(proxy): defer proxySettings init
 
