@@ -127,8 +127,16 @@ func LoadTheme(filename string) (*Theme, error) {
 	return t, nil
 }
 
+func isNameOk(name string) bool {
+	if strings.ContainsRune(name, '/') || name == "" ||
+		name == "." || name == ".." {
+		return false
+	}
+	return true
+}
+
 func (finder *Finder) Find(reqTheme, reqOutputProfile, reqName string) string {
-	if reqName == "" {
+	if !(isNameOk(reqTheme) && isNameOk(reqName)) {
 		return ""
 	}
 
