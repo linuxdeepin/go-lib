@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.2.16] 2018-08-07
+*   feat(sound-effect): check theme and event validity
+
 ## [1.2.15] 2018-07-31
 *   fix(desktopappinfo): expandFieldCode
 
