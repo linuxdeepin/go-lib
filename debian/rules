@@ -5,8 +5,13 @@ export DH_GOLANG_INSTALL_ALL := 1
  
 
 
+ifeq ($(DEB_BUILD_ARCH),sw_64)
+%:
+	dh $@
+else
 %:
 	dh $@ --buildsystem=golang --with=golang
+endif
 
 override_dh_auto_install:
 	dh_auto_install
