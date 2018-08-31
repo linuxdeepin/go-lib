@@ -1,4 +1,5 @@
-## [Unreleased]
+## [1.2.16.1] 2018-08-31
+*   chore: add makefile for `sw_64`
 
 ## [1.2.16] 2018-08-07
 *   feat(sound-effect): check theme and event validity
