@@ -20,6 +20,7 @@
 package desktopappinfo
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"os/exec"
@@ -29,6 +30,7 @@ import (
 
 	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
+	"pkg.deepin.io/lib/shell"
 	"pkg.deepin.io/lib/xdg/basedir"
 )
 
@@ -437,9 +439,14 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		exeargs = append(cmdPrefixes, exeargs...)
 	}
 
-	shellArgs := append([]string{"/dev/stdin"}, exeargs...)
-	cmd := exec.Command("/bin/sh", shellArgs...)
-	cmd.Stdin = strings.NewReader(launchScript)
+	var launchScriptBuf bytes.Buffer
+	launchScriptBuf.WriteString(`export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec`)
+	for _, arg := range exeargs {
+		launchScriptBuf.WriteByte(' ')
+		launchScriptBuf.WriteString(shell.Encode(arg))
+	}
+
+	cmd := exec.Command("/bin/sh", "-c", launchScriptBuf.String())
 	cmd.Env = append(os.Environ(), "GIO_LAUNCHED_DESKTOP_FILE="+ai.GetFileName())
 	cmd.Dir = workingDir
 
@@ -454,8 +461,6 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 	err = cmd.Start()
 	return cmd, err
 }
-
-const launchScript = `export GIO_LAUNCHED_DESKTOP_FILE_PID=$$;exec "$@"`
 
 func launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
 	cmd, err := startCommand(ai, cmdline, files, launchContext)
