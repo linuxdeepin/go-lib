@@ -50,6 +50,7 @@ build:
 	echo ignore build
 
 install: install-prepare install-dev
+	cp *.go ${DESTDIR}${GOSITE_DIR}/src/${GOPKG_PERFIX}
 
 install/lib/%:
 	cp -r ${@F} ${DESTDIR}${GOSITE_DIR}/src/${GOPKG_PERFIX}
