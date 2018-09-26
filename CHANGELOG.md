@@ -1,3 +1,6 @@
+## [1.2.16.3] 2018-09-26
+*   chore(gettext): do not run test
+
 ## [1.2.16.2] 2018-09-26
 *   fix: make install lost a file
 
