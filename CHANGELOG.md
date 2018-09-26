@@ -1,3 +1,6 @@
+## [1.2.16.2] 2018-09-26
+*   fix: make install lost a file
+
 ## [1.2.16.1] 2018-08-31
 *   chore: add makefile for `sw_64`
 
