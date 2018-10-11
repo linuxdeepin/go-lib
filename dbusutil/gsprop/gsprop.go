@@ -27,13 +27,21 @@ func (b *base) bind(gs *gio.Settings, keyName string,
 	var propPath string
 	gs.GetProperty("path", &propPath)
 	gsettings.ConnectChanged(propPath, keyName, func(_ string) {
-		val, _ := getFn()
-		b.notifyChanged(val)
+		b.mu.Lock()
+		notifyChanged := b.notifyChanged
+		b.mu.Unlock()
+
+		if notifyChanged != nil {
+			val, _ := getFn()
+			notifyChanged(val)
+		}
 	})
 }
 
 func (b *base) SetNotifyChangedFunc(fn func(val interface{})) {
+	b.mu.Lock()
 	b.notifyChanged = fn
+	b.mu.Unlock()
 }
 
 func checkSet(setOk bool) *dbus.Error {
