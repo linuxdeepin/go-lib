@@ -1,4 +1,9 @@
-## [Unreleased]
+## [1.3.0] 2018-10-25
+*   fix(dbusutil): gsprop nil pointer panic
+*   feat: add lib shell
+*   chore(gettext): do not run test
+*   fix: make install lost a file
+*   chore: add makefile for `sw_64`
 
 ## [1.2.16] 2018-08-07
 *   feat(sound-effect): check theme and event validity
