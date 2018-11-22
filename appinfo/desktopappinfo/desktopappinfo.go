@@ -153,7 +153,14 @@ func NewDesktopAppInfoFromKeyFile(kfile *keyfile.KeyFile) (*DesktopAppInfo, erro
 		return nil, ErrInvalidType
 	}
 
-	f.name, _ = f.GetLocaleString(MainSection, KeyName, "")
+	vendor, _ := f.GetString(MainSection, "X-Deepin-Vendor")
+	if vendor == "deepin" {
+		f.name, _ = f.GetLocaleString(MainSection, KeyGenericName, "")
+	}
+	if f.name == "" {
+		f.name, _ = f.GetLocaleString(MainSection, KeyName, "")
+	}
+
 	icon, _ := f.GetString(MainSection, KeyIcon)
 	/* Work around a common mistake in desktop files */
 	if !filepath.IsAbs(icon) {
@@ -236,7 +243,13 @@ func (ai *DesktopAppInfo) GetFileName() string {
 	return ai.filename
 }
 
+// deprecated
 func (ai *DesktopAppInfo) GetIsHiden() bool {
+	hidden, _ := ai.GetBool(MainSection, KeyHidden)
+	return hidden
+}
+
+func (ai *DesktopAppInfo) GetIsHidden() bool {
 	hidden, _ := ai.GetBool(MainSection, KeyHidden)
 	return hidden
 }
@@ -286,7 +299,7 @@ func (ai *DesktopAppInfo) ShouldShow() bool {
 	if ai.GetNoDisplay() {
 		return false
 	}
-	if ai.GetIsHiden() {
+	if ai.GetIsHidden() {
 		return false
 	}
 	return ai.GetShowIn(nil)
