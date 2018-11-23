@@ -1,3 +1,6 @@
+## [1.4.0] 2018-11-23
+*   feat(desktopappinfo): support key X-Deepin-Vendor
+
 ## [1.3.0] 2018-10-25
 *   fix(dbusutil): gsprop nil pointer panic
 *   feat: add lib shell
