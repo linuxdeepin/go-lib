@@ -61,7 +61,7 @@ func SavePng(img image.Image, filename string, enc *png.Encoder) error {
 }
 
 func IsSupported(filename string) bool {
-	format, err := SniffImageFormat(filename)
+	format, err := SniffFormat(filename)
 	if err != nil {
 		return false
 	}
@@ -72,14 +72,14 @@ func IsSupported(filename string) bool {
 	return false
 }
 
-func SniffImageFormat(file string) (string, error) {
-	fh, err := os.Open(file)
+func CanDecodeConfig(filename string) bool {
+	fh, err := os.Open(filename)
 	if err != nil {
-		return "", err
+		return false
 	}
-	defer fh.Close()
 
+	defer fh.Close()
 	reader := bufio.NewReader(fh)
-	_, format, err := image.DecodeConfig(reader)
-	return format, err
+	_, _, err = image.DecodeConfig(reader)
+	return err == nil
 }

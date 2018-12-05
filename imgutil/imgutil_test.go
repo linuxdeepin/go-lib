@@ -30,16 +30,25 @@ func TestIsSupported(t *testing.T) {
 	}
 }
 
-func TestSniffImageFormat(t *testing.T) {
+func TestCanDecodeConfig(t *testing.T) {
+	for _, name := range []string{"deepin-music.bmp", "deepin-music.gif",
+		"deepin-music.jpg", "deepin-music.png", "deepin-music.tiff"} {
+
+		filename := filepath.Join("testdata", name)
+		assert.True(t, CanDecodeConfig(filename), "should decode config ok "+name)
+	}
+}
+
+func TestSniffFormat(t *testing.T) {
 	for _, ext := range []string{"bmp", "gif", "png", "tiff"} {
 		filename := "testdata/deepin-music." + ext
-		format, err := SniffImageFormat(filename)
+		format, err := SniffFormat(filename)
 		if assert.Nil(t, err) {
 			assert.Equal(t, ext, format)
 		}
 	}
 
-	format, err := SniffImageFormat("testdata/deepin-music.jpg")
+	format, err := SniffFormat("testdata/deepin-music.jpg")
 	if assert.Nil(t, err) {
 		assert.Equal(t, "jpeg", format)
 	}
