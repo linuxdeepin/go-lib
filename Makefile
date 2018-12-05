@@ -42,6 +42,7 @@ tasker \
 timer \
 users \
 utils \
+imgutil \
 xdg
 
 all: build
