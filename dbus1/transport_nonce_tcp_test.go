@@ -9,6 +9,7 @@ import (
 )
 
 func TestTcpNonceConnection(t *testing.T) {
+	t.Skip("do not test tcp-nonce")
 	addr, process := startDaemon(t, `<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
 <busconfig>
