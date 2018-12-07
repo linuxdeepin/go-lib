@@ -1,3 +1,9 @@
+## [1.5.0] 2018-12-07
+*   chore(dbus1): skip test transport nonce tcp
+*   chore(dbus1): update to the latest upstream code
+*   feat(imgutil): add method CanDecodeConfig
+*   feat: add lib imgutil
+
 ## [1.4.0] 2018-11-23
 *   feat(desktopappinfo): support key X-Deepin-Vendor
 
