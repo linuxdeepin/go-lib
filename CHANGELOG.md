@@ -1,3 +1,6 @@
+## [1.6.0] 2018-12-10
+*   fix(dbus1): defaultSignalHandler.DeliverSignal
+
 ## [1.5.0] 2018-12-07
 *   chore(dbus1): skip test transport nonce tcp
 *   chore(dbus1): update to the latest upstream code
