@@ -82,6 +82,10 @@ func NewPlayer(useCache bool, backendType PlayBackendType) *Player {
 	return player
 }
 
+func (player *Player) Finder() *theme.Finder {
+	return player.finder
+}
+
 func (player *Player) Play(theme, event, device string) error {
 	filename := player.finder.Find(theme, "stereo", event)
 	if filename == "" {
