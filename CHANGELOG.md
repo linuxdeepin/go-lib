@@ -1,3 +1,6 @@
+## [1.7.0] 2018-12-29
+*   chore(`sound_effect`): player add method Finder
+
 ## [1.6.0] 2018-12-10
 *   fix(dbus1): defaultSignalHandler.DeliverSignal
 
