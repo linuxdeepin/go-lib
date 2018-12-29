@@ -110,14 +110,25 @@ func SessionBus() (conn *Conn, err error) {
 	return
 }
 
+func getSessionBusAddress() (string, error) {
+	if address := os.Getenv("DBUS_SESSION_BUS_ADDRESS"); address != "" && address != "autolaunch:" {
+		return address, nil
+
+	} else if address := tryDiscoverDbusSessionBusAddress(); address != "" {
+		os.Setenv("DBUS_SESSION_BUS_ADDRESS", address)
+		return address, nil
+	}
+	return getSessionBusPlatformAddress()
+}
+
 // SessionBusPrivate returns a new private connection to the session bus.
 func SessionBusPrivate() (*Conn, error) {
-	address := os.Getenv("DBUS_SESSION_BUS_ADDRESS")
-	if address != "" && address != "autolaunch:" {
-		return Dial(address)
+	address, err := getSessionBusAddress()
+	if err != nil {
+		return nil, err
 	}
 
-	return sessionBusPlatform()
+	return Dial(address)
 }
 
 // SystemBus returns a shared connection to the system bus, connecting to it if
