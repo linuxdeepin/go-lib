@@ -158,10 +158,27 @@ func (e *Enum) Get() int32 {
 	return v
 }
 
+func (e *Enum) GetString() string {
+	e.mu.Lock()
+	v := e.gs.GetString(e.key)
+	e.mu.Unlock()
+	return v
+}
+
 func (e *Enum) Set(val int32) bool {
 	if e.Get() != val {
 		e.mu.Lock()
 		ok := e.gs.SetEnum(e.key, val)
+		e.mu.Unlock()
+		return ok
+	}
+	return true
+}
+
+func (e *Enum) SetString(val string) bool {
+	if e.GetString() != val {
+		e.mu.Lock()
+		ok := e.gs.SetString(e.key, val)
 		e.mu.Unlock()
 		return ok
 	}
