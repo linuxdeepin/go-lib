@@ -1,3 +1,8 @@
+## [1.8.0] 2019-01-03
+*   chore: use dh golang build system on `sw_64`
+*   feat(dbusutil): gsprop.Enum add methods GetString and SetString
+*   fix(dbus): failed to find session bus address in systemd 240+
+
 ## [1.7.0] 2018-12-29
 *   chore(`sound_effect`): player add method Finder
 
