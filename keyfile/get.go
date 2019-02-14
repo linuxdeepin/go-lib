@@ -22,10 +22,11 @@ package keyfile
 import (
 	"bytes"
 	"fmt"
-	libLocale "pkg.deepin.io/lib/locale"
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	libLocale "pkg.deepin.io/lib/locale"
 )
 
 func parseValueAsBool(value string) (bool, error) {
@@ -71,15 +72,6 @@ func (f *KeyFile) GetFloat64(section, key string) (float64, error) {
 	return strconv.ParseFloat(value, 64)
 }
 
-type ParseValueAsStringError struct {
-	Value  string
-	Reason string
-}
-
-func (err ParseValueAsStringError) Error() string {
-	return fmt.Sprintf("value %q %s", err.Value, err.Reason)
-}
-
 // support escape characters:
 // \s space
 // \n newline
@@ -99,7 +91,7 @@ func parseValueAsString(value string, wantArray bool, listSeparator byte) (strin
 		if ch == '\\' {
 			ch, err := reader.ReadByte()
 			if err != nil {
-				return "", nil, ParseValueAsStringError{value, "contains escape character at end of line"}
+				break
 			}
 
 			switch ch {
@@ -117,7 +109,8 @@ func parseValueAsString(value string, wantArray bool, listSeparator byte) (strin
 				if wantArray && ch == listSeparator {
 					buf.WriteByte(';')
 				} else {
-					return "", nil, ParseValueAsStringError{value, "contains invalid escape sequence \\" + string(ch)}
+					buf.WriteByte('\\')
+					buf.WriteByte(ch)
 				}
 			}
 		} else if wantArray && ch == listSeparator {

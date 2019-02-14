@@ -21,9 +21,10 @@ package keyfile
 
 import (
 	"bytes"
-	. "github.com/smartystreets/goconvey/convey"
 	"path/filepath"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 const desktopFileContent0 = `#!/usr/bin/env xdg-open
@@ -182,13 +183,14 @@ func TestGetStringList(t *testing.T) {
 		So(list, ShouldBeNil)
 
 		list, err = f.GetStringList("Test", "strlist4")
-		So(err, ShouldNotBeNil)
-		So(err, ShouldHaveSameTypeAs, ParseValueAsStringError{})
+		So(err, ShouldBeNil)
+		So(list, ShouldResemble, []string{"abc"})
+
 		t.Log(err)
 
 		list, err = f.GetStringList("Test", "strlist5")
-		So(err, ShouldNotBeNil)
-		So(err, ShouldHaveSameTypeAs, ParseValueAsStringError{})
+		So(err, ShouldBeNil)
+		So(list, ShouldResemble, []string{"abc\\befg"})
 		t.Log(err)
 
 		list, err = f.GetStringList("Test", "strlist6")
@@ -227,13 +229,16 @@ func TestGetString(t *testing.T) {
 		So(str, ShouldEqual, "line\n<-newline\r<-break\t<-table <-space")
 
 		str, err = f.GetString("Test", "str2")
-		So(err, ShouldHaveSameTypeAs, ParseValueAsStringError{})
+		So(err, ShouldBeNil)
+		So(str, ShouldEqual, "abcdef")
 
 		str, err = f.GetString("Test", "str3")
-		So(err, ShouldHaveSameTypeAs, ParseValueAsStringError{})
+		So(err, ShouldBeNil)
+		So(str, ShouldEqual, "abc\\bdef")
 
 		str, err = f.GetString("Test", "str4")
-		So(err, ShouldHaveSameTypeAs, ParseValueAsStringError{})
+		So(err, ShouldBeNil)
+		So(str, ShouldEqual, "abc\\;def")
 
 		str, err = f.GetString("Test", "str5")
 		So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})

@@ -405,6 +405,22 @@ func Test_splitExec(t *testing.T) {
 		_, err = splitExec(`"abc"def`)
 		So(err, ShouldEqual, ErrNoSpaceAfterQuoting)
 
+		parts, err = splitExec(`env WINEPREFIX="/home/tp/.wine" wine-stable C:\\windows\\command\\start.exe /Unix /home/tp/.wine/dosdevices/c:/users/tp/Start\ Menu/Programs/sc1.08/sc1.08.lnk`)
+		So(err, ShouldBeNil)
+		So(parts, ShouldResemble, []string{"env", "WINEPREFIX=/home/tp/.wine",
+			"wine-stable", "C:\\\\windows\\\\command\\\\start.exe",
+			"/Unix", "/home/tp/.wine/dosdevices/c:/users/tp/Start Menu/Programs/sc1.08/sc1.08.lnk"})
+
+		parts, err = splitExec(`echo hello\ world`)
+		So(err, ShouldBeNil)
+		So(parts, ShouldResemble, []string{"echo", "hello world"})
+
+		parts, err = splitExec(`echo hello\world`)
+		So(err, ShouldBeNil)
+		So(parts, ShouldResemble, []string{"echo", "helloworld"})
+
+		_, err = splitExec(`echo hello\`)
+		So(err, ShouldEqual, ErrEscapeCharAtEnd)
 	})
 }
 

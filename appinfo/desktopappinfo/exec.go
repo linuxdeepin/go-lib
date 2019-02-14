@@ -120,7 +120,6 @@ func splitExec(exec string) ([]string, error) {
 				return nil, ErrQuotingNotClosed
 			}
 			outlist = append(outlist, buf.String())
-			buf.Reset()
 			break
 		}
 
@@ -143,7 +142,7 @@ func splitExec(exec string) ([]string, error) {
 				if ch0 != ' ' {
 					return nil, ErrNoSpaceAfterQuoting
 				}
-				reader.UnreadByte()
+				_ = reader.UnreadByte()
 			}
 
 		case '\\':
@@ -163,7 +162,23 @@ func splitExec(exec string) ([]string, error) {
 				}
 
 			} else {
-				return nil, ErrReservedCharNotQuoted{ch}
+				ch1, err1 := reader.ReadByte()
+				if err1 != nil {
+					// \ at end
+					return nil, ErrEscapeCharAtEnd
+				}
+
+				switch ch1 {
+				case ' ':
+					// \ + space => space
+					buf.WriteByte(' ')
+				case '\\':
+					// \ + \ => \ + \
+					buf.WriteString(`\\`)
+				default:
+					// \ + w => w
+					_ = reader.UnreadByte()
+				}
 			}
 
 		default:
