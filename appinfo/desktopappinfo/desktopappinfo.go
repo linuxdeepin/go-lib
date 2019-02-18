@@ -449,7 +449,9 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 	if launchContext != nil {
 		cmdPrefixes := launchContext.GetCmdPrefixes()
+		cmdSuffixes := launchContext.GetCmdSuffixes()
 		exeargs = append(cmdPrefixes, exeargs...)
+		exeargs = append(exeargs, cmdSuffixes...)
 	}
 
 	var launchScriptBuf bytes.Buffer
@@ -459,6 +461,7 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		launchScriptBuf.WriteString(shell.Encode(arg))
 	}
 
+	println("launch script: ", launchScriptBuf.String())
 	cmd := exec.Command("/bin/sh", "-c", launchScriptBuf.String())
 	cmd.Env = append(os.Environ(), "GIO_LAUNCHED_DESKTOP_FILE="+ai.GetFileName())
 	cmd.Dir = workingDir

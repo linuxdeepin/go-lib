@@ -47,6 +47,7 @@ type AppLaunchContext struct {
 	count       uint
 	timestamp   uint32
 	cmdPrefixes []string
+	cmdSuffixes []string
 }
 
 func NewAppLaunchContext(conn *x.Conn) *AppLaunchContext {
@@ -69,6 +70,14 @@ func (ctx *AppLaunchContext) SetCmdPrefixes(v []string) {
 
 func (ctx *AppLaunchContext) GetCmdPrefixes() []string {
 	return ctx.cmdPrefixes
+}
+
+func (ctx *AppLaunchContext) SetCmdSuffixes(v []string) {
+	ctx.cmdSuffixes = v
+}
+
+func (ctx *AppLaunchContext) GetCmdSuffixes() []string {
+	return ctx.cmdSuffixes
 }
 
 func (ctx *AppLaunchContext) GetStartupNotifyId(appInfo AppInfo, files []string) (string, error) {
