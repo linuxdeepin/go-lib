@@ -1,3 +1,8 @@
+[1.9.0] 2019-02-22
+*   refactor: fix a typo
+*   change(api): appinfo AppLaunchContext add method SetCmdSuffixes
+*   fix(desktpappinfo): failed to parse Exec field of wine programs desktop files
+
 ## [1.8.0] 2019-01-03
 *   chore: use dh golang build system on `sw_64`
 *   feat(dbusutil): gsprop.Enum add methods GetString and SetString
