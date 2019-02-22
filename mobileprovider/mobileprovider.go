@@ -128,7 +128,7 @@ func GetGSM(countryCode, providerName string) (gsm *GSM, err error) {
 	return
 }
 
-// GetCDMA return the cdma infromation that match the provided
+// GetCDMA return the cdma information that match the provided
 // country code and provider name.
 func GetCDMA(countryCode, providerName string) (cdma *CDMA, err error) {
 	provider, err := GetProvider(countryCode, providerName)
