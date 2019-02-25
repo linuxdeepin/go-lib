@@ -130,13 +130,13 @@ func showEnv(envName string) {
 func updateProxyEnvs() {
 	logger.Debug("update proxy environment variables...")
 
-	utils.UnsetEnv(envHttpProxy)
-	utils.UnsetEnv(envHttpsProxy)
-	utils.UnsetEnv(envFtpProxy)
-	utils.UnsetEnv(envSocksProxy)
-	utils.UnsetEnv(envAutoProxy)
-	utils.UnsetEnv(envAllProxy)
-	utils.UnsetEnv(envNoProxy)
+	os.Unsetenv(envHttpProxy)
+	os.Unsetenv(envHttpsProxy)
+	os.Unsetenv(envFtpProxy)
+	os.Unsetenv(envSocksProxy)
+	os.Unsetenv(envAutoProxy)
+	os.Unsetenv(envAllProxy)
+	os.Unsetenv(envNoProxy)
 	proxyMode := proxySettings.GetString(gkeyProxyMode)
 	switch proxyMode {
 	case proxyModeNone:
