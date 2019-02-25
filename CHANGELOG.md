@@ -1,3 +1,6 @@
+[1.9.1] 2019-02-25
+*   fix(proxy): abnormally clear env vars when modifying config
+
 [1.9.0] 2019-02-22
 *   refactor: fix a typo
 *   change(api): appinfo AppLaunchContext add method SetCmdSuffixes
