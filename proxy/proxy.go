@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gir/gio-2.0"
+	"pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/gsettings"
 	"pkg.deepin.io/lib/log"
 	"pkg.deepin.io/lib/utils"

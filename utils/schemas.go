@@ -21,7 +21,7 @@ package utils
 
 import (
 	"fmt"
-	"gir/gio-2.0"
+	"pkg.deepin.io/gir/gio-2.0"
 )
 
 func CheckAndNewGSettings(schema string) (*gio.Settings, error) {

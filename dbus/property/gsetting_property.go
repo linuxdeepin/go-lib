@@ -20,7 +20,7 @@
 package property
 
 import (
-	"gir/gio-2.0"
+	"pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/gsettings"
 )
 import "pkg.deepin.io/lib/dbus"
