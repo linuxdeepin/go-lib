@@ -256,6 +256,10 @@ const (
 
 func (o *Object) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
 	o.mu.Lock()
+	defer o.mu.Unlock()
+
+	o.checkSignalExt()
+
 	switch handlerId {
 	case RemoveAllHandlers:
 		o.removeAllHandlers()
@@ -264,7 +268,6 @@ func (o *Object) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
 	default:
 		o.removeHandler(handlerId)
 	}
-	o.mu.Unlock()
 }
 
 func (o *Object) ConnectPropertiesChanged(
