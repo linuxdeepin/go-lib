@@ -18,10 +18,16 @@ type Object struct {
 }
 
 type objectSignalExt struct {
-	sigLoop         *dbusutil.SignalLoop
-	ruleAuto        bool
+	sigLoop  *dbusutil.SignalLoop
+	ruleAuto bool
+
+	// used when ruleAuto is true
 	ruleHandlersMap map[string][]dbusutil.SignalHandlerId
 	//                  ^rule  ^handler ids
+
+	// used when ruleAuto is false
+	handleIds []dbusutil.SignalHandlerId
+
 	propChangedHandlerId dbusutil.SignalHandlerId
 	propChangedCallbacks map[propChangedKey][]PropChangedCallback
 }
@@ -178,17 +184,33 @@ func handlerIdSliceDelete(slice []dbusutil.SignalHandlerId,
 	return append(slice[:index], slice[index+1:]...)
 }
 
+func handlerIdSliceIndex(slice []dbusutil.SignalHandlerId, hId dbusutil.SignalHandlerId) int {
+	for idx, value := range slice {
+		if value == hId {
+			return idx
+		}
+	}
+	return -1
+}
+
 func (o *Object) removeHandler(handlerId dbusutil.SignalHandlerId) {
-	for rule, handlerIds := range o.ruleHandlersMap {
-		for idx, hId := range handlerIds {
-			if hId == handlerId {
-				o.sigLoop.RemoveHandler(hId)
-				if len(handlerIds) == 1 {
-					globalRuleCounter.removeMatch(o.conn, rule)
+	o.sigLoop.RemoveHandler(handlerId)
+	if o.ruleAuto {
+		for rule, handlerIds := range o.ruleHandlersMap {
+			for idx, hId := range handlerIds {
+				if hId == handlerId {
+					if len(handlerIds) == 1 {
+						_ = globalRuleCounter.removeMatch(o.conn, rule)
+					}
+					o.ruleHandlersMap[rule] = handlerIdSliceDelete(handlerIds, idx)
+					return
 				}
-				o.ruleHandlersMap[rule] = handlerIdSliceDelete(handlerIds, idx)
-				return
 			}
+		}
+	} else {
+		idx := handlerIdSliceIndex(o.handleIds, handlerId)
+		if idx != -1 {
+			o.handleIds = handlerIdSliceDelete(o.handleIds, idx)
 		}
 	}
 }
@@ -201,14 +223,20 @@ func (o *Object) removePropertiesChangedHandler() {
 }
 
 func (o *Object) removeAllHandlers() {
-	for rule, handlerIds := range o.ruleHandlersMap {
-		for _, hId := range handlerIds {
+	if o.ruleAuto {
+		for rule, handlerIds := range o.ruleHandlersMap {
+			for _, hId := range handlerIds {
+				o.sigLoop.RemoveHandler(hId)
+			}
+			_ = globalRuleCounter.removeMatch(o.conn, rule)
+		}
+		o.ruleHandlersMap = nil
+	} else {
+		for _, hId := range o.handleIds {
 			o.sigLoop.RemoveHandler(hId)
 		}
-		globalRuleCounter.removeMatch(o.conn, rule)
 	}
-	o.ruleHandlersMap = nil
-	o.propChangedHandlerId = 0
+	o.removePropertiesChangedHandler()
 }
 
 func (o *Object) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, cb dbusutil.SignalHandlerFunc) (dbusutil.SignalHandlerId, error) {
@@ -220,17 +248,21 @@ func (o *Object) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, cb db
 }
 
 func (o *Object) connectSignal(rule string, sigRule *dbusutil.SignalRule, cb dbusutil.SignalHandlerFunc) (dbusutil.SignalHandlerId, error) {
-	if !o.ruleAuto {
-		return o.sigLoop.AddHandler(sigRule, cb), nil
-	}
-	err := o.addMatch(rule)
-	if err != nil {
-		return 0, err
-	}
+	if o.ruleAuto {
+		err := o.addMatch(rule)
+		if err != nil {
+			return 0, err
+		}
 
-	handlerId := o.sigLoop.AddHandler(sigRule, cb)
-	o.addRuleHandlerId(rule, handlerId)
-	return handlerId, nil
+		handlerId := o.sigLoop.AddHandler(sigRule, cb)
+		o.addRuleHandlerId(rule, handlerId)
+		return handlerId, nil
+
+	} else {
+		handlerId := o.sigLoop.AddHandler(sigRule, cb)
+		o.handleIds = append(o.handleIds, handlerId)
+		return handlerId, nil
+	}
 }
 
 // Object public methods:
@@ -253,6 +285,10 @@ const (
 	RemoveAllHandlers              = -1
 	RemovePropertiesChangedHandler = -2
 )
+
+func (o *Object) RemoveAllHandlers() {
+	o.removeAllHandlers()
+}
 
 func (o *Object) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
 	o.mu.Lock()
