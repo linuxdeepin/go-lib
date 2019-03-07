@@ -984,7 +984,7 @@ func (e MixerElem) SelemHasCaptureSwitch() bool {
 // Return info about capture switch control of a mixer simple element.
 // return false if control is separated per channel, true if control acts on all channels together
 func (e MixerElem) SelemHasCaptureSwitchJoined() bool {
-	ret := C.snd_mixer_selem_has_playback_switch_joined(e.native())
+	ret := C.snd_mixer_selem_has_capture_switch_joined(e.native())
 	return ret != 0
 }
 
@@ -1300,8 +1300,8 @@ const (
 )
 
 // Return name of mixer simple element channel.
-func MixerSelemChannelName(channel MixerSelemChannelId) string {
-	return C.GoString(C.snd_mixer_selem_channel_name(C.snd_mixer_selem_channel_id_t(channel)))
+func (id MixerSelemChannelId) Name() string {
+	return C.GoString(C.snd_mixer_selem_channel_name(C.snd_mixer_selem_channel_id_t(id)))
 }
 
 // get the current selected enumerated item for the given mixer simple element
