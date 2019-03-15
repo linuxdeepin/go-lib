@@ -1,3 +1,8 @@
+[1.10.0] 2019-03-15
+*   fix(asound): SelemHasCaptureSwitchJoined wrong
+*   change(api): asound add more functions
+*   fix(dbusutil): proxy.Object removeHandler not work if ruleAuto is false
+
 [1.9.2] 2019-03-01
 *   chore(dbusutil): RemoveHandler check signal ext
 *   chore: use pkg.deepin.io/gir
