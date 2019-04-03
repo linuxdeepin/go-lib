@@ -82,7 +82,7 @@ func (err *GroupNotFoundError) Error() string {
 	if len(err.Name) > 0 {
 		return fmt.Sprintf("Group with name `%s` not found!", err.Name)
 	} else {
-		return fmt.Sprintf("Group with gid `%s` not found!", err.Gid)
+		return fmt.Sprintf("Group with gid `%d` not found!", err.Gid)
 	}
 }
 

@@ -33,7 +33,7 @@ type TimeSpec struct {
 }
 
 func (ts TimeSpec) String() string {
-	return fmt.Sprintf("%d.%d", ts.Seconds, ts.NanoSeconds)
+	return fmt.Sprintf("%d.%d", ts.Seconds(), ts.NanoSeconds())
 }
 
 // Seconds returns the seconds.
