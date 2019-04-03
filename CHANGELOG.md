@@ -1,3 +1,7 @@
+[1.10.1] 2019-04-03
+*   fix: build failed
+*   chore(desktopappinfo): remove redundant println
+
 [1.10.0] 2019-03-15
 *   fix(asound): SelemHasCaptureSwitchJoined wrong
 *   change(api): asound add more functions
