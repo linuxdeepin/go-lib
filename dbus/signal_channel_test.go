@@ -33,7 +33,7 @@ func TestSignalChannle(t *testing.T) {
 			<-ch.Out()
 		}
 		if len(ch.In()) != 0 || len(ch.Out()) != 0 || len(ch.caches) > 1 {
-			t.Fatal("Count: %d  %d %d %d\n", count, len(ch.In()), len(ch.Out()), len(ch.caches))
+			t.Fatalf("Count: %d  %d %d %d\n", count, len(ch.In()), len(ch.Out()), len(ch.caches))
 		}
 	}
 }
