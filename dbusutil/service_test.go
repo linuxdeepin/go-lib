@@ -555,7 +555,7 @@ func TestService_AutoQuit(t *testing.T) {
 		// ok
 		close(ch)
 	case <-time.After(5 * time.Second):
-		t.Error("Failed to announce that the service was quitted")
+		t.Error("Failed to announce that the service has quit")
 	}
 }
 
