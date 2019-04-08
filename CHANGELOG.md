@@ -1,3 +1,6 @@
+[1.10.2] 2019-04-08
+*   feat(desktopappinfo): do not process X-Deepin-Vendor field
+
 [1.10.1] 2019-04-03
 *   fix: build failed
 *   chore(desktopappinfo): remove redundant println
