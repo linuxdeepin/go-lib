@@ -153,13 +153,7 @@ func NewDesktopAppInfoFromKeyFile(kfile *keyfile.KeyFile) (*DesktopAppInfo, erro
 		return nil, ErrInvalidType
 	}
 
-	vendor, _ := f.GetString(MainSection, "X-Deepin-Vendor")
-	if vendor == "deepin" {
-		f.name, _ = f.GetLocaleString(MainSection, KeyGenericName, "")
-	}
-	if f.name == "" {
-		f.name, _ = f.GetLocaleString(MainSection, KeyName, "")
-	}
+	f.name, _ = f.GetLocaleString(MainSection, KeyName, "")
 
 	icon, _ := f.GetString(MainSection, KeyIcon)
 	/* Work around a common mistake in desktop files */
