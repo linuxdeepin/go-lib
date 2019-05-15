@@ -2,7 +2,7 @@ package asound
 
 /*
 #cgo pkg-config: alsa
-#include <asoundlib.h>
+#include <alsa/asoundlib.h>
 #include <stdlib.h>
 #include <errno.h>
 */
