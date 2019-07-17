@@ -122,12 +122,17 @@ func GetGroupByGid(gid uint32) (*Group, error) {
 // GetGroupEntry wraps up `getgrent` system call.
 // It performs sequential scans of the records in the group file.
 func GetGroupEntry() []*Group {
-	groups := make([]*Group, 0)
+	var groups []*Group
 
 	// Restart scanning from the begging of the group file.
 	C.setgrent()
 
-	for groupC, err := C.getgrent(); groupC != nil && err == nil; groupC, err = C.getgrent() {
+	for {
+		groupC := C.getgrent()
+		if groupC == nil {
+			break
+		}
+
 		group := groupC2Go(groupC)
 		groups = append(groups, group)
 	}
