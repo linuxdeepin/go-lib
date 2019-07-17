@@ -101,12 +101,16 @@ func GetPasswdByUid(uid uint32) (*Passwd, error) {
 // GetPasswdEntry wraps up `getpwent` system call
 // It performs sequential scans of the records in the password file.
 func GetPasswdEntry() []*Passwd {
-	passwds := make([]*Passwd, 0)
+	var passwds []*Passwd
 
 	// Restart scanning from the begging of the password file.
 	C.setpwent()
 
-	for passwdC, err := C.getpwent(); passwdC != nil && err == nil; passwdC, err = C.getpwent() {
+	for {
+		passwdC := C.getpwent()
+		if passwdC == nil {
+			break
+		}
 		passwd := passwdC2Go(passwdC)
 		passwds = append(passwds, passwd)
 	}
