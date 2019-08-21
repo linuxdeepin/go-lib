@@ -2,6 +2,7 @@ package sound_effect
 
 import (
 	"io"
+	"time"
 
 	"pkg.deepin.io/lib/asound"
 	paSimple "pkg.deepin.io/lib/pulse/simple"
@@ -34,6 +35,11 @@ type OggDecoder struct {
 	core       stb_vorbis.Decoder
 	sampleSpec *SampleSpec
 	bufSize    int
+}
+
+func (d *OggDecoder) GetDuration() time.Duration {
+	// TODO
+	return 0
 }
 
 func (d *OggDecoder) Decode() ([]byte, error) {

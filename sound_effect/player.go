@@ -53,6 +53,7 @@ type Decoder interface {
 	GetSampleSpec() *SampleSpec
 	Decode() ([]byte, error)
 	Close() error
+	GetDuration() time.Duration
 }
 
 type SampleSpec struct {
@@ -84,6 +85,14 @@ func NewPlayer(useCache bool, backendType PlayBackendType) *Player {
 
 func (player *Player) Finder() *theme.Finder {
 	return player.finder
+}
+
+func (player *Player) GetDuration(theme, event string) (time.Duration, error) {
+	filename := player.finder.Find(theme, "stereo", event)
+	if filename == "" {
+		return 0, errors.New("not found file")
+	}
+	return player.getDuration(filename)
 }
 
 func (player *Player) Play(theme, event, device string) error {
@@ -136,6 +145,20 @@ func getPlayBackend(type0 PlayBackendType, event, device string, sampleSpec *Sam
 	default:
 		return nil, fmt.Errorf("unknown play backend type %d", type0)
 	}
+}
+
+func (Player *Player) getDuration(file string) (time.Duration, error) {
+	fileInfo, err := os.Stat(file)
+	if err != nil {
+		return 0, err
+	}
+
+	decoder, err := getDecoder(file, fileInfo)
+	if err != nil {
+		return 0, err
+	}
+	defer decoder.Close()
+	return decoder.GetDuration(), nil
 }
 
 func (player *Player) play(file, event, device string) error {

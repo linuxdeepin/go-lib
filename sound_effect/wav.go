@@ -3,6 +3,7 @@ package sound_effect
 import (
 	"errors"
 	"os"
+	"time"
 
 	"github.com/cryptix/wav"
 	"pkg.deepin.io/lib/asound"
@@ -15,6 +16,7 @@ type WavDecoder struct {
 	sampleSpec    *SampleSpec
 	bufSize       int
 	bytesPerFrame int
+	duration      time.Duration
 }
 
 func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
@@ -42,12 +44,19 @@ func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
 
 	bytesPerFrame := int(wavFile.Channels) * int(wavFile.SignificantBits/8)
 	bufSize := int(wavFile.SampleRate/8) * bytesPerFrame
+	// NOTE: do not use wavFile.Duration
+	duration := time.Duration(
+		float64(wavReader.GetSampleCount()/uint32(wavFile.Channels)) / float64(wavFile.SampleRate) *
+			float64(time.Second),
+	)
+
 	return &WavDecoder{
 		f:             f,
 		reader:        wavReader,
 		sampleSpec:    sampleSpec,
 		bufSize:       bufSize,
 		bytesPerFrame: bytesPerFrame,
+		duration:      duration,
 	}, nil
 }
 
@@ -72,6 +81,10 @@ func (d *WavDecoder) Decode() ([]byte, error) {
 	buf := make([]byte, d.bufSize)
 	n, err := d.read(buf)
 	return buf[:n], err
+}
+
+func (d *WavDecoder) GetDuration() time.Duration {
+	return d.duration
 }
 
 func (d *WavDecoder) read(buf []byte) (int, error) {
