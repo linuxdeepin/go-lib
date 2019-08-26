@@ -53,10 +53,40 @@ func newALSAPlayBackend(device string, sampleSpec *SampleSpec) (pb PlayBackend, 
 		return
 	}
 
-	sampleRate := sampleSpec.rate
-	err = pcm.HwParamsSetRate(params, uint(sampleRate), 0)
+	sampleRate := uint(sampleSpec.rate)
+	_, err = pcm.HwParamsSetRateNear(params, &sampleRate)
 	if err != nil {
 		return
+	}
+
+	bufferTime, _, err := params.GetBufferTimeMax()
+	if err != nil {
+		return
+	}
+
+	if bufferTime > 500000 {
+		bufferTime = 500000
+	}
+
+	periodTime := uint(0)
+	if bufferTime > 0 {
+		periodTime = bufferTime / 4
+	}
+
+	// set period time
+	if periodTime > 0 {
+		_, err = pcm.HwParamsSetPeriodTimeNear(params, &periodTime)
+		if err != nil {
+			return
+		}
+	}
+
+	// set buffer time
+	if bufferTime > 0 {
+		_, err = pcm.HwParamsSetBufferTimeNear(params, &bufferTime)
+		if err != nil {
+			return
+		}
 	}
 
 	err = pcm.HwParams(params)

@@ -445,37 +445,40 @@ func (pcm PCM) HwParamsSetRate(params PCMHwParams, val uint, dir int) error {
 }
 
 // Restrict a configuration space to have rate nearest to a target.
-func (pcm PCM) HwParamsSetRateNear(params PCMHwParams, val uint) (uint, int, error) {
-	cval := C.uint(val)
+func (pcm PCM) HwParamsSetRateNear(params PCMHwParams, val *uint) (int, error) {
+	cVal := C.uint(*val)
 	var dir C.int
 	ret := C.snd_pcm_hw_params_set_rate_near(pcm.native(), params.native(),
-		&cval, &dir)
+		&cVal, &dir)
 	if ret == 0 {
-		return uint(cval), int(dir), nil
+		*val = uint(cVal)
+		return int(dir), nil
 	}
-	return 0, 0, newError("snd_pcm_hw_params_set_rate_near", ret)
+	return 0, newError("snd_pcm_hw_params_set_rate_near", ret)
 }
 
 // Restrict a configuration space to have period time nearest to a target.
-func (pcm PCM) HwParamsSetPeriodTimeNear(params PCMHwParams, val uint) (uint, int, error) {
-	val0 := C.uint(val)
+func (pcm PCM) HwParamsSetPeriodTimeNear(params PCMHwParams, val *uint) (int, error) {
+	val0 := C.uint(*val)
 	var dir0 C.int
 	ret := C.snd_pcm_hw_params_set_period_time_near(pcm.native(), params.native(), &val0, &dir0)
 	if ret == 0 {
-		return uint(val0), int(dir0), nil
+		*val = uint(val0)
+		return int(dir0), nil
 	}
-	return 0, 0, newError("snd_pcm_hw_params_set_period_time_near", ret)
+	return 0, newError("snd_pcm_hw_params_set_period_time_near", ret)
 }
 
 // Restrict a configuration space to have buffer time nearest to a target.
-func (pcm PCM) HwParamsSetBufferTimeNear(params PCMHwParams, val uint) (uint, int, error) {
-	val0 := C.uint(val)
+func (pcm PCM) HwParamsSetBufferTimeNear(params PCMHwParams, val *uint) (int, error) {
+	val0 := C.uint(*val)
 	var dir0 C.int
 	ret := C.snd_pcm_hw_params_set_buffer_time_near(pcm.native(), params.native(), &val0, &dir0)
 	if ret == 0 {
-		return uint(val0), int(dir0), nil
+		*val = uint(val0)
+		return int(dir0), nil
 	}
-	return 0, 0, newError("snd_pcm_hw_params_set_buffer_time_near", ret)
+	return 0, newError("snd_pcm_hw_params_set_buffer_time_near", ret)
 }
 
 // Restrict a configuration space to contain only one period size.
