@@ -44,6 +44,16 @@ pa_context_success_cb_t get_success_cb()
   return __empty_success_cb;
 }
 
+static void __empty_index_cb(pa_context *c, uint32_t idx, void *userdata)
+{
+    return;
+}
+
+pa_context_index_cb_t get_index_cb()
+{
+    return __empty_index_cb;
+}
+
 #define DEFINE(ID, TYPE, PA_FUNC_SUFFIX)                                \
   void receive_##TYPE##_cb(pa_context *c, const pa_##TYPE##_info *info, int eol, void *userdata) \
   {                                                                     \

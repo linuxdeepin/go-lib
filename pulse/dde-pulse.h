@@ -47,6 +47,8 @@ pa_context* new_pa_context(pa_threaded_mainloop* ml, int timeout_in_seconds);
 // Fixed gccgo(1.4) compile failed, becase of 'success_cb' duplicate definition
 pa_context_success_cb_t get_success_cb();
 
+pa_context_index_cb_t get_index_cb();
+
 pa_stream* createMonitorStreamForSource(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t source_idx, uint32_t stream_idx, int suspend);
 
 void _suspend_sink_by_id(pa_threaded_mainloop* loop, pa_context* ctx, uint32_t idx, int suspend);

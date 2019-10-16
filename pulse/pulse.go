@@ -484,3 +484,17 @@ func (c *Context) SetSinkInputMute(sinkInputIndex uint32, mute bool) {
 		C.pa_operation_unref(op)
 	})
 }
+
+func (c *Context) LoadModule(name, argument string) {
+	c.safeDo(func() {
+		cName := C.CString(name)
+		defer C.free(unsafe.Pointer(cName))
+		var cArgument *C.char
+		if argument != "" {
+			cArgument = C.CString(argument)
+			defer C.free(unsafe.Pointer(cArgument))
+		}
+		op := C.pa_context_load_module(c.ctx, cName, cArgument, C.get_index_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
