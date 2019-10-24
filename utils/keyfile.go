@@ -21,9 +21,10 @@ package utils
 
 import (
 	"fmt"
-	"pkg.deepin.io/gir/glib-2.0"
 	"os"
 	"sync"
+
+	"pkg.deepin.io/gir/glib-2.0"
 )
 
 var (
@@ -132,8 +133,6 @@ func ReadKeyFromKeyFile(filename, group, key string, t interface{}) (interface{}
 		}
 		return value, true
 	}
-
-	return nil, false
 }
 
 func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {

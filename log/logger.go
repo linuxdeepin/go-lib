@@ -26,12 +26,13 @@ import (
 	golog "log"
 	"os"
 	"path/filepath"
-	"pkg.deepin.io/lib/utils"
 	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
 	"sync"
+
+	"pkg.deepin.io/lib/utils"
 )
 
 const (
@@ -466,7 +467,7 @@ func (l *Logger) launchCrashReporter() {
 		}
 
 		// launch crash reporter
-		l.Info("launch deepin-crash-reporter: %s %s", crashReporterExe, append(crashReporterArgs, f.Name()))
+		l.Infof("launch deepin-crash-reporter: %s %v", crashReporterExe, append(crashReporterArgs, f.Name()))
 		_, err = os.StartProcess(crashReporterExe, append(crashReporterArgs, f.Name()),
 			&os.ProcAttr{Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}})
 		if err != nil {

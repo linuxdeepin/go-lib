@@ -17,22 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package profile_test
+package profile
 
-import (
-	"pkg.deepin.io/lib/profile"
-)
-
-func ExampleCPUProfile() {
-	p := &profile.Config{CPUProfile: "test"}
+func ExampleConfig_Start() {
+	p := &Config{CPUProfile: "test"}
 	if err := p.Start(); err != nil {
 		// error handle
 		return
 	}
 }
 
-func ExampleNoShutdownHook() {
-	p := &profile.Config{CPUProfile: "cpu.prof", NoShutdownHook: true}
+func ExampleConfig_Stop() {
+	p := &Config{CPUProfile: "cpu.prof", NoShutdownHook: true}
 	if err := p.Start(); err != nil {
 		// error handle
 		return

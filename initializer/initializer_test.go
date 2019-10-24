@@ -21,9 +21,10 @@ package initializer_test
 
 import (
 	"errors"
+	"testing"
+
 	. "github.com/smartystreets/goconvey/convey"
 	. "pkg.deepin.io/lib/initializer"
-	"testing"
 )
 
 func TestInitializer(t *testing.T) {
@@ -52,7 +53,6 @@ func TestInitializerError(t *testing.T) {
 				return nil, errors.New("initialize error")
 			}).Init(func(interface{}) (interface{}, error) {
 				panic("should not be executed")
-				return nil, nil
 			}).GetError()
 
 		}, ShouldNotPanic)

@@ -40,8 +40,6 @@ func CompressDir(src, dest string, t int32) error {
 	default:
 		return fmt.Errorf("Invalid archive type: %q", t)
 	}
-
-	return nil
 }
 
 func CompressFiles(files []string, dest string, t int32) error {
@@ -55,8 +53,6 @@ func CompressFiles(files []string, dest string, t int32) error {
 	default:
 		return fmt.Errorf("Invalid archive type: %q", t)
 	}
-
-	return nil
 }
 
 func Extracte(src, destDir string, t int32) ([]string, error) {
@@ -70,6 +66,4 @@ func Extracte(src, destDir string, t int32) ([]string, error) {
 	default:
 		return nil, fmt.Errorf("Invalid archive type: %q", t)
 	}
-
-	return nil, nil
 }

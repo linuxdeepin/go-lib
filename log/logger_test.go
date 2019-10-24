@@ -21,11 +21,12 @@ package log
 
 import (
 	"fmt"
-	C "gopkg.in/check.v1"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"testing"
+
+	C "gopkg.in/check.v1"
 )
 
 var originStdout = os.Stdout
@@ -105,7 +106,7 @@ func (*testWrapper) TestGeneral(c *C.C) {
 	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: error message append string\n$`, true)
 
 	resetOutput()
-	logger.Warning("test warning: %v", fmt.Errorf("error message"))
+	logger.Warning("test warning:", fmt.Errorf("error message"))
 	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: %v error message\n$`, true)
 
 	resetOutput()

@@ -21,8 +21,9 @@ package archive
 
 import (
 	"fmt"
-	"pkg.deepin.io/lib/archive/gzip"
 	"strings"
+
+	"pkg.deepin.io/lib/archive/gzip"
 )
 
 const (
@@ -46,8 +47,6 @@ func CompressDir(src, dest string) error {
 	default:
 		return fmt.Errorf("Invalid archive compress type")
 	}
-
-	return nil
 }
 
 func CompressFiles(files []string, dest string) error {
@@ -63,8 +62,6 @@ func CompressFiles(files []string, dest string) error {
 	default:
 		return fmt.Errorf("Invalid archive compress type")
 	}
-
-	return nil
 }
 
 func Extracte(src, dest string) ([]string, error) {
@@ -80,8 +77,6 @@ func Extracte(src, dest string) ([]string, error) {
 	default:
 		return nil, fmt.Errorf("Invalid archive compress type")
 	}
-
-	return nil, nil
 }
 
 func getCompressType(file string) int32 {
