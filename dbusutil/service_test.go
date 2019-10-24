@@ -217,7 +217,7 @@ func TestService_Emit(t *testing.T) {
 	select {
 	case <-ch1:
 		close(ch1)
-	case <-time.After(5 * time.Second):
+	case <-time.After(30 * time.Second):
 		t.Errorf("Failed to announce that the Signal1 was emitted")
 	}
 
@@ -258,7 +258,7 @@ func TestService_Emit(t *testing.T) {
 	select {
 	case <-ch2:
 		close(ch2)
-	case <-time.After(5 * time.Second):
+	case <-time.After(30 * time.Second):
 		t.Errorf("Failed to announce that the Signal2 was emitted")
 	}
 

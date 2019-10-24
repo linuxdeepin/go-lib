@@ -107,7 +107,7 @@ func (*testWrapper) TestGeneral(c *C.C) {
 
 	resetOutput()
 	logger.Warning("test warning:", fmt.Errorf("error message"))
-	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: %v error message\n$`, true)
+	checkOutput(c, `^<warning> logger_test.go:\d+: test warning: error message\n$`, true)
 
 	resetOutput()
 	logger.Warningf("test warningf: %v", fmt.Errorf("error message"))
