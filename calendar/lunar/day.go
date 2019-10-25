@@ -21,11 +21,14 @@ package lunar
 
 // Day 保存农历日信息
 type Day struct {
-	Year      int    // 公历年
-	Day       int    // 农历日
-	Month     *Month // 农历月
-	MonthZhi  int    // 农历日所在的月的地支
-	SolarTerm int    // 0~23 二十四节气 ，-1 非节气
+	Year       int    // 公历年
+	Month      int    // 公历月
+	Day        int    // 公历日
+	LunarYear  int    // 农历年
+	LunarDay   int    // 农历日
+	LunarMonth *Month // 农历月
+	MonthZhi   int    // 农历日所在的月的地支
+	SolarTerm  int    // 0~23 二十四节气 ，-1 非节气
 }
 
 // 十二月名
@@ -33,8 +36,8 @@ var monthNames = []string{"正", "二", "三", "四", "五", "六", "七", "八"
 
 // MonthName 获取当天的农历月名称
 func (d *Day) MonthName() string {
-	monthName := monthNames[d.Month.Name-1]
-	if d.Month.IsLeap {
+	monthName := monthNames[d.LunarMonth.Name-1]
+	if d.LunarMonth.IsLeap {
 		return "闰" + monthName + "月"
 	}
 	return monthName + "月"
@@ -50,7 +53,7 @@ var dayNames = []string{
 
 // DayName 获取当天的农历日名
 func (d *Day) DayName() string {
-	return dayNames[d.Day-1]
+	return dayNames[d.LunarDay-1]
 }
 
 //农历节日
@@ -72,12 +75,12 @@ var lunarFestival = map[int]string{
 // Festival 获取当天的农历节日名
 // 没有则返回空字符串
 func (d *Day) Festival() string {
-	key := d.Month.Name*100 + d.Day
+	key := d.LunarMonth.Name*100 + d.LunarDay
 	if name, ok := lunarFestival[key]; ok {
 		return name
 	}
 	// 农历腊月（十二月）的最后个一天
-	if d.Month.Name == 12 && d.Day == d.Month.Days {
+	if d.LunarMonth.Name == 12 && d.LunarDay == d.LunarMonth.Days {
 		return "除夕"
 	}
 	return ""
@@ -92,4 +95,19 @@ func (d *Day) SolarTermName() string {
 // GanZhiMonth 获取当天的月干支
 func (d *Day) GanZhiMonth() string {
 	return cyclical((d.Year-1900)*12 + d.MonthZhi + 12)
+}
+
+// GanZhiYear 获取当天的年干支
+func (d *Day) GanZhiYear() string {
+	return GetYearGanZhi(d.LunarYear)
+}
+
+// GanZhiYear 获取当天的日干支
+func (d *Day) GanZhiDay() string {
+	return GetDayGanZhi(d.Year, d.Month, d.Day)
+}
+
+// YearZodiac 获取当天的生肖
+func (d *Day) YearZodiac() string {
+	return GetYearZodiac(d.LunarYear)
 }

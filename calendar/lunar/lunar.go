@@ -20,8 +20,9 @@
 package lunar
 
 import (
-	"pkg.deepin.io/lib/calendar/util"
 	"time"
+
+	"pkg.deepin.io/lib/calendar/util"
 )
 
 // Calendar 保存公历年内计算农历所需的信息
@@ -36,11 +37,12 @@ type Calendar struct {
 
 // Month 保存农历月信息
 type Month struct {
-	Name     int       // 农历月名
-	Days     int       // 本月天数
-	ShuoJD   float64   // 本月朔日时间 北京时间 儒略日
-	ShuoTime time.Time // 本月朔日时间 北京时间
-	IsLeap   bool      // 是否为闰月
+	LunarYear int       // 农历年
+	Name      int       // 农历月名
+	Days      int       // 本月天数
+	ShuoJD    float64   // 本月朔日时间 北京时间 儒略日
+	ShuoTime  time.Time // 本月朔日时间 北京时间
+	IsLeap    bool      // 是否为闰月
 }
 
 func newCalendar(year int) *Calendar {
@@ -132,14 +134,16 @@ func deltaDays(t1, t2 time.Time) int {
 }
 
 func (cc *Calendar) fillMonths() {
-	//采用夏历建寅，冬至所在月份为农历11月
+	//采用夏历建寅，冬至所在月份为农历11月(冬月)
 	yuejian := 11
 	for i := 0; i < 14; i++ {
 		info := new(Month)
 		if yuejian <= 12 {
 			info.Name = yuejian
+			info.LunarYear = cc.Year - 1
 		} else {
 			info.Name = yuejian - 12
+			info.LunarYear = cc.Year
 		}
 		info.ShuoJD = cc.NewMoonJDs[i]
 		info.ShuoTime = util.GetDateTimeFromJulianDay(info.ShuoJD)
@@ -191,12 +195,14 @@ func (cc *Calendar) SolarDayToLunarDay(month, day int) *Day {
 		}
 	}
 
-	// 求农历月份和日
+	// 求农历年、月、日
+	var lunarYear int
 	var lunarMonth *Month
 	var lunarDay int
 	for _, m := range cc.Months {
 		dd := deltaDays(m.ShuoTime, dt) + 1
 		if 1 <= dd && dd <= m.Days {
+			lunarYear = m.LunarYear
 			lunarMonth = m
 			lunarDay = dd
 			break
@@ -212,11 +218,14 @@ func (cc *Calendar) SolarDayToLunarDay(month, day int) *Day {
 	}
 
 	return &Day{
-		Year:      cc.Year,
-		Day:       lunarDay,
-		Month:     lunarMonth,
-		MonthZhi:  monthZhi,
-		SolarTerm: solarTerm,
+		Year:       cc.Year,
+		Month:      month,
+		Day:        day,
+		LunarYear:  lunarYear,
+		LunarDay:   lunarDay,
+		LunarMonth: lunarMonth,
+		MonthZhi:   monthZhi,
+		SolarTerm:  solarTerm,
 	}
 }
 
