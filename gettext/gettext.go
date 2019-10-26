@@ -26,9 +26,38 @@ package gettext
 void _init_i18n() { setlocale(LC_ALL, ""); }
 */
 import "C"
-import "unsafe"
-import "os"
-import "strings"
+
+import (
+	"os"
+	"strings"
+	"unsafe"
+)
+
+var (
+	// LcAll is for all of the locale.
+	LcAll = int(C.LC_ALL)
+
+	// LcCollate is for regular expression matching (it determines the meaning of
+	// range expressions and equivalence classes) and string collation.
+	LcCollate = int(C.LC_COLLATE)
+
+	// LcCtype is for regular expression matching, character classification,
+	// conversion, case-sensitive comparison, and wide character functions.
+	LcCtype = int(C.LC_CTYPE)
+
+	// LcMessages is for localizable natural-language messages.
+	LcMessages = int(C.LC_MESSAGES)
+
+	// LcMonetary is for monetary formatting.
+	LcMonetary = int(C.LC_MONETARY)
+
+	// LcNumeric is for number formatting (such as the decimal point and the
+	// thousands separator).
+	LcNumeric = int(C.LC_NUMERIC)
+
+	// LcTime is for time and date formatting.
+	LcTime = int(C.LC_TIME)
+)
 
 func Tr(id string) string {
 	_id := C.CString(id)
@@ -52,6 +81,12 @@ func Textdomain(domain string) {
 
 func InitI18n() {
 	C._init_i18n()
+}
+
+func SetLocale(category int, locale string) string {
+	cLocale := C.CString(locale)
+	defer C.free(unsafe.Pointer(cLocale))
+	return C.GoString(C.setlocale(C.int(category), cLocale))
 }
 
 func Bindtextdomain(domain, dirname string) string {
