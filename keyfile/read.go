@@ -31,7 +31,7 @@ import (
 )
 
 //var entryReg = regexp.MustCompile(`^(?P<key>[a-zA-Z0-9\-]+(?:\[[a-zA-Z0-9_@\.]+\])?)\s*=\s*(?P<value>.*)$`)
-var keyReg = regexp.MustCompile(`^[a-zA-Z0-9\-_@\.\[\]]+$`)
+var keyReg = regexp.MustCompile(`^[a-zA-Z0-9\-_@\.\[\]/]+$`)
 
 func (f *KeyFile) LoadFromReader(reader io.Reader) error {
 	var comments string
