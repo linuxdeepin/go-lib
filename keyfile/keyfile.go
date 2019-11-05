@@ -21,14 +21,16 @@ package keyfile
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 )
 
 var LineBreak = "\n"
 
 type KeyFile struct {
-	mutex sync.RWMutex
-	data  map[string]map[string]string // section -> key : value
+	mutex  sync.RWMutex
+	keyReg *regexp.Regexp
+	data   map[string]map[string]string // section -> key : value
 
 	sectionList []string            // section name list
 	keyList     map[string][]string // section -> key name list
@@ -49,10 +51,19 @@ func NewKeyFile() *KeyFile {
 	return f
 }
 
+func (f *KeyFile) SetKeyRegexp(keyReg *regexp.Regexp) {
+	f.keyReg = keyReg
+}
+
 // it returns true if the key and value were inserted
 // or return false if the value was overwritten.
 func (f *KeyFile) SetValue(section, key, value string) bool {
 	if section == "" || key == "" {
+		return false
+	}
+
+	if f.keyReg != nil &&
+		!f.keyReg.MatchString(key) {
 		return false
 	}
 

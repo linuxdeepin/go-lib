@@ -5,6 +5,7 @@ Exec=deepin-screenshot --icon
 GenericName=Screen capturing application
 Icon=deepin-screenshot
 Name=Deepin Screenshot
+Name[xy_XY.UTF-8@abc123]=test
 StartupNotify=false
 Type=Application
 

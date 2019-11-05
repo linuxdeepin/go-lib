@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -124,8 +125,12 @@ var ErrInvalidFileExt = errors.New("the file extension is not " + desktopExt)
 var ErrInvalidFirstSection = errors.New("first section is not " + MainSection)
 var ErrInvalidType = errors.New("type is not " + TypeApplication)
 
+// Only the characters A-Za-z0-9- may be used in key names.
+var keyReg = regexp.MustCompile(`^[A-Za-z0-9\-]+(\[[A-Za-z0-9@_\-.]+])?$`)
+
 func newDesktopAppInfoFromFile(filename string) (*DesktopAppInfo, error) {
 	kfile := keyfile.NewKeyFile()
+	kfile.SetKeyRegexp(keyReg)
 	err := kfile.LoadFromFile(filename)
 	if err != nil {
 		return nil, err

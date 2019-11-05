@@ -22,6 +22,7 @@ package keyfile
 import (
 	"bytes"
 	"path/filepath"
+	"regexp"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -57,6 +58,11 @@ const desktopFileContent3 = `
 =nokey
 `
 
+const desktopFileContent4 = `
+[Desktop Entry]
+abc/def=nokey
+`
+
 func TestLoadFromData(t *testing.T) {
 
 	Convey("Test LoadFromData EntryNotInSectionError", t, func() {
@@ -75,12 +81,26 @@ func TestLoadFromData(t *testing.T) {
 		t.Log(err)
 	})
 
-	Convey("Test LoadFromData InvalidKeyError", t, func() {
+	Convey("Test LoadFromData key is empty", t, func() {
 		f := NewKeyFile()
 		err := f.LoadFromData([]byte(desktopFileContent3))
 		So(err, ShouldNotBeNil)
-		So(err, ShouldHaveSameTypeAs, InvalidKeyError{})
 		t.Log(err)
+	})
+
+	Convey("Test LoadFromData InvalidKeyError", t, func() {
+		f := NewKeyFile()
+		keyReg := regexp.MustCompile(`^[A-Za-z0-9\-]+$`)
+		f.SetKeyRegexp(keyReg)
+		err := f.LoadFromData([]byte(desktopFileContent4))
+		So(err, ShouldNotBeNil)
+		t.Log(err)
+
+		ret := f.SetValue("Desktop Entry", "Abc+", "123")
+		So(ret, ShouldBeFalse)
+
+		ret = f.SetValue("Desktop Entry", "Abc", "123")
+		So(ret, ShouldBeTrue)
 	})
 
 	Convey("Test LoadFromData", t, func() {

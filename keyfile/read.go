@@ -22,16 +22,13 @@ package keyfile
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
-	"regexp"
 	"strings"
 	"unicode"
 )
-
-//var entryReg = regexp.MustCompile(`^(?P<key>[a-zA-Z0-9\-]+(?:\[[a-zA-Z0-9_@\.]+\])?)\s*=\s*(?P<value>.*)$`)
-var keyReg = regexp.MustCompile(`^[a-zA-Z0-9\-_@\.\[\]/]+$`)
 
 func (f *KeyFile) LoadFromReader(reader io.Reader) error {
 	var comments string
@@ -72,8 +69,13 @@ func (f *KeyFile) LoadFromReader(reader io.Reader) error {
 				return EntryNotInSectionError{line}
 			}
 			key := strings.TrimRightFunc(line[:idx], unicode.IsSpace)
-			if !keyReg.MatchString(key) {
-				return InvalidKeyError{key}
+			if key == "" {
+				return errEmptyKey
+			}
+			if f.keyReg != nil {
+				if !f.keyReg.MatchString(key) {
+					return InvalidKeyError{key}
+				}
 			}
 			value := strings.TrimLeftFunc(line[idx+1:], unicode.IsSpace)
 			f.SetValue(section, key, value)
@@ -121,6 +123,8 @@ type InvalidKeyError struct {
 func (err InvalidKeyError) Error() string {
 	return fmt.Sprintf("invalid key name %q", err.Key)
 }
+
+var errEmptyKey = errors.New("key is empty")
 
 type ParseError struct {
 	Line string
