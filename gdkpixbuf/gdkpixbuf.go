@@ -26,7 +26,9 @@ package gdkpixbuf
 import "C"
 
 import (
+	"errors"
 	"fmt"
+	"image"
 	"unsafe"
 
 	x "github.com/linuxdeepin/go-x11-client"
@@ -100,6 +102,41 @@ func NewPixbufFromFile(imgFile string) (pixbuf *C.GdkPixbuf, err error) {
 		return
 	}
 	return
+}
+
+func GetPixels(pixbuf *C.GdkPixbuf) []byte {
+	var cLength C.guint
+	ptr := C.gdk_pixbuf_get_pixels_with_length(pixbuf, &cLength)
+	return C.GoBytes(unsafe.Pointer(ptr), C.int(cLength))
+}
+
+func ToImage(pixbuf *C.GdkPixbuf) (image.Image, error) {
+	width, height, err := GetSize(pixbuf)
+	if err != nil {
+		return nil, err
+	}
+	colorspace := C.gdk_pixbuf_get_colorspace(pixbuf)
+	if colorspace != C.GDK_COLORSPACE_RGB {
+		return nil, errors.New("colorspace is not RGB")
+	}
+	nChannels := C.gdk_pixbuf_get_n_channels(pixbuf)
+	if nChannels != 4 {
+		return nil, errors.New("n channels != 4")
+	}
+	bitsPerSample := C.gdk_pixbuf_get_bits_per_sample(pixbuf)
+	if bitsPerSample != 8 {
+		return nil, errors.New("bits per sample != 8")
+	}
+	stride := C.gdk_pixbuf_get_rowstride(pixbuf)
+
+	pixels := GetPixels(pixbuf)
+
+	img := &image.RGBA{
+		Pix:    pixels,
+		Stride: int(stride),
+		Rect:   image.Rect(0, 0, width, height),
+	}
+	return img, nil
 }
 
 // Info

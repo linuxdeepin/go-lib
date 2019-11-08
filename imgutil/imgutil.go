@@ -10,6 +10,7 @@ import (
 
 	_ "golang.org/x/image/bmp"
 	_ "golang.org/x/image/tiff"
+	"pkg.deepin.io/lib/gdkpixbuf"
 	"pkg.deepin.io/lib/strv"
 )
 
@@ -29,6 +30,14 @@ func GetSupportedFormats() strv.Strv {
 }
 
 func Load(filename string) (image.Image, error) {
+	img, err := loadViaGdkPixbuf(filename)
+	if err == nil {
+		return img, nil
+	}
+	return loadCommon(filename)
+}
+
+func loadCommon(filename string) (image.Image, error) {
 	fh, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -37,6 +46,16 @@ func Load(filename string) (image.Image, error) {
 
 	br := bufio.NewReader(fh)
 	img, _, err := image.Decode(br)
+	return img, err
+}
+
+func loadViaGdkPixbuf(filename string) (image.Image, error) {
+	pb, err := gdkpixbuf.NewPixbufFromFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	img, err := gdkpixbuf.ToImage(pb)
+	gdkpixbuf.FreePixbuf(pb)
 	return img, err
 }
 
