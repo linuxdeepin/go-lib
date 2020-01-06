@@ -20,6 +20,7 @@
 package lunar
 
 import (
+	"fmt"
 	"time"
 
 	"pkg.deepin.io/lib/calendar/util"
@@ -43,6 +44,11 @@ type Month struct {
 	ShuoJD    float64   // 本月朔日时间 北京时间 儒略日
 	ShuoTime  time.Time // 本月朔日时间 北京时间
 	IsLeap    bool      // 是否为闰月
+}
+
+func (m *Month) String() string {
+	return fmt.Sprintf("Month{ LunnarYear: %d, Name: %d, Days: %d, ShuoJD: %f, ShuoTime: %v, IsLeap: %v }",
+		m.LunarYear, m.Name, m.Days, m.ShuoJD, m.ShuoTime, m.IsLeap)
 }
 
 func newCalendar(year int) *Calendar {
@@ -148,7 +154,8 @@ func (cc *Calendar) fillMonths() {
 		info.ShuoJD = cc.NewMoonJDs[i]
 		info.ShuoTime = util.GetDateTimeFromJulianDay(info.ShuoJD)
 		nextShuoJD := cc.NewMoonJDs[i+1]
-		info.Days = int(nextShuoJD+0.5) - int(info.ShuoJD+0.5)
+		nextShuoTime := util.GetDateTimeFromJulianDay(nextShuoJD)
+		info.Days = deltaDays(info.ShuoTime, nextShuoTime)
 		cc.Months = append(cc.Months, info)
 		yuejian++
 	}

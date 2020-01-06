@@ -20,8 +20,9 @@
 package calendar
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func Test_SolarToLunar(t *testing.T) {
@@ -60,5 +61,17 @@ func Test_SolarToLunar(t *testing.T) {
 		So(dayInfo.GanZhiYear, ShouldEqual, "甲午")
 		So(dayInfo.GanZhiMonth, ShouldEqual, "己巳")
 		So(dayInfo.GanZhiDay, ShouldEqual, "癸卯")
+	})
+
+	Convey("2057-10-27", t, func() {
+		dayInfo, _ := SolarToLunar(2057, 10, 27)
+		So(dayInfo.LunarMonthName, ShouldEqual, "九月")
+		So(dayInfo.LunarDayName, ShouldEqual, "三十")
+		So(dayInfo.Term, ShouldEqual, "")
+		So(dayInfo.LunarFestival, ShouldEqual, "")
+		So(dayInfo.Zodiac, ShouldEqual, "牛")
+		So(dayInfo.GanZhiYear, ShouldEqual, "丁丑")
+		So(dayInfo.GanZhiMonth, ShouldEqual, "庚戌")
+		So(dayInfo.GanZhiDay, ShouldEqual, "丁巳")
 	})
 }
