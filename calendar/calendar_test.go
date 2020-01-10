@@ -56,7 +56,7 @@ func Test_SolarToLunar(t *testing.T) {
 		So(dayInfo.LunarDayName, ShouldEqual, "初四")
 		So(dayInfo.Term, ShouldEqual, "")
 		So(dayInfo.LunarFestival, ShouldEqual, "")
-		So(dayInfo.SolarFestival, ShouldEqual, "国际儿童节")
+		So(dayInfo.SolarFestival, ShouldEqual, "儿童节")
 		So(dayInfo.Zodiac, ShouldEqual, "马")
 		So(dayInfo.GanZhiYear, ShouldEqual, "甲午")
 		So(dayInfo.GanZhiMonth, ShouldEqual, "己巳")
