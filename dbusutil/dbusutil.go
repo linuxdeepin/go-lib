@@ -337,6 +337,9 @@ func getStructValue(m interface{}) (reflect.Value, bool) {
 	if elemType.Kind() != reflect.Struct {
 		return reflect.Value{}, false
 	}
+	if !elemValue.IsValid() {
+		return reflect.Value{}, false
+	}
 	return elemValue, true
 }
 
