@@ -78,6 +78,9 @@ func (d *Day) Festival() string {
 	if d.LunarMonth.Name == 12 && d.LunarDay == d.LunarMonth.Days {
 		return "除夕"
 	}
+	if d.SolarTerm == QingMing {
+		return "清明节"
+	}
 	return ""
 }
 
