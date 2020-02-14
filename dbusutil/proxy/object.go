@@ -13,8 +13,26 @@ type Object struct {
 	obj  dbus.BusObject
 	conn *dbus.Conn
 	mu   sync.Mutex
-
+	extraMap map[string]interface{}
 	*objectSignalExt
+}
+
+func (o *Object) SetExtra(key string, v interface{}) {
+	o.mu.Lock()
+
+	if o.extraMap == nil {
+		o.extraMap = make(map[string]interface{})
+	}
+	o.extraMap[key] = v
+
+	o.mu.Unlock()
+}
+
+func (o *Object) GetExtra(key string) (interface{}, bool) {
+	o.mu.Lock()
+	v, ok := o.extraMap[key]
+	o.mu.Unlock()
+	return v, ok
 }
 
 type objectSignalExt struct {
