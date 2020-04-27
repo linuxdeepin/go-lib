@@ -65,7 +65,7 @@ func (d *Day) Festival() string {
 	return ""
 }
 
-func (d *Day) festivalForFatherAndMother(year, month, day int) string {
+func  festivalForFatherAndMother(year, month, day int) string {
 	var disparityMotherDay,disparityFatherDay,fatherDay,i,motherDay int
 	var leapYear int
 	for i = 1900 ; i <= year ;i++{
