@@ -19,6 +19,7 @@
 
 package calendar
 
+
 type Day struct {
 	Year, Month, Day int
 }
@@ -47,9 +48,50 @@ var solarFestival = map[int]string{
 }
 
 func (d *Day) Festival() string {
-	key := d.Month*100 + d.Day
+	year := d.Year
+	month := d.Month
+	day := d.Day
+	name := ""
+	if (month == 5) || (month == 6){
+		name = festivalForFatherAndMother(year, month, day)
+		if name != ""{
+			return name
+		}
+	}
+	key := month * 100 + day
 	if name, ok := solarFestival[key]; ok {
 		return name
 	}
 	return ""
+}
+
+func (d *Day) festivalForFatherAndMother(year, month, day int) string {
+	var disparityMotherDay,disparityFatherDay,fatherDay,i,motherDay int
+	var leapYear int
+	for i = 1900 ; i <= year ;i++{
+		if( ( i % 400 == 0 ) || ( ( i % 100 != 0 ) && ( i % 4 == 0 ) ) ){
+			leapYear = leapYear + 1
+		}
+	}
+	if month == 5 {
+		disparityMotherDay = ( ( ( year - 1899 ) * 365 + leapYear ) -( 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 ) ) % 7
+		motherDay = 14 - disparityMotherDay
+		if day == motherDay {
+			return "母亲节"
+		}else{
+			return ""
+		}
+	}
+	if month == 6 {
+		disparityFatherDay = ( ( ( year - 1899 ) * 365 + leapYear ) -(  30 + 31 + 31 + 30 + 31 + 30 + 31 ) ) % 7
+		fatherDay =  21 - disparityFatherDay
+		if day == fatherDay {
+			return "父亲节"
+		}else{
+			return ""
+		}
+	}
+
+	return ""
+
 }
