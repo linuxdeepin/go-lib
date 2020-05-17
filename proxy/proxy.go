@@ -72,41 +72,43 @@ func showEnv(envName string) {
 	}
 }
 
-// BUGGY. DO NOT UNCOMMENT UNTIL IT'S FIXED.
 func updateProxyEnvs() {
-//	utils.UnsetEnv(envAutoProxy)
-//	utils.UnsetEnv(envHttpProxy)
-//	utils.UnsetEnv(envHttpsProxy)
-//	utils.UnsetEnv(envFtpProxy)
-//	utils.UnsetEnv(envSocksProxy)
-//	proxyMethod := proxySettings.GetString(gkeyProxyMethod)
-//	switch proxyMethod {
-//	case proxyMethodNone:
-//	case proxyMethodAuto:
-//		autoProxy := proxySettings.GetString(gkeyAutoProxy)
-//		if len(autoProxy) > 0 {
-//			os.Setenv(envAutoProxy, autoProxy)
-//		}
-//	case proxyMethodManual:
-//		httpProxy := proxySettings.GetString(gkeyHttpProxy)
-//		if len(httpProxy) > 0 {
-//			os.Setenv(envHttpProxy, httpProxy)
-//		}
-//
-//		httpsProxy := proxySettings.GetString(gkeyHttpsProxy)
-//		if len(httpsProxy) > 0 {
-//			os.Setenv(envHttpsProxy, httpsProxy)
-//		}
-//
-//		ftpProxy := proxySettings.GetString(gkeyFtpProxy)
-//		if len(ftpProxy) > 0 {
-//			os.Setenv(envFtpProxy, ftpProxy)
-//		}
-//
-//		socksProxy := proxySettings.GetString(gkeySocksProxy)
-//		if len(socksProxy) > 0 {
-//			os.Setenv(envSocksProxy, socksProxy)
-//		}
-//	}
-//	showEnvs()
+	// BUGGY. DO NOT UNCOMMENT UNTIL IT'S FIXED.
+	if false {
+		utils.UnsetEnv(envAutoProxy)
+		utils.UnsetEnv(envHttpProxy)
+		utils.UnsetEnv(envHttpsProxy)
+		utils.UnsetEnv(envFtpProxy)
+		utils.UnsetEnv(envSocksProxy)
+		proxyMethod := proxySettings.GetString(gkeyProxyMethod)
+		switch proxyMethod {
+		case proxyMethodNone:
+		case proxyMethodAuto:
+			autoProxy := proxySettings.GetString(gkeyAutoProxy)
+			if len(autoProxy) > 0 {
+				os.Setenv(envAutoProxy, autoProxy)
+			}
+		case proxyMethodManual:
+			httpProxy := proxySettings.GetString(gkeyHttpProxy)
+			if len(httpProxy) > 0 {
+				os.Setenv(envHttpProxy, httpProxy)
+			}
+	
+			httpsProxy := proxySettings.GetString(gkeyHttpsProxy)
+			if len(httpsProxy) > 0 {
+				os.Setenv(envHttpsProxy, httpsProxy)
+			}
+	
+			ftpProxy := proxySettings.GetString(gkeyFtpProxy)
+			if len(ftpProxy) > 0 {
+				os.Setenv(envFtpProxy, ftpProxy)
+			}
+	
+			socksProxy := proxySettings.GetString(gkeySocksProxy)
+			if len(socksProxy) > 0 {
+				os.Setenv(envSocksProxy, socksProxy)
+			}
+		}
+		showEnvs()
+	}
 }
