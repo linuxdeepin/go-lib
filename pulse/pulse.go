@@ -27,9 +27,12 @@ package pulse
 //#cgo LDFLAGS: -ltsan
 */
 import "C"
-import "fmt"
-import "unsafe"
-import "sync"
+import (
+	"fmt"
+	"sync"
+	"time"
+	"unsafe"
+)
 
 type Callback func(eventType int, idx uint32)
 
@@ -369,7 +372,7 @@ func GetContextForced() *Context {
 	return GetContext()
 }
 
-var PulseInitTimeout = 20
+var PulseInitTimeout = 15
 
 func GetContext() *Context {
 	__ctxLocker.Lock()
@@ -377,7 +380,13 @@ func GetContext() *Context {
 	if __context == nil {
 		loop := C.pa_threaded_mainloop_new()
 
-		ctx := C.new_pa_context(loop, C.int(PulseInitTimeout))
+		timer := time.AfterFunc(time.Second*time.Duration(PulseInitTimeout), func() {
+			C.connect_timeout = 1
+			C.pa_threaded_mainloop_signal(loop, 0)
+		})
+		defer timer.Stop()
+
+		ctx := C.new_pa_context(loop)
 		if ctx == nil {
 			//TODO: Free loop
 			fmt.Println("Failed to init pulseaudio")
