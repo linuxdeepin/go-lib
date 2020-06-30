@@ -40,7 +40,7 @@ DECLARE(card);
 DECLARE(module);
 DECLARE(sample);
 
-int connect_timeout;
+extern int connect_timeout;
 
 void _get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
 
