@@ -44,7 +44,7 @@ func newRestartConfig(logname string) *restartConfig {
 	config.RestartCommand[0], _ = filepath.Abs(os.Args[0])
 	config.RestartDirectory, _ = os.Getwd()
 
-	// setup envrionment variables
+	// setup environment variables
 	config.RestartEnv = make(map[string]string)
 	environs := os.Environ()
 	for _, env := range environs {
