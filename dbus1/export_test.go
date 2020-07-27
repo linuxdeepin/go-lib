@@ -8,7 +8,7 @@ import (
 )
 
 type lowerCaseExport struct{}
-
+//nolint
 func (export lowerCaseExport) foo() (string, *Error) {
 	return "bar", nil
 }
@@ -43,7 +43,7 @@ func TestExport(t *testing.T) {
 
 	name := connection.Names()[0]
 
-	connection.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 	subtreeObject := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
 
@@ -65,7 +65,7 @@ func TestExport(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Double", 0, int64(2)).Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -82,7 +82,7 @@ func TestExport_message(t *testing.T) {
 	name := connection.Names()[0]
 
 	export := &fooExport{}
-	connection.Export(export, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(export, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response string
@@ -123,7 +123,7 @@ func TestExport_unexportedMethod(t *testing.T) {
 
 	name := connection.Names()[0]
 
-	connection.Export(lowerCaseExport{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(lowerCaseExport{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response string
@@ -144,7 +144,7 @@ func TestExport_badSignature(t *testing.T) {
 
 	name := connection.Names()[0]
 
-	connection.Export(badExport{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(badExport{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response string
@@ -167,7 +167,7 @@ func TestExportWithMap(t *testing.T) {
 	mapping := make(map[string]string)
 	mapping["Double"] = "double" // Export this method as lower-case
 
-	connection.ExportWithMap(server{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportWithMap(server{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response int64
@@ -193,7 +193,7 @@ func TestExportWithMap_bypassAlias(t *testing.T) {
 	mapping := make(map[string]string)
 	mapping["Double"] = "double" // Export this method as lower-case
 
-	connection.ExportWithMap(server{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportWithMap(server{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response int64
@@ -214,7 +214,7 @@ func TestExportSubtree(t *testing.T) {
 	name := connection.Names()[0]
 
 	export := &fooExport{}
-	connection.ExportSubtree(export, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportSubtree(export, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	// Call a subpath of the exported path
 	object := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
@@ -234,7 +234,7 @@ func TestExportSubtree(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Foo", 0, "qux").Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -251,7 +251,7 @@ func TestExportSubtree_noMessage(t *testing.T) {
 
 	name := connection.Names()[0]
 
-	connection.ExportSubtree(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportSubtree(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	// Call a subpath of the exported path
 	object := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
@@ -267,7 +267,7 @@ func TestExportSubtree_noMessage(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Double", 0, int64(2)).Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -284,11 +284,11 @@ func TestExportSubtree_exportPrecedence(t *testing.T) {
 	name := connection.Names()[0]
 
 	// Register for the entire subtree of /org/guelfey/DBus/Test
-	connection.ExportSubtree(&fooExport{},
+	_ = connection.ExportSubtree(&fooExport{},
 		"/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	// Explicitly register for /org/guelfey/DBus/Test/Foo, a subpath of above
-	connection.Export(&barExport{}, "/org/guelfey/DBus/Test/Foo",
+	_ = connection.Export(&barExport{}, "/org/guelfey/DBus/Test/Foo",
 		"org.guelfey.DBus.Test")
 
 	// Call the explicitly exported path
@@ -307,7 +307,7 @@ func TestExportSubtree_exportPrecedence(t *testing.T) {
 	response = "" // Reset response so errors aren't confusing
 
 	// Now remove explicit export
-	connection.Export(nil, "/org/guelfey/DBus/Test/Foo", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test/Foo", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Foo", 0, "qux").Store(&response)
 	if err != nil {
 		t.Errorf("Unexpected error calling Foo: %s", err)
@@ -331,7 +331,7 @@ func TestExportSubtreeWithMap(t *testing.T) {
 	mapping := make(map[string]string)
 	mapping["Foo"] = "foo" // Export this method as lower-case
 
-	connection.ExportSubtreeWithMap(&fooExport{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportSubtreeWithMap(&fooExport{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	// Call a subpath of the exported path
 	object := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
@@ -348,7 +348,7 @@ func TestExportSubtreeWithMap(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.foo", 0, "qux").Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -367,7 +367,7 @@ func TestExportSubtreeWithMap_bypassAlias(t *testing.T) {
 	mapping := make(map[string]string)
 	mapping["Foo"] = "foo" // Export this method as lower-case
 
-	connection.ExportSubtreeWithMap(&fooExport{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportSubtreeWithMap(&fooExport{}, mapping, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
 
 	var response string
@@ -391,7 +391,7 @@ func TestExportMethodTable(t *testing.T) {
 		return export.Foo(message, param)
 	}
 	tbl["Foo2"] = export.Foo
-	connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
@@ -423,7 +423,7 @@ func TestExportMethodTable(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Foo", 0, "qux").Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -444,7 +444,7 @@ func TestExportSubtreeMethodTable(t *testing.T) {
 		return export.Foo(message, param)
 	}
 	tbl["Foo2"] = export.Foo
-	connection.ExportSubtreeMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportSubtreeMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 
 	// Call a subpath of the exported path
 	object := connection.Object(name, "/org/guelfey/DBus/Test/Foo")
@@ -477,7 +477,7 @@ func TestExportSubtreeMethodTable(t *testing.T) {
 	}
 
 	// Now remove export
-	connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.Export(nil, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	err = object.Call("org.guelfey.DBus.Test.Foo", 0, "qux").Store(&response)
 	if err == nil {
 		t.Error("Expected an error since the export was removed")
@@ -498,7 +498,7 @@ func TestExportMethodTable_NotFunc(t *testing.T) {
 	}
 	tbl["Foo2"] = "foobar"
 
-	connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response string
@@ -535,7 +535,7 @@ func TestExportMethodTable_ReturnNotError(t *testing.T) {
 		return out, out
 	}
 
-	connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = connection.ExportMethodTable(tbl, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	object := connection.Object(name, "/org/guelfey/DBus/Test")
 
 	var response string
@@ -586,10 +586,10 @@ func TestExportSubPathIntrospection(t *testing.T) {
 
 	foo := &fooExport{}
 	bar := &barExport{}
-	connection.Export(foo, foopathstr, test1intfstr)
-	connection.Export(foo, foopathstr, test2intfstr)
-	connection.Export(bar, barpathstr, test2intfstr)
-	connection.Export(intro, pathstr, introIntf)
+	_ = connection.Export(foo, foopathstr, test1intfstr)
+	_ = connection.Export(foo, foopathstr, test2intfstr)
+	_ = connection.Export(bar, barpathstr, test2intfstr)
+	_ = connection.Export(intro, pathstr, introIntf)
 
 	var response string
 	var match bool

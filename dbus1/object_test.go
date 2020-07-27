@@ -26,7 +26,7 @@ func TestObjectGoWithContextTimeout(t *testing.T) {
 	}
 
 	name := bus.Names()[0]
-	bus.Export(objectGoContextServer{t, time.Second}, "/org/dannin/DBus/Test", "org.dannin.DBus.Test")
+	_ = bus.Export(objectGoContextServer{t, time.Second}, "/org/dannin/DBus/Test", "org.dannin.DBus.Test")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	select {
@@ -46,7 +46,7 @@ func TestObjectGoWithContext(t *testing.T) {
 	}
 
 	name := bus.Names()[0]
-	bus.Export(objectGoContextServer{t, time.Millisecond}, "/org/dannin/DBus/Test", "org.dannin.DBus.Test")
+	_ = bus.Export(objectGoContextServer{t, time.Millisecond}, "/org/dannin/DBus/Test", "org.dannin.DBus.Test")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	select {
@@ -105,17 +105,17 @@ func TestObjectSignalHandling(t *testing.T) {
 		}()
 
 		// desired signals
-		bus.Emit(path, iface+".Heartbeat", uint32(1))
-		bus.Emit(path, iface+".Heartbeat", uint32(2))
+		_ = bus.Emit(path, iface+".Heartbeat", uint32(1))
+		_ = bus.Emit(path, iface+".Heartbeat", uint32(2))
 		// undesired signals
-		bus.Emit(otherPath, iface+".Heartbeat", uint32(3))
-		bus.Emit(otherPath, otherIface+".Heartbeat", uint32(4))
-		bus.Emit(path, iface+".Updated", false)
+		_ = bus.Emit(otherPath, iface+".Heartbeat", uint32(3))
+		_ = bus.Emit(otherPath, otherIface+".Heartbeat", uint32(4))
+		_ = bus.Emit(path, iface+".Updated", false)
 		// sentinel
-		bus.Emit(path, iface+".Heartbeat", uint32(5))
+		_ = bus.Emit(path, iface+".Heartbeat", uint32(5))
 
 		time.Sleep(100 * time.Millisecond)
-		bus.Emit(path, iface+".Heartbeat", uint32(6))
+		_ = bus.Emit(path, iface+".Heartbeat", uint32(6))
 	}()
 
 	checkSignal := func(sig *Signal, value uint32) {

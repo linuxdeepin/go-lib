@@ -179,7 +179,7 @@ func (t *tester) AddSignal(iface, name string) {
 }
 
 func (t *tester) Close() {
-	t.conn.Close()
+	_ = t.conn.Close()
 	close(t.sigs)
 }
 
@@ -230,12 +230,12 @@ func newTester() (*tester, error) {
 	}
 	err = conn.Auth(nil)
 	if err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 	err = conn.Hello()
 	if err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 	tester.conn = conn
@@ -371,7 +371,7 @@ func TestHandlerIntrospect(t *testing.T) {
 	}
 	obj := conn.Object(tester.Name(), "/com/github/godbus/tester")
 	var out string
-	err = obj.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&out)
+	_ = obj.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&out)
 	expected := `<node>
     <interface name="org.freedesktop.DBus.Introspectable.Introspect">
         <method name="Introspect">
@@ -405,7 +405,7 @@ func TestHandlerIntrospectPath(t *testing.T) {
 	}
 	obj := conn.Object(tester.Name(), "/com/github/godbus")
 	var out string
-	err = obj.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&out)
+	_ = obj.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&out)
 	expected := `<node><node name="tester"></node></node>`
 	if out != expected {
 		t.Errorf("didn't get expected return value, expected %s got %s", expected, out)
@@ -423,7 +423,7 @@ func TestHandlerSignal(t *testing.T) {
 		t.Errorf("Unexpected error: %s", err)
 	}
 	tester.AddSignal("com.github.godbus.dbus.Tester", "sig1")
-	conn.Emit("/com/github/godbus/tester",
+	_ = conn.Emit("/com/github/godbus/tester",
 		"com.github.godbus.dbus.Tester.sig1", "foo")
 	select {
 	case sig := <-tester.sigs:
@@ -458,6 +458,7 @@ func TestRaceInExport(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
+	//nolint
 	go func() {
 		err = bus.Export(&x, dbusPath, dbusInterface)
 		if err != nil {

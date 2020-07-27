@@ -147,7 +147,7 @@ type Properties struct {
 // exported as org.freedesktop.DBus.Properties on path.
 func New(conn *dbus.Conn, path dbus.ObjectPath, props map[string]map[string]*Prop) *Properties {
 	p := &Properties{m: props, conn: conn, path: path}
-	conn.Export(p, path, "org.freedesktop.DBus.Properties")
+	_ = conn.Export(p, path, "org.freedesktop.DBus.Properties")
 	return p
 }
 
@@ -217,10 +217,10 @@ func (p *Properties) set(iface, property string, v interface{}) {
 	case EmitFalse:
 		// do nothing
 	case EmitInvalidates:
-		p.conn.Emit(p.path, "org.freedesktop.DBus.Properties.PropertiesChanged",
+		_ = p.conn.Emit(p.path, "org.freedesktop.DBus.Properties.PropertiesChanged",
 			iface, map[string]dbus.Variant{}, []string{property})
 	case EmitTrue:
-		p.conn.Emit(p.path, "org.freedesktop.DBus.Properties.PropertiesChanged",
+		_ = p.conn.Emit(p.path, "org.freedesktop.DBus.Properties.PropertiesChanged",
 			iface, map[string]dbus.Variant{property: dbus.MakeVariant(v)},
 			[]string{})
 	default:

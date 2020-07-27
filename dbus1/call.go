@@ -1,12 +1,8 @@
 package dbus
 
 import (
-	"errors"
-
 	"golang.org/x/net/context"
 )
-
-var errSignature = errors.New("dbus: mismatched signature")
 
 // Call represents a pending or completed method call.
 type Call struct {

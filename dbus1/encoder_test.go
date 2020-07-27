@@ -41,7 +41,7 @@ func TestEncodeArrayOfMaps(t *testing.T) {
 		for _, tt := range tests {
 			buf := new(bytes.Buffer)
 			enc := newEncoder(buf, order)
-			enc.Encode(tt.vs...)
+			_ = enc.Encode(tt.vs...)
 
 			dec := newDecoder(buf, order)
 			v, err := dec.Decode(SignatureOf(tt.vs...))
@@ -73,7 +73,7 @@ func TestEncodeMapStringInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := map[string]interface{}{}
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)
@@ -98,7 +98,7 @@ func TestEncodeMapStringNamedInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := map[string]empty{}
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)
@@ -151,7 +151,7 @@ func TestEncodeSliceInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := []interface{}{}
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)
@@ -174,7 +174,7 @@ func TestEncodeSliceNamedInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := []empty{}
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)
@@ -207,7 +207,7 @@ func TestEncodeNestedInterface(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := map[string]interface{}{}
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%#v', want '%#v'",
 			out, val)
@@ -230,7 +230,7 @@ func TestEncodeInt(t *testing.T) {
 		t.Fatal(err)
 	}
 	var out int
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)
@@ -276,7 +276,7 @@ func TestEncodeUint(t *testing.T) {
 		t.Fatal(err)
 	}
 	var out uint
-	Store(v, &out)
+	_ = Store(v, &out)
 	if !reflect.DeepEqual(out, val) {
 		t.Errorf("not equal: got '%v', want '%v'",
 			out, val)

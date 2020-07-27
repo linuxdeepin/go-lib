@@ -101,8 +101,8 @@ func (t *unixTransport) ReadMessage() (*Message, error) {
 	}
 	// csheader[4:8] -> length of message body, csheader[12:16] -> length of
 	// header fields (without alignment)
-	binary.Read(bytes.NewBuffer(csheader[4:8]), order, &blen)
-	binary.Read(bytes.NewBuffer(csheader[12:]), order, &hlen)
+	_ = binary.Read(bytes.NewBuffer(csheader[4:8]), order, &blen)
+	_ = binary.Read(bytes.NewBuffer(csheader[12:]), order, &hlen)
 	if hlen%8 != 0 {
 		hlen += 8 - (hlen % 8)
 	}
@@ -119,7 +119,7 @@ func (t *unixTransport) ReadMessage() (*Message, error) {
 	if err != nil {
 		return nil, err
 	}
-	Store(vs, &headers)
+	_ = Store(vs, &headers)
 	for _, v := range headers {
 		if v.Field == byte(FieldUnixFDs) {
 			unixfds, _ = v.Variant.value.(uint32)
@@ -154,15 +154,15 @@ func (t *unixTransport) ReadMessage() (*Message, error) {
 		// substitute the values in the message body (which are indices for the
 		// array receiver via OOB) with the actual values
 		for i, v := range msg.Body {
-			switch v.(type) {
+			switch vType := v.(type) {
 			case UnixFDIndex:
-				j := v.(UnixFDIndex)
+				j := vType
 				if uint32(j) >= unixfds {
 					return nil, InvalidMessageError("invalid index for unix fd")
 				}
 				msg.Body[i] = UnixFD(fds[j])
 			case []UnixFDIndex:
-				idxArray := v.([]UnixFDIndex)
+				idxArray := vType
 				fdArray := make([]UnixFD, len(idxArray))
 				for k, j := range idxArray {
 					if uint32(j) >= unixfds {
@@ -193,7 +193,7 @@ func (t *unixTransport) SendMessage(msg *Message) error {
 		msg.Headers[FieldUnixFDs] = MakeVariant(uint32(len(fds)))
 		oob := syscall.UnixRights(fds...)
 		buf := new(bytes.Buffer)
-		msg.EncodeTo(buf, nativeEndian)
+		_ = msg.EncodeTo(buf, nativeEndian)
 		n, oobn, err := t.UnixConn.WriteMsgUnix(buf.Bytes(), oob, nil)
 		if err != nil {
 			return err

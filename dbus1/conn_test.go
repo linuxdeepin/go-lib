@@ -68,13 +68,13 @@ func TestRemoveSignal(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	signals := bus.signalHandler.(*defaultSignalHandler).signals
+
 	ch := make(chan *Signal)
 	ch2 := make(chan *Signal)
 	for _, ch := range []chan *Signal{ch, ch2, ch, ch2, ch2, ch} {
 		bus.Signal(ch)
 	}
-	signals = bus.signalHandler.(*defaultSignalHandler).signals
+	signals := bus.signalHandler.(*defaultSignalHandler).signals
 	if len(signals) != 6 {
 		t.Errorf("remove signal: signals length not equal: got '%d', want '6'", len(signals))
 	}
@@ -111,8 +111,12 @@ func (fakeAuth) HandleData(data []byte) (resp []byte, status AuthStatus) {
 
 func TestCloseBeforeSignal(t *testing.T) {
 	reader, pipewriter := io.Pipe()
-	defer pipewriter.Close()
-	defer reader.Close()
+	defer func() {
+		_ = pipewriter.Close()
+	}()
+	defer func() {
+		_ = reader.Close()
+	}()
 
 	bus, err := NewConn(rwc{Reader: reader, Writer: ioutil.Discard})
 	if err != nil {
@@ -274,7 +278,7 @@ func benchmarkServe(b *testing.B, srv, cli *Conn) {
 	var r int64
 	var err error
 	dest := srv.Names()[0]
-	srv.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = srv.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	obj := cli.Object(dest, "/org/guelfey/DBus/Test")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -290,10 +294,11 @@ func benchmarkServe(b *testing.B, srv, cli *Conn) {
 
 func benchmarkServeAsync(b *testing.B, srv, cli *Conn) {
 	dest := srv.Names()[0]
-	srv.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
+	_ = srv.Export(server{}, "/org/guelfey/DBus/Test", "org.guelfey.DBus.Test")
 	obj := cli.Object(dest, "/org/guelfey/DBus/Test")
 	c := make(chan *Call, 50)
 	done := make(chan struct{})
+	//nolint
 	go func() {
 		for i := 0; i < b.N; i++ {
 			v := <-c

@@ -24,7 +24,9 @@ func TestTcpNonceConnection(t *testing.T) {
 		</policy>
 </busconfig>
 `)
-	defer process.Kill()
+	defer func() {
+		_ = process.Kill()
+	}()
 
 	c, err := Dial(addr)
 	if err != nil {
@@ -40,6 +42,7 @@ func TestTcpNonceConnection(t *testing.T) {
 
 // startDaemon starts a dbus-daemon instance with the given config
 // and returns its address string and underlying process.
+//nolint
 func startDaemon(t *testing.T, config string) (string, *os.Process) {
 	cfg, err := ioutil.TempFile("", "")
 	if err != nil {

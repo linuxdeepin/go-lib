@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 
@@ -615,18 +614,6 @@ func getTransport(address string) (transport, error) {
 	return nil, err
 }
 
-// dereferenceAll returns a slice that, assuming that vs is a slice of pointers
-// of arbitrary types, containes the values that are obtained from dereferencing
-// all elements in vs.
-func dereferenceAll(vs []interface{}) []interface{} {
-	for i := range vs {
-		v := reflect.ValueOf(vs[i])
-		v = v.Elem()
-		vs[i] = v.Interface()
-	}
-	return vs
-}
-
 // getKey gets a key from a the list of keys. Returns "" on error / not found...
 func getKey(s, key string) string {
 	for _, keyEqualsValue := range strings.Split(s, ",") {
@@ -793,18 +780,6 @@ func (tracker *callTracker) handleSendError(msg *Message, err error) {
 	}
 }
 
-// finalize was the only func that did not strobe Done
-func (tracker *callTracker) finalize(sn uint32) {
-	tracker.lck.Lock()
-	defer tracker.lck.Unlock()
-	c, ok := tracker.calls[sn]
-	if ok {
-		delete(tracker.calls, sn)
-		c.ContextCancel()
-	}
-	return
-}
-
 func (tracker *callTracker) finalizeWithBody(sn uint32, body []interface{}) {
 	tracker.lck.Lock()
 	c, ok := tracker.calls[sn]
@@ -816,7 +791,6 @@ func (tracker *callTracker) finalizeWithBody(sn uint32, body []interface{}) {
 		c.Body = body
 		c.done()
 	}
-	return
 }
 
 func (tracker *callTracker) finalizeWithError(sn uint32, err error) {
@@ -830,7 +804,6 @@ func (tracker *callTracker) finalizeWithError(sn uint32, err error) {
 		c.Err = err
 		c.done()
 	}
-	return
 }
 
 func (tracker *callTracker) finalizeAllWithError(err error) {

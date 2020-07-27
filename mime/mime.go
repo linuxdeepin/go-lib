@@ -29,8 +29,6 @@ const (
 	MimeTypeGtk    = "application/x-gtk-theme"
 	MimeTypeIcon   = "application/x-icon-theme"
 	MimeTypeCursor = "application/x-cursor-theme"
-
-	mimeTypeTheme = "application/x-theme"
 )
 
 // Query query file mime type
