@@ -174,7 +174,7 @@ func DecodeMessage(rd io.Reader) (msg *Message, err error) {
 	if err != nil {
 		return nil, err
 	}
-	binary.Read(bytes.NewBuffer(b), order, &hlength)
+	_ = binary.Read(bytes.NewBuffer(b), order, &hlength)
 	if hlength+length+16 > 1<<27 {
 		return nil, InvalidMessageError("message is too long")
 	}
@@ -238,7 +238,7 @@ func (msg *Message) EncodeTo(out io.Writer, order binary.ByteOrder) error {
 	body := new(bytes.Buffer)
 	enc := newEncoder(body, order)
 	if len(msg.Body) != 0 {
-		enc.Encode(msg.Body...)
+		_ = enc.Encode(msg.Body...)
 	}
 	vs[1] = msg.Type
 	vs[2] = msg.Flags
@@ -252,9 +252,9 @@ func (msg *Message) EncodeTo(out io.Writer, order binary.ByteOrder) error {
 	vs[6] = headers
 	var buf bytes.Buffer
 	enc = newEncoder(&buf, order)
-	enc.Encode(vs[:]...)
+	_ = enc.Encode(vs[:]...)
 	enc.align(8)
-	body.WriteTo(&buf)
+	_, _ = body.WriteTo(&buf)
 	if buf.Len() > 1<<27 {
 		return InvalidMessageError("message is too long")
 	}

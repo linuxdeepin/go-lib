@@ -48,7 +48,7 @@ func (annos AnnotationInfos) FieldValue(field string) (string, bool) {
 	return "", false
 }
 func (annos AnnotationInfos) I18nInfo() (string, string, bool) {
-	dir, ok := annos.FieldValue(ExtendFieldI18nDir)
+	dir, _ := annos.FieldValue(ExtendFieldI18nDir)
 	domain, ok := annos.FieldValue(ExtendFieldI18nDomain)
 	return dir, domain, ok
 }

@@ -42,8 +42,6 @@ type Call struct {
 	Body []interface{}
 }
 
-var errSignature = errors.New("dbus: mismatched signature")
-
 // Store stores the body of the reply into the provided pointers. It returns
 // an error if the signatures of the body and retvalues don't match, or if
 // the error status is not nil.

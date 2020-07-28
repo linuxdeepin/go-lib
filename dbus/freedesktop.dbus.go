@@ -55,7 +55,7 @@ func (ifc *IntrospectProxy) Introspect() (string, error) {
 	ifc.locker.RLock()
 	defer ifc.locker.RUnlock()
 	var node = new(introspect.NodeInfo)
-	for k, _ := range ifc.child {
+	for k := range ifc.child {
 		node.Children = append(node.Children, introspect.NodeInfo{
 			Name: k,
 		})
@@ -69,7 +69,7 @@ func (ifc *IntrospectProxy) Introspect() (string, error) {
 
 	writer := xml.NewEncoder(&buffer)
 	writer.Indent("", "     ")
-	writer.Encode(node)
+	_ = writer.Encode(node)
 	return buffer.String(), nil
 }
 
@@ -180,7 +180,7 @@ func (propProxy *PropertiesProxy) Get(ifcName string, propName string) (Variant,
 			return MakeVariant(""), NewUnknowPropertyError(propName)
 		}
 		value := getValueOf(ifc).FieldByName(propName)
-		if value.IsValid() == false {
+		if !value.IsValid() {
 			return MakeVariant(""), NewUnknowPropertyError(propName)
 		}
 

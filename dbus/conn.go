@@ -23,7 +23,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 )
@@ -562,7 +561,7 @@ func getTransport(address string) (transport, error) {
 		}
 		f := m[v[:i]]
 		if f == nil {
-			err = errors.New("dbus: invalid bus address (invalid or unsupported transport)")
+			_ = errors.New("dbus: invalid bus address (invalid or unsupported transport)")
 		}
 		t, err = f(v[i+1:])
 		if err == nil {
@@ -570,18 +569,6 @@ func getTransport(address string) (transport, error) {
 		}
 	}
 	return nil, err
-}
-
-// dereferenceAll returns a slice that, assuming that vs is a slice of pointers
-// of arbitrary types, containes the values that are obtained from dereferencing
-// all elements in vs.
-func dereferenceAll(vs []interface{}) []interface{} {
-	for i := range vs {
-		v := reflect.ValueOf(vs[i])
-		v = v.Elem()
-		vs[i] = v.Interface()
-	}
-	return vs
 }
 
 // getKey gets a key from a the list of keys. Returns "" on error / not found...

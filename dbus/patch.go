@@ -48,14 +48,14 @@ func (msg DMessage) GetSender() string {
 }
 
 func (msg DMessage) GetSenderPID() (r uint32) {
-	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixProcessID", 0, msg.GetSender()).Store(&r)
+	_ = msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixProcessID", 0, msg.GetSender()).Store(&r)
 	return
 }
 func (msg DMessage) GetSenderUID() (r uint32) {
-	msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixUser", 0, msg.GetSender()).Store(&r)
+	_ = msg.c.BusObject().Call("org.freedesktop.DBus.GetConnectionUnixUser", 0, msg.GetSender()).Store(&r)
 	return
 }
-
+//nolint
 var (
 	dbusObject          DBusObject
 	dbusObjectInterface = reflect.TypeOf((*DBusObject)(nil)).Elem()

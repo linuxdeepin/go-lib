@@ -197,7 +197,6 @@ func (conn *Conn) tryAuth(m Auth, state authState, in *bufio.Reader) (error, boo
 				if err != nil {
 					return err, false
 				}
-				state = waitingForReject
 			}
 			conn.uuid = string(s[1])
 			return nil, true
@@ -212,7 +211,6 @@ func (conn *Conn) tryAuth(m Auth, state authState, in *bufio.Reader) (error, boo
 				if err != nil {
 					return err, false
 				}
-				state = waitingForReject
 			}
 			conn.uuid = string(s[1])
 			return nil, true

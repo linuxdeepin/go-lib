@@ -66,7 +66,7 @@ func handleIntrospectionPartialPathRequest(possible_path []string, partial_path 
 			valid_field[path] = true
 		}
 	}
-	for k, _ := range valid_field {
+	for k := range valid_field {
 		xml += `	<node name="` + k + `"/>`
 	}
 	xml += `</node>`
@@ -87,7 +87,7 @@ func handleIntrospect(conn *Conn, msg *Message) error {
 	serial := msg.serial
 
 	paths := make([]string, 0)
-	for key, _ := range conn.handlers {
+	for key := range conn.handlers {
 		paths = append(paths, string(key))
 	}
 	conn.sendReply(sender, serial, handleIntrospectionPartialPathRequest(paths, string(path)))
@@ -254,7 +254,7 @@ func tryTranslateDBusObjectToObjectPath(con *Conn, value reflect.Value) reflect.
 		if !value.IsNil() {
 			obj := value.Interface().(DBusObject)
 			//TODO: which session to install
-			InstallOnAny(con, obj)
+			_ = InstallOnAny(con, obj)
 			return reflect.ValueOf(ObjectPath(obj.GetDBusInfo().ObjectPath))
 		} else {
 			return reflect.ValueOf(ObjectPath("/"))

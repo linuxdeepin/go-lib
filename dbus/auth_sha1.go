@@ -67,7 +67,7 @@ func (a authCookieSha1) HandleData(data []byte) ([]byte, AuthStatus) {
 		return nil, AuthError
 	}
 	hash := sha1.New()
-	hash.Write(bytes.Join([][]byte{svchallenge, clchallenge, cookie}, []byte{':'}))
+	_, _ = hash.Write(bytes.Join([][]byte{svchallenge, clchallenge, cookie}, []byte{':'}))
 	hexhash := make([]byte, 2*hash.Size())
 	hex.Encode(hexhash, hash.Sum(nil))
 	data = append(clchallenge, ' ')
@@ -86,7 +86,9 @@ func (a authCookieSha1) getCookie(context, id []byte) []byte {
 	if err != nil {
 		return nil
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 	rd := bufio.NewReader(file)
 	for {
 		line, err := rd.ReadBytes('\n')

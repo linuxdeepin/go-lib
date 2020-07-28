@@ -104,17 +104,17 @@ func TestProto(t *testing.T) {
 	for i, v := range protoTests {
 		buf := new(bytes.Buffer)
 		bigEnc := newEncoder(buf, binary.BigEndian)
-		bigEnc.Encode(v.vs...)
+		_ = bigEnc.Encode(v.vs...)
 		marshalled := buf.Bytes()
-		if bytes.Compare(marshalled, v.bigEndian) != 0 {
+		if !bytes.Equal(marshalled, v.bigEndian) {
 			t.Errorf("test %d (marshal be): got '%v', but expected '%v'\n", i+1, marshalled,
 				v.bigEndian)
 		}
 		buf.Reset()
 		litEnc := newEncoder(buf, binary.LittleEndian)
-		litEnc.Encode(v.vs...)
+		_ = litEnc.Encode(v.vs...)
 		marshalled = buf.Bytes()
-		if bytes.Compare(marshalled, v.littleEndian) != 0 {
+		if !bytes.Equal(marshalled, v.littleEndian) {
 			t.Errorf("test %d (marshal le): got '%v', but expected '%v'\n", i+1, marshalled,
 				v.littleEndian)
 		}
@@ -154,7 +154,7 @@ func TestProtoMap(t *testing.T) {
 	var n map[string]uint8
 	buf := new(bytes.Buffer)
 	enc := newEncoder(buf, binary.LittleEndian)
-	enc.Encode(m)
+	_ = enc.Encode(m)
 	dec := newDecoder(buf, binary.LittleEndian)
 	vs, err := dec.Decode(Signature{"a{sy}"})
 	if err != nil {
@@ -176,7 +176,7 @@ func TestProtoVariantStruct(t *testing.T) {
 	}{1, 2})
 	buf := new(bytes.Buffer)
 	enc := newEncoder(buf, binary.LittleEndian)
-	enc.Encode(v)
+	_ = enc.Encode(v)
 	dec := newDecoder(buf, binary.LittleEndian)
 	vs, err := dec.Decode(Signature{"v"})
 	if err != nil {
@@ -206,7 +206,7 @@ func TestProtoStructTag(t *testing.T) {
 	bar2.C = 345
 	buf := new(bytes.Buffer)
 	enc := newEncoder(buf, binary.LittleEndian)
-	enc.Encode(bar1)
+	_ = enc.Encode(bar1)
 	dec := newDecoder(buf, binary.LittleEndian)
 	vs, err := dec.Decode(Signature{"(ii)"})
 	if err != nil {

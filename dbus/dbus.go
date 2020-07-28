@@ -29,7 +29,6 @@ import (
 var (
 	byteType        = reflect.TypeOf(byte(0))
 	boolType        = reflect.TypeOf(false)
-	uint8Type       = reflect.TypeOf(uint8(0))
 	int16Type       = reflect.TypeOf(int16(0))
 	uint16Type      = reflect.TypeOf(uint16(0))
 	int32Type       = reflect.TypeOf(int32(0))

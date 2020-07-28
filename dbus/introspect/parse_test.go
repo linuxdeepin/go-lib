@@ -86,13 +86,13 @@ func TestParse(t *testing.T) {
 				C.So(m.Name, C.ShouldEqual, "ConnectProfile")
 				C.So(m.Annotations[0].Name, C.ShouldEqual, "org.freedesktop.DBus.GLib.CSymbol")
 				C.So(m.Annotations[0].Value, C.ShouldEqual, "impl_manager_activate_connection")
-				dir, domain, ok := m.Args[0].I18nInfo()
+				_, _, ok := m.Args[0].I18nInfo()
 				C.So(ok, C.ShouldEqual, false)
 
 				C.So(ifc.Methods[4].Name, C.ShouldEqual, "Pair")
 				C.So(ifc.Methods[4].NoReply(), C.ShouldEqual, true)
 
-				dir, domain, ok = ifc.Methods[3].Args[0].I18nInfo()
+				dir, domain, ok := ifc.Methods[3].Args[0].I18nInfo()
 				C.So(dir, C.ShouldEqual, "")
 				C.So(domain, C.ShouldEqual, "")
 				C.So(ok, C.ShouldEqual, false)
@@ -104,10 +104,10 @@ func TestParse(t *testing.T) {
 				C.So(domain, C.ShouldEqual, "dde-daemon")
 				C.So(ok, C.ShouldEqual, true)
 
-				dir, domain, ok = ifc.Properties[1].I18nInfo()
+				_, domain, ok = ifc.Properties[1].I18nInfo()
 				C.So(domain, C.ShouldEqual, "test")
 				C.So(ok, C.ShouldEqual, true)
-				dir, domain, ok = ifc.Properties[2].I18nInfo()
+				_, _, ok = ifc.Properties[2].I18nInfo()
 				C.So(ok, C.ShouldEqual, false)
 				C.So(m.NoReply(), C.ShouldEqual, false)
 			})

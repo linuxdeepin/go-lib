@@ -27,7 +27,7 @@ func ExampleConn_Emit() {
 		panic(err)
 	}
 
-	conn.Emit("/foo/bar", "foo.bar.Baz", uint32(0xDAEDBEEF))
+	_ = conn.Emit("/foo/bar", "foo.bar.Baz", uint32(0xDAEDBEEF))
 }
 
 func ExampleObject_Call() {
@@ -55,15 +55,13 @@ func ExampleObject_Go() {
 
 	ch := make(chan *Call, 10)
 	conn.BusObject().Go("org.freedesktop.DBus.ListActivatableNames", 0, ch)
-	select {
-	case call := <-ch:
-		if call.Err != nil {
-			panic(err)
-		}
-		list := call.Body[0].([]string)
-		for _, v := range list {
-			fmt.Println(v)
-		}
-		// put some other cases here
+
+	call := <-ch
+	if call.Err != nil {
+		panic(err)
+	}
+	list := call.Body[0].([]string)
+	for _, v := range list {
+		fmt.Println(v)
 	}
 }

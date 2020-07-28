@@ -261,7 +261,7 @@ func export(c *Conn, v DBusObject, interfaces []interfaces.DBusInterface) error 
 	interfaces = append(interfaces, NewPropertiesProxy(ifcs))
 
 	for _, ifc := range interfaces {
-		c.Export(ifc, path, ifc.InterfaceName())
+		_ = c.Export(ifc, path, ifc.InterfaceName())
 	}
 
 	return nil

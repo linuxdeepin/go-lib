@@ -41,7 +41,7 @@ func TestTimer(t *testing.T) {
 		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
+		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*3+time.Millisecond*100)
 	})
 
 	Convey("stop and elapse", t, func() {

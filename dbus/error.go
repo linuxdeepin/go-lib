@@ -29,7 +29,6 @@ type dbusError struct {
 
 var (
 	goErrorType   = reflect.TypeOf((*error)(nil)).Elem()
-	dbusErrorType = reflect.TypeOf((*dbusError)(nil))
 )
 
 func (e dbusError) Error() string {
@@ -60,18 +59,6 @@ func NewNoObjectError(path ObjectPath) dbusError {
 	return dbusError{
 		"org.freedesktop.DBus.Error.NoSuchObject",
 		[]interface{}{"No such object" + string(path)},
-	}
-}
-func newError(errType int, args ...interface{}) dbusError {
-	//TODO: complete this
-	name := "UnknowError"
-	switch errType {
-	case NoObjectError:
-		name = "org.freedesktop.DBus.Error.NoSuchObject"
-	}
-	return dbusError{
-		name,
-		args,
 	}
 }
 

@@ -119,12 +119,12 @@ func TestEmbededStrcut(t *testing.T) {
 	}
 	c := detectConnByDBusObject(s)
 	var ret string
-	c.Object("com.deepin.test", "/com/deepin/test").Call("Test", 0).Store(&ret)
+	_ = c.Object("com.deepin.test", "/com/deepin/test").Call("Test", 0).Store(&ret)
 	if ret != "ABC" {
 		t.Fail()
 	}
 	var props map[string]Variant
-	c.Object("com.deepin.test", "/com/deepin/test").Call(
+	_ = c.Object("com.deepin.test", "/com/deepin/test").Call(
 		"org.freedesktop.DBus.Properties.GetAll", 0, "com.deepin.test").Store(&props)
 	_, ok := props["A"]
 	if !ok {
