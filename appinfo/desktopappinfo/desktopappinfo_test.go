@@ -436,7 +436,7 @@ func Test_expandFieldCode(t *testing.T) {
 		So(parts, ShouldResemble, []string{"start", files[0], "--icon", icon, translatedName, desktopFile, "end"})
 
 		cmdline = []string{"start", "%G", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+		_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		So(err, ShouldEqual, ErrBadFieldCode)
 
 		cmdline = []string{"start", "%d", "%d", "%v", "end"}
@@ -460,7 +460,7 @@ func Test_expandFieldCode(t *testing.T) {
 		So(parts, ShouldResemble, []string{"start", "file:///dir1/dir2/a", "file:///dir1/dir2/b", "end"})
 
 		cmdline = []string{"start", "%%", "%abc", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+		_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		So(err, ShouldEqual, ErrBadFieldCode)
 
 		cmdline = []string{"start", "1%%", "end"}

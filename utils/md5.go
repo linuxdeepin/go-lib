@@ -37,6 +37,6 @@ func SumFileMd5(filename string) (string, bool) {
 	}
 	defer f.Close()
 	h := md5.New()
-	io.Copy(h, f)
+	_, _ = io.Copy(h, f)
 	return fmt.Sprintf("%x", h.Sum(nil)), true
 }

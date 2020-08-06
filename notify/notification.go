@@ -127,7 +127,7 @@ func (n *Notification) Show() error {
 				return
 			}
 			n.closedReason = ClosedReason(reason)
-			n.closed.Trigger(n, ClosedReason(reason))
+			_ = n.closed.Trigger(n, ClosedReason(reason))
 		})
 	}
 

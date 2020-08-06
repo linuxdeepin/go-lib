@@ -30,7 +30,9 @@ func (*testWrapper) TestCopyDir(c *C.C) {
 	dest := "testdata/copy-dest"
 
 	pwd, _ := os.Getwd()
-	defer os.Chdir(pwd)
+	defer func() {
+		_ = os.Chdir(pwd)
+	}()
 
 	err := os.RemoveAll(dest)
 	if err != nil {

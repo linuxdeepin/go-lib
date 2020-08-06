@@ -183,7 +183,7 @@ func (*testWrapper) TestIsFileExist(c *C.C) {
 	for _, d := range data {
 		os.Remove(d.path)
 		c.Check(IsFileExist(d.path), C.Equals, false)
-		ioutil.WriteFile(d.path, nil, 0644)
+		_ = ioutil.WriteFile(d.path, nil, 0644)
 		c.Check(IsFileExist(d.path), C.Equals, true)
 		c.Check(IsFileExist(d.uri), C.Equals, true)
 		os.Remove(d.path)
@@ -220,8 +220,8 @@ func (*testWrapper) TestIsSymlink(c *C.C) {
 	testSymlink := "/tmp/deepin_test_symlink"
 	os.Remove(testSymlink)
 	c.Check(IsSymlink(testSymlink), C.Equals, false)
-	ioutil.WriteFile(testFile, nil, 0644)
-	os.Symlink(testFile, testSymlink)
+	_ = ioutil.WriteFile(testFile, nil, 0644)
+	_ = os.Symlink(testFile, testSymlink)
 	c.Check(IsSymlink(testSymlink), C.Equals, true)
 	os.Remove(testSymlink)
 	os.Remove(testFile)
@@ -242,7 +242,7 @@ func (*testWrapper) TestUnsetEnv(c *C.C) {
 	os.Setenv(testEnvName, testEnvValue)
 	c.Check(true, C.Equals, IsEnvExists(testEnvName))
 	envCount := len(os.Environ())
-	UnsetEnv(testEnvName)
+	_ = UnsetEnv(testEnvName)
 	c.Check(false, C.Equals, IsEnvExists(testEnvName))
 	c.Check(len(os.Environ()), C.Equals, envCount-1)
 }
@@ -281,7 +281,6 @@ func (*testWrapper) TestIsInterfaceNil(c *C.C) {
 	var a2 []int = make([]int, 0)
 	c.Check(IsInterfaceNil(a2), C.Equals, false)
 
-	var ifcWrapper interface{}
-	ifcWrapper = "str"
+	var ifcWrapper interface{} = "str"
 	c.Check(IsInterfaceNil(ifcWrapper), C.Equals, false)
 }

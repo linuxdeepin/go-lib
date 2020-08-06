@@ -76,7 +76,9 @@ func broadcastXMessage(conn *x.Conn, atomMsgType, atomMsgTypeBegin x.Atom, msgRe
 	if err != nil {
 		return err
 	}
-	defer conn.FreeID(xid)
+	defer func() {
+		_ = conn.FreeID(xid)
+	}()
 
 	win := x.Window(xid)
 	root := conn.GetDefaultScreen().Root

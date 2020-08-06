@@ -5,13 +5,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
-	"sync"
-	"time"
-
 	"pkg.deepin.io/lib/keyfile"
 	"pkg.deepin.io/lib/strv"
 	"pkg.deepin.io/lib/xdg/basedir"
+	"strings"
+	"sync"
 )
 
 type Theme struct {
@@ -21,7 +19,6 @@ type Theme struct {
 	Directories  []string
 	SubDirs      []SubDir
 
-	mTime time.Time // dir mtime
 	//Name string
 	//Comment string
 	//Hidden bool

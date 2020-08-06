@@ -101,7 +101,7 @@ func eatAllSpace(reader *strings.Reader) {
 			return
 		}
 		if ch != ' ' {
-			reader.UnreadByte()
+			_ = reader.UnreadByte()
 			break
 		}
 	}

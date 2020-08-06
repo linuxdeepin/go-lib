@@ -88,10 +88,10 @@ func GetTimeFromJulianDay(jd float64) (hour, minute, second int) {
 // GetDateTimeFromJulianDay 将儒略日转换为 time.Time
 // 其中包含了 TT 到 UTC 的转换
 func GetDateTimeFromJulianDay(jd float64) time.Time {
-	yy, mm, dd := GetDateFromJulianDay(jd)
+	yy, mm, _ := GetDateFromJulianDay(jd)
 	//  TT -> UTC
 	jd -= GetDeltaT(yy, mm) / 86400
-	yy, mm, dd = GetDateFromJulianDay(jd)
+	yy, mm, dd := GetDateFromJulianDay(jd)
 	h, m, s := GetTimeFromJulianDay(jd)
 	return time.Date(yy, time.Month(mm), dd, h, m, s, 0, time.UTC)
 }

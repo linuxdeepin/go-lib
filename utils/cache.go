@@ -31,7 +31,7 @@ func GenerateCacheFilePath(keyword string) (dstfile string) {
 	cachePathFormat := DefaultCachePrefix + "/%s"
 	md5, _ := SumStrMd5(keyword)
 	dstfile = fmt.Sprintf(cachePathFormat, md5)
-	EnsureDirExist(path.Dir(dstfile))
+	_ = EnsureDirExist(path.Dir(dstfile))
 	return
 }
 
@@ -39,6 +39,6 @@ func GenerateCacheFilePathWithPrefix(prefix, keyword string) (dstfile string) {
 	graphicCacheFormat := DefaultCachePrefix + "/%s/%s"
 	md5, _ := SumStrMd5(keyword)
 	dstfile = fmt.Sprintf(graphicCacheFormat, prefix, md5)
-	EnsureDirExist(path.Dir(dstfile))
+	_ = EnsureDirExist(path.Dir(dstfile))
 	return
 }

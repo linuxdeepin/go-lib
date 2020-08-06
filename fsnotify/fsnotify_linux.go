@@ -15,7 +15,7 @@ import (
 	"syscall"
 	"unsafe"
 )
-
+//nolint
 const (
 	// Options for inotify_init() are not exported
 	// sys_IN_CLOEXEC    uint32 = syscall.IN_CLOEXEC
@@ -139,7 +139,7 @@ func (w *Watcher) Close() error {
 
 	// Remove all watches
 	for path := range w.watches {
-		w.RemoveWatch(path)
+		_ = w.RemoveWatch(path)
 	}
 
 	// Send "quit" message to the reader goroutine
@@ -186,7 +186,7 @@ func (w *Watcher) removeWatch(path string) error {
 	defer w.mu.Unlock()
 	watch, ok := w.watches[path]
 	if !ok {
-		return errors.New(fmt.Sprintf("can't remove non-existent inotify watch for: %s", path))
+		return fmt.Errorf("can't remove non-existent inotify watch for: %s", path)
 	}
 	success, errno := syscall.InotifyRmWatch(w.fd, watch.wd)
 	if success == -1 {
@@ -209,7 +209,7 @@ func (w *Watcher) readEvents() {
 		// See if there is a message on the "done" channel
 		select {
 		case <-w.done:
-			syscall.Close(w.fd)
+			_ = syscall.Close(w.fd)
 			close(w.internalEvent)
 			close(w.Error)
 			return
@@ -220,7 +220,7 @@ func (w *Watcher) readEvents() {
 
 		// If EOF is received
 		if n == 0 {
-			syscall.Close(w.fd)
+			_ = syscall.Close(w.fd)
 			close(w.internalEvent)
 			close(w.Error)
 			return

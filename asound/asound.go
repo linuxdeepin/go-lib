@@ -592,12 +592,7 @@ func CardNext(rcard *int) error {
 // return true if driver is present, false if driver is not present
 func CardLoad(card int) bool {
 	ret := C.snd_card_load(C.int(card))
-	if ret == 1 {
-		//driver is present
-		return true
-	}
-	// else 0, driver not present
-	return false
+	return ret == 1
 }
 
 // CTL handle

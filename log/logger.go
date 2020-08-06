@@ -29,7 +29,6 @@ import (
 	"reflect"
 	"regexp"
 	"runtime"
-	"strings"
 	"sync"
 
 	"pkg.deepin.io/lib/utils"
@@ -176,7 +175,7 @@ func (l *Logger) GetLogLevel() Priority {
 // ResetBackends clear all backends.
 func (l *Logger) ResetBackends() {
 	for _, b := range l.backends {
-		b.close()
+		_ = b.close()
 	}
 	l.backends = nil
 }
@@ -206,7 +205,7 @@ func (l *Logger) RemoveBackend(b Backend) {
 func (l *Logger) doRemoveBackend(i int) {
 	l.backendsLock.Lock()
 	defer l.backendsLock.Unlock()
-	l.backends[i].close()
+	_ = l.backends[i].close()
 	l.backends[i] = nil
 	newLen := len(l.backends) - 1
 	copy(l.backends[i:], l.backends[i+1:])
@@ -269,57 +268,12 @@ func (l *Logger) EndTracing() {
 	// l.doLog(LevelInfo, msg)
 }
 
-func getCallerFuncInfo(skip int) (funcName string, file string, line int, ok bool) {
-	_, file, line, ok = runtime.Caller(skip)
-	if !ok {
-		return
-	}
-	for {
-		pc, _, _, ok2 := runtime.Caller(skip)
-		if !ok2 {
-			break
-		}
-		if funcInfo := runtime.FuncForPC(pc); funcInfo != nil {
-			// get the short function name
-			fullFuncName := funcInfo.Name()
-			funcName = filepath.Base(fullFuncName)
-			if funcName == "runtime.panic" {
-				// if is panic function, skip it and get file/line again
-				_, file, line, ok = runtime.Caller(skip + 1)
-				skip++
-				continue
-			} else if strings.Contains(funcName, "func·") {
-				// if is an anonymous function, just skip it
-				skip++
-				continue
-			} else {
-				break
-			}
-		} else {
-			break
-		}
-	}
-	// fix function name
-	a := strings.Split(funcName, ".")
-	// strings.Split() will return at least one element, so we could
-	// get the last element safely
-	funcName = a[len(a)-1]
-	funcName = funcName + "()"
-	return
-}
-
 func (l *Logger) isNeedLog(level Priority) bool {
-	if level <= l.level {
-		return true
-	}
-	return false
+	return level <= l.level
 }
 
 func (l *Logger) isNeedTraceMore(level Priority) bool {
-	if level <= LevelError {
-		return true
-	}
-	return false
+	return level <= LevelError
 }
 
 func (l *Logger) log(level Priority, v ...interface{}) {
@@ -338,7 +292,7 @@ func (l *Logger) logf(level Priority, format string, v ...interface{}) {
 }
 func (l *Logger) doLog(level Priority, msg string) {
 	for _, b := range l.backends {
-		b.log(level, msg)
+		_ = b.log(level, msg)
 	}
 }
 
@@ -457,7 +411,9 @@ func (l *Logger) launchCrashReporter() {
 
 		// create temporary json file and it will be removed by deepin-crash-reporter
 		f, err := ioutil.TempFile("", "deepin_crash_reporter_config_")
-		defer f.Close()
+		defer func() {
+			_ = f.Close()
+		}()
 		if err != nil {
 			l.Error(err)
 		}

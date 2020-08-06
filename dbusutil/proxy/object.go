@@ -40,14 +40,14 @@ type objectSignalExt struct {
 	ruleAuto bool
 
 	// used when ruleAuto is true
-	ruleHandlersMap map[string][]dbusutil.SignalHandlerId
+	ruleHandlersMap map[string][]dbusutil.SignalHandlerId //nolint
 	//                  ^rule  ^handler ids
 
 	// used when ruleAuto is false
-	handleIds []dbusutil.SignalHandlerId
+	handleIds []dbusutil.SignalHandlerId //nolint:
 
-	propChangedHandlerId dbusutil.SignalHandlerId
-	propChangedCallbacks map[propChangedKey][]PropChangedCallback
+	propChangedHandlerId dbusutil.SignalHandlerId //nolint:
+	propChangedCallbacks map[propChangedKey][]PropChangedCallback //nolint:
 }
 
 type propChangedKey struct {

@@ -107,28 +107,6 @@ func (task *DelayTask) Stop() {
 	}
 }
 
-func (task *DelayTask) handleArgSignature(args ...interface{}) ([]reflect.Value, error) {
-	if len(task.argsType) != len(args) {
-		return nil, fmt.Errorf("argument length expected %d, but got %d",
-			len(task.argsType), len(args))
-	}
-
-	// check each arg type
-	for i, t := range task.argsType {
-		t0 := reflect.TypeOf(args[i])
-		if t != t0 {
-			return nil, fmt.Errorf("args[%d] type expected %s, but got %s",
-				i, t, t0)
-		}
-	}
-
-	var values = make([]reflect.Value, len(args))
-	for i, v := range args {
-		values[i] = reflect.ValueOf(v)
-	}
-	return values, nil
-}
-
 func handleFuncSignature(f interface{}) (*reflect.Value,
 	[]reflect.Type, error) {
 	fn := reflect.ValueOf(f)

@@ -105,10 +105,7 @@ func (player *Player) Play(theme, event, device string) error {
 }
 
 func cacheItemOk(cacheItem *CacheItem, fileInfo os.FileInfo) bool {
-	if cacheItem.modTime != fileInfo.ModTime() {
-		return false
-	}
-	return true
+	return cacheItem.modTime == fileInfo.ModTime()
 }
 
 func getDecoder(file string, fileInfo os.FileInfo) (Decoder, error) {

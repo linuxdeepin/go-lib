@@ -55,7 +55,7 @@ func (w *WatchProxy) setFileListWatch() {
 	}
 
 	for _, filename := range w.fileList {
-		w.watcher.Watch(filename)
+		_ = w.watcher.Watch(filename)
 	}
 }
 
@@ -65,7 +65,7 @@ func (w *WatchProxy) removeFileListWatch() {
 	}
 
 	for _, filename := range w.fileList {
-		w.watcher.RemoveWatch(filename)
+		_ = w.watcher.RemoveWatch(filename)
 	}
 }
 

@@ -478,7 +478,9 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 func launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
 	cmd, err := startCommand(ai, cmdline, files, launchContext)
-	go cmd.Wait()
+	go func() {
+		_ = cmd.Wait()
+	}()
 	return err
 }
 

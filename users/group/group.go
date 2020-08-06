@@ -36,18 +36,6 @@ type Group struct {
 	Members *[]string // member list
 }
 
-var char *C.char
-
-// stringArrayC2Go converts string arrray in C to string slice in Golang
-func stringArrayC2Go(strArrC **C.char) *[]string {
-	strArr := make([]string, 5)
-	for offset := uintptr(0); uintptr(*(*C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(strArrC)) + offset))) != uintptr(0); offset += unsafe.Sizeof(uintptr(0)) {
-		str := C.GoString(*(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(strArrC)) + offset)))
-		strArr = append(strArr, str)
-	}
-	return &strArr
-}
-
 // stringArrayC2Go_2 converts string array in C to string slice in Golang
 // It is a revised version of @stringArrayC2Go
 func stringArrayC2Go_2(strArrC **C.char) *[]string {

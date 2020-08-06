@@ -153,68 +153,68 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	}
 	defer kFile.Free()
 
-	switch value.(type) {
+	switch vType := value.(type) {
 	case bool:
-		kFile.SetBoolean(group, key, value.(bool))
+		kFile.SetBoolean(group, key, vType)
 	case []bool:
-		kFile.SetBooleanList(group, key, value.([]bool))
+		kFile.SetBooleanList(group, key, vType)
 	case int:
-		kFile.SetInteger(group, key, int32(value.(int)))
+		kFile.SetInteger(group, key, int32(vType))
 	case int32:
-		kFile.SetInteger(group, key, int32(value.(int32)))
+		kFile.SetInteger(group, key, int32(vType))
 	case uint32:
-		kFile.SetInteger(group, key, int32(value.(uint32)))
+		kFile.SetInteger(group, key, int32(vType))
 	case []int:
-		list := value.([]int)
+		list := vType
 		tmp := []int32{}
 		for _, l := range list {
 			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case []int32:
-		kFile.SetIntegerList(group, key, value.([]int32))
+		kFile.SetIntegerList(group, key, vType)
 	case []uint32:
-		list := value.([]uint32)
+		list := vType
 		tmp := []int32{}
 		for _, l := range list {
 			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case []int64:
-		list := value.([]int64)
+		list := vType
 		tmp := []int32{}
 		for _, l := range list {
 			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case []uint64:
-		list := value.([]uint64)
+		list := vType
 		tmp := []int32{}
 		for _, l := range list {
 			tmp = append(tmp, int32(l))
 		}
 		kFile.SetIntegerList(group, key, tmp)
 	case int64:
-		kFile.SetInt64(group, key, value.(int64))
+		kFile.SetInt64(group, key, vType)
 	case uint64:
-		kFile.SetUint64(group, key, value.(uint64))
+		kFile.SetUint64(group, key, vType)
 	case float32:
-		kFile.SetDouble(group, key, float64(value.(float32)))
+		kFile.SetDouble(group, key, float64(vType))
 	case float64:
-		kFile.SetDouble(group, key, value.(float64))
+		kFile.SetDouble(group, key, vType)
 	case []float32:
-		list := value.([]float32)
+		list := vType
 		tmp := []float64{}
 		for _, l := range list {
 			tmp = append(tmp, float64(l))
 		}
 		kFile.SetDoubleList(group, key, tmp)
 	case []float64:
-		kFile.SetDoubleList(group, key, value.([]float64))
+		kFile.SetDoubleList(group, key, vType)
 	case string:
-		kFile.SetString(group, key, value.(string))
+		kFile.SetString(group, key, vType)
 	case []string:
-		kFile.SetStringList(group, key, value.([]string))
+		kFile.SetStringList(group, key, vType)
 	}
 
 	_, contents, err1 := kFile.ToData()
@@ -223,22 +223,14 @@ func WriteKeyToKeyFile(filename, group, key string, value interface{}) bool {
 	}
 
 	ok := WriteStringToKeyFile(filename, string(contents))
-	if !ok {
-		return false
-	}
-
-	return true
+	return ok
 }
 
 //TODO: Abandoned it
 //Do't use this interface.
 func WriteStringToKeyFile(filename, content string) bool {
 	err := WriteStringToFile(filename, content)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 func WriteStringToFile(filename, content string) error {
@@ -253,12 +245,14 @@ func WriteStringToFile(filename, content string) error {
 	if err != nil {
 		return err
 	}
-	defer fp.Close()
+	defer func() {
+		_ = fp.Close()
+	}()
 
 	_, err = fp.WriteString(content)
 	if err != nil {
 		return err
 	}
-	fp.Sync()
+	_ = fp.Sync()
 	return os.Rename(swapFile, filename)
 }

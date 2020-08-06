@@ -62,10 +62,7 @@ func IsSupportedImage(imgfile string) bool {
 	}
 	defer f.Close()
 	_, _, err = image.DecodeConfig(f)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func GetImagesInDir(dir string) ([]string, error) {

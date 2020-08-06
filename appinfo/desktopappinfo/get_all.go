@@ -82,11 +82,7 @@ func getAppNames(root string, skipDirs []string) map[string]int {
 	ret := make(map[string]int)
 	Walk(root, func(name string, info os.FileInfo) bool {
 		if info.IsDir() {
-			if stringSliceContains(skipDirs, name) {
-				// skip dir
-				return true
-			}
-			return false
+			return stringSliceContains(skipDirs, name)
 		}
 
 		if strings.HasSuffix(name, desktopExt) {

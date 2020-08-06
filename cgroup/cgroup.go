@@ -436,6 +436,9 @@ func chmodRecursiveController(path string,
 	logger.Debug("chmod: path is ", path)
 
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		for _, ig := range ignoreList {
 			if ig == path {
 				// ignore
@@ -706,7 +709,7 @@ func deleteCgroupControllerRecursive(cgroupName, controller string, targetTasksF
 			}
 
 			if pStat.IsDir() {
-				deleteCgroupControllerRecursive(cgroupName1, controller, targetTasksF, flags, true)
+				_ = deleteCgroupControllerRecursive(cgroupName1, controller, targetTasksF, flags, true)
 			}
 
 		}
@@ -714,15 +717,11 @@ func deleteCgroupControllerRecursive(cgroupName, controller string, targetTasksF
 			break
 		}
 
-		if err1 != nil {
-			err = err1
-		}
-
 		if len(names) == 0 {
 			break
 		}
 	}
-	fd.Close()
+	_ = fd.Close()
 
 	if deleteRoot {
 		err = deleteCgroupController(cgroupName, controller, targetTasksF, flags)

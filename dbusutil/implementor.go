@@ -101,7 +101,7 @@ func (impl *implementer) notifyChanged(s *Service, path dbus.ObjectPath,
 	interfaceName := impl.core.GetInterfaceName()
 	propChanged := newPropertyChanged(path, interfaceName, propStatic.name, value)
 	p.notifyChanged(propChanged)
-	emitPropertiesChanged(s.conn, path, interfaceName,
+	_ = emitPropertiesChanged(s.conn, path, interfaceName,
 		propStatic.name, value, propStatic.emit)
 }
 

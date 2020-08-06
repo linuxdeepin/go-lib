@@ -71,6 +71,7 @@ func TestService_RequestName(t *testing.T) {
 	}
 }
 
+//nolint
 type srvObject1 struct {
 	methods *struct {
 		Method1 func() `out:"num"`
@@ -128,7 +129,7 @@ func TestService_Export(t *testing.T) {
 		t.Error("IsExported expected true")
 	}
 
-	service.StopExport(srvObj1)
+	_ = service.StopExport(srvObj1)
 
 	if service.IsExported(srvObj1) {
 		t.Error("IsExported expected false")
@@ -147,6 +148,7 @@ func TestService_Export(t *testing.T) {
 	}
 }
 
+//nolint
 type srvObject2 struct {
 	signals *struct {
 		Signal1 struct{}
@@ -652,7 +654,7 @@ func TestService_SetReadCallback(t *testing.T) {
 		t.Errorf("prop1ReadCount expected 1, got %d", srvObj6.prop1ReadCount)
 	}
 
-	err = serverObject6.SetReadCallback(srvObj6, "Prop1",
+	_ = serverObject6.SetReadCallback(srvObj6, "Prop1",
 		func(read *PropertyRead) *dbus.Error {
 			srvObj6.prop1ReadCount++
 			return dbus.MakeFailedError(errors.New("xxx err msg"))
@@ -953,7 +955,7 @@ func TestService_PropTag(t *testing.T) {
 
 	// rule for watch PropertiesChanged signal
 	rulePC := NewMatchRuleBuilder().ExtPropertiesChanged(srvObj9Path, srvObj9.GetInterfaceName()).Build()
-	rulePC.AddTo(service.conn)
+	_ = rulePC.AddTo(service.conn)
 	// Test Prop4 emit: true
 
 	chP4 := make(chan int)
@@ -1076,7 +1078,7 @@ func TestService_PropTag(t *testing.T) {
 	}
 
 	// Test End
-	rulePC.RemoveFrom(service.conn)
+	_ = rulePC.RemoveFrom(service.conn)
 }
 
 type rect struct {
@@ -1118,19 +1120,19 @@ func TestService_StructProp(t *testing.T) {
 
 	serverObject10, err := service.NewServerObject("/com/deepin/lib/Object10", srvObj10)
 
-	serverObject10.ConnectChanged(srvObj10, "Prop1", func(change *PropertyChanged) {
+	_ = serverObject10.ConnectChanged(srvObj10, "Prop1", func(change *PropertyChanged) {
 		srvObj10.prop1ChangedCount++
 	})
 
-	serverObject10.ConnectChanged(srvObj10, "Prop2", func(change *PropertyChanged) {
+	_ = serverObject10.ConnectChanged(srvObj10, "Prop2", func(change *PropertyChanged) {
 		srvObj10.prop2ChangedCount++
 	})
 
-	serverObject10.ConnectChanged(srvObj10, "Prop3", func(change *PropertyChanged) {
+	_ = serverObject10.ConnectChanged(srvObj10, "Prop3", func(change *PropertyChanged) {
 		srvObj10.prop3ChangedCount++
 	})
 
-	serverObject10.ConnectChanged(srvObj10, "Prop4", func(change *PropertyChanged) {
+	_ = serverObject10.ConnectChanged(srvObj10, "Prop4", func(change *PropertyChanged) {
 		srvObj10.prop4ChangedCount++
 	})
 
@@ -1139,7 +1141,7 @@ func TestService_StructProp(t *testing.T) {
 		t.Error("Unexpected error exporting srvObj10:", err)
 	}
 
-	service.RequestName("com.deepin.lib.Object10")
+	_ = service.RequestName("com.deepin.lib.Object10")
 	if err != nil {
 		t.Error("Unexpected error calling RequestName:", err)
 	}
@@ -1332,15 +1334,15 @@ func TestService_IntUintProp(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 
-	serverObject13.ConnectChanged(srvObj13, "Prop1", func(change *PropertyChanged) {
+	_ = serverObject13.ConnectChanged(srvObj13, "Prop1", func(change *PropertyChanged) {
 		srvObj13.prop1ChangedCount++
 	})
 
-	serverObject13.ConnectChanged(srvObj13, "Prop2", func(change *PropertyChanged) {
+	_ = serverObject13.ConnectChanged(srvObj13, "Prop2", func(change *PropertyChanged) {
 		srvObj13.prop2ChangedCount++
 	})
 
-	serverObject13.ConnectChanged(srvObj13, "Prop3", func(change *PropertyChanged) {
+	_ = serverObject13.ConnectChanged(srvObj13, "Prop3", func(change *PropertyChanged) {
 		srvObj13.prop3ChangedCount++
 	})
 
@@ -1349,7 +1351,7 @@ func TestService_IntUintProp(t *testing.T) {
 		t.Error("Unexpected error exporting srvObj13:", err)
 	}
 
-	service.RequestName("com.deepin.lib.Object13")
+	_ = service.RequestName("com.deepin.lib.Object13")
 	if err != nil {
 		t.Error("Unexpected error calling RequestName:", err)
 	}

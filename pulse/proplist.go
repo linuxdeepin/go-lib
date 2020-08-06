@@ -23,7 +23,6 @@ package pulse
 #include "dde-pulse.h"
 */
 import "C"
-import "unsafe"
 
 const (
 	PA_PROP_MEDIA_NAME                     = "media.name"
@@ -100,16 +99,3 @@ const (
 	PA_PROP_FORMAT_CHANNEL_MAP             = "format.channel_map"
 )
 
-type PropList map[string]string
-
-func (p PropList) toC() *C.pa_proplist {
-	core := C.pa_proplist_new()
-	for k, v := range p {
-		ck := C.CString(k)
-		cv := C.CString(v)
-		C.pa_proplist_sets(core, ck, cv)
-		C.free(unsafe.Pointer(ck))
-		C.free(unsafe.Pointer(cv))
-	}
-	return core
-}

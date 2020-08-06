@@ -186,10 +186,7 @@ func GetImageFormat(imgFile string) (f Format, err error) {
 // IsSupportedImage check if image file is supported.
 func IsSupportedImage(imgFile string) bool {
 	_, err := GetImageFormat(imgFile)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Clip

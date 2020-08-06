@@ -73,7 +73,7 @@ func GenUuid() string {
 func RandString(n int) string {
 	const alphanum = "0123456789abcdef"
 	var bytes = make([]byte, n)
-	rand.Read(bytes)
+	_, _ = rand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
 	}
@@ -81,16 +81,13 @@ func RandString(n int) string {
 }
 
 func IsInterfaceNil(v interface{}) bool {
-	defer func() { recover() }()
-
 	if v == nil {
 		return true
 	}
 
 	value := reflect.ValueOf(v)
 
-	// Value.IsNil reports whether its argument v is nil. But the
-	// argument must be a chan, func, interface, map, pointer, or
+	// The argument must be a chan, func, interface, map, pointer, or
 	// slice value; if it is not, Value.IsNil panics.
 	switch value.Kind() {
 	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:

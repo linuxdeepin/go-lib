@@ -217,7 +217,7 @@ func TestGetStringList(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(list, ShouldResemble, []string{"a;bc", "def"})
 
-		list, err = f.GetStringList("Test", "strlist7")
+		_, err = f.GetStringList("Test", "strlist7")
 		So(err, ShouldNotBeNil)
 		So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})
 		t.Log(err)
@@ -260,7 +260,7 @@ func TestGetString(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(str, ShouldEqual, "abc\\;def")
 
-		str, err = f.GetString("Test", "str5")
+		_, err = f.GetString("Test", "str5")
 		So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})
 	})
 }

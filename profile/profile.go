@@ -32,7 +32,7 @@ import (
 )
 
 type _Profile struct {
-	writer io.Writer
+	writer io.Writer //nolint
 	file   string
 }
 
@@ -49,7 +49,7 @@ func newCPUProfile(file string) *_CPUProfile {
 }
 
 func (prof *_CPUProfile) Start(writer io.Writer) {
-	pprof.StartCPUProfile(writer)
+	_ = pprof.StartCPUProfile(writer)
 }
 
 func (prof *_CPUProfile) Stop() {
@@ -69,7 +69,7 @@ func (prof *_MemProfile) Start(writer io.Writer) {
 }
 
 func (prof *_MemProfile) Stop() {
-	pprof.Lookup("heap").WriteTo(prof.writer, 0)
+	_ = pprof.Lookup("heap").WriteTo(prof.writer, 0)
 }
 
 type _BlockProfile struct {
@@ -85,7 +85,7 @@ func (prof *_BlockProfile) Start(writer io.Writer) {
 }
 
 func (prof *_BlockProfile) Stop() {
-	pprof.Lookup("block").WriteTo(prof.writer, 0)
+	_ = pprof.Lookup("block").WriteTo(prof.writer, 0)
 }
 
 // Config controls the operation of the profile package.
@@ -141,7 +141,7 @@ func (cfg *Config) enableProfile(prof interface {
 	prof.Start(f)
 	cfg.closers = append(cfg.closers, func() {
 		prof.Stop()
-		f.Close()
+		_ = f.Close()
 	})
 
 	return nil

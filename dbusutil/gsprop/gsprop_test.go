@@ -314,7 +314,9 @@ gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c
 	gio.SettingsSync()
 
 	// property changed signal
-	go gsettings.StartMonitor()
+	go func() {
+		_ = gsettings.StartMonitor()
+	}()
 
 	rule := dbusutil.NewMatchRuleBuilder().ExtPropertiesChanged(srvObj1Path,
 		srvObj1Interface).Build()

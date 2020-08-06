@@ -87,7 +87,7 @@ func (c *Config) Load(v interface{}) (err error) {
 func (c *Config) Save(v interface{}) (err error) {
 	c.Lock()
 	defer c.Unlock()
-	EnsureDirExist(path.Dir(c.configFile))
+	_ = EnsureDirExist(path.Dir(c.configFile))
 	var fileContent []byte
 	fileContent, err = c.GetFileContentToSave(v)
 	if err != nil {

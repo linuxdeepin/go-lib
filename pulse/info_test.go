@@ -16,8 +16,8 @@ func TestQueryInfo(t *testing.T) {
 		t.Skip("home dir is not exist")
 	}
 
-	ctx := GetContext()
-	ctx = GetContextForced()
+	_ = GetContext()
+	ctx := GetContextForced()
 	if ctx == nil {
 		t.Skip("Can't connect to pulseaudio.")
 		return

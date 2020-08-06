@@ -188,9 +188,7 @@ func (f *KeyFile) GetSection(section string) (map[string]string, error) {
 
 func (f *KeyFile) SetSectionComments(section, comments string) bool {
 	if len(comments) == 0 {
-		if _, ok := f.sectionComments[section]; ok {
-			delete(f.sectionComments, section)
-		}
+		delete(f.sectionComments, section)
 		return true
 	}
 
@@ -206,10 +204,7 @@ func (f *KeyFile) SetSectionComments(section, comments string) bool {
 func (f *KeyFile) SetKeyComments(section, key, comments string) bool {
 	if _, ok := f.keyComments[section]; ok {
 		if len(comments) == 0 {
-
-			if _, ok := f.keyComments[section][key]; ok {
-				delete(f.keyComments[section], key)
-			}
+			delete(f.keyComments[section], key)
 			return true
 		}
 	} else {

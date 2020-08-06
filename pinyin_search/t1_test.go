@@ -45,7 +45,7 @@ func Test_matchAux(t *testing.T) {
 	assert.True(t, end)
 	_ = n
 
-	isMatch, end, n = matchAux("dong", "don")
+	isMatch, end, _ = matchAux("dong", "don")
 	assert.True(t, isMatch)
 	assert.True(t, end)
 
@@ -54,7 +54,7 @@ func Test_matchAux(t *testing.T) {
 	assert.False(t, end)
 	assert.Equal(t, 4, n)
 
-	isMatch, end, n = matchAux("dong", "sh")
+	isMatch, _, _ = matchAux("dong", "sh")
 	assert.False(t, isMatch)
 }
 

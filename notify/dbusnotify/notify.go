@@ -62,19 +62,19 @@ func DestroyNotifier(obj *Notifier) {
 	if obj.signals == nil {
 		return
 	}
-	for ch, _ := range obj.signals {
+	for ch := range obj.signals {
 		getBus().DetachSignal(ch)
 	}
 	obj.signals = nil
 
 	runtime.SetFinalizer(obj, nil)
 
-	dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.DBus.Properties',sender='" + obj.DestName + "',member='PropertiesChanged'")
-	dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='PropertiesChanged'")
+	_ = dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.DBus.Properties',sender='" + obj.DestName + "',member='PropertiesChanged'")
+	_ = dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='PropertiesChanged'")
 
-	dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='NotificationClosed'")
+	_ = dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='NotificationClosed'")
 
-	dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='ActionInvoked'")
+	_ = dbusRemoveMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='ActionInvoked'")
 
 }
 
@@ -163,9 +163,9 @@ func NewNotifier(destName string, path dbus.ObjectPath) (*Notifier, error) {
 
 	obj := &Notifier{Path: path, DestName: destName, core: core, signals: make(map[<-chan *dbus.Signal]struct{})}
 
-	dbusAddMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='NotificationClosed'")
+	_ = dbusAddMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='NotificationClosed'")
 
-	dbusAddMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='ActionInvoked'")
+	_ = dbusAddMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='ActionInvoked'")
 
 	runtime.SetFinalizer(obj, func(_obj *Notifier) { DestroyNotifier(_obj) })
 	return obj, nil

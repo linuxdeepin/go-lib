@@ -81,7 +81,7 @@ func GetProviders(countryCode string) (providers []*Provider, err error) {
 	}
 	found := false
 	for _, c := range database.Countries {
-		if strings.ToUpper(c.Code) == strings.ToUpper(countryCode) {
+		if strings.EqualFold(c.Code, countryCode) {
 			found = true
 			providers = c.Providers
 			break

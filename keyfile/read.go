@@ -105,7 +105,7 @@ func (f *KeyFile) LoadFromFile(filename string) error {
 type BlankSectionNameError struct{}
 
 func (err BlankSectionNameError) Error() string {
-	return fmt.Sprintf("empty section name not allowed")
+	return "empty section name not allowed"
 }
 
 type EntryNotInSectionError struct {

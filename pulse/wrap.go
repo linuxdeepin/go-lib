@@ -170,6 +170,3 @@ type SampleSpec struct {
 	Channels uint8
 }
 
-func toSampleSpec(c *C.pa_sample_spec) *SampleSpec {
-	return nil
-}

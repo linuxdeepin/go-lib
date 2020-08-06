@@ -42,10 +42,6 @@ func isFileExists(file string) bool {
 	}
 }
 
-func ensureDirExists(dir string) {
-	os.MkdirAll(dir, 0755)
-}
-
 // convert image.Image to *image.RGBA
 func convertToRGBA(img image.Image) (rgba *image.RGBA) {
 	b := img.Bounds()

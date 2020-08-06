@@ -37,12 +37,12 @@ func (c *testConfig) save() error {
 	return c.core.Save(c)
 }
 func (c *testConfig) load() {
-	c.core.Load(c)
+	_ = c.core.Load(c)
 }
 
 func (*testWrapper) TestConfig(c *C.C) {
 	conf := newTestConfig()
-	conf.core.RemoveConfigFile()
+	_ = conf.core.RemoveConfigFile()
 	conf.Data = "data"
 	err := conf.save()
 	if err != nil {

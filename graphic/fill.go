@@ -32,7 +32,7 @@ type FillStyle string
 
 const (
 	FillTile   FillStyle = "tile"   // 平铺
-	FillCenter           = "center" // 居中
+	FillCenter FillStyle = "center" // 居中
 )
 
 // FillImage generate a new image file in target width and height through

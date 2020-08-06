@@ -99,11 +99,6 @@ func (r *Reader) ReadAll() (pairs []*Pair, err error) {
 	}
 }
 
-func (r *Reader) skipLine() error {
-	_, err := r.r.ReadBytes('\n')
-	return err
-}
-
 var ErrBadLine = errors.New("bad line")
 
 func (r *Reader) parseLine() (*Pair, error) {

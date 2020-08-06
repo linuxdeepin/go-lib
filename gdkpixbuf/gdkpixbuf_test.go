@@ -23,7 +23,6 @@ import (
 	"fmt"
 	C "gopkg.in/check.v1"
 	"os"
-	"pkg.deepin.io/lib/utils"
 	"testing"
 )
 
@@ -47,20 +46,10 @@ const (
 	originImgIconTxt = "testdata/origin_icon_48x48.txt"
 
 	originImgPngSmall       = "testdata/origin_small_200x200.png"
-	originImgPngSmallWidth  = 200
-	originImgPngSmallHeight = 200
 	originImgIconPng1       = "testdata/origin_icon_1_48x48.png"
-	originImgIconPng2       = "testdata/origin_icon_2_48x48.png"
-	originImgIconWidth      = 48
-	originImgIconHeight     = 48
 
 	originImgNotImage = "testdata/origin_not_image"
 )
-
-func sumFileMd5(f string) (md5 string) {
-	md5, _ = utils.SumFileMd5(f)
-	return
-}
 
 func (*testWrapper) TestGetImageSize(c *C.C) {
 	w, h, _ := GetImageSize(originImg)
@@ -120,17 +109,17 @@ func (*testWrapper) TestBlurImageCache(c *C.C) {
 		c.Skip(err.Error())
 		return
 	}
+	_, _, err = BlurImageCache(originImg, 50, 1, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
 	resultFile, useCache, err := BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	resultFile, useCache, err = BlurImageCache(originImg, 50, 1, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
 	c.Check(useCache, C.Equals, true)
-	os.Remove(resultFile)
-	resultFile, useCache, err = BlurImageCache(originImg, 50, 1, FormatPng)
+	_ = os.Remove(resultFile)
+	_, useCache, err = BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -178,31 +167,31 @@ func (*testWrapper) TestClipImage(c *C.C) {
 func (*testWrapper) TestConvertImage(c *C.C) {
 	var f Format
 	resultFilePng := "testdata/test_convertimage.png"
-	ConvertImage(originImgPngSmall, resultFilePng, FormatPng)
+	_ = ConvertImage(originImgPngSmall, resultFilePng, FormatPng)
 	f, _ = GetImageFormat(resultFilePng)
 	c.Check(f, C.Equals, FormatPng)
 	// c.Check(sumFileMd5(resultFilePng), C.Equals, "597e22ed7a9633950908d50e9309be21")
 
 	resultFileJpg := "testdata/test_convertimage.jpg"
-	ConvertImage(originImgPngSmall, resultFileJpg, FormatJpeg)
+	_ = ConvertImage(originImgPngSmall, resultFileJpg, FormatJpeg)
 	f, _ = GetImageFormat(resultFileJpg)
 	c.Check(f, C.Equals, FormatJpeg)
 	// c.Check(sumFileMd5(resultFileJpg), C.Equals, "00c7c47613c39e0321cf4df6ab87fd45")
 
 	resultFileBmp := "testdata/test_convertimage.bmp"
-	ConvertImage(originImgPngSmall, resultFileBmp, FormatBmp)
+	_ = ConvertImage(originImgPngSmall, resultFileBmp, FormatBmp)
 	f, _ = GetImageFormat(resultFileBmp)
 	c.Check(f, C.Equals, FormatBmp)
 	// c.Check(sumFileMd5(resultFileBmp), C.Equals, "aef8c2806dfa927f996b18785e58650c")
 
 	resultFileIco := "testdata/test_convertimage.ico"
-	ConvertImage(originImgPngSmall, resultFileIco, FormatIco)
+	_ = ConvertImage(originImgPngSmall, resultFileIco, FormatIco)
 	f, _ = GetImageFormat(resultFileIco)
 	c.Check(f, C.Equals, FormatIco)
 	// c.Check(sumFileMd5(resultFileIco), C.Equals, "530442dfd38b9118e944d30d82a9cd37")
 
 	resultFileTiff := "testdata/test_convertimage.tiff"
-	ConvertImage(originImgPngSmall, resultFileTiff, FormatTiff)
+	_ = ConvertImage(originImgPngSmall, resultFileTiff, FormatTiff)
 	f, _ = GetImageFormat(resultFileTiff)
 	c.Check(f, C.Equals, FormatTiff)
 	// FIXME: this hash won't be the same on different arch.
@@ -276,17 +265,17 @@ func (*testWrapper) TestScaleImageCache(c *C.C) {
 		c.Skip(err.Error())
 		return
 	}
+	_, _, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
 	resultFile, useCache, err := ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	resultFile, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
 	c.Check(useCache, C.Equals, true)
-	os.Remove(resultFile)
-	resultFile, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	_ = os.Remove(resultFile)
+	_, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
@@ -299,17 +288,17 @@ func (*testWrapper) TestScaleImagePreferCache(c *C.C) {
 		c.Skip(err.Error())
 		return
 	}
+	_, _, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	if err != nil {
+		c.Error(err)
+	}
 	resultFile, useCache, err := ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}
-	resultFile, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
-	if err != nil {
-		c.Error(err)
-	}
 	c.Check(useCache, C.Equals, true)
-	os.Remove(resultFile)
-	resultFile, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
+	_ = os.Remove(resultFile)
+	_, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
 		c.Error(err)
 	}

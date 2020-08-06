@@ -108,7 +108,7 @@ func GetUserRuntimeDir(strict bool) (string, error) {
 		}
 
 		if create {
-			os.Mkdir(fallback, 0700)
+			_ = os.Mkdir(fallback, 0700)
 		}
 		return fallback, nil
 	}

@@ -30,12 +30,12 @@ func handleTask(id int, name string) {
 }
 
 func TestDelayTask(t *testing.T) {
-	task, err := NewDelayTask(time.Second*1, nil)
+	_, err := NewDelayTask(time.Second*1, nil)
 	if err == nil {
 		panic("Failed: should error, because if invalid callback function")
 	}
 
-	task, err = NewDelayTask(time.Second*1, handleTask)
+	task, err := NewDelayTask(time.Second*1, handleTask)
 	if err != nil {
 		panic("Failed: should no error")
 	}

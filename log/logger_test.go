@@ -21,6 +21,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -50,8 +51,8 @@ func restoreOutput() {
 	os.Stdout = originStdout
 }
 func resetOutput() {
-	redirectStdout.Truncate(0)
-	redirectStdout.Seek(0, os.SEEK_SET)
+	_ = redirectStdout.Truncate(0)
+	_, _ = redirectStdout.Seek(0, io.SeekStart)
 }
 func readOutput() string {
 	fileContent, err := ioutil.ReadFile(redirectStdoutFile)
@@ -71,7 +72,7 @@ func checkOutput(c *C.C, regfmt string, preferResult bool) {
 func (*testWrapper) BenchmarkSyslog(c *C.C) {
 	b := newBackendSyslog("benchSyslog")
 	for i := 0; i < c.N; i++ {
-		b.log(LevelInfo, "test")
+		_ = b.log(LevelInfo, "test")
 	}
 }
 
@@ -216,10 +217,10 @@ func (*testWrapper) TestDebugFile(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	os.Remove(DebugFile)
+	_ = os.Remove(DebugFile)
 	c.Check(getDefaultLogLevel("test_debug_file"), C.Equals, LevelInfo)
 
-	os.Create(DebugFile)
+	_, _ =os.Create(DebugFile)
 	c.Check(getDefaultLogLevel("test_debug_file"), C.Equals, LevelDebug)
 }
 
@@ -230,11 +231,11 @@ func (*testWrapper) TestDebugEnv(c *C.C) {
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelInfo)
 
 	os.Clearenv()
-	os.Setenv("DDE_DEBUG", "")
+	_ = os.Setenv("DDE_DEBUG", "")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 
 	os.Clearenv()
-	os.Setenv("DDE_DEBUG", "1")
+	_ = os.Setenv("DDE_DEBUG", "1")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 }
 
@@ -244,10 +245,10 @@ func (*testWrapper) TestDebugLevelEnv(c *C.C) {
 
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelInfo)
 
-	os.Setenv("DDE_DEBUG_LEVEL", "debug")
+	_ = os.Setenv("DDE_DEBUG_LEVEL", "debug")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDebug)
 
-	os.Setenv("DDE_DEBUG_LEVEL", "warning")
+	_ = os.Setenv("DDE_DEBUG_LEVEL", "warning")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelWarning)
 }
 
@@ -255,15 +256,15 @@ func (*testWrapper) TestDebugMatchEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	os.Setenv("DDE_DEBUG_MATCH", "test1")
+	_ = os.Setenv("DDE_DEBUG_MATCH", "test1")
 	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDebug)
 	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)
 
-	os.Setenv("DDE_DEBUG_MATCH", "test1|test2")
+	_ = os.Setenv("DDE_DEBUG_MATCH", "test1|test2")
 	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDebug)
 	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDebug)
 
-	os.Setenv("DDE_DEBUG_MATCH", "not match")
+	_ = os.Setenv("DDE_DEBUG_MATCH", "not match")
 	c.Check(getDefaultLogLevel("test1"), C.Equals, LevelDisable)
 	c.Check(getDefaultLogLevel("test2"), C.Equals, LevelDisable)
 }
@@ -272,18 +273,18 @@ func (*testWrapper) TestDebugMixEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	os.Setenv("DDE_DEBUG", "1")
-	os.Setenv("DDE_DEBUG_LEVEL", "warning")
+	_ = os.Setenv("DDE_DEBUG", "1")
+	_ = os.Setenv("DDE_DEBUG_LEVEL", "warning")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelWarning)
 
 	os.Clearenv()
-	os.Setenv("DDE_DEBUG_LEVEL", "error")
-	os.Setenv("DDE_DEBUG_MATCH", "test_env")
+	_ = os.Setenv("DDE_DEBUG_LEVEL", "error")
+	_ = os.Setenv("DDE_DEBUG_MATCH", "test_env")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelError)
 
 	os.Clearenv()
-	os.Setenv("DDE_DEBUG_LEVEL", "error")
-	os.Setenv("DDE_DEBUG_MATCH", "not match")
+	_ = os.Setenv("DDE_DEBUG_LEVEL", "error")
+	_ = os.Setenv("DDE_DEBUG_MATCH", "not match")
 	c.Check(getDefaultLogLevel("test_env"), C.Equals, LevelDisable)
 }
 
@@ -291,14 +292,14 @@ func (*testWrapper) TestDebugConsoleEnv(c *C.C) {
 	os.Clearenv()
 	defer os.Clearenv()
 
-	os.Setenv("DDE_DEBUG_CONSOLE", "1")
+	_ = os.Setenv("DDE_DEBUG_CONSOLE", "1")
 	console := newBackendConsole("test-console")
 	c.Check(console.syslogMode, C.Equals, true)
 
 	redirectOutput()
 	defer restoreOutput()
 	resetOutput()
-	console.log(LevelInfo, "this line shows as syslog format in console")
+	_ = console.log(LevelInfo, "this line shows as syslog format in console")
 	checkOutput(c, `\w+ \d+ \d{2}:\d{2}:\d{2} .* test-console\[\d+\]: <info> this line shows as syslog format in console\n$`, true)
 }
 

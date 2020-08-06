@@ -27,26 +27,26 @@ import (
 	C "gopkg.in/check.v1"
 )
 
-type gettext struct{}
+type gettext struct{} //nolint:golint,unused
 
 func Test(t *testing.T) { C.TestingT(t) }
 
 func init() {
 	// use ./build_test_locale_data to update locale def if need
-	os.Setenv("LOCPATH", "testdata/locale_def/")
-	os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LOCPATH", "testdata/locale_def/")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 
 	cmd := exec.Command("/usr/bin/locale", "-a")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+	_ = cmd.Run()
 
 	//C.Suite(&gettext{})
 }
 
 func (*gettext) TestTr(c *C.C) {
-	os.Setenv("LC_ALL", "en_US.UTF-8")
-	os.Setenv("LANGUAGE", "ar")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LANGUAGE", "ar")
 
 	InitI18n()
 
@@ -56,15 +56,15 @@ func (*gettext) TestTr(c *C.C) {
 }
 
 func (*gettext) TestDGettext(c *C.C) {
-	os.Setenv("LC_ALL", "en_US.UTF-8")
-	os.Setenv("LANGUAGE", "zh_CN")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
 	Bindtextdomain("test", "testdata/locale")
 	c.Check(DGettext("test", "Back"), C.Equals, "返回")
 }
 
 func (*gettext) TestFailed(c *C.C) {
-	os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	InitI18n()
 	Bindtextdomain("test", "testdata/locale")
 	c.Check(DGettext("test", "notfound"), C.Equals, "notfound")
@@ -72,17 +72,17 @@ func (*gettext) TestFailed(c *C.C) {
 }
 
 func (*gettext) TestNTr(c *C.C) {
-	os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	Bindtextdomain("test", "testdata/plural/locale")
 	Textdomain("test")
 
-	os.Setenv("LANGUAGE", "es")
+	_ = os.Setenv("LANGUAGE", "es")
 	InitI18n()
 
 	c.Check(NTr("%d apple", "%d apples", 1), C.Equals, "%d manzana")
 	c.Check(NTr("%d apple", "%d apples", 2), C.Equals, "%d manzanas")
 
-	os.Setenv("LANGUAGE", "zh_CN")
+	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
 
 	c.Check(NTr("%d apple", "%d apples", 0), C.Equals, "%d苹果")
@@ -91,15 +91,15 @@ func (*gettext) TestNTr(c *C.C) {
 }
 
 func (*gettext) TestDNGettext(c *C.C) {
-	os.Setenv("LC_ALL", "en_US.UTF-8")
+	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	Bindtextdomain("test", "testdata/plural/locale")
 
-	os.Setenv("LANGUAGE", "es")
+	_ = os.Setenv("LANGUAGE", "es")
 	InitI18n()
 	c.Check(DNGettext("test", "%d person", "%d persons", 1), C.Equals, "%d persona")
 	c.Check(DNGettext("test", "%d person", "%d persons", 2), C.Equals, "%d personas")
 
-	os.Setenv("LANGUAGE", "zh_CN")
+	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
 	c.Check(DNGettext("test", "%d person", "%d persons", 0), C.Equals, "%d人")
 	c.Check(DNGettext("test", "%d person", "%d persons", 1), C.Equals, "%d人")
@@ -107,16 +107,16 @@ func (*gettext) TestDNGettext(c *C.C) {
 }
 
 func (*gettext) TestQueryLang(c *C.C) {
-	os.Setenv("LC_ALL", "zh_CN.UTF-8")
-	os.Setenv("LC_MESSAGE", "zh_TW.")
-	os.Setenv("LANGUAGE", "en_US.12")
-	os.Setenv("LANG", "it")
+	_ = os.Setenv("LC_ALL", "zh_CN.UTF-8")
+	_ = os.Setenv("LC_MESSAGE", "zh_TW.")
+	_ = os.Setenv("LANGUAGE", "en_US.12")
+	_ = os.Setenv("LANG", "it")
 
 	c.Check(QueryLang(), C.Equals, "en_US")
 
-	os.Setenv("LANGUAGE", "")
+	_ = os.Setenv("LANGUAGE", "")
 	c.Check(QueryLang(), C.Equals, "zh_CN")
 
-	os.Setenv("LC_ALL", "")
+	_ = os.Setenv("LC_ALL", "")
 	c.Check(QueryLang(), C.Equals, "zh_TW")
 }

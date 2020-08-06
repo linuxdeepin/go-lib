@@ -30,7 +30,6 @@ import (
 )
 
 const iso3166XMLFile = "/usr/share/xml/iso-codes/iso_3166.xml"
-const isoCodesLocalesDir = "/usr/share/locale"
 
 // map dtd of iso_3166.xml to go structures
 type CountryDatabase struct {
@@ -135,7 +134,7 @@ func GetCountryNameForCode(code string) (name string, err error) {
 		return
 	}
 	for _, entry := range database.Countries {
-		if strings.ToUpper(code) == strings.ToUpper(entry.Alpha2Code) {
+		if strings.EqualFold(code, entry.Alpha2Code) {
 			name = DGettext("iso_3166", entry.Name)
 			break
 		}
