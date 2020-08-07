@@ -1350,10 +1350,6 @@ func (opt *MixerSelemRegopt) SetCapturePCM(pcm PCM) {
 	opt.c.capture_pcm = pcm.native()
 }
 
-func (opt *MixerSelemRegopt) SetAbstract(val int) {
-	opt.c.abstract = C.enum_snd_mixer_selem_regopt_abstract(val)
-}
-
 const (
 	MixerSAbstractNone  = C.SND_MIXER_SABSTRACT_NONE
 	MixerSAbstractBasic = C.SND_MIXER_SABSTRACT_BASIC
