@@ -3,7 +3,7 @@ package dbusutil
 import (
 	"errors"
 
-	"pkg.deepin.io/lib/dbus1"
+	"github.com/godbus/dbus"
 )
 
 type ServerObject struct {

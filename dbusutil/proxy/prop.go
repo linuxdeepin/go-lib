@@ -1,7 +1,7 @@
 package proxy
 
 import "errors"
-import "pkg.deepin.io/lib/dbus1"
+import "github.com/godbus/dbus"
 
 var errNilCallback = errors.New("nil callback")
 

@@ -3,8 +3,8 @@ package dbusutil
 import (
 	"errors"
 
-	"pkg.deepin.io/lib/dbus1"
-	"pkg.deepin.io/lib/dbus1/prop"
+	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/prop"
 )
 
 func (so *ServerObject) propertiesGet(sender dbus.Sender,

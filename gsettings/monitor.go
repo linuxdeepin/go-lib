@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"pkg.deepin.io/lib/dbus"
+	"github.com/godbus/dbus"
 )
 
 func addMatch(bus *dbus.Conn, rule string) error {
@@ -97,7 +97,8 @@ func StartMonitor() error {
 	if err != nil {
 		return err
 	}
-	signalCh := bus.Signal()
+	signalCh := make(chan *dbus.Signal, 10)
+	bus.Signal(signalCh)
 
 	go func() {
 		for signal := range signalCh {

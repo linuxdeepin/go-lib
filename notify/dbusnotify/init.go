@@ -19,9 +19,12 @@
 
 package dbusnotify
 
-import "pkg.deepin.io/lib/dbus"
-import "fmt"
-import "sync"
+import (
+	"fmt"
+	"sync"
+
+	"github.com/godbus/dbus"
+)
 
 var __conn *dbus.Conn = nil
 var __connLock sync.Mutex

@@ -22,10 +22,9 @@ package notify
 import (
 	"errors"
 	"runtime"
-
 	"sync"
 
-	"pkg.deepin.io/lib/dbus"
+	"github.com/godbus/dbus"
 	"pkg.deepin.io/lib/event"
 )
 

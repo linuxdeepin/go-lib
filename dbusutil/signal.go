@@ -3,7 +3,7 @@ package dbusutil
 import (
 	"sync"
 
-	"pkg.deepin.io/lib/dbus1"
+	"github.com/godbus/dbus"
 )
 
 type SignalHandlerId int

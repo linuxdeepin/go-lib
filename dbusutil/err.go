@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"pkg.deepin.io/lib/dbus1"
+	"github.com/godbus/dbus"
 )
 
 func MakeError(v Implementer, name string, args ...interface{}) *dbus.Error {
