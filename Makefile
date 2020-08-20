@@ -7,6 +7,9 @@ prepare:
 		ln -sf ../../.. ${GOPATH_DIR}/src/${GOPKG_PREFIX}; \
 		fi
 
+print_gopath: prepare
+	GOPATH="${CURDIR}/${GOPATH_DIR}:${GOPATH}"
+
 clean:
 	rm -rf ${GOPATH_DIR}
 
