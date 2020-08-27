@@ -22,13 +22,11 @@ package proxy
 import (
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
-
 	"pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/gsettings"
 	"pkg.deepin.io/lib/log"
 	"pkg.deepin.io/lib/utils"
+	"strconv"
 )
 
 // Synchronize proxy gsettings to environment variables.
@@ -128,36 +126,36 @@ func showEnv(envName string) {
 }
 
 func updateProxyEnvs() {
-	logger.Debug("update proxy environment variables...")
-
-	os.Unsetenv(envHttpProxy)
-	os.Unsetenv(envHttpsProxy)
-	os.Unsetenv(envFtpProxy)
-	os.Unsetenv(envSocksProxy)
-	os.Unsetenv(envAutoProxy)
-	os.Unsetenv(envAllProxy)
-	os.Unsetenv(envNoProxy)
-	proxyMode := proxySettings.GetString(gkeyProxyMode)
-	switch proxyMode {
-	case proxyModeNone:
-	case proxyModeAuto:
-		doSetEnv(envAutoProxy, proxySettings.GetString(gkeyProxyAuto))
-	case proxyModeManual:
-		doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp))
-		doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps))
-		doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp))
-		doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks))
-
-		arrayIgnoreHosts := proxySettings.GetStrv(gkeyProxyIgnoreHosts)
-		ignoreHosts := strings.Join(arrayIgnoreHosts, ",")
-		doSetEnv(envNoProxy, ignoreHosts)
-
-		// fallback socks proxy value to http to be compatible with Qt>=4.6
-		if utils.IsEnvExists(envSocksProxy) && !utils.IsEnvExists(envHttpProxy) {
-			doSetEnv(envHttpProxy, os.Getenv(envSocksProxy))
-		}
-	}
-	showEnvs()
+	//logger.Debug("update proxy environment variables...")
+	//
+	//os.Unsetenv(envHttpProxy)
+	//os.Unsetenv(envHttpsProxy)
+	//os.Unsetenv(envFtpProxy)
+	//os.Unsetenv(envSocksProxy)
+	//os.Unsetenv(envAutoProxy)
+	//os.Unsetenv(envAllProxy)
+	//os.Unsetenv(envNoProxy)
+	//proxyMode := proxySettings.GetString(gkeyProxyMode)
+	//switch proxyMode {
+	//case proxyModeNone:
+	//case proxyModeAuto:
+	//	doSetEnv(envAutoProxy, proxySettings.GetString(gkeyProxyAuto))
+	//case proxyModeManual:
+	//	doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp))
+	//	doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps))
+	//	doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp))
+	//	doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks))
+	//
+	//	arrayIgnoreHosts := proxySettings.GetStrv(gkeyProxyIgnoreHosts)
+	//	ignoreHosts := strings.Join(arrayIgnoreHosts, ",")
+	//	doSetEnv(envNoProxy, ignoreHosts)
+	//
+	//	// fallback socks proxy value to http to be compatible with Qt>=4.6
+	//	if utils.IsEnvExists(envSocksProxy) && !utils.IsEnvExists(envHttpProxy) {
+	//		doSetEnv(envHttpProxy, os.Getenv(envSocksProxy))
+	//	}
+	//}
+	//showEnvs()
 }
 
 func doSetEnv(env, value string) {
