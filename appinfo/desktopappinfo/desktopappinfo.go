@@ -20,6 +20,7 @@
 package desktopappinfo
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"os"
@@ -28,7 +29,9 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
+	"pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
 	"pkg.deepin.io/lib/shell"
@@ -64,8 +67,12 @@ const (
 	TypeLink        = "Link"
 	TypeDirectory   = "Directory"
 
-	envDesktopEnv = "XDG_CURRENT_DESKTOP"
-	desktopExt    = ".desktop"
+	envDesktopEnv    = "XDG_CURRENT_DESKTOP"
+	desktopExt       = ".desktop"
+	gsSchemaStartdde = "com.deepin.dde.startdde"
+	enableInvoker    = "ENABLE_TURBO_INVOKER"
+	faliedMsg        = "Failed to invoke: Booster:"
+	errMsg           = "deepin-turbo-invoker: error"
 )
 
 var xdgDataDirs []string
@@ -414,6 +421,63 @@ func (ai *DesktopAppInfo) IsExecutableOk() bool {
 }
 
 func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
+	gs := gio.NewSettings(gsSchemaStartdde)
+	defer gs.Unref()
+	enabledInvoker := gs.GetBoolean("turbo-invoker-enabled")
+
+	if os.Getenv(enableInvoker) == "1" || (os.Getenv(enableInvoker) == "" && enabledInvoker) {
+		var cmdInvoker string
+		var fileBuf bytes.Buffer
+
+		if len(files) != 0 {
+			for _, file := range files {
+				fileBuf.WriteByte(' ')
+				fileBuf.WriteString(shell.Encode(toLocalPath(file)))
+			}
+			cmdInvoker = "deepin-turbo-invoker --type=auto --desktop-file " + ai.GetFileName() + fileBuf.String()
+		} else {
+			cmdInvoker = "deepin-turbo-invoker --type=auto --desktop-file " + ai.GetFileName()
+		}
+
+		cmd := exec.Command("/bin/sh", "-c", cmdInvoker)
+		stdout, _ := cmd.StdoutPipe()
+		stderr, _ := cmd.StderrPipe()
+		err := cmd.Start()
+
+		scanOut := bufio.NewScanner(stdout)
+		scanErr := bufio.NewScanner(stderr)
+		skip := make(chan bool, 1)
+		//check standard output in goroutine
+		go func() {
+			for scanOut.Scan() {
+				s := scanOut.Text()
+				if strings.Contains(s, faliedMsg) || strings.Contains(s, errMsg) {
+					skip <- true
+					return
+				}
+			}
+		}()
+		//check standard err in goroutine
+		go func() {
+			for scanErr.Scan() {
+				s := scanErr.Text()
+				if strings.Contains(s, faliedMsg) || strings.Contains(s, errMsg) {
+					skip <- true
+					return
+				}
+			}
+		}()
+
+		select {
+		//if the execution of the command "deepin-turbo-invoker" failed, follow the previous logic
+		case <-skip:
+			break
+		//if the execution of the command "deepin-turbo-invoker" succeed, return directly
+		case <-time.After(time.Second * 2):
+			return cmd, err
+		}
+	}
+
 	if cmdline == "" {
 		return nil, errors.New("command line is empty")
 	}
