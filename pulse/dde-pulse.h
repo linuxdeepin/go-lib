@@ -40,14 +40,14 @@ DECLARE(card);
 DECLARE(module);
 DECLARE(sample);
 
-int connect_timeout;
-
 void _get_server_info(pa_threaded_mainloop*, pa_context *c, int64_t cookie);
 
 pa_context* new_pa_context(pa_threaded_mainloop* ml);
 
 // Fixed gccgo(1.4) compile failed, becase of 'success_cb' duplicate definition
 pa_context_success_cb_t get_success_cb();
+
+void set_connect_timeout();
 
 pa_context_index_cb_t get_index_cb();
 

@@ -381,7 +381,7 @@ func GetContext() *Context {
 		loop := C.pa_threaded_mainloop_new()
 
 		timer := time.AfterFunc(time.Second*time.Duration(PulseInitTimeout), func() {
-			C.connect_timeout = 1
+			C.set_connect_timeout()
 			C.pa_threaded_mainloop_signal(loop, 0)
 		})
 		defer timer.Stop()

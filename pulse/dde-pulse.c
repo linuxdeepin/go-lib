@@ -40,9 +40,15 @@ static inline void __empty_success_cb(pa_context *c, int success, void *userdata
           userdata);
 
 }
+
 pa_context_success_cb_t get_success_cb()
 {
   return __empty_success_cb;
+}
+
+void set_connect_timeout()
+{
+  connect_timeout = 1;
 }
 
 static void __empty_index_cb(pa_context *c, uint32_t idx, void *userdata)
