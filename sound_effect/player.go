@@ -18,9 +18,6 @@
  */
 
 package sound_effect
-// #include "wav.h"
-//#cgo LDFLAGS: -lm
-import "C"
 
 import (
 	"errors"
@@ -43,7 +40,6 @@ type Player struct {
 	cacheMu     sync.Mutex
 	UseCache    bool
 	backendType PlayBackendType
-	Volume      float32
 }
 
 type CacheItem struct {
@@ -104,19 +100,7 @@ func (player *Player) Play(theme, event, device string) error {
 	if filename == "" {
 		return errors.New("not found file")
 	}
-	if event == "desktop-login" && player.backendType == PlayBackendALSA {
-		os.Remove("/tmp/desktop-login.wav")
-		C.wav_convert(C.CString(filename), C.CString("/tmp/desktop-login.wav"), C.float(player.Volume/100.0))
-		filename = "/tmp/desktop-login.wav"
-	} else if event == "system-shutdown" && player.backendType == PlayBackendALSA {
-		os.Remove("/tmp/system-shutdown.wav")
-		C.wav_convert(C.CString(filename), C.CString("/tmp/system-shutdown.wav"), C.float(player.Volume/100.0))
-		filename = "/tmp/system-shutdown.wav"
-	} else if event == "desktop-logout" && player.backendType == PlayBackendALSA {
-		os.Remove("/tmp/desktop-logout.wav")
-		C.wav_convert(C.CString(filename), C.CString("/tmp/desktop-logout.wav"), C.float(player.Volume/100.0))
-		filename = "/tmp/desktop-logout.wav"
-	}
+
 	return player.play(filename, event, device)
 }
 
