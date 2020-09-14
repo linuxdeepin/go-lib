@@ -25,6 +25,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+        "io/ioutil"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -117,7 +118,7 @@ func NewDesktopAppInfo(id string) *DesktopAppInfo {
 	}
 
 	for _, appDir := range xdgAppDirs {
-		file := filepath.Join(appDir, id)
+	        file := filepath.Join(appDir, getAppNamebyId(appDir, id))
 		ai, err := newDesktopAppInfoFromFile(file)
 		if err == nil {
 			// length of desktopExt is 8
@@ -587,4 +588,22 @@ func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLa
 func (action *DesktopAction) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
 	ai := action.parent
 	return startCommand(ai, action.Exec, files, launchContext)
+}
+
+func getAppNamebyId(folder string, id string) string {
+	files, _ := ioutil.ReadDir(folder)
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		} else {
+			src :=strings.Split(file.Name(),".")
+			dst :=strings.Split(id, ".")
+			if len(src)>1 && len(dst)>1 {
+				if strings.EqualFold(src[len(src)-2], dst[len(dst)-2]) {
+					return file.Name()
+				}
+			}
+		}
+	}
+    return ""
 }
