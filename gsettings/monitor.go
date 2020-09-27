@@ -109,7 +109,14 @@ func StartMonitor() error {
 					if !ok {
 						continue
 					}
-					handleSignal(keyPath)
+					subPathList, ok := signal.Body[1].([]string)
+					if !ok || len(subPathList) == 0 {
+						handleSignal(keyPath)
+					} else {
+						for _, subPath := range subPathList {
+							handleSignal(keyPath + subPath)
+						}
+					}
 				}
 			}
 		}
