@@ -1241,8 +1241,10 @@ static uint32 get_bits(vorb *f, int n)
       }
    }
    if (f->valid_bits < 0) return 0;
-   z = f->acc & ((1 << n)-1);
-   f->acc >>= n;
+   if (n < 32) {
+       z = f->acc & ((1U << n)-1);
+       f->acc >>= n;
+   }
    f->valid_bits -= n;
    return z;
 }
