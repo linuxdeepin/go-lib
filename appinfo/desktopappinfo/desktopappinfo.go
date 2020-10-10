@@ -32,7 +32,7 @@ import (
 	"sync"
 	"time"
 
-	"pkg.deepin.io/gir/gio-2.0"
+	gio "pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/appinfo"
 	"pkg.deepin.io/lib/keyfile"
 	"pkg.deepin.io/lib/shell"
@@ -430,20 +430,15 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 	if turboInvokerPath != "" &&
 		(os.Getenv(enableInvoker) == "1" || (os.Getenv(enableInvoker) == "" && enabledInvoker)) {
-		var cmdInvoker string
-		var fileBuf bytes.Buffer
-
-		if len(files) != 0 {
-			for _, file := range files {
-				fileBuf.WriteByte(' ')
-				fileBuf.WriteString(shell.Encode(toLocalPath(file)))
-			}
-			cmdInvoker = turboInvokerPath + " --type=auto --desktop-file " + ai.GetFileName() + fileBuf.String()
-		} else {
-			cmdInvoker = turboInvokerPath + " --type=auto --desktop-file " + ai.GetFileName()
+		args := []string{
+			"--desktop-file",
+			"--type=auto",
 		}
-
-		cmd := exec.Command("/bin/sh", "-c", cmdInvoker)
+		args = append(args, ai.GetFileName())
+		for _, file := range files {
+			args = append(args, toLocalPath(file))
+		}
+		cmd := exec.Command(turboInvokerPath, args...)
 		stdout, _ := cmd.StdoutPipe()
 		stderr, _ := cmd.StderrPipe()
 		err := cmd.Start()
