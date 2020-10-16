@@ -26,9 +26,9 @@ import (
 )
 
 func TestExplodeLocale(t *testing.T) {
-	Convey("ExplodeLocale", t, func() {
+	Convey("ExplodeLocale", t, func(c C) {
 		cs := ExplodeLocale("zh_CN.UTF-8@hubei")
-		So(cs, ShouldResemble, &Components{
+		c.So(cs, ShouldResemble, &Components{
 			Language:  "zh",
 			Territory: "CN",
 			Codeset:   "UTF-8",
@@ -37,7 +37,7 @@ func TestExplodeLocale(t *testing.T) {
 		})
 
 		cs = ExplodeLocale("zh_CN.UTF-8")
-		So(cs, ShouldResemble, &Components{
+		c.So(cs, ShouldResemble, &Components{
 			Language:  "zh",
 			Territory: "CN",
 			Codeset:   "UTF-8",
@@ -45,66 +45,66 @@ func TestExplodeLocale(t *testing.T) {
 		})
 
 		cs = ExplodeLocale("zh_CN")
-		So(cs, ShouldResemble, &Components{
+		c.So(cs, ShouldResemble, &Components{
 			Language:  "zh",
 			Territory: "CN",
 			Mask:      ComponentTerritory,
 		})
 
 		cs = ExplodeLocale("zh")
-		So(cs, ShouldResemble, &Components{
+		c.So(cs, ShouldResemble, &Components{
 			Language: "zh",
 		})
 
 		cs = ExplodeLocale("")
-		So(cs, ShouldResemble, &Components{})
+		c.So(cs, ShouldResemble, &Components{})
 
 		cs = ExplodeLocale("_.@")
-		So(cs, ShouldResemble, &Components{
+		c.So(cs, ShouldResemble, &Components{
 			Mask: ComponentTerritory | ComponentCodeset | ComponentModifier,
 		})
 	})
 }
 
 func TestGetLocaleVariants(t *testing.T) {
-	Convey("GetLocaleVariants", t, func() {
+	Convey("GetLocaleVariants", t, func(c C) {
 		variants := GetLocaleVariants("zh_CN")
-		So(variants, ShouldResemble, []string{"zh_CN", "zh"})
+		c.So(variants, ShouldResemble, []string{"zh_CN", "zh"})
 
 		variants = GetLocaleVariants("zh_CN.UTF-8")
-		So(variants, ShouldResemble, []string{"zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
+		c.So(variants, ShouldResemble, []string{"zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
 
 		variants = GetLocaleVariants("zh_CN.UTF-8@hubei")
-		So(variants, ShouldResemble, []string{"zh_CN.UTF-8@hubei", "zh_CN@hubei", "zh.UTF-8@hubei", "zh@hubei", "zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
+		c.So(variants, ShouldResemble, []string{"zh_CN.UTF-8@hubei", "zh_CN@hubei", "zh.UTF-8@hubei", "zh@hubei", "zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
 	})
 }
 
 func Test_readAliases(t *testing.T) {
-	Convey("readAliases", t, func() {
+	Convey("readAliases", t, func(c C) {
 		aliases := readAliases("testdata/locale.alias")
-		So(aliases, ShouldResemble, map[string]string{"bokmal": "nb_NO.ISO-8859-1", "catalan": "ca_ES.ISO-8859-1", "croatian": "hr_HR.ISO-8859-2"})
+		c.So(aliases, ShouldResemble, map[string]string{"bokmal": "nb_NO.ISO-8859-1", "catalan": "ca_ES.ISO-8859-1", "croatian": "hr_HR.ISO-8859-2"})
 
 		aliases = readAliases("testdata/x")
-		So(aliases, ShouldBeNil)
-		So(aliases["nil"], ShouldEqual, "")
+		c.So(aliases, ShouldBeNil)
+		c.So(aliases["nil"], ShouldEqual, "")
 	})
 }
 
 func Test_unaliasLang(t *testing.T) {
-	Convey("unaliasLang", t, func() {
+	Convey("unaliasLang", t, func(c C) {
 		aliasFile = "testdata/locale.alias"
-		So(unaliasLang("zh_CN"), ShouldEqual, "zh_CN")
-		So(unaliasLang(""), ShouldEqual, "")
-		So(unaliasLang("bokmal"), ShouldEqual, "nb_NO.ISO-8859-1")
+		c.So(unaliasLang("zh_CN"), ShouldEqual, "zh_CN")
+		c.So(unaliasLang(""), ShouldEqual, "")
+		c.So(unaliasLang("bokmal"), ShouldEqual, "nb_NO.ISO-8859-1")
 	})
 }
 
 func TestGetLanguageNames(t *testing.T) {
-	Convey("GetLanguageNames", t, func() {
+	Convey("GetLanguageNames", t, func(c C) {
 		os.Setenv("LANGUAGE", "zh_CN")
-		So(GetLanguageNames(), ShouldResemble, []string{"zh_CN", "zh", "C"})
+		c.So(GetLanguageNames(), ShouldResemble, []string{"zh_CN", "zh", "C"})
 
 		os.Setenv("LANGUAGE", "en_US")
-		So(GetLanguageNames(), ShouldResemble, []string{"en_US", "en", "C"})
+		c.So(GetLanguageNames(), ShouldResemble, []string{"en_US", "en", "C"})
 	})
 }

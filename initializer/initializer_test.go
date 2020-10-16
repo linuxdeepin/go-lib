@@ -28,26 +28,26 @@ import (
 )
 
 func TestInitializer(t *testing.T) {
-	Convey("test initializer with success", t, func() {
+	Convey("test initializer with success", t, func(c C) {
 		err := NewInitializer().Init(func(interface{}) (interface{}, error) {
 			return 1, nil
 		}).Init(func(v interface{}) (interface{}, error) {
-			So(v, ShouldEqual, 1)
+			c.So(v, ShouldEqual, 1)
 			return nil, nil
 		}).GetError()
 
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 	})
 }
 
 func TestInitializerError(t *testing.T) {
-	Convey("test initializer with error", t, func() {
+	Convey("test initializer with error", t, func(c C) {
 		var err error
-		So(func() {
+		c.So(func() {
 			err = NewInitializer().Init(func(interface{}) (interface{}, error) {
 				return 1, nil
 			}).Init(func(v interface{}) (interface{}, error) {
-				So(v, ShouldEqual, 1)
+				c.So(v, ShouldEqual, 1)
 				return nil, nil
 			}).Init(func(interface{}) (interface{}, error) {
 				return nil, errors.New("initialize error")
@@ -57,6 +57,6 @@ func TestInitializerError(t *testing.T) {
 
 		}, ShouldNotPanic)
 
-		So(err, ShouldNotBeNil)
+		c.So(err, ShouldNotBeNil)
 	})
 }

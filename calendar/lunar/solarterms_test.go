@@ -27,9 +27,9 @@ import (
 )
 
 func TestSolarTerms(t *testing.T) {
-	Convey("GetSolarTermName", t, func() {
+	Convey("GetSolarTermName", t, func(c C) {
 
-		So(GetSolarTermName(DongZhi), ShouldEqual, "冬至")
+		c.So(GetSolarTermName(DongZhi), ShouldEqual, "冬至")
 
 		var stNameList []string
 		for i := -1; i < 25; i++ {
@@ -38,12 +38,12 @@ func TestSolarTerms(t *testing.T) {
 		}
 		stNameListStr := strings.Join(stNameList, ",")
 		const testStNameListStr = ",春分,清明,谷雨,立夏,小满,芒种,夏至,小暑,大暑,立秋,处暑,白露,秋分,寒露,霜降,立冬,小雪,大雪,冬至,小寒,大寒,立春,雨水,惊蛰,"
-		So(stNameListStr, ShouldEqual, testStNameListStr)
+		c.So(stNameListStr, ShouldEqual, testStNameListStr)
 	})
 
-	Convey("GetSolarTermJD", t, func() {
+	Convey("GetSolarTermJD", t, func(c C) {
 		dongZhiJD := GetSolarTermJD(2016, DongZhi)
 		dt := util.GetDateTimeFromJulianDay(dongZhiJD)
-		So(dt.String(), ShouldEqual, "2016-12-21 10:44:08 +0000 UTC")
+		c.So(dt.String(), ShouldEqual, "2016-12-21 10:44:08 +0000 UTC")
 	})
 }

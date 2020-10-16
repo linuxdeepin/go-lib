@@ -26,126 +26,126 @@ import (
 )
 
 func TestDay(t *testing.T) {
-	Convey("year 2012", t, func() {
+	Convey("year 2012", t, func(c C) {
 		cc := New(2012)
 
-		Convey("01-01", func() {
+		c.Convey("01-01", func(c C) {
 			day := cc.SolarDayToLunarDay(1, 1)
 
-			So(day.MonthName(), ShouldEqual, "腊月")
-			So(day.DayName(), ShouldEqual, "初八")
-			So(day.GanZhiYear(), ShouldEqual, "辛卯")
-			So(day.GanZhiMonth(), ShouldEqual, "庚子")
-			So(day.GanZhiDay(), ShouldEqual, "辛酉")
-			So(day.YearZodiac(), ShouldEqual, "兔")
-			So(day.Festival(), ShouldEqual, "腊八节")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "腊月")
+			c.So(day.DayName(), ShouldEqual, "初八")
+			c.So(day.GanZhiYear(), ShouldEqual, "辛卯")
+			c.So(day.GanZhiMonth(), ShouldEqual, "庚子")
+			c.So(day.GanZhiDay(), ShouldEqual, "辛酉")
+			c.So(day.YearZodiac(), ShouldEqual, "兔")
+			c.So(day.Festival(), ShouldEqual, "腊八节")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 
-		Convey("02-04", func() {
+		c.Convey("02-04", func(c C) {
 			day := cc.SolarDayToLunarDay(2, 4)
 
-			So(day.MonthName(), ShouldEqual, "正月")
-			So(day.DayName(), ShouldEqual, "十三")
-			So(day.GanZhiYear(), ShouldEqual, "壬辰")
-			So(day.GanZhiMonth(), ShouldEqual, "壬寅")
-			So(day.GanZhiDay(), ShouldEqual, "乙未")
-			So(day.YearZodiac(), ShouldEqual, "龙")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "立春")
+			c.So(day.MonthName(), ShouldEqual, "正月")
+			c.So(day.DayName(), ShouldEqual, "十三")
+			c.So(day.GanZhiYear(), ShouldEqual, "壬辰")
+			c.So(day.GanZhiMonth(), ShouldEqual, "壬寅")
+			c.So(day.GanZhiDay(), ShouldEqual, "乙未")
+			c.So(day.YearZodiac(), ShouldEqual, "龙")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "立春")
 		})
 
-		Convey("05-20", func() {
+		c.Convey("05-20", func(c C) {
 			day := cc.SolarDayToLunarDay(5, 20)
 
-			So(day.MonthName(), ShouldEqual, "四月")
-			So(day.DayName(), ShouldEqual, "三十")
-			So(day.GanZhiYear(), ShouldEqual, "壬辰")
-			So(day.GanZhiMonth(), ShouldEqual, "乙巳")
-			So(day.GanZhiDay(), ShouldEqual, "辛巳")
-			So(day.YearZodiac(), ShouldEqual, "龙")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "小满")
+			c.So(day.MonthName(), ShouldEqual, "四月")
+			c.So(day.DayName(), ShouldEqual, "三十")
+			c.So(day.GanZhiYear(), ShouldEqual, "壬辰")
+			c.So(day.GanZhiMonth(), ShouldEqual, "乙巳")
+			c.So(day.GanZhiDay(), ShouldEqual, "辛巳")
+			c.So(day.YearZodiac(), ShouldEqual, "龙")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "小满")
 		})
 
-		Convey("06-10", func() {
+		c.Convey("06-10", func(c C) {
 			day := cc.SolarDayToLunarDay(6, 10)
 
-			So(day.MonthName(), ShouldEqual, "闰四月")
-			So(day.DayName(), ShouldEqual, "廿一")
-			So(day.GanZhiYear(), ShouldEqual, "壬辰")
-			So(day.GanZhiMonth(), ShouldEqual, "丙午")
-			So(day.GanZhiDay(), ShouldEqual, "壬寅")
-			So(day.YearZodiac(), ShouldEqual, "龙")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "闰四月")
+			c.So(day.DayName(), ShouldEqual, "廿一")
+			c.So(day.GanZhiYear(), ShouldEqual, "壬辰")
+			c.So(day.GanZhiMonth(), ShouldEqual, "丙午")
+			c.So(day.GanZhiDay(), ShouldEqual, "壬寅")
+			c.So(day.YearZodiac(), ShouldEqual, "龙")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 	})
 
-	Convey("year 2016", t, func() {
+	Convey("year 2016", t, func(c C) {
 		cc := New(2016)
-		Convey("01-01", func() {
+		c.Convey("01-01", func(c C) {
 			day := cc.SolarDayToLunarDay(1, 1)
-			So(day.MonthName(), ShouldEqual, "冬月") // 十一月
-			So(day.DayName(), ShouldEqual, "廿二")
-			So(day.GanZhiYear(), ShouldEqual, "乙未")
-			So(day.GanZhiMonth(), ShouldEqual, "戊子")
-			So(day.GanZhiDay(), ShouldEqual, "壬午")
-			So(day.YearZodiac(), ShouldEqual, "羊")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "冬月") // 十一月
+			c.So(day.DayName(), ShouldEqual, "廿二")
+			c.So(day.GanZhiYear(), ShouldEqual, "乙未")
+			c.So(day.GanZhiMonth(), ShouldEqual, "戊子")
+			c.So(day.GanZhiDay(), ShouldEqual, "壬午")
+			c.So(day.YearZodiac(), ShouldEqual, "羊")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 
-		Convey("02-26", func() {
+		c.Convey("02-26", func(c C) {
 			day := cc.SolarDayToLunarDay(2, 26)
 
-			So(day.MonthName(), ShouldEqual, "正月")
-			So(day.DayName(), ShouldEqual, "十九")
-			So(day.GanZhiYear(), ShouldEqual, "丙申")
-			So(day.GanZhiMonth(), ShouldEqual, "庚寅")
-			So(day.GanZhiDay(), ShouldEqual, "戊寅")
-			So(day.YearZodiac(), ShouldEqual, "猴")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "正月")
+			c.So(day.DayName(), ShouldEqual, "十九")
+			c.So(day.GanZhiYear(), ShouldEqual, "丙申")
+			c.So(day.GanZhiMonth(), ShouldEqual, "庚寅")
+			c.So(day.GanZhiDay(), ShouldEqual, "戊寅")
+			c.So(day.YearZodiac(), ShouldEqual, "猴")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 
-		Convey("03-05", func() {
+		c.Convey("03-05", func(c C) {
 			day := cc.SolarDayToLunarDay(3, 5)
 
-			So(day.MonthName(), ShouldEqual, "正月")
-			So(day.DayName(), ShouldEqual, "廿七")
-			So(day.GanZhiYear(), ShouldEqual, "丙申")
-			So(day.GanZhiMonth(), ShouldEqual, "辛卯")
-			So(day.GanZhiDay(), ShouldEqual, "丙戌")
-			So(day.YearZodiac(), ShouldEqual, "猴")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "惊蛰")
+			c.So(day.MonthName(), ShouldEqual, "正月")
+			c.So(day.DayName(), ShouldEqual, "廿七")
+			c.So(day.GanZhiYear(), ShouldEqual, "丙申")
+			c.So(day.GanZhiMonth(), ShouldEqual, "辛卯")
+			c.So(day.GanZhiDay(), ShouldEqual, "丙戌")
+			c.So(day.YearZodiac(), ShouldEqual, "猴")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "惊蛰")
 		})
 
-		Convey("06-09", func() {
+		c.Convey("06-09", func(c C) {
 			day := cc.SolarDayToLunarDay(6, 9)
 
-			So(day.MonthName(), ShouldEqual, "五月")
-			So(day.DayName(), ShouldEqual, "初五")
-			So(day.GanZhiYear(), ShouldEqual, "丙申")
-			So(day.GanZhiMonth(), ShouldEqual, "甲午")
-			So(day.GanZhiDay(), ShouldEqual, "壬戌")
-			So(day.YearZodiac(), ShouldEqual, "猴")
-			So(day.Festival(), ShouldEqual, "端午节")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "五月")
+			c.So(day.DayName(), ShouldEqual, "初五")
+			c.So(day.GanZhiYear(), ShouldEqual, "丙申")
+			c.So(day.GanZhiMonth(), ShouldEqual, "甲午")
+			c.So(day.GanZhiDay(), ShouldEqual, "壬戌")
+			c.So(day.YearZodiac(), ShouldEqual, "猴")
+			c.So(day.Festival(), ShouldEqual, "端午节")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 
-		Convey("12-31", func() {
+		c.Convey("12-31", func(c C) {
 			day := cc.SolarDayToLunarDay(12, 31)
 
-			So(day.MonthName(), ShouldEqual, "腊月")
-			So(day.DayName(), ShouldEqual, "初三")
-			So(day.GanZhiYear(), ShouldEqual, "丙申")
-			So(day.GanZhiMonth(), ShouldEqual, "庚子")
-			So(day.GanZhiDay(), ShouldEqual, "丁亥")
-			So(day.YearZodiac(), ShouldEqual, "猴")
-			So(day.Festival(), ShouldEqual, "")
-			So(day.SolarTermName(), ShouldEqual, "")
+			c.So(day.MonthName(), ShouldEqual, "腊月")
+			c.So(day.DayName(), ShouldEqual, "初三")
+			c.So(day.GanZhiYear(), ShouldEqual, "丙申")
+			c.So(day.GanZhiMonth(), ShouldEqual, "庚子")
+			c.So(day.GanZhiDay(), ShouldEqual, "丁亥")
+			c.So(day.YearZodiac(), ShouldEqual, "猴")
+			c.So(day.Festival(), ShouldEqual, "")
+			c.So(day.SolarTermName(), ShouldEqual, "")
 		})
 	})
 }

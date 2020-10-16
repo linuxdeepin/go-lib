@@ -38,51 +38,51 @@ func getControllerByName(cs []*Controller, name string) *Controller {
 }
 
 func Test_list(t *testing.T) {
-	Convey("Test list", t, func() {
+	Convey("Test list", t, func(c C) {
 		controllers, err := list("./testdata")
-		So(err, ShouldBeNil)
-		So(controllers, ShouldHaveLength, 2)
+		c.So(err, ShouldBeNil)
+		c.So(controllers, ShouldHaveLength, 2)
 
-		Convey("Test Controller", func() {
-			Convey("Test intel_backlight", func() {
-				c := getControllerByName(controllers, "intel_backlight")
-				So(c.Type, ShouldEqual, ControllerTypeRaw)
-				So(c.MaxBrightness, ShouldEqual, 937)
-				So(c.DeviceEDID, ShouldHaveLength, 128)
-				t.Logf("%#v\n", c.DeviceEDID)
+		c.Convey("Test Controller", func(c C) {
+			c.Convey("Test intel_backlight", func(c C) {
+				controller := getControllerByName(controllers, "intel_backlight")
+				c.So(controller.Type, ShouldEqual, ControllerTypeRaw)
+				c.So(controller.MaxBrightness, ShouldEqual, 937)
+				c.So(controller.DeviceEDID, ShouldHaveLength, 128)
+				t.Logf("%#v\n", controller.DeviceEDID)
 
-				br, err := c.GetBrightness()
-				So(err, ShouldBeNil)
-				So(br, ShouldEqual, 100)
+				br, err := controller.GetBrightness()
+				c.So(err, ShouldBeNil)
+				c.So(br, ShouldEqual, 100)
 
-				abr, err := c.GetActualBrightness()
-				So(err, ShouldBeNil)
-				So(abr, ShouldEqual, 100)
+				abr, err := controller.GetActualBrightness()
+				c.So(err, ShouldBeNil)
+				c.So(abr, ShouldEqual, 100)
 			})
 
-			Convey("Test acpi_video0", func() {
-				c := getControllerByName(controllers, "acpi_video0")
-				So(c.Type, ShouldEqual, ControllerTypeFirmware)
-				So(c.MaxBrightness, ShouldEqual, 15)
-				So(c.DeviceEDID, ShouldBeNil)
+			c.Convey("Test acpi_video0", func(c C) {
+				controller := getControllerByName(controllers, "acpi_video0")
+				c.So(controller.Type, ShouldEqual, ControllerTypeFirmware)
+				c.So(controller.MaxBrightness, ShouldEqual, 15)
+				c.So(controller.DeviceEDID, ShouldBeNil)
 
-				br, err := c.GetBrightness()
-				So(err, ShouldBeNil)
-				So(br, ShouldEqual, 1)
+				br, err := controller.GetBrightness()
+				c.So(err, ShouldBeNil)
+				c.So(br, ShouldEqual, 1)
 
-				abr, err := c.GetActualBrightness()
-				So(err, ShouldBeNil)
-				So(abr, ShouldEqual, 1)
+				abr, err := controller.GetActualBrightness()
+				c.So(err, ShouldBeNil)
+				c.So(abr, ShouldEqual, 1)
 			})
 		})
 
-		Convey("Test GetByEDID", func() {
-			c := controllers.GetByEDID(edid0)
-			So(c, ShouldNotBeNil)
-			So(c.Name, ShouldEqual, "intel_backlight")
+		c.Convey("Test GetByEDID", func(c C) {
+			controller := controllers.GetByEDID(edid0)
+			c.So(controller, ShouldNotBeNil)
+			c.So(controller.Name, ShouldEqual, "intel_backlight")
 
-			c = controllers.GetByEDID(edid1)
-			So(c, ShouldBeNil)
+			controller = controllers.GetByEDID(edid1)
+			c.So(controller, ShouldBeNil)
 		})
 	})
 }

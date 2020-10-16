@@ -27,62 +27,62 @@ import (
 )
 
 func TestTimer(t *testing.T) {
-	Convey("just stop", t, func() {
+	Convey("just stop", t, func(c C) {
 		timer := NewTimer()
 		timer.Stop()
-		So(timer.Elapsed(), ShouldEqual, 0)
+		c.So(timer.Elapsed(), ShouldEqual, 0)
 	})
 
-	Convey("get elapse without stop", t, func() {
+	Convey("get elapse without stop", t, func(c C) {
 		timer := NewTimer()
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*3+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*3+time.Millisecond*100)
 	})
 
-	Convey("stop and elapse", t, func() {
+	Convey("stop and elapse", t, func(c C) {
 		timer := NewTimer()
 		timer.Start()
 
 		time.Sleep(time.Second)
 		timer.Stop()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 	})
 
-	Convey("stop and continue", t, func() {
+	Convey("stop and continue", t, func(c C) {
 		timer := NewTimer()
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		timer.Stop()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
 		timer.Continue()
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
 	})
 
-	Convey("reset", t, func() {
+	Convey("reset", t, func(c C) {
 		timer := NewTimer()
 		timer.Start()
 
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
 		timer.Reset()
 		time.Sleep(time.Second)
-		So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 	})
 }

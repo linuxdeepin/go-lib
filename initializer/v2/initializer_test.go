@@ -37,7 +37,7 @@ func e2() error {
 }
 
 func TestInitializer(t *testing.T) {
-	Convey("test initializer with success", t, func() {
+	Convey("test initializer with success", t, func(c C) {
 		err := initializer.Do(func() error {
 			return nil
 		}).Do(func() error {
@@ -46,14 +46,14 @@ func TestInitializer(t *testing.T) {
 			return e2()
 		}).GetError()
 
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 	})
 }
 
 func TestInitializerError(t *testing.T) {
-	Convey("test initializer with error", t, func() {
+	Convey("test initializer with error", t, func(c C) {
 		var err error
-		So(func() {
+		c.So(func() {
 			err = initializer.Do(func() error {
 				return e1()
 			}).Do(func() error {
@@ -66,7 +66,7 @@ func TestInitializerError(t *testing.T) {
 
 		}, ShouldNotPanic)
 
-		So(err, ShouldNotBeNil)
-		So(err.Error(), ShouldEqual, "initialize error")
+		c.So(err, ShouldNotBeNil)
+		c.So(err.Error(), ShouldEqual, "initialize error")
 	})
 }

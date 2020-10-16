@@ -27,49 +27,49 @@ import (
 )
 
 func TestGetFile(t *testing.T) {
-	Convey("getFile", t, func() {
+	Convey("getFile", t, func(c C) {
 		p := Process(1)
-		So(p.getFile("cwd"), ShouldEqual, "/proc/1/cwd")
+		c.So(p.getFile("cwd"), ShouldEqual, "/proc/1/cwd")
 	})
 }
 
 func TestExist(t *testing.T) {
-	Convey("Exist", t, func() {
+	Convey("Exist", t, func(c C) {
 		p := Process(os.Getpid())
-		So(p.Exist(), ShouldBeTrue)
+		c.So(p.Exist(), ShouldBeTrue)
 	})
 }
 
 func TestCmdline(t *testing.T) {
-	Convey("Cmdline", t, func() {
+	Convey("Cmdline", t, func(c C) {
 		p := Process(os.Getpid())
 		cmdline, err := p.Cmdline()
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 		t.Log("cmdline:", cmdline)
-		So(len(cmdline) > 0, ShouldBeTrue)
+		c.So(len(cmdline) > 0, ShouldBeTrue)
 	})
 }
 
 func TestCwd(t *testing.T) {
-	Convey("Cwd", t, func() {
+	Convey("Cwd", t, func(c C) {
 		p := Process(os.Getpid())
 		cwd, err := p.Cwd()
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 		t.Log("cwd:", cwd)
 
 		osWd, err1 := os.Getwd()
-		So(err1, ShouldBeNil)
-		So(cwd, ShouldEqual, osWd)
+		c.So(err1, ShouldBeNil)
+		c.So(cwd, ShouldEqual, osWd)
 	})
 }
 
 func TestExe(t *testing.T) {
-	Convey("Exe", t, func() {
+	Convey("Exe", t, func(c C) {
 		p := Process(os.Getpid())
 		exe, err := p.Exe()
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 		t.Log("exe:", exe)
-		So(len(exe) > 0, ShouldBeTrue)
+		c.So(len(exe) > 0, ShouldBeTrue)
 	})
 }
 
@@ -77,73 +77,73 @@ func TestEnvVars(t *testing.T) {
 	vars := EnvVars{
 		"PWD=/a/b/c",
 	}
-	Convey("EnvVars.Lookup", t, func() {
+	Convey("EnvVars.Lookup", t, func(c C) {
 		pwd, ok := vars.Lookup("PWD")
-		So(pwd, ShouldEqual, "/a/b/c")
-		So(ok, ShouldBeTrue)
+		c.So(pwd, ShouldEqual, "/a/b/c")
+		c.So(ok, ShouldBeTrue)
 
 		abc, ok := vars.Lookup("abc")
-		So(abc, ShouldEqual, "")
-		So(ok, ShouldBeFalse)
+		c.So(abc, ShouldEqual, "")
+		c.So(ok, ShouldBeFalse)
 	})
 
-	Convey("EnvVars.Get", t, func() {
+	Convey("EnvVars.Get", t, func(c C) {
 		pwd := vars.Get("PWD")
-		So(pwd, ShouldEqual, "/a/b/c")
+		c.So(pwd, ShouldEqual, "/a/b/c")
 
 		abc := vars.Get("abc")
-		So(abc, ShouldEqual, "")
+		c.So(abc, ShouldEqual, "")
 	})
 }
 
 func TestEnvion(t *testing.T) {
-	Convey("Envion", t, func() {
+	Convey("Envion", t, func(c C) {
 		p := Process(os.Getpid())
 		environ, err := p.Environ()
-		So(err, ShouldBeNil)
-		So(len(environ) > 0, ShouldBeTrue)
+		c.So(err, ShouldBeNil)
+		c.So(len(environ) > 0, ShouldBeTrue)
 		for _, aVar := range environ {
 			t.Log(string(aVar))
 		}
 
 		path, ok := environ.Lookup("PATH")
-		So(ok, ShouldBeTrue)
-		So(path != "", ShouldBeTrue)
+		c.So(ok, ShouldBeTrue)
+		c.So(path != "", ShouldBeTrue)
 
 		home, ok := environ.Lookup("HOME")
-		So(ok, ShouldBeTrue)
-		So(home != "", ShouldBeTrue)
+		c.So(ok, ShouldBeTrue)
+		c.So(home != "", ShouldBeTrue)
 
 		xxx, ok := environ.Lookup("XXXXXXXXXXXXXXX")
-		So(ok, ShouldBeFalse)
-		So(xxx, ShouldEqual, "")
+		c.So(ok, ShouldBeFalse)
+		c.So(xxx, ShouldEqual, "")
 	})
 }
 
 func TestStatus(t *testing.T) {
-	Convey("Status", t, func() {
+	Convey("Status", t, func(c C) {
 		p := Process(os.Getpid())
 		status, err := p.Status()
-		So(err, ShouldBeNil)
-		So(status, ShouldNotBeEmpty)
+		c.So(err, ShouldBeNil)
+		c.So(status, ShouldNotBeEmpty)
 
 		// test lookup
 		val, err := status.lookup("XXX")
-		So(val, ShouldBeBlank)
-		So(err, ShouldResemble, StatusFieldNotFoundErr{"XXX"})
-		So(err.Error(), ShouldEqual, "field XXX is not found in proc status file")
+		c.So(val, ShouldBeBlank)
+		c.So(err, ShouldResemble, StatusFieldNotFoundErr{"XXX"})
+		c.So(err.Error(), ShouldEqual, "field XXX is not found in proc status file")
 
 		// test Uids
 		uids, err := status.Uids()
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 		t.Log("uids:", uids)
-		So(uids[0], ShouldEqual, uint(os.Getuid()))
-		So(uids[1], ShouldEqual, uint(os.Geteuid()))
+		c.So(uids[0], ShouldEqual, uint(os.Getuid()))
+		c.So(uids[1], ShouldEqual, uint(os.Geteuid()))
 
 		// test PPid
 		ppid, err := status.PPid()
-		So(err, ShouldBeNil)
+		c.So(err, ShouldBeNil)
 		t.Log("ppid:", ppid)
-		So(ppid, ShouldBeGreaterThan, 0)
+		c.So(ppid, ShouldBeGreaterThan, 0)
 	})
 }

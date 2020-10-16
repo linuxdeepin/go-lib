@@ -27,17 +27,17 @@ import (
 )
 
 func TestReader(t *testing.T) {
-	Convey("Test Reader", t, func() {
+	Convey("Test Reader", t, func(c C) {
 		f, err := os.Open("./testdata/a")
-		So(err, ShouldBeNil)
-		So(f, ShouldNotBeNil)
+		c.So(err, ShouldBeNil)
+		c.So(f, ShouldNotBeNil)
 		defer f.Close()
 
 		r := NewReader(f)
 		r.Delim = ':'
 		r.TrimSpace = TrimDelimRightSpace | TrimTailingSpace
 
-		Convey("Get Pid", func() {
+		c.Convey("Get Pid", func(c C) {
 			var resultPair *Pair
 			for {
 				pair, err := r.Read()
@@ -49,34 +49,34 @@ func TestReader(t *testing.T) {
 					break
 				}
 			}
-			So(resultPair, ShouldNotBeNil)
-			So(resultPair.Value, ShouldEqual, "21722")
+			c.So(resultPair, ShouldNotBeNil)
+			c.So(resultPair.Value, ShouldEqual, "21722")
 		})
 
-		Convey("ReadAll", func() {
+		c.Convey("ReadAll", func(c C) {
 			pairs, err := r.ReadAll()
-			So(err, ShouldBeNil)
-			So(len(pairs), ShouldEqual, 48)
+			c.So(err, ShouldBeNil)
+			c.So(len(pairs), ShouldEqual, 48)
 		})
 
 	})
 
-	Convey("Test ReadAll error", t, func() {
+	Convey("Test ReadAll error", t, func(c C) {
 		f, err := os.Open("./testdata/b")
-		So(err, ShouldBeNil)
-		So(f, ShouldNotBeNil)
+		c.So(err, ShouldBeNil)
+		c.So(f, ShouldNotBeNil)
 		defer f.Close()
 
 		r := NewReader(f)
 		pairs, err := r.ReadAll()
-		So(err, ShouldEqual, ErrBadLine)
-		So(pairs, ShouldBeNil)
+		c.So(err, ShouldEqual, ErrBadLine)
+		c.So(pairs, ShouldBeNil)
 	})
 
-	Convey("Test Read shell vars", t, func() {
+	Convey("Test Read shell vars", t, func(c C) {
 		f, err := os.Open("./testdata/c")
-		So(err, ShouldBeNil)
-		So(f, ShouldNotBeNil)
+		c.So(err, ShouldBeNil)
+		c.So(f, ShouldNotBeNil)
 		defer f.Close()
 
 		r := NewReader(f)
@@ -84,15 +84,15 @@ func TestReader(t *testing.T) {
 		r.Comment = '#'
 
 		pair, err := r.Read()
-		So(err, ShouldBeNil)
-		So(pair, ShouldResemble, &Pair{"LANG", "zh_CN.UTF-8"})
+		c.So(err, ShouldBeNil)
+		c.So(pair, ShouldResemble, &Pair{"LANG", "zh_CN.UTF-8"})
 
 		pair, err = r.Read()
-		So(err, ShouldBeNil)
-		So(pair, ShouldResemble, &Pair{"LANGUAGE", "zh_CN"})
+		c.So(err, ShouldBeNil)
+		c.So(pair, ShouldResemble, &Pair{"LANGUAGE", "zh_CN"})
 
 		pair, err = r.Read()
-		So(pair, ShouldBeNil)
-		So(err, ShouldEqual, io.EOF)
+		c.So(pair, ShouldBeNil)
+		c.So(err, ShouldEqual, io.EOF)
 	})
 }

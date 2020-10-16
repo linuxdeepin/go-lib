@@ -39,19 +39,19 @@ func TestList(t *testing.T) {
 }
 
 func Test_list(t *testing.T) {
-	Convey("Test list", t, func() {
+	Convey("Test list", t, func(c C) {
 		controllers, err := list("./testdata")
-		So(err, ShouldBeNil)
-		So(controllers, ShouldHaveLength, 1)
+		c.So(err, ShouldBeNil)
+		c.So(controllers, ShouldHaveLength, 1)
 
-		Convey("Test Controller", func() {
-			c := controllers[0]
-			So(c.Name, ShouldEqual, "xxx::kbd_backlight")
-			So(c.MaxBrightness, ShouldEqual, 3)
+		c.Convey("Test Controller", func(c C) {
+			controller := controllers[0]
+			c.So(controller.Name, ShouldEqual, "xxx::kbd_backlight")
+			c.So(controller.MaxBrightness, ShouldEqual, 3)
 
-			br, err := c.GetBrightness()
-			So(err, ShouldBeNil)
-			So(br, ShouldEqual, 1)
+			br, err := controller.GetBrightness()
+			c.So(err, ShouldBeNil)
+			c.So(br, ShouldEqual, 1)
 
 		})
 	})

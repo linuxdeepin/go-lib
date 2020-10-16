@@ -25,7 +25,7 @@ import (
 )
 
 func TestQueryURI(t *testing.T) {
-	Convey("Query uri mime", t, func() {
+	Convey("Query uri mime", t, func(c C) {
 		var infos = []struct {
 			uri  string
 			mime string
@@ -42,8 +42,8 @@ func TestQueryURI(t *testing.T) {
 
 		for _, info := range infos {
 			m, err := Query(info.uri)
-			So(m, ShouldEqual, info.mime)
-			So(err, ShouldBeNil)
+			c.So(m, ShouldEqual, info.mime)
+			c.So(err, ShouldBeNil)
 		}
 	})
 }

@@ -26,51 +26,51 @@ import (
 )
 
 func TestMathUtil(t *testing.T) {
-	Convey("convert", t, func() {
+	Convey("convert", t, func(c C) {
 
-		Convey("ToRadians", func() {
-			So(ToRadians(90), ShouldEqual, math.Pi/2)
+		c.Convey("ToRadians", func(c C) {
+			c.So(ToRadians(90), ShouldEqual, math.Pi/2)
 		})
-		Convey("SecondsToRadians", func() {
-			So(SecondsToRadians(648000), ShouldEqual, math.Pi)
+		c.Convey("SecondsToRadians", func(c C) {
+			c.So(SecondsToRadians(648000), ShouldEqual, math.Pi)
 		})
-		Convey("SecondsToDegrees", func() {
-			So(SecondsToDegrees(648000), ShouldEqual, 180)
+		c.Convey("SecondsToDegrees", func(c C) {
+			c.So(SecondsToDegrees(648000), ShouldEqual, 180)
 		})
-		Convey("DmsToDegrees", func() {
-			So(DmsToDegrees(40, 11, 15), ShouldEqual, 40.1875)
+		c.Convey("DmsToDegrees", func(c C) {
+			c.So(DmsToDegrees(40, 11, 15), ShouldEqual, 40.1875)
 		})
-		Convey("DmsToSeconds", func() {
-			So(DmsToSeconds(40, 11, 15), ShouldEqual, 144675)
+		c.Convey("DmsToSeconds", func(c C) {
+			c.So(DmsToSeconds(40, 11, 15), ShouldEqual, 144675)
 		})
-		Convey("DmsToRadians", func() {
-			So(DmsToRadians(40, 11, 15), ShouldAlmostEqual, 0.7014041931452)
+		c.Convey("DmsToRadians", func(c C) {
+			c.So(DmsToRadians(40, 11, 15), ShouldAlmostEqual, 0.7014041931452)
 		})
 
 	})
 
-	Convey("modpi", t, func() {
-		Convey("Mod2Pi", func() {
+	Convey("modpi", t, func(c C) {
+		c.Convey("Mod2Pi", func(c C) {
 			rad := Mod2Pi(3 * math.Pi)
-			So(rad, ShouldEqual, math.Pi)
+			c.So(rad, ShouldEqual, math.Pi)
 			rad = Mod2Pi(-math.Pi)
-			So(rad, ShouldEqual, math.Pi)
+			c.So(rad, ShouldEqual, math.Pi)
 		})
-		Convey("ModPi", func() {
+		c.Convey("ModPi", func(c C) {
 			rad := ModPi(2 * math.Pi)
-			So(rad, ShouldEqual, 0)
+			c.So(rad, ShouldEqual, 0)
 			rad = ModPi(-2 * math.Pi)
-			So(rad, ShouldEqual, 0)
+			c.So(rad, ShouldEqual, 0)
 		})
 	})
 
-	Convey("NewtonIteration", t, func() {
+	Convey("NewtonIteration", t, func(c C) {
 		var n float64 = 2
 		x := NewtonIteration(
 			func(x float64) float64 {
 				return x*x - n
 			},
 			1.4)
-		So(x, ShouldAlmostEqual, math.Sqrt(2), 1e-7)
+		c.So(x, ShouldAlmostEqual, math.Sqrt(2), 1e-7)
 	})
 }
