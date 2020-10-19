@@ -18,15 +18,18 @@
  */
 
 package sound_effect
+
 // #include "wav.h"
 //#cgo LDFLAGS: -lm
 import "C"
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sync"
 	"time"
@@ -100,24 +103,38 @@ func (player *Player) GetDuration(theme, event string) (time.Duration, error) {
 }
 
 func (player *Player) Play(theme, event, device string) error {
+	speakerSwitch := false
 	filename := player.finder.Find(theme, "stereo", event)
 	if filename == "" {
 		return errors.New("not found file")
 	}
 	if event == "desktop-login" && player.backendType == PlayBackendALSA {
+		speakerSwitch = true
 		os.Remove("/tmp/desktop-login.wav")
 		C.wav_convert(C.CString(filename), C.CString("/tmp/desktop-login.wav"), C.float(player.Volume/100.0))
 		filename = "/tmp/desktop-login.wav"
 	} else if event == "system-shutdown" && player.backendType == PlayBackendALSA {
+		speakerSwitch = true
 		os.Remove("/tmp/system-shutdown.wav")
 		C.wav_convert(C.CString(filename), C.CString("/tmp/system-shutdown.wav"), C.float(player.Volume/100.0))
 		filename = "/tmp/system-shutdown.wav"
 	} else if event == "desktop-logout" && player.backendType == PlayBackendALSA {
+		speakerSwitch = true
 		os.Remove("/tmp/desktop-logout.wav")
 		C.wav_convert(C.CString(filename), C.CString("/tmp/desktop-logout.wav"), C.float(player.Volume/100.0))
 		filename = "/tmp/desktop-logout.wav"
 	}
-	return player.play(filename, event, device)
+
+	var err error
+	if speakerSwitch {
+		hwSpeakerEnable(true)
+		err = player.play(filename, event, device)
+		hwSpeakerEnable(false)
+	} else {
+		err = player.play(filename, event, device)
+	}
+
+	return err
 }
 
 func cacheItemOk(cacheItem *CacheItem, fileInfo os.FileInfo) bool {
@@ -269,4 +286,18 @@ func (player *Player) playCacheItem(cacheItem *CacheItem, device string) error {
 	}
 
 	return backend.Drain()
+}
+
+func hwSpeakerEnable(s bool) error {
+	param := ""
+	if s {
+		param = "-o"
+	} else {
+		param = "-c"
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+	cmdline := exec.CommandContext(ctx, "/usr/bin/hwaudioservice", param)
+	_, err := cmdline.CombinedOutput()
+	return err
 }
