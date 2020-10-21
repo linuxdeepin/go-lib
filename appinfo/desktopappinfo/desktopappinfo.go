@@ -431,8 +431,8 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 	if turboInvokerPath != "" &&
 		(os.Getenv(enableInvoker) == "1" || (os.Getenv(enableInvoker) == "" && enabledInvoker)) {
 		args := []string{
-			"--desktop-file",
 			"--type=auto",
+			"--desktop-file",
 		}
 		args = append(args, ai.GetFileName())
 		for _, file := range files {
