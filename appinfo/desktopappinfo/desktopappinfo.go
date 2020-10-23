@@ -469,6 +469,9 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 			select {
 			//if the execution of the command "deepin-turbo-invoker" failed, follow the previous logic
 			case <-skip:
+				go func() {
+					_ = cmd.Wait()
+				}()
 				break
 			//if the execution of the command "deepin-turbo-invoker" succeed, return directly
 			case <-time.After(time.Second * 2):
