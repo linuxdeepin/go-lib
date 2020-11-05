@@ -364,6 +364,17 @@ int wav_convert(char *file_name,char *dest_name,float precent){
                 wtlen = fwrite(buffer, 1, rdlen, dest_fp);
             }
             
+            while(1){
+                rdlen = fread(buffer, 1, 256, wav->fp);
+                if(rdlen == 0){
+                    printf("read end\n");
+                    wav_close(&wav);
+                    fclose(dest_fp);
+                    return 0;
+                }
+                
+                wtlen = fwrite(buffer, 1, rdlen, dest_fp);
+            }
             break;
         }
         else{
