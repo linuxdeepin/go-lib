@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
         "io/ioutil"
@@ -391,7 +392,7 @@ func (ai *DesktopAppInfo) Launch(files []string, launchContext *appinfo.AppLaunc
 }
 
 func (ai *DesktopAppInfo) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
-	return startCommand(ai, ai.GetCommandline(), files, launchContext)
+	return startCommand(ai, ai.GetCommandline(), files, launchContext, false)
 }
 
 func (ai *DesktopAppInfo) GetExecutable() string {
@@ -421,58 +422,100 @@ func (ai *DesktopAppInfo) IsExecutableOk() bool {
 	return err == nil
 }
 
-func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
-	gs := gio.NewSettings(gsSchemaStartdde)
-	defer gs.Unref()
-	enabledInvoker := gs.GetBoolean("turbo-invoker-enabled")
+var _startddeGs *gio.Settings
+var _startddeGsMu sync.Mutex
 
+func getStartddeGs() *gio.Settings {
+	_startddeGsMu.Lock()
+	if _startddeGs == nil {
+		_startddeGs = gio.NewSettings(gsSchemaStartdde)
+	}
+	_startddeGsMu.Unlock()
+	return _startddeGs
+}
+
+// isAction 表示是否是启动一个 desktop action。
+func shouldUseTurboInvoker(ai *DesktopAppInfo, isAction bool, turboInvokerPath string, ctx *appinfo.AppLaunchContext) bool {
+	// NOTE: 启用 turbo invoker 的条件：
+	// 必须 isAction 为 false，即必须不是 desktop action 快捷动作，而是 desktop 文件主要的那个。
+	// 必须有 deepin-turbo-invoker 程序，它在 deepin-turbo 包。
+	// 必须 desktop 文件中有 X-Deepin-TurboType 字段的值不为空。
+	// 如果开了应用代理添加了 prefix 或 suffix 则不用 turbo。
+	// 环境变量 ENABLE_TURBO_INVOKER  == 1
+	// 或者环境变量 ENABLE_TURBO_INVOKER  == 空且 gsettings com.deepin.dde.startdde turbo-invoker-enabled 设置为 true。
+	// 因此当环境变量 ENABLE_TURBO_INVOKER == 0 时，可以禁用此功能。
+	if isAction || turboInvokerPath == "" {
+		return false
+	}
+
+	turboType, _ := ai.GetString(MainSection, "X-Deepin-TurboType")
+	if turboType == "" {
+		return false
+	}
+
+	// 应用代理是通过添加 prefix 和 suffix 来实现的
+	for _, prefix := range ctx.GetCmdPrefixes() {
+		if strings.Contains(prefix, "proxychains") {
+			return false
+		}
+	}
+	for _, suffix := range ctx.GetCmdSuffixes() {
+		if strings.Contains(suffix, "--proxy-server") {
+			return false
+		}
+	}
+
+	envEnabled := os.Getenv(enableInvoker)
+	if envEnabled == "1" {
+		return true
+	}
+
+	gsEnabled := getStartddeGs().GetBoolean("turbo-invoker-enabled")
+	return envEnabled == "" && gsEnabled
+}
+
+func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext, isAction bool) (*exec.Cmd, error) {
 	turboInvokerPath, _ := exec.LookPath("deepin-turbo-invoker")
 
-	if turboInvokerPath != "" &&
-		(os.Getenv(enableInvoker) == "1" || (os.Getenv(enableInvoker) == "" && enabledInvoker)) {
-
-		// NOTE: 启用 turbo invoker 的条件：
-		// 必须有 deepin-turbo-invoker 程序，它在 deepin-turbo 包。
-		// 环境变量 ENABLE_TURBO_INVOKER  == 1
-		// 或者环境变量 ENABLE_TURBO_INVOKER  == 空且 gsettings com.deepin.dde.startdde turbo-invoker-enabled 设置为 true。
-		// 因此当环境变量 ENABLE_TURBO_INVOKER == 0 时，可以禁用此功能。
-
+	if shouldUseTurboInvoker(ai, isAction, turboInvokerPath, launchContext) {
 		args := []string{"--desktop-file"}
 		args = append(args, ai.GetFileName())
 		for _, file := range files {
 			args = append(args, toLocalPath(file))
 		}
 		cmd := exec.Command(turboInvokerPath, args...)
-		stdout, _ := cmd.StdoutPipe()
-		stderr, _ := cmd.StderrPipe()
-		err := cmd.Start()
-		if err == nil {
-			scanOut := bufio.NewScanner(stdout)
-			scanErr := bufio.NewScanner(stderr)
-			skip := make(chan bool, 1)
-			//check standard output in goroutine
-			go func() {
-				for scanOut.Scan() {
-					s := scanOut.Text()
-					if strings.Contains(s, faliedMsg) || strings.Contains(s, errMsg) {
-						skip <- true
-						return
-					}
-				}
-			}()
-			//check standard err in goroutine
-			go func() {
-				for scanErr.Scan() {
-					s := scanErr.Text()
-					if strings.Contains(s, faliedMsg) || strings.Contains(s, errMsg) {
-						skip <- true
-						return
-					}
-				}
-			}()
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "warning: failed to open cmd stdout pipe: %v\n", err)
+		}
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "warning: failed to open cmd stderr pipe: %v\n", err)
+		}
 
+		err = cmd.Start()
+		if err == nil {
+			skip := make(chan bool, 1)
+			watchScanner := func(scanner *bufio.Scanner) {
+				for scanner.Scan() {
+					line := scanner.Text()
+					if strings.Contains(line, faliedMsg) || strings.Contains(line, errMsg) {
+						skip <- true
+						return
+					}
+				}
+			}
+			if stdout != nil {
+				scannerOut := bufio.NewScanner(stdout)
+				go watchScanner(scannerOut)
+			}
+			if stderr != nil {
+				scannerErr := bufio.NewScanner(stderr)
+				go watchScanner(scannerErr)
+			}
+
+			// 2 秒之内，如果从 skip 通道收到消息则表示 turbo invoker 启动失败，需要走后续逻辑。
 			select {
-			//if the execution of the command "deepin-turbo-invoker" failed, follow the previous logic
 			case <-skip:
 				go func() {
 					_ = cmd.Wait()
@@ -549,8 +592,10 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 }
 
 func launch(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext) error {
-	cmd, err := startCommand(ai, cmdline, files, launchContext)
-	go cmd.Wait()
+	cmd, err := startCommand(ai, cmdline, files, launchContext, false)
+	go func() {
+		_ = cmd.Wait()
+	}()
 	return err
 }
 
@@ -594,7 +639,7 @@ func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLa
 
 func (action *DesktopAction) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
 	ai := action.parent
-	return startCommand(ai, action.Exec, files, launchContext)
+	return startCommand(ai, action.Exec, files, launchContext, true)
 }
 
 func getAppNamebyId(folder string, id string) string {
