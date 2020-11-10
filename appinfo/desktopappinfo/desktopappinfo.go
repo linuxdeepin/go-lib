@@ -429,10 +429,14 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 	if turboInvokerPath != "" &&
 		(os.Getenv(enableInvoker) == "1" || (os.Getenv(enableInvoker) == "" && enabledInvoker)) {
-		args := []string{
-			"--type=auto",
-			"--desktop-file",
-		}
+
+		// NOTE: 启用 turbo invoker 的条件：
+		// 必须有 deepin-turbo-invoker 程序，它在 deepin-turbo 包。
+		// 环境变量 ENABLE_TURBO_INVOKER  == 1
+		// 或者环境变量 ENABLE_TURBO_INVOKER  == 空且 gsettings com.deepin.dde.startdde turbo-invoker-enabled 设置为 true。
+		// 因此当环境变量 ENABLE_TURBO_INVOKER == 0 时，可以禁用此功能。
+
+		args := []string{"--desktop-file"}
 		args = append(args, ai.GetFileName())
 		for _, file := range files {
 			args = append(args, toLocalPath(file))
