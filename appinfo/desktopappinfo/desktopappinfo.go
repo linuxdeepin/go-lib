@@ -20,10 +20,8 @@
 package desktopappinfo
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -68,12 +66,12 @@ const (
 	TypeLink        = "Link"
 	TypeDirectory   = "Directory"
 
-	envDesktopEnv    = "XDG_CURRENT_DESKTOP"
-	desktopExt       = ".desktop"
-	gsSchemaStartdde = "com.deepin.dde.startdde"
-	enableInvoker    = "ENABLE_TURBO_INVOKER"
-	faliedMsg        = "Failed to invoke: Booster:"
-	errMsg           = "deepin-turbo-invoker: error"
+	envDesktopEnv         = "XDG_CURRENT_DESKTOP"
+	desktopExt            = ".desktop"
+	gsSchemaStartdde      = "com.deepin.dde.startdde"
+	enableInvoker         = "ENABLE_TURBO_INVOKER"
+	turboInvokerFailedMsg = "Failed to invoke: Booster:"
+	turboInvokerErrMsg    = "deepin-turbo-invoker: error"
 )
 
 var xdgDataDirs []string
@@ -473,6 +471,53 @@ func shouldUseTurboInvoker(ai *DesktopAppInfo, isAction bool, turboInvokerPath s
 	return envEnabled == "" && gsEnabled
 }
 
+type failDetector struct {
+	buf    bytes.Buffer
+	full   bool
+	failed bool
+	ch     chan struct{}
+}
+
+func newFailDetector(ch chan struct{}) *failDetector {
+	return &failDetector{
+		ch: ch,
+	}
+}
+
+func (w *failDetector) Write(p []byte) (n int, err error) {
+	if w.failed || w.full {
+		return len(p), nil
+	}
+
+	n, err = w.buf.Write(p)
+	data := w.buf.Bytes()
+	if bytes.Contains(data, []byte(turboInvokerFailedMsg)) || bytes.Contains(data, []byte(turboInvokerErrMsg)) {
+		w.failed = true
+		w.buf = bytes.Buffer{}
+		select {
+		case w.ch <- struct{}{}:
+		// 告知 turbo invoker 启动失败
+		default:
+			// 表示 ch 已经没有接收者了
+		}
+	} else {
+		// 把最后一个 \n 前面的数据清除
+		idx := bytes.LastIndexByte(data, '\n')
+		if idx != -1 {
+			newData := make([]byte, len(data)-idx-1)
+			copy(newData, data[idx+1:])
+			w.buf.Reset()
+			w.buf.Write(newData)
+		}
+	}
+	// 防止 buf 数据量太大
+	if w.buf.Len() > 50000 {
+		w.full = true
+		w.buf = bytes.Buffer{} // 释放 w.buf 占用的内存
+	}
+	return n, err
+}
+
 func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchContext *appinfo.AppLaunchContext, isAction bool) (*exec.Cmd, error) {
 	turboInvokerPath, _ := exec.LookPath("deepin-turbo-invoker")
 
@@ -483,48 +528,19 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 			args = append(args, toLocalPath(file))
 		}
 		cmd := exec.Command(turboInvokerPath, args...)
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "warning: failed to open cmd stdout pipe: %v\n", err)
-		}
-		stderr, err := cmd.StderrPipe()
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "warning: failed to open cmd stderr pipe: %v\n", err)
-		}
+		failCh := make(chan struct{})
+		cmd.Stdout = newFailDetector(failCh)
+		cmd.Stderr = newFailDetector(failCh)
 
-		err = cmd.Start()
+		err := cmd.Start()
 		if err == nil {
-			skip := make(chan bool, 1)
-			watchScanner := func(scanner *bufio.Scanner) {
-				for scanner.Scan() {
-					line := scanner.Text()
-					if strings.Contains(line, faliedMsg) || strings.Contains(line, errMsg) {
-						skip <- true
-						return
-					}
-				}
-			}
-			if stdout != nil {
-				scannerOut := bufio.NewScanner(stdout)
-				go watchScanner(scannerOut)
-			}
-			if stderr != nil {
-				scannerErr := bufio.NewScanner(stderr)
-				go watchScanner(scannerErr)
-			}
-
-			// 2 秒之内，如果从 skip 通道收到消息则表示 turbo invoker 启动失败，需要走后续逻辑。
 			select {
-			case <-skip:
-				go func() {
-					_ = cmd.Wait()
-				}()
-				break
-			//if the execution of the command "deepin-turbo-invoker" succeed, return directly
-			case <-time.After(time.Second * 2):
-				return cmd, err
+			case <-time.After(2 * time.Second):
+				// turbo invoker 启动成功
+				return cmd, nil
+			case <-failCh:
+				// turbo invoker 启动失败
 			}
-
 		}
 	}
 
