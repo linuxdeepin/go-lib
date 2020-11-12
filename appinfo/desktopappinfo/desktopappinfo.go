@@ -473,10 +473,10 @@ func shouldUseTurboInvoker(ai *DesktopAppInfo, isAction bool, turboInvokerPath s
 }
 
 type failDetector struct {
-	buf    bytes.Buffer
-	full   bool
-	failed bool
-	ch     chan struct{}
+	buf  bytes.Buffer
+	done bool // 是否完成检测
+	ch   chan struct{}
+	mu   sync.Mutex
 }
 
 func newFailDetector(ch chan struct{}) *failDetector {
@@ -485,15 +485,27 @@ func newFailDetector(ch chan struct{}) *failDetector {
 	}
 }
 
+func (w *failDetector) markDone() {
+	w.mu.Lock()
+
+	w.done = true
+	w.buf = bytes.Buffer{}
+
+	w.mu.Unlock()
+}
+
 func (w *failDetector) Write(p []byte) (n int, err error) {
-	if w.failed || w.full {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if w.done {
 		return len(p), nil
 	}
 
 	n, err = w.buf.Write(p)
 	data := w.buf.Bytes()
 	if bytes.Contains(data, []byte(turboInvokerFailedMsg)) || bytes.Contains(data, []byte(turboInvokerErrMsg)) {
-		w.failed = true
+		w.done = true
 		w.buf = bytes.Buffer{}
 		select {
 		case w.ch <- struct{}{}:
@@ -513,7 +525,7 @@ func (w *failDetector) Write(p []byte) (n int, err error) {
 	}
 	// 防止 buf 数据量太大
 	if w.buf.Len() > 50000 {
-		w.full = true
+		w.done = true
 		w.buf = bytes.Buffer{} // 释放 w.buf 占用的内存
 	}
 	return n, err
@@ -530,17 +542,25 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		}
 		cmd := exec.Command(turboInvokerPath, args...)
 		failCh := make(chan struct{})
-		cmd.Stdout = newFailDetector(failCh)
-		cmd.Stderr = newFailDetector(failCh)
+		fdOut := newFailDetector(failCh)
+		fdErr := newFailDetector(failCh)
+		cmd.Stdout = fdOut
+		cmd.Stderr = fdErr
 
 		err := cmd.Start()
 		if err == nil {
 			select {
 			case <-time.After(2 * time.Second):
 				// turbo invoker 启动成功
+				fdOut.markDone()
+				fdErr.markDone()
 				return cmd, nil
 			case <-failCh:
 				// turbo invoker 启动失败
+				go func() {
+					// NOTE: 注意回收 cmd 进程资源
+					_ = cmd.Wait()
+				}()
 			}
 		}
 	}
