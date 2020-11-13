@@ -538,7 +538,7 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 		args := []string{"--desktop-file"}
 		args = append(args, ai.GetFileName())
 		for _, file := range files {
-			args = append(args, toLocalPath(file))
+			args = append(args, file)
 		}
 		cmd := exec.Command(turboInvokerPath, args...)
 		failCh := make(chan struct{})
