@@ -381,17 +381,23 @@ func Test_splitExec(t *testing.T) {
 		c.So(err, ShouldBeNil)
 		c.So(parts, ShouldResemble, []string{"abc"})
 
+		parts, err = splitExec(`"$abcdef"`)
+		c.So(err, ShouldBeNil)
+		c.So(parts, ShouldResemble, []string{"$abcdef"})
+
+		parts, err = splitExec("\"`abcdef\" def")
+		c.So(err, ShouldBeNil)
+		c.So(parts, ShouldResemble, []string{"`abcdef", "def"})
+
+		parts, err = splitExec(`sh -c 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
+		c.So(err, ShouldBeNil)
+		c.So(parts, ShouldResemble, []string{"sh", "-c", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
+
 		_, err = splitExec(`"abcdef`)
 		c.So(err, ShouldEqual, ErrQuotingNotClosed)
 
 		_, err = splitExec(`"abcdef\"`)
 		c.So(err, ShouldEqual, ErrQuotingNotClosed)
-
-		_, err = splitExec(`"$abcdef"`)
-		c.So(err, ShouldResemble, ErrCharNotEscaped{'$'})
-
-		_, err = splitExec("\"`abcdef\" def")
-		c.So(err, ShouldResemble, ErrCharNotEscaped{'`'})
 
 		_, err = splitExec(`"abc\def"`)
 		c.So(err, ShouldResemble, ErrInvalidEscapeSequence{'d'})

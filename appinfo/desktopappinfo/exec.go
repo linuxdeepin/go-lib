@@ -111,12 +111,12 @@ func splitExec(exec string) ([]string, error) {
 	var buf bytes.Buffer
 	var outlist []string
 	reader := strings.NewReader(exec)
-	var in bool
+	var quoteChar byte
 	for {
 		ch, err := reader.ReadByte()
 		if err != nil {
 			// err is EOF
-			if in {
+			if quoteChar != 0 {
 				return nil, ErrQuotingNotClosed
 			}
 			outlist = append(outlist, buf.String())
@@ -125,16 +125,18 @@ func splitExec(exec string) ([]string, error) {
 
 		switch ch {
 		case ' ':
-			if in {
+			if quoteChar != 0 {
 				buf.WriteByte(ch)
 			} else {
 				eatAllSpace(reader)
 				outlist = append(outlist, buf.String())
 				buf.Reset()
 			}
-		case '"':
-			in = !in
-			if !in {
+		case '"', '\'':
+			if quoteChar == 0 {
+				quoteChar = ch
+			} else if quoteChar == ch {
+				quoteChar = 0
 				ch0, err0 := reader.ReadByte()
 				if err0 != nil {
 					continue
@@ -143,14 +145,21 @@ func splitExec(exec string) ([]string, error) {
 					return nil, ErrNoSpaceAfterQuoting
 				}
 				_ = reader.UnreadByte()
+			} else {
+				buf.WriteByte(ch)
 			}
 
 		case '\\':
-			if in {
+			if quoteChar != 0 {
 				ch1, err1 := reader.ReadByte()
 				if err1 != nil {
 					// err1 is EOF
 					return nil, ErrEscapeCharAtEnd
+				}
+
+				if quoteChar == ch1 {
+					buf.WriteByte(ch1)
+					continue
 				}
 
 				if shouldEscapeChar(ch1) {
@@ -183,10 +192,7 @@ func splitExec(exec string) ([]string, error) {
 
 		default:
 			if isReservedChar(ch) {
-				if in {
-					if shouldEscapeChar(ch) {
-						return nil, ErrCharNotEscaped{ch}
-					}
+				if quoteChar != 0 {
 					buf.WriteByte(ch)
 				} else {
 					return nil, ErrReservedCharNotQuoted{ch}
