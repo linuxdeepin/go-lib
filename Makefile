@@ -15,3 +15,9 @@ clean:
 
 check_code_quality: prepare
 	env GOPATH="${CURDIR}/${GOPATH_DIR}:${GOPATH}" go vet ./...
+
+test: prepare
+	env GOPATH="${CURDIR}/${GOBUILD_DIR}:${GOPATH}" go test -v ./...
+
+test-coverage: prepare
+	env GOPATH="${CURDIR}/${GOBUILD_DIR}:${GOPATH}" go test -cover -v ./... | awk '$$1 ~ "^(ok|\\?)" {print $$2","$$5}' | sed "s:${CURDIR}::g" | sed 's/files\]/0\.0%/g' > coverage.csv

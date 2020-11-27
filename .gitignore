@@ -6,3 +6,4 @@ gdkpixbuf/testdata/test*
 _*
 !dbusutil/_tool
 **/*.test
+coverage.csv
