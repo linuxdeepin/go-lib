@@ -501,12 +501,8 @@ func (w *failDetector) Write(p []byte) (n int, err error) {
 	if bytes.Contains(data, []byte(turboInvokerFailedMsg)) || bytes.Contains(data, []byte(turboInvokerErrMsg)) {
 		w.done = true
 		w.buf = bytes.Buffer{}
-		select {
-		case w.ch <- struct{}{}:
 		// 告知 turbo invoker 启动失败
-		default:
-			// 表示 ch 已经没有接收者了
-		}
+		w.ch <- struct{}{}
 	} else {
 		// 把最后一个 \n 前面的数据清除
 		idx := bytes.LastIndexByte(data, '\n')
@@ -535,7 +531,7 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 			args = append(args, file)
 		}
 		cmd := exec.Command(turboInvokerPath, args...)
-		failCh := make(chan struct{})
+		failCh := make(chan struct{}, 2)
 		fdOut := newFailDetector(failCh)
 		fdErr := newFailDetector(failCh)
 		cmd.Stdout = fdOut

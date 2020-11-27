@@ -8,7 +8,7 @@ import (
 
 // 测试简单的情况
 func TestFailDetectorSimple(t *testing.T) {
-	ch := make(chan struct{})
+	ch := make(chan struct{}, 2)
 	fd := newFailDetector(ch)
 	_, err := fd.Write([]byte("Failed to invoke: Booster: abcdef"))
 	assert.Nil(t, err)
@@ -22,7 +22,7 @@ func TestFailDetectorSimple(t *testing.T) {
 
 // 测试多次写入，\n 后有其他字符的情况
 func TestFailDetectorWrite(t *testing.T) {
-	ch := make(chan struct{})
+	ch := make(chan struct{}, 2)
 	fd := newFailDetector(ch)
 	_, err := fd.Write([]byte("line1\n"))
 	assert.Nil(t, err)
