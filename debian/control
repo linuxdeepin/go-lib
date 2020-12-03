@@ -10,6 +10,7 @@ Build-Depends: debhelper (>= 9), dh-golang, golang-go,
  golang-github-fsnotify-fsnotify-dev,
  golang-github-mozillazg-go-pinyin-dev,
  golang-dbus-dev,
+ libgdk-pixbuf2.0-dev,
  libpulse-dev, libgtk-3-dev, libcanberra-dev, golang-gopkg-alecthomas-kingpin.v2-dev, mobile-broadband-provider-info,
  iso-codes, dbus-x11, libasound2-dev, libpam0g-dev, golang-golang-x-net-dev, golang-github-stretchr-testify-dev
 Standards-Version: 3.9.8
