@@ -105,7 +105,7 @@ func (so *ServerObject) propertiesSet(sender dbus.Sender, interfaceName, propert
 		return setErr
 	}
 	if changed {
-		impl.notifyChanged(so.service, so.path, p, propStatic, newVarValue)
+		impl.notifyChanged(so.service, so.path, p, propStatic, propWrite.Value)
 	}
 	return nil
 }
