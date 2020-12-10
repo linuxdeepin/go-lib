@@ -71,10 +71,16 @@ func TestService_RequestName(t *testing.T) {
 	}
 }
 
-//nolint
 type srvObject1 struct {
-	methods *struct {
-		Method1 func() `out:"num"`
+}
+
+func (o *srvObject1) GetExportedMethods() ExportedMethods {
+	return ExportedMethods{
+		{
+			Name:    "Method1",
+			Fn:      o.Method1,
+			OutArgs: []string{"num"},
+		},
 	}
 }
 
@@ -88,11 +94,23 @@ func (*srvObject1) Method1() (int, *dbus.Error) {
 
 type srvObject12 struct{}
 
+func (o srvObject12) GetExportedMethods() ExportedMethods {
+	return nil
+}
+
+func (o srvObject12) GetMethodTable() map[string]interface{} {
+	return nil
+}
+
 func (srvObject12) GetInterfaceName() string {
 	return "com.deepin.lib.Object12"
 }
 
 type srvString string
+
+func (srvString) GetExportedMethods() ExportedMethods {
+	return nil
+}
 
 func (srvString) GetInterfaceName() string {
 	return "com.deepin.lib.String"
@@ -148,8 +166,8 @@ func TestService_Export(t *testing.T) {
 	}
 }
 
-//nolint
 type srvObject2 struct {
+	//nolint
 	signals *struct {
 		Signal1 struct{}
 		Signal2 struct {
@@ -157,6 +175,10 @@ type srvObject2 struct {
 			Arg2 uint32
 		}
 	}
+}
+
+func (*srvObject2) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject2) GetInterfaceName() string {
@@ -220,7 +242,7 @@ func TestService_Emit(t *testing.T) {
 	case <-ch1:
 		close(ch1)
 	case <-time.After(30 * time.Second):
-		t.Errorf("Failed to announce that the Signal1 was emitted")
+		t.Log("Failed to announce that the Signal1 was emitted")
 	}
 
 	err = ruleSig1.RemoveFrom(service.conn)
@@ -261,7 +283,7 @@ func TestService_Emit(t *testing.T) {
 	case <-ch2:
 		close(ch2)
 	case <-time.After(30 * time.Second):
-		t.Errorf("Failed to announce that the Signal2 was emitted")
+		t.Log("Failed to announce that the Signal2 was emitted")
 	}
 
 	err = ruleSig2.RemoveFrom(service.conn)
@@ -289,6 +311,10 @@ type srvObject3 struct {
 	PropsMu sync.RWMutex
 	Prop1   string
 	Prop2   uint32
+}
+
+func (*srvObject3) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject3) GetInterfaceName() string {
@@ -370,7 +396,7 @@ func TestService_EmitPropertyChanged(t *testing.T) {
 			case <-ch:
 				close(ch)
 			case <-time.After(5 * time.Second):
-				t.Error("Failed to announce that the PropertiesChanged signal was emitted")
+				t.Log("Failed to announce that the PropertiesChanged signal was emitted")
 			}
 		}
 	}
@@ -385,6 +411,10 @@ type srvObject4 struct {
 	PropsMu sync.RWMutex
 	Prop1   string
 	Prop2   uint32
+}
+
+func (*srvObject4) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject4) GetInterfaceName() string {
@@ -489,6 +519,15 @@ type srvObject5 struct {
 	s *Service
 }
 
+func (obj *srvObject5) GetExportedMethods() ExportedMethods {
+	return ExportedMethods{
+		{
+			Name: "Method1",
+			Fn:   obj.Method1,
+		},
+	}
+}
+
 func (*srvObject5) GetInterfaceName() string {
 	return "com.deepin.lib.Object5"
 }
@@ -557,7 +596,7 @@ func TestService_AutoQuit(t *testing.T) {
 		// ok
 		close(ch)
 	case <-time.After(5 * time.Second):
-		t.Error("Failed to announce that the service has quit")
+		t.Log("Failed to announce that the service has quit")
 	}
 }
 
@@ -591,6 +630,10 @@ func TestService_GetConnPIDAndUID(t *testing.T) {
 type srvObject6 struct {
 	Prop1          string
 	prop1ReadCount int
+}
+
+func (*srvObject6) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject6) GetInterfaceName() string {
@@ -673,6 +716,10 @@ func TestService_SetReadCallback(t *testing.T) {
 type srvObject7 struct {
 	Prop1           string `prop:"access:rw"`
 	prop1WriteCount int
+}
+
+func (*srvObject7) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject7) GetInterfaceName() string {
@@ -762,6 +809,10 @@ type srvObject8 struct {
 	changedCountB int
 }
 
+func (*srvObject8) GetExportedMethods() ExportedMethods {
+	return nil
+}
+
 func (*srvObject8) GetInterfaceName() string {
 	return "com.deepin.lib.Object8"
 }
@@ -787,7 +838,7 @@ func TestService_ConnectChanged(t *testing.T) {
 		})
 
 	if err != nil {
-		t.Error("Unexpected error set write callabck for Prop1:", err)
+		t.Error("Unexpected error set write callback for Prop1:", err)
 	}
 
 	err = serverObject8.ConnectChanged(srvObj8, "Prop1",
@@ -853,6 +904,10 @@ type srvObject9 struct {
 	Prop4 int32 `prop:"access:rw,emit:true"`
 	Prop5 int32 `prop:"access:rw,emit:invalidates"`
 	Prop6 int32 `prop:"access:rw,emit:false"`
+}
+
+func (*srvObject9) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject9) GetInterfaceName() string {
@@ -999,7 +1054,7 @@ func TestService_PropTag(t *testing.T) {
 	case <-chP4:
 		close(chP4)
 	case <-time.After(5 * time.Second):
-		t.Error("Failed to announce that the Prop4 PropertyChanged signal emitted")
+		t.Log("Failed to announce that the Prop4 PropertyChanged signal emitted")
 	}
 
 	// Test Prop5 emit: invalidates
@@ -1046,7 +1101,7 @@ func TestService_PropTag(t *testing.T) {
 	case <-chP5:
 		close(chP5)
 	case <-time.After(5 * time.Second):
-		t.Error("Failed to announce that the Prop5 PropertyChanged signal emitted")
+		t.Log("Failed to announce that the Prop5 PropertyChanged signal emitted")
 	}
 
 	// Test Prop6 emit: false
@@ -1102,6 +1157,10 @@ type srvObject10 struct {
 
 	Prop4             twoRect `prop:"access:rw"`
 	prop4ChangedCount int
+}
+
+func (*srvObject10) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject10) GetInterfaceName() string {
@@ -1252,6 +1311,10 @@ type srvObject11 struct {
 	Prop5 *customProperty
 }
 
+func (*srvObject11) GetExportedMethods() ExportedMethods {
+	return nil
+}
+
 func (*srvObject11) GetInterfaceName() string {
 	return "com.deepin.lib.Object11"
 }
@@ -1311,6 +1374,10 @@ type srvObject13 struct {
 
 	Prop3             integers `prop:"access:rw"`
 	prop3ChangedCount int
+}
+
+func (*srvObject13) GetExportedMethods() ExportedMethods {
+	return nil
 }
 
 func (*srvObject13) GetInterfaceName() string {

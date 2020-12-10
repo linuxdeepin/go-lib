@@ -13,11 +13,19 @@ func newImplementerStatic(impl Implementer, structValue reflect.Value) *implemen
 	structType := structValue.Type()
 	s.props = getFieldPropStaticMap(structType, structValue)
 
+	// 对旧代码实现兼容
+	var methods []introspect.Method
+	if implExt, ok := impl.(ImplementerExt); ok {
+		methods = getMethods(implExt, implExt.GetExportedMethods())
+	} else {
+		methods = getMethodsOld(impl, getMethodDetailMap(structType))
+	}
+
 	s.introspectInterface = introspect.Interface{
 		Name:       impl.GetInterfaceName(),
 		Signals:    getSignals(structType),
 		Properties: getPropsIntrospection(s.props),
-		Methods:    getMethods(impl, getMethodDetailMap(structType)),
+		Methods:    methods,
 	}
 	return s
 }

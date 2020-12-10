@@ -13,6 +13,40 @@ type Implementer interface {
 	GetInterfaceName() string
 }
 
+type ImplementerExt interface {
+	Implementer
+	GetExportedMethods() ExportedMethods
+}
+
+type ExportedMethods []ExportedMethod
+
+func (methods ExportedMethods) Len() int {
+	return len(methods)
+}
+
+func (methods ExportedMethods) Less(i, j int) bool {
+	return methods[i].Name < methods[j].Name
+}
+
+func (methods ExportedMethods) Swap(i, j int) {
+	methods[i], methods[j] = methods[j], methods[i]
+}
+
+func (methods ExportedMethods) toMethodTable() map[string]interface{} {
+	result := make(map[string]interface{}, len(methods))
+	for _, method := range methods {
+		result[method.Name] = method.Fn
+	}
+	return result
+}
+
+type ExportedMethod struct {
+	Name    string
+	Fn      interface{}
+	InArgs  []string
+	OutArgs []string
+}
+
 func getImplementerPointer(impl Implementer) unsafe.Pointer {
 	return unsafe.Pointer(reflect.ValueOf(impl).Pointer())
 }

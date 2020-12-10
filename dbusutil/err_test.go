@@ -10,6 +10,10 @@ import (
 type impl1 struct {
 }
 
+func (*impl1) GetExportedMethods() ExportedMethods {
+	return nil
+}
+
 func (*impl1) GetInterfaceName() string {
 	return "com.deepin.lib.Exportable1"
 }

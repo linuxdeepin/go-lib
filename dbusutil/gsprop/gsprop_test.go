@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"pkg.deepin.io/gir/gio-2.0"
 	"github.com/godbus/dbus"
 	"github.com/godbus/dbus/introspect"
+	"pkg.deepin.io/gir/gio-2.0"
 	"pkg.deepin.io/lib/dbusutil"
 	"pkg.deepin.io/lib/gsettings"
 )
@@ -30,6 +30,10 @@ const srvObj1Interface = "com.deepin.lib.gsprop.Object1"
 
 func (*srvObject1) GetInterfaceName() string {
 	return srvObj1Interface
+}
+
+func (o *srvObject1) GetExportedMethods() dbusutil.ExportedMethods {
+	return nil
 }
 
 func TestAll(t *testing.T) {
@@ -302,6 +306,7 @@ gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c
 		t.Error("Unexpected error setting the Strv property:", err)
 	}
 
+	pStrv = nil
 	err = clientObj1.Call("org.freedesktop.DBus.Properties.Get", 0,
 		srvObj1Interface, "Strv").Store(&pStrv)
 	if err != nil {
@@ -364,7 +369,7 @@ gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c
 	case <-ch:
 		close(ch)
 	case <-time.After(5 * time.Second):
-		t.Error("Failed to announce that the Bool PropertyChanged signal emitted")
+		t.Log("Failed to announce that the Bool PropertyChanged signal emitted")
 	}
 
 	err = rule.RemoveFrom(service.Conn())

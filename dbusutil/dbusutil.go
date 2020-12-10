@@ -591,7 +591,7 @@ func splitArg(str string) (result []string) {
 
 // Methods returns the description of the methods of v. This can be used to
 // create a Node which can be passed to NewIntrospectable.
-func getMethods(v interface{}, methodDetailMap map[string]methodDetail) []introspect.Method {
+func getMethodsOld(v interface{}, methodDetailMap map[string]methodDetail) []introspect.Method {
 	t := reflect.TypeOf(v)
 	ms := make([]introspect.Method, 0, t.NumMethod())
 	for i := 0; i < t.NumMethod(); i++ {
@@ -636,6 +636,78 @@ func getMethods(v interface{}, methodDetailMap map[string]methodDetail) []intros
 		ms = append(ms, m)
 	}
 	return ms
+}
+
+func (em *ExportedMethod) getInArgName(index int, type0 reflect.Type, methodName string) string {
+	if index >= len(em.InArgs) {
+		panic(fmt.Errorf("failed to get %s.%s in[%d] argument name",
+			type0, methodName, index))
+	}
+	return em.InArgs[index]
+}
+
+func (em *ExportedMethod) getOutArgName(index int, type0 reflect.Type, methodName string) string {
+	if index >= len(em.OutArgs) {
+		panic(fmt.Errorf("failed to get %s.%s out[%d] argument name",
+			type0, methodName, index))
+	}
+	return em.OutArgs[index]
+}
+
+var (
+	typeOfDBusErrorPtr = reflect.TypeOf((*dbus.Error)(nil))
+	typeOfDBusSender   = reflect.TypeOf((*dbus.Sender)(nil)).Elem()
+	typeOfDBusMessage  = reflect.TypeOf((*dbus.Message)(nil)).Elem()
+)
+
+// Methods returns the description of the methods of v. This can be used to
+// create a Node which can be passed to NewIntrospectable.
+func getMethods(v interface{}, methods ExportedMethods) []introspect.Method {
+	t := reflect.TypeOf(v)
+	result := make([]introspect.Method, 0, len(methods))
+	for _, method := range methods {
+		methodType := reflect.TypeOf(method.Fn)
+
+		numIn := methodType.NumIn()
+		numOut := methodType.NumOut()
+		if numOut == 0 ||
+			methodType.Out(numOut-1) != typeOfDBusErrorPtr {
+
+			continue
+		}
+		var m introspect.Method
+		m.Name = method.Name
+		m.Args = make([]introspect.Arg, 0, numIn+numOut-1)
+		inArgIndex := 0
+		for j := 0; j < numIn; j++ {
+			argType := methodType.In(j)
+			if argType == typeOfDBusSender || argType == typeOfDBusMessage {
+				// 忽略类型为 dbus.Sender 或 dbus.Message 的参数
+				continue
+			}
+
+			argName := method.getInArgName(inArgIndex, t, m.Name)
+			inArgIndex++
+			arg := introspect.Arg{
+				Name:      argName,
+				Type:      dbus.SignatureOfType(methodType.In(j)).String(),
+				Direction: "in",
+			}
+			m.Args = append(m.Args, arg)
+		}
+		for j := 0; j < numOut-1; j++ {
+			argName := method.getOutArgName(j, t, m.Name)
+			arg := introspect.Arg{
+				Name:      argName,
+				Type:      dbus.SignatureOfType(methodType.Out(j)).String(),
+				Direction: "out",
+			}
+			m.Args = append(m.Args, arg)
+		}
+		m.Annotations = make([]introspect.Annotation, 0)
+		result = append(result, m)
+	}
+	return result
 }
 
 type PropertyReadCallback func(read *PropertyRead) *dbus.Error

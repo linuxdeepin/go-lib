@@ -37,9 +37,17 @@ func (so *ServerObject) Export() error {
 			return errors.New("implementer is exported")
 		}
 
-		err := conn.Export(core, so.path, core.GetInterfaceName())
-		if err != nil {
-			return err
+		// 对旧代码实现兼容
+		if coreExt, ok := core.(ImplementerExt); ok {
+			err := conn.ExportMethodTable(coreExt.GetExportedMethods().toMethodTable(), so.path, core.GetInterfaceName())
+			if err != nil {
+				return err
+			}
+		} else {
+			err := conn.Export(core, so.path, core.GetInterfaceName())
+			if err != nil {
+				return err
+			}
 		}
 
 		s.implObjMap[corePtr] = so
@@ -82,6 +90,8 @@ func (so *ServerObject) StopExport() error {
 		return errors.New("server object is not exported")
 	}
 
+	// TODO: 等 github.com/godbus/dbus 升级之后，需要把所有 conn.Export 都换成 conn.ExportMethodTable。
+	// 目前是由于 conn.ExportMethodTable 方法在 methods 参数为 nil 时有 bug，才用了 conn.Export 方法。
 	err := conn.Export(nil, path, orgFreedesktopDBus+".Properties")
 	if err != nil {
 		return err
