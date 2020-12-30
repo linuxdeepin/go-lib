@@ -175,7 +175,8 @@ func getProxyValue(proxyType string) (proxyValue string) {
 		return
 	}
 	port := strconv.Itoa(int(childSettings.GetInt(gkeyProxyPort)))
-	proxyValue = fmt.Sprintf("%s://%s:%s", proxyType, host, port)
+	// proxyValue = fmt.Sprintf("%s://%s:%s", proxyType, host, port)
+	proxyValue = fmt.Sprintf("%s:%s", host, port)
 	return
 }
 
