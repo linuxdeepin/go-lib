@@ -21,9 +21,10 @@ package gdkpixbuf
 
 import (
 	"fmt"
-	C "gopkg.in/check.v1"
 	"os"
 	"testing"
+
+	C "gopkg.in/check.v1"
 )
 
 // Hook up gocheck into the "go test" runner.
@@ -37,16 +38,16 @@ const (
 	originImg               = "testdata/origin_1920x1080.jpg"
 	originImgWidth          = 1920
 	originImgHeight         = 1080
-	originImgDominantColorH = 198.6
-	originImgDominantColorS = 0.40
-	originImgDominantColorV = 0.43
+	originImgDominantColorH = 219.6
+	originImgDominantColorS = 0.5625
+	originImgDominantColorV = 0.3137
 
-	originImgIconBmp = "testdata/origin_icon_48x48.bmp"
-	originImgIconGif = "testdata/origin_icon_48x48.gif"
-	originImgIconTxt = "testdata/origin_icon_48x48.txt"
+	originImgIconPng = "testdata/origin_icon_1_48x48.png"
+	originImgIconBmp = "testdata/origin_icon_1_48x48.bmp"
+	originImgIconGif = "testdata/origin_icon_1_48x48.gif"
+	originImgIconTxt = "testdata/origin_icon_1_48x48.txt"
 
-	originImgPngSmall       = "testdata/origin_small_200x200.png"
-	originImgIconPng1       = "testdata/origin_icon_1_48x48.png"
+	originImgPngSmall = "testdata/origin_small_200x200.png"
 
 	originImgNotImage = "testdata/origin_not_image"
 )
@@ -59,7 +60,7 @@ func (*testWrapper) TestGetImageSize(c *C.C) {
 
 func (*testWrapper) TestGetImageFormat(c *C.C) {
 	var f Format
-	f, _ = GetImageFormat(originImgIconPng1)
+	f, _ = GetImageFormat(originImgIconPng)
 	c.Check(f, C.Equals, FormatPng)
 	f, _ = GetImageFormat(originImgIconBmp)
 	c.Check(f, C.Equals, FormatBmp)
@@ -68,7 +69,7 @@ func (*testWrapper) TestGetImageFormat(c *C.C) {
 }
 
 func (*testWrapper) TestIsSupportedImage(c *C.C) {
-	c.Check(IsSupportedImage(originImgIconPng1), C.Equals, true)
+	c.Check(IsSupportedImage(originImgIconPng), C.Equals, true)
 	c.Check(IsSupportedImage(originImgIconBmp), C.Equals, true)
 	c.Check(IsSupportedImage(originImgIconGif), C.Equals, true)
 	c.Check(IsSupportedImage(originImgIconTxt), C.Equals, false)
