@@ -98,11 +98,11 @@ func SetDataDirs(dirs []string) {
 
 type DesktopAppInfo struct {
 	*keyfile.KeyFile
-	filename string
-	id       string
-
-	name string
-	icon string
+	filename     string
+	id           string
+	name         string
+	icon         string
+	overrideExec string
 }
 
 func NewDesktopAppInfo(id string) *DesktopAppInfo {
@@ -414,6 +414,18 @@ func (ai *DesktopAppInfo) IsExecutableOk() bool {
 	return err == nil
 }
 
+func (ai *DesktopAppInfo) IsDesktopOverrideExecSet() bool {
+	return ai.overrideExec != ""
+}
+
+func (ai *DesktopAppInfo) GetDesktopOverrideExec() string {
+	return ai.overrideExec
+}
+
+func (ai *DesktopAppInfo) SetDesktopOverrideExec(exec string) {
+	ai.overrideExec = exec
+}
+
 var _startddeGs *gio.Settings
 var _startddeGsMu sync.Mutex
 
@@ -527,6 +539,11 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 	if shouldUseTurboInvoker(ai, isAction, turboInvokerPath, launchContext) {
 		args := []string{"--desktop-file"}
 		args = append(args, ai.GetFileName())
+
+		if ai.IsDesktopOverrideExecSet() {
+			args = append(args, "--desktop-override-exec="+ai.GetDesktopOverrideExec())
+		}
+
 		for _, file := range files {
 			args = append(args, file)
 		}
