@@ -57,5 +57,4 @@ func (*testWrapper) TestGetGroupByGid(c *C.C) {
 func (*testWrapper) TestGetGroupEntry(c *C.C) {
 	groups := GetGroupEntry()
 	c.Check(len(groups), C.Not(C.Equals), 0)
-	c.Check(groups[0].Name, C.Equals, "root")
 }
