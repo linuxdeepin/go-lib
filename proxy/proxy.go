@@ -142,10 +142,10 @@ func updateProxyEnvs() {
 	case proxyModeAuto:
 		doSetEnv(envAutoProxy, proxySettings.GetString(gkeyProxyAuto))
 	case proxyModeManual:
-		doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp))
-		doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps))
-		doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp))
-		doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks))
+		doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp, proxyTypeHttp))
+		doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps, proxyTypeHttp))
+		doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp, proxyTypeHttp))
+		doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks, proxyTypeSocks))
 
 		arrayIgnoreHosts := proxySettings.GetStrv(gkeyProxyIgnoreHosts)
 		ignoreHosts := strings.Join(arrayIgnoreHosts, ",")
@@ -165,7 +165,7 @@ func doSetEnv(env, value string) {
 	}
 }
 
-func getProxyValue(proxyType string) (proxyValue string) {
+func getProxyValue(proxyType string, protocol string) (proxyValue string) {
 	childSettings, err := getProxyChildSettings(proxyType)
 	if err != nil {
 		return
@@ -175,7 +175,7 @@ func getProxyValue(proxyType string) (proxyValue string) {
 		return
 	}
 	port := strconv.Itoa(int(childSettings.GetInt(gkeyProxyPort)))
-	proxyValue = fmt.Sprintf("%s://%s:%s", proxyType, host, port)
+	proxyValue = fmt.Sprintf("%s://%s:%s", protocol, host, port)
 	return
 }
 
