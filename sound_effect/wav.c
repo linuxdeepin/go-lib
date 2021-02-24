@@ -9,7 +9,7 @@ int wav_getdb(double factor);
 
 wav_t *wav_open(char *file_name){
     wav_t *wav = NULL;
-    char buffer[256];
+    char buffer[1024];
     int read_len = 0;
     int offset = 0;
 
@@ -233,7 +233,7 @@ int wav_write_header(wav_t *wav,FILE *fp){
         printf("%02X ",tempbuff[i]);
     }
     printf("\n");
-    
+
     write_len = fwrite(tempbuff, 1, 36, fp);
     printf("writelen:%d\n",write_len);
     return 0;
@@ -241,7 +241,7 @@ int wav_write_header(wav_t *wav,FILE *fp){
 
 int wav_convert(char *file_name,char *dest_name,float precent){
     wav_t *wav = NULL;
-    char buffer[256];
+    char buffer[1024];
     int read_len = 0;
     int write_len = 0;
     int offset = 0;
@@ -350,7 +350,7 @@ int wav_convert(char *file_name,char *dest_name,float precent){
             write_len = fwrite((char *)(&(wav->data.size)), 1, 4, dest_fp);
 
             while(filllen < wav->data_size){
-                rdlen = fread(buffer, 1, 256, wav->fp);
+                rdlen = fread(buffer, 1, 1024, wav->fp);
                 if(rdlen == 0){
                     printf("read end\n");
                     wav_close(&wav);
@@ -363,16 +363,16 @@ int wav_convert(char *file_name,char *dest_name,float precent){
                 //fseek(wav->fp, -rdlen, SEEK_CUR);
                 wtlen = fwrite(buffer, 1, rdlen, dest_fp);
             }
-            
+
             while(1){
-                rdlen = fread(buffer, 1, 256, wav->fp);
+                rdlen = fread(buffer, 1, 1024, wav->fp);
                 if(rdlen == 0){
                     printf("read end\n");
                     wav_close(&wav);
                     fclose(dest_fp);
                     return 0;
                 }
-                
+
                 wtlen = fwrite(buffer, 1, rdlen, dest_fp);
             }
             break;

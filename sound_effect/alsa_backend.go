@@ -71,6 +71,10 @@ func newALSAPlayBackend(device string, sampleSpec *SampleSpec) (pb PlayBackend, 
 	periodTime := uint(0)
 	if bufferTime > 0 {
 		periodTime = bufferTime / 4
+		//hisihdmi pcm device PERIOD_SIZE/PERIOD_TIME 值偏小会导致音频流数据下发不足，微调该参数以获取足够数据
+		if device == "plughw:CARD=hisihdmi,DEV=0" || device == "plughw:CARD=1,DEV=0,SUBDEV=0" {
+			periodTime = bufferTime
+		}
 	}
 
 	// set period time
