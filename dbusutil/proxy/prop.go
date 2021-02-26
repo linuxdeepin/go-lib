@@ -1,25 +1,36 @@
 package proxy
 
-import "errors"
-import "github.com/godbus/dbus"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/godbus/dbus"
+	"github.com/stretchr/testify/mock"
+)
 
 var errNilCallback = errors.New("nil callback")
 
-type PropBool struct {
+type PropBool interface {
+	Get(flags dbus.Flags) (value bool, err error)
+	Set(flags dbus.Flags, value bool) error
+	ConnectChanged(cb func(hasValue bool, value bool)) error
+}
+
+type ImplPropBool struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropBool) Get(flags dbus.Flags) (value bool, err error) {
+func (p ImplPropBool) Get(flags dbus.Flags) (value bool, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropBool) Set(flags dbus.Flags, value bool) error {
+func (p ImplPropBool) Set(flags dbus.Flags, value bool) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropBool) ConnectChanged(cb func(hasValue bool, value bool)) error {
+func (p ImplPropBool) ConnectChanged(cb func(hasValue bool, value bool)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -36,21 +47,57 @@ func (p PropBool) ConnectChanged(cb func(hasValue bool, value bool)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropString struct {
+type MockPropBool struct {
+	mock.Mock
+}
+
+func (p *MockPropBool) Get(flags dbus.Flags) (value bool, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(bool)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropBool) Set(flags dbus.Flags, value bool) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropBool) ConnectChanged(cb func(hasValue bool, value bool)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropString interface {
+	Get(flags dbus.Flags) (value string, err error)
+	Set(flags dbus.Flags, value string) error
+	ConnectChanged(cb func(hasValue bool, value string)) error
+}
+
+type ImplPropString struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropString) Get(flags dbus.Flags) (value string, err error) {
+func (p ImplPropString) Get(flags dbus.Flags) (value string, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropString) Set(flags dbus.Flags, value string) error {
+func (p ImplPropString) Set(flags dbus.Flags, value string) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropString) ConnectChanged(cb func(hasValue bool, value string)) error {
+func (p ImplPropString) ConnectChanged(cb func(hasValue bool, value string)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -67,21 +114,57 @@ func (p PropString) ConnectChanged(cb func(hasValue bool, value string)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropObjectPath struct {
+type MockPropString struct {
+	mock.Mock
+}
+
+func (p *MockPropString) Get(flags dbus.Flags) (value string, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(string)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropString) Set(flags dbus.Flags, value string) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropString) ConnectChanged(cb func(hasValue bool, value string)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropObjectPath interface {
+	Get(flags dbus.Flags) (value dbus.ObjectPath, err error)
+	Set(flags dbus.Flags, value dbus.ObjectPath) error
+	ConnectChanged(cb func(hasValue bool, value dbus.ObjectPath)) error
+}
+
+type ImplPropObjectPath struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropObjectPath) Get(flags dbus.Flags) (value dbus.ObjectPath, err error) {
+func (p ImplPropObjectPath) Get(flags dbus.Flags) (value dbus.ObjectPath, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropObjectPath) Set(flags dbus.Flags, value dbus.ObjectPath) error {
+func (p ImplPropObjectPath) Set(flags dbus.Flags, value dbus.ObjectPath) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropObjectPath) ConnectChanged(cb func(hasValue bool, value dbus.ObjectPath)) error {
+func (p ImplPropObjectPath) ConnectChanged(cb func(hasValue bool, value dbus.ObjectPath)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -98,21 +181,57 @@ func (p PropObjectPath) ConnectChanged(cb func(hasValue bool, value dbus.ObjectP
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropDouble struct {
+type MockPropObjectPath struct {
+	mock.Mock
+}
+
+func (p *MockPropObjectPath) Get(flags dbus.Flags) (value dbus.ObjectPath, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(dbus.ObjectPath)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropObjectPath) Set(flags dbus.Flags, value dbus.ObjectPath) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropObjectPath) ConnectChanged(cb func(hasValue bool, value dbus.ObjectPath)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropDouble interface {
+	Get(flags dbus.Flags) (value float64, err error)
+	Set(flags dbus.Flags, value float64) error
+	ConnectChanged(cb func(hasValue bool, value float64)) error
+}
+
+type ImplPropDouble struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropDouble) Get(flags dbus.Flags) (value float64, err error) {
+func (p ImplPropDouble) Get(flags dbus.Flags) (value float64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropDouble) Set(flags dbus.Flags, value float64) error {
+func (p ImplPropDouble) Set(flags dbus.Flags, value float64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropDouble) ConnectChanged(cb func(hasValue bool, value float64)) error {
+func (p ImplPropDouble) ConnectChanged(cb func(hasValue bool, value float64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -129,21 +248,57 @@ func (p PropDouble) ConnectChanged(cb func(hasValue bool, value float64)) error 
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropByte struct {
+type MockPropDouble struct {
+	mock.Mock
+}
+
+func (p *MockPropDouble) Get(flags dbus.Flags) (value float64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(float64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropDouble) Set(flags dbus.Flags, value float64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropDouble) ConnectChanged(cb func(hasValue bool, value float64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropByte interface {
+	Get(flags dbus.Flags) (value byte, err error)
+	Set(flags dbus.Flags, value byte) error
+	ConnectChanged(cb func(hasValue bool, value byte)) error
+}
+
+type ImplPropByte struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropByte) Get(flags dbus.Flags) (value byte, err error) {
+func (p ImplPropByte) Get(flags dbus.Flags) (value byte, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropByte) Set(flags dbus.Flags, value byte) error {
+func (p ImplPropByte) Set(flags dbus.Flags, value byte) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropByte) ConnectChanged(cb func(hasValue bool, value byte)) error {
+func (p ImplPropByte) ConnectChanged(cb func(hasValue bool, value byte)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -160,21 +315,57 @@ func (p PropByte) ConnectChanged(cb func(hasValue bool, value byte)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt16 struct {
+type MockPropByte struct {
+	mock.Mock
+}
+
+func (p *MockPropByte) Get(flags dbus.Flags) (value byte, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(byte)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropByte) Set(flags dbus.Flags, value byte) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropByte) ConnectChanged(cb func(hasValue bool, value byte)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt16 interface {
+	Get(flags dbus.Flags) (value int16, err error)
+	Set(flags dbus.Flags, value int16) error
+	ConnectChanged(cb func(hasValue bool, value int16)) error
+}
+
+type ImplPropInt16 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt16) Get(flags dbus.Flags) (value int16, err error) {
+func (p ImplPropInt16) Get(flags dbus.Flags) (value int16, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt16) Set(flags dbus.Flags, value int16) error {
+func (p ImplPropInt16) Set(flags dbus.Flags, value int16) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt16) ConnectChanged(cb func(hasValue bool, value int16)) error {
+func (p ImplPropInt16) ConnectChanged(cb func(hasValue bool, value int16)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -191,21 +382,57 @@ func (p PropInt16) ConnectChanged(cb func(hasValue bool, value int16)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint16 struct {
+type MockPropInt16 struct {
+	mock.Mock
+}
+
+func (p *MockPropInt16) Get(flags dbus.Flags) (value int16, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(int16)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt16) Set(flags dbus.Flags, value int16) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt16) ConnectChanged(cb func(hasValue bool, value int16)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint16 interface {
+	Get(flags dbus.Flags) (value uint16, err error)
+	Set(flags dbus.Flags, value uint16) error
+	ConnectChanged(cb func(hasValue bool, value uint16)) error
+}
+
+type ImplPropUint16 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint16) Get(flags dbus.Flags) (value uint16, err error) {
+func (p ImplPropUint16) Get(flags dbus.Flags) (value uint16, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint16) Set(flags dbus.Flags, value uint16) error {
+func (p ImplPropUint16) Set(flags dbus.Flags, value uint16) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint16) ConnectChanged(cb func(hasValue bool, value uint16)) error {
+func (p ImplPropUint16) ConnectChanged(cb func(hasValue bool, value uint16)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -222,21 +449,57 @@ func (p PropUint16) ConnectChanged(cb func(hasValue bool, value uint16)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt32 struct {
+type MockPropUint16 struct {
+	mock.Mock
+}
+
+func (p *MockPropUint16) Get(flags dbus.Flags) (value uint16, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(uint16)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint16) Set(flags dbus.Flags, value uint16) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint16) ConnectChanged(cb func(hasValue bool, value uint16)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt32 interface {
+	Get(flags dbus.Flags) (value int32, err error)
+	Set(flags dbus.Flags, value int32) error
+	ConnectChanged(cb func(hasValue bool, value int32)) error
+}
+
+type ImplPropInt32 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt32) Get(flags dbus.Flags) (value int32, err error) {
+func (p ImplPropInt32) Get(flags dbus.Flags) (value int32, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt32) Set(flags dbus.Flags, value int32) error {
+func (p ImplPropInt32) Set(flags dbus.Flags, value int32) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt32) ConnectChanged(cb func(hasValue bool, value int32)) error {
+func (p ImplPropInt32) ConnectChanged(cb func(hasValue bool, value int32)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -253,21 +516,57 @@ func (p PropInt32) ConnectChanged(cb func(hasValue bool, value int32)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint32 struct {
+type MockPropInt32 struct {
+	mock.Mock
+}
+
+func (p *MockPropInt32) Get(flags dbus.Flags) (value int32, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(int32)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt32) Set(flags dbus.Flags, value int32) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt32) ConnectChanged(cb func(hasValue bool, value int32)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint32 interface {
+	Get(flags dbus.Flags) (value uint32, err error)
+	Set(flags dbus.Flags, value uint32) error
+	ConnectChanged(cb func(hasValue bool, value uint32)) error
+}
+
+type ImplPropUint32 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint32) Get(flags dbus.Flags) (value uint32, err error) {
+func (p ImplPropUint32) Get(flags dbus.Flags) (value uint32, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint32) Set(flags dbus.Flags, value uint32) error {
+func (p ImplPropUint32) Set(flags dbus.Flags, value uint32) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint32) ConnectChanged(cb func(hasValue bool, value uint32)) error {
+func (p ImplPropUint32) ConnectChanged(cb func(hasValue bool, value uint32)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -284,21 +583,57 @@ func (p PropUint32) ConnectChanged(cb func(hasValue bool, value uint32)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt64 struct {
+type MockPropUint32 struct {
+	mock.Mock
+}
+
+func (p *MockPropUint32) Get(flags dbus.Flags) (value uint32, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(uint32)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint32) Set(flags dbus.Flags, value uint32) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint32) ConnectChanged(cb func(hasValue bool, value uint32)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt64 interface {
+	Get(flags dbus.Flags) (value int64, err error)
+	Set(flags dbus.Flags, value int64) error
+	ConnectChanged(cb func(hasValue bool, value int64)) error
+}
+
+type ImplPropInt64 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt64) Get(flags dbus.Flags) (value int64, err error) {
+func (p ImplPropInt64) Get(flags dbus.Flags) (value int64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt64) Set(flags dbus.Flags, value int64) error {
+func (p ImplPropInt64) Set(flags dbus.Flags, value int64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt64) ConnectChanged(cb func(hasValue bool, value int64)) error {
+func (p ImplPropInt64) ConnectChanged(cb func(hasValue bool, value int64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -315,21 +650,57 @@ func (p PropInt64) ConnectChanged(cb func(hasValue bool, value int64)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint64 struct {
+type MockPropInt64 struct {
+	mock.Mock
+}
+
+func (p *MockPropInt64) Get(flags dbus.Flags) (value int64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(int64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt64) Set(flags dbus.Flags, value int64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt64) ConnectChanged(cb func(hasValue bool, value int64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint64 interface {
+	Get(flags dbus.Flags) (value uint64, err error)
+	Set(flags dbus.Flags, value uint64) error
+	ConnectChanged(cb func(hasValue bool, value uint64)) error
+}
+
+type ImplPropUint64 struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint64) Get(flags dbus.Flags) (value uint64, err error) {
+func (p ImplPropUint64) Get(flags dbus.Flags) (value uint64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint64) Set(flags dbus.Flags, value uint64) error {
+func (p ImplPropUint64) Set(flags dbus.Flags, value uint64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint64) ConnectChanged(cb func(hasValue bool, value uint64)) error {
+func (p ImplPropUint64) ConnectChanged(cb func(hasValue bool, value uint64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -346,21 +717,57 @@ func (p PropUint64) ConnectChanged(cb func(hasValue bool, value uint64)) error {
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropBoolArray struct {
+type MockPropUint64 struct {
+	mock.Mock
+}
+
+func (p *MockPropUint64) Get(flags dbus.Flags) (value uint64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).(uint64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint64) Set(flags dbus.Flags, value uint64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint64) ConnectChanged(cb func(hasValue bool, value uint64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropBoolArray interface {
+	Get(flags dbus.Flags) (value []bool, err error)
+	Set(flags dbus.Flags, value []bool) error
+	ConnectChanged(cb func(hasValue bool, value []bool)) error
+}
+
+type ImplPropBoolArray struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropBoolArray) Get(flags dbus.Flags) (value []bool, err error) {
+func (p ImplPropBoolArray) Get(flags dbus.Flags) (value []bool, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropBoolArray) Set(flags dbus.Flags, value []bool) error {
+func (p ImplPropBoolArray) Set(flags dbus.Flags, value []bool) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropBoolArray) ConnectChanged(cb func(hasValue bool, value []bool)) error {
+func (p ImplPropBoolArray) ConnectChanged(cb func(hasValue bool, value []bool)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -377,21 +784,57 @@ func (p PropBoolArray) ConnectChanged(cb func(hasValue bool, value []bool)) erro
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropStringArray struct {
+type MockPropBoolArray struct {
+	mock.Mock
+}
+
+func (p *MockPropBoolArray) Get(flags dbus.Flags) (value []bool, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]bool)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropBoolArray) Set(flags dbus.Flags, value []bool) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropBoolArray) ConnectChanged(cb func(hasValue bool, value []bool)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropStringArray interface {
+	Get(flags dbus.Flags) (value []string, err error)
+	Set(flags dbus.Flags, value []string) error
+	ConnectChanged(cb func(hasValue bool, value []string)) error
+}
+
+type ImplPropStringArray struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropStringArray) Get(flags dbus.Flags) (value []string, err error) {
+func (p ImplPropStringArray) Get(flags dbus.Flags) (value []string, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropStringArray) Set(flags dbus.Flags, value []string) error {
+func (p ImplPropStringArray) Set(flags dbus.Flags, value []string) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropStringArray) ConnectChanged(cb func(hasValue bool, value []string)) error {
+func (p ImplPropStringArray) ConnectChanged(cb func(hasValue bool, value []string)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -408,21 +851,57 @@ func (p PropStringArray) ConnectChanged(cb func(hasValue bool, value []string)) 
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropObjectPathArray struct {
+type MockPropStringArray struct {
+	mock.Mock
+}
+
+func (p *MockPropStringArray) Get(flags dbus.Flags) (value []string, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]string)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropStringArray) Set(flags dbus.Flags, value []string) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropStringArray) ConnectChanged(cb func(hasValue bool, value []string)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropObjectPathArray interface {
+	Get(flags dbus.Flags) (value []dbus.ObjectPath, err error)
+	Set(flags dbus.Flags, value []dbus.ObjectPath) error
+	ConnectChanged(cb func(hasValue bool, value []dbus.ObjectPath)) error
+}
+
+type ImplPropObjectPathArray struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropObjectPathArray) Get(flags dbus.Flags) (value []dbus.ObjectPath, err error) {
+func (p ImplPropObjectPathArray) Get(flags dbus.Flags) (value []dbus.ObjectPath, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropObjectPathArray) Set(flags dbus.Flags, value []dbus.ObjectPath) error {
+func (p ImplPropObjectPathArray) Set(flags dbus.Flags, value []dbus.ObjectPath) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropObjectPathArray) ConnectChanged(cb func(hasValue bool, value []dbus.ObjectPath)) error {
+func (p ImplPropObjectPathArray) ConnectChanged(cb func(hasValue bool, value []dbus.ObjectPath)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -439,21 +918,57 @@ func (p PropObjectPathArray) ConnectChanged(cb func(hasValue bool, value []dbus.
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropDoubleArray struct {
+type MockPropObjectPathArray struct {
+	mock.Mock
+}
+
+func (p *MockPropObjectPathArray) Get(flags dbus.Flags) (value []dbus.ObjectPath, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]dbus.ObjectPath)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropObjectPathArray) Set(flags dbus.Flags, value []dbus.ObjectPath) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropObjectPathArray) ConnectChanged(cb func(hasValue bool, value []dbus.ObjectPath)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropDoubleArray interface {
+	Get(flags dbus.Flags) (value []float64, err error)
+	Set(flags dbus.Flags, value []float64) error
+	ConnectChanged(cb func(hasValue bool, value []float64)) error
+}
+
+type ImplPropDoubleArray struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropDoubleArray) Get(flags dbus.Flags) (value []float64, err error) {
+func (p ImplPropDoubleArray) Get(flags dbus.Flags) (value []float64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropDoubleArray) Set(flags dbus.Flags, value []float64) error {
+func (p ImplPropDoubleArray) Set(flags dbus.Flags, value []float64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropDoubleArray) ConnectChanged(cb func(hasValue bool, value []float64)) error {
+func (p ImplPropDoubleArray) ConnectChanged(cb func(hasValue bool, value []float64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -470,21 +985,57 @@ func (p PropDoubleArray) ConnectChanged(cb func(hasValue bool, value []float64))
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropByteArray struct {
+type MockPropDoubleArray struct {
+	mock.Mock
+}
+
+func (p *MockPropDoubleArray) Get(flags dbus.Flags) (value []float64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]float64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropDoubleArray) Set(flags dbus.Flags, value []float64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropDoubleArray) ConnectChanged(cb func(hasValue bool, value []float64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropByteArray interface {
+	Get(flags dbus.Flags) (value []byte, err error)
+	Set(flags dbus.Flags, value []byte) error
+	ConnectChanged(cb func(hasValue bool, value []byte)) error
+}
+
+type ImplPropByteArray struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropByteArray) Get(flags dbus.Flags) (value []byte, err error) {
+func (p ImplPropByteArray) Get(flags dbus.Flags) (value []byte, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropByteArray) Set(flags dbus.Flags, value []byte) error {
+func (p ImplPropByteArray) Set(flags dbus.Flags, value []byte) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropByteArray) ConnectChanged(cb func(hasValue bool, value []byte)) error {
+func (p ImplPropByteArray) ConnectChanged(cb func(hasValue bool, value []byte)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -501,21 +1052,57 @@ func (p PropByteArray) ConnectChanged(cb func(hasValue bool, value []byte)) erro
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt16Array struct {
+type MockPropByteArray struct {
+	mock.Mock
+}
+
+func (p *MockPropByteArray) Get(flags dbus.Flags) (value []byte, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]byte)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropByteArray) Set(flags dbus.Flags, value []byte) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropByteArray) ConnectChanged(cb func(hasValue bool, value []byte)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt16Array interface {
+	Get(flags dbus.Flags) (value []int16, err error)
+	Set(flags dbus.Flags, value []int16) error
+	ConnectChanged(cb func(hasValue bool, value []int16)) error
+}
+
+type ImplPropInt16Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt16Array) Get(flags dbus.Flags) (value []int16, err error) {
+func (p ImplPropInt16Array) Get(flags dbus.Flags) (value []int16, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt16Array) Set(flags dbus.Flags, value []int16) error {
+func (p ImplPropInt16Array) Set(flags dbus.Flags, value []int16) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt16Array) ConnectChanged(cb func(hasValue bool, value []int16)) error {
+func (p ImplPropInt16Array) ConnectChanged(cb func(hasValue bool, value []int16)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -532,21 +1119,57 @@ func (p PropInt16Array) ConnectChanged(cb func(hasValue bool, value []int16)) er
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint16Array struct {
+type MockPropInt16Array struct {
+	mock.Mock
+}
+
+func (p *MockPropInt16Array) Get(flags dbus.Flags) (value []int16, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]int16)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt16Array) Set(flags dbus.Flags, value []int16) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt16Array) ConnectChanged(cb func(hasValue bool, value []int16)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint16Array interface {
+	Get(flags dbus.Flags) (value []uint16, err error)
+	Set(flags dbus.Flags, value []uint16) error
+	ConnectChanged(cb func(hasValue bool, value []uint16)) error
+}
+
+type ImplPropUint16Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint16Array) Get(flags dbus.Flags) (value []uint16, err error) {
+func (p ImplPropUint16Array) Get(flags dbus.Flags) (value []uint16, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint16Array) Set(flags dbus.Flags, value []uint16) error {
+func (p ImplPropUint16Array) Set(flags dbus.Flags, value []uint16) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint16Array) ConnectChanged(cb func(hasValue bool, value []uint16)) error {
+func (p ImplPropUint16Array) ConnectChanged(cb func(hasValue bool, value []uint16)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -563,21 +1186,57 @@ func (p PropUint16Array) ConnectChanged(cb func(hasValue bool, value []uint16)) 
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt32Array struct {
+type MockPropUint16Array struct {
+	mock.Mock
+}
+
+func (p *MockPropUint16Array) Get(flags dbus.Flags) (value []uint16, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]uint16)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint16Array) Set(flags dbus.Flags, value []uint16) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint16Array) ConnectChanged(cb func(hasValue bool, value []uint16)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt32Array interface {
+	Get(flags dbus.Flags) (value []int32, err error)
+	Set(flags dbus.Flags, value []int32) error
+	ConnectChanged(cb func(hasValue bool, value []int32)) error
+}
+
+type ImplPropInt32Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt32Array) Get(flags dbus.Flags) (value []int32, err error) {
+func (p ImplPropInt32Array) Get(flags dbus.Flags) (value []int32, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt32Array) Set(flags dbus.Flags, value []int32) error {
+func (p ImplPropInt32Array) Set(flags dbus.Flags, value []int32) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt32Array) ConnectChanged(cb func(hasValue bool, value []int32)) error {
+func (p ImplPropInt32Array) ConnectChanged(cb func(hasValue bool, value []int32)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -594,21 +1253,57 @@ func (p PropInt32Array) ConnectChanged(cb func(hasValue bool, value []int32)) er
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint32Array struct {
+type MockPropInt32Array struct {
+	mock.Mock
+}
+
+func (p *MockPropInt32Array) Get(flags dbus.Flags) (value []int32, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]int32)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt32Array) Set(flags dbus.Flags, value []int32) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt32Array) ConnectChanged(cb func(hasValue bool, value []int32)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint32Array interface {
+	Get(flags dbus.Flags) (value []uint32, err error)
+	Set(flags dbus.Flags, value []uint32) error
+	ConnectChanged(cb func(hasValue bool, value []uint32)) error
+}
+
+type ImplPropUint32Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint32Array) Get(flags dbus.Flags) (value []uint32, err error) {
+func (p ImplPropUint32Array) Get(flags dbus.Flags) (value []uint32, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint32Array) Set(flags dbus.Flags, value []uint32) error {
+func (p ImplPropUint32Array) Set(flags dbus.Flags, value []uint32) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint32Array) ConnectChanged(cb func(hasValue bool, value []uint32)) error {
+func (p ImplPropUint32Array) ConnectChanged(cb func(hasValue bool, value []uint32)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -625,21 +1320,57 @@ func (p PropUint32Array) ConnectChanged(cb func(hasValue bool, value []uint32)) 
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropInt64Array struct {
+type MockPropUint32Array struct {
+	mock.Mock
+}
+
+func (p *MockPropUint32Array) Get(flags dbus.Flags) (value []uint32, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]uint32)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint32Array) Set(flags dbus.Flags, value []uint32) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint32Array) ConnectChanged(cb func(hasValue bool, value []uint32)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropInt64Array interface {
+	Get(flags dbus.Flags) (value []int64, err error)
+	Set(flags dbus.Flags, value []int64) error
+	ConnectChanged(cb func(hasValue bool, value []int64)) error
+}
+
+type ImplPropInt64Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropInt64Array) Get(flags dbus.Flags) (value []int64, err error) {
+func (p ImplPropInt64Array) Get(flags dbus.Flags) (value []int64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropInt64Array) Set(flags dbus.Flags, value []int64) error {
+func (p ImplPropInt64Array) Set(flags dbus.Flags, value []int64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropInt64Array) ConnectChanged(cb func(hasValue bool, value []int64)) error {
+func (p ImplPropInt64Array) ConnectChanged(cb func(hasValue bool, value []int64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -656,21 +1387,57 @@ func (p PropInt64Array) ConnectChanged(cb func(hasValue bool, value []int64)) er
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
 }
 
-type PropUint64Array struct {
+type MockPropInt64Array struct {
+	mock.Mock
+}
+
+func (p *MockPropInt64Array) Get(flags dbus.Flags) (value []int64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]int64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropInt64Array) Set(flags dbus.Flags, value []int64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropInt64Array) ConnectChanged(cb func(hasValue bool, value []int64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
+}
+
+type PropUint64Array interface {
+	Get(flags dbus.Flags) (value []uint64, err error)
+	Set(flags dbus.Flags, value []uint64) error
+	ConnectChanged(cb func(hasValue bool, value []uint64)) error
+}
+
+type ImplPropUint64Array struct {
 	Impl Implementer
 	Name string
 }
 
-func (p PropUint64Array) Get(flags dbus.Flags) (value []uint64, err error) {
+func (p ImplPropUint64Array) Get(flags dbus.Flags) (value []uint64, err error) {
 	err = p.Impl.GetObject_().GetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, &value)
 	return
 }
 
-func (p PropUint64Array) Set(flags dbus.Flags, value []uint64) error {
+func (p ImplPropUint64Array) Set(flags dbus.Flags, value []uint64) error {
 	return p.Impl.GetObject_().SetProperty_(flags, p.Impl.GetInterfaceName_(), p.Name, value)
 }
 
-func (p PropUint64Array) ConnectChanged(cb func(hasValue bool, value []uint64)) error {
+func (p ImplPropUint64Array) ConnectChanged(cb func(hasValue bool, value []uint64)) error {
 	if cb == nil {
 		return errNilCallback
 	}
@@ -685,4 +1452,34 @@ func (p PropUint64Array) ConnectChanged(cb func(hasValue bool, value []uint64)) 
 		}
 	}
 	return p.Impl.GetObject_().ConnectPropertyChanged_(p.Impl.GetInterfaceName_(), p.Name, cb0)
+}
+
+type MockPropUint64Array struct {
+	mock.Mock
+}
+
+func (p *MockPropUint64Array) Get(flags dbus.Flags) (value []uint64, err error) {
+	args := p.Called(flags)
+
+	var ok bool
+	value, ok = args.Get(0).([]uint64)
+	if !ok {
+		panic(fmt.Sprintf("assert: arguments: %d failed because object wasn't correct type: %v", 0, args.Get(0)))
+	}
+
+	err = args.Error(1)
+
+	return
+}
+
+func (p *MockPropUint64Array) Set(flags dbus.Flags, value []uint64) error {
+	args := p.Called(flags, value)
+
+	return args.Error(0)
+}
+
+func (p *MockPropUint64Array) ConnectChanged(cb func(hasValue bool, value []uint64)) error {
+	args := p.Called(cb)
+
+	return args.Error(0)
 }
