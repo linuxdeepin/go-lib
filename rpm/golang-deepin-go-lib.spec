@@ -5,8 +5,6 @@
 
 %global goipath  pkg.deepin.io/lib
 %global forgeurl https://github.com/linuxdeepin/go-lib
-%global sname go-dlib
-%global release_name server-industry
 
 %global with_debug 1
 
@@ -16,12 +14,12 @@
 %gometa
 
 Name:           go-lib
-Version:        5.7.1
+Version:        5.7.2
 Release:        1
 Summary:        Go bindings for Deepin Desktop Environment development
 License:        GPLv3
 URL:            http://shuttle.corp.deepin.com/cache/tasks/18990/unstable-amd64/
-Source0:        %{sname}_%{version}-%{release_name}.orig.tar.xz
+Source0:        %{name}_%{version}.orig.tar.xz
 BuildRequires:  compiler(go-compiler)
 
 %description
@@ -57,8 +55,8 @@ building other packages which use import path with
 %{goipath} prefix.
 
 %prep
-%setup -q -n  %{sname}-%{version}-%{release_name}
-%forgeautosetup -n  %{sname}-%{version}-%{release_name}
+%setup -q -n  %{name}_%{version}
+%forgeautosetup -n %{name}_%{version}
 
 %install
 install -d -p %{buildroot}/%{gopath}/src/%{import_path}/
@@ -83,5 +81,5 @@ echo "%%{gopath}/src/%%{goipath}/CHANGELOG.md" >> devel.file-list
 %license LICENSE
 
 %changelog
-* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.1-1
-- Update to 5.7.1
+* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.2-1
+- Update to 5.7.2
