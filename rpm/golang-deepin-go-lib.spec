@@ -14,7 +14,7 @@
 %gometa
 
 Name:           go-lib
-Version:        5.7.4
+Version:        5.7.5
 Release:        1
 Summary:        Go bindings for Deepin Desktop Environment development
 License:        GPLv3
@@ -55,8 +55,8 @@ building other packages which use import path with
 %{goipath} prefix.
 
 %prep
-%setup -q -n  go-dlib_%{version}
-%forgeautosetup -n go-dlib_%{version}
+%setup -q -n  go-dlib-%{version}
+%forgeautosetup -n go-dlib-%{version}
 
 %install
 install -d -p %{buildroot}/%{gopath}/src/%{import_path}/
@@ -81,5 +81,5 @@ echo "%%{gopath}/src/%%{goipath}/CHANGELOG.md" >> devel.file-list
 %license LICENSE
 
 %changelog
-* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.4-1
-- Update to 5.7.4
+* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.5-1
+- Update to 5.7.5
