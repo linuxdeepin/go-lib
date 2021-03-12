@@ -19,7 +19,7 @@ Release:        1
 Summary:        Go bindings for Deepin Desktop Environment development
 License:        GPLv3
 URL:            http://shuttle.corp.deepin.com/cache/tasks/18990/unstable-amd64/
-Source0:        %{name}_%{version}.orig.tar.xz
+Source0:        go-dlib_%{version}.orig.tar.xz
 BuildRequires:  compiler(go-compiler)
 
 %description
@@ -55,8 +55,8 @@ building other packages which use import path with
 %{goipath} prefix.
 
 %prep
-%setup -q -n  %{name}_%{version}
-%forgeautosetup -n %{name}_%{version}
+%setup -q -n  go-dlib_%{version}
+%forgeautosetup -n go-dlib_%{version}
 
 %install
 install -d -p %{buildroot}/%{gopath}/src/%{import_path}/
