@@ -14,7 +14,7 @@
 %gometa
 
 Name:           go-lib
-Version:        5.7.2
+Version:        5.7.4
 Release:        1
 Summary:        Go bindings for Deepin Desktop Environment development
 License:        GPLv3
@@ -81,5 +81,5 @@ echo "%%{gopath}/src/%%{goipath}/CHANGELOG.md" >> devel.file-list
 %license LICENSE
 
 %changelog
-* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.2-1
-- Update to 5.7.2
+* Wed Mar 12 2021 uoser <uoser@uniontech.com> - 5.7.4-1
+- Update to 5.7.4
