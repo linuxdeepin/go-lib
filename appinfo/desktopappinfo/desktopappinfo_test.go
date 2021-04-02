@@ -458,12 +458,12 @@ func Test_expandFieldCode(t *testing.T) {
 		cmdline = []string{"start", "%u", "end"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file:///dir1/dir2/a", "end"})
+		c.So(parts, ShouldResemble, []string{"start", "/dir1/dir2/a", "end"})
 
 		cmdline = []string{"start", "%U", "end"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file:///dir1/dir2/a", "file:///dir1/dir2/b", "end"})
+		c.So(parts, ShouldResemble, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
 
 		cmdline = []string{"start", "%%", "%abc", "end"}
 		_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
@@ -484,12 +484,12 @@ func Test_expandFieldCode(t *testing.T) {
 		cmdline = []string{"start", "file=%u", "end"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file=file:///a/b/log", "end"})
+		c.So(parts, ShouldResemble, []string{"start", "file=/a/b/log", "end"})
 
 		cmdline = []string{"start", "file=%u+++", "end"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file=file:///a/b/log+++", "end"})
+		c.So(parts, ShouldResemble, []string{"start", "file=/a/b/log+++", "end"})
 
 		cmdline = []string{"start", "icon:%i", "end"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
