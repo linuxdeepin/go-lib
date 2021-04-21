@@ -680,6 +680,21 @@ func (action *DesktopAction) StartCommand(files []string, launchContext *appinfo
 
 func getAppNamebyId(folder string, id string) string {
 	files, _ := ioutil.ReadDir(folder)
+	// 优先进行严格匹配
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		} else {
+			idFromFile := file.Name()
+			idFromFiles := strings.Split(idFromFile, "/")
+			if len(idFromFiles) > 1 {
+				if idFromFiles[len(idFromFiles) - 1] == id {
+					return file.Name()
+				}
+			}
+		}
+	}
+
 	for _, file := range files {
 		if file.IsDir() {
 			continue
