@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -10,9 +11,9 @@ import (
 )
 
 type Object struct {
-	obj  dbus.BusObject
-	conn *dbus.Conn
-	mu   sync.Mutex
+	obj      dbus.BusObject
+	conn     *dbus.Conn
+	mu       sync.Mutex
 	extraMap map[string]interface{}
 	*objectSignalExt
 }
@@ -73,6 +74,11 @@ func (o *Object) ServiceName_() string {
 func (o *Object) Go_(method string, flags dbus.Flags,
 	ch chan *dbus.Call, args ...interface{}) *dbus.Call {
 	return o.obj.Go(method, flags, ch, args...)
+}
+
+func (o *Object) GoWithContext_(ctx context.Context, method string, flags dbus.Flags,
+	ch chan *dbus.Call, args ...interface{}) *dbus.Call {
+	return o.obj.GoWithContext(ctx, method, flags, ch, args...)
 }
 
 func (o *Object) GetProperty_(flags dbus.Flags, interfaceName, propName string,
