@@ -33,7 +33,7 @@ const (
 
 func Get() ArchFamilyType {
 	switch runtime.GOARCH {
-	case "sw_64":
+	case "sw_64","sw64":
 		return Sunway
 	case "amd64":
 		return AMD64
