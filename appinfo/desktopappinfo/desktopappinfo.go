@@ -686,11 +686,8 @@ func getAppNamebyId(folder string, id string) string {
 			continue
 		} else {
 			idFromFile := file.Name()
-			idFromFiles := strings.Split(idFromFile, "/")
-			if len(idFromFiles) > 1 {
-				if idFromFiles[len(idFromFiles) - 1] == id {
-					return file.Name()
-				}
+			if idFromFile == id {
+				return file.Name()
 			}
 		}
 	}
