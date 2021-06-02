@@ -4,8 +4,8 @@ import (
 	"errors"
 	"reflect"
 
-	"pkg.deepin.io/lib/dbus1"
-	"pkg.deepin.io/lib/dbus1/introspect"
+	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/introspect"
 )
 
 func newImplementerStatic(impl Implementer, structValue reflect.Value) *implementerStatic {

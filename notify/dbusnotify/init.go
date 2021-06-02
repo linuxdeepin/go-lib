@@ -19,7 +19,7 @@
 
 package dbusnotify
 
-import "pkg.deepin.io/lib/dbus"
+import "github.com/godbus/dbus"
 import "fmt"
 import "sync"
 

@@ -19,8 +19,7 @@
 
 package dbusnotify
 
-import "pkg.deepin.io/lib/dbus"
-import "pkg.deepin.io/lib/dbus/property"
+import "github.com/godbus/dbus"
 import "reflect"
 import "sync"
 import "runtime"
@@ -32,28 +31,28 @@ var _ = fmt.Println
 var _ = runtime.SetFinalizer
 var _ = sync.NewCond
 var _ = reflect.TypeOf
-var _ = property.BaseObserver{}
 
 type Notifier struct {
 	Path     dbus.ObjectPath
 	DestName string
-	core     *dbus.Object
+	core     dbus.BusObject
 
-	signals       map[<-chan *dbus.Signal]struct{}
+	signals       map[chan *dbus.Signal]struct{}
 	signalsLocker sync.Mutex
 }
 
-func (obj *Notifier) _createSignalChan() <-chan *dbus.Signal {
+func (obj *Notifier) _createSignalChan() chan *dbus.Signal {
 	obj.signalsLocker.Lock()
-	ch := getBus().Signal()
+	ch := make(chan *dbus.Signal, 10)
+	getBus().Signal(ch)
 	obj.signals[ch] = struct{}{}
 	obj.signalsLocker.Unlock()
 	return ch
 }
-func (obj *Notifier) _deleteSignalChan(ch <-chan *dbus.Signal) {
+func (obj *Notifier) _deleteSignalChan(ch chan *dbus.Signal) {
 	obj.signalsLocker.Lock()
 	delete(obj.signals, ch)
-	getBus().DetachSignal(ch)
+	getBus().RemoveSignal(ch)
 	obj.signalsLocker.Unlock()
 }
 func DestroyNotifier(obj *Notifier) {
@@ -63,7 +62,7 @@ func DestroyNotifier(obj *Notifier) {
 		return
 	}
 	for ch, _ := range obj.signals {
-		getBus().DetachSignal(ch)
+		getBus().RemoveSignal(ch)
 	}
 	obj.signals = nil
 
@@ -161,7 +160,7 @@ func NewNotifier(destName string, path dbus.ObjectPath) (*Notifier, error) {
 
 	core := getBus().Object(destName, path)
 
-	obj := &Notifier{Path: path, DestName: destName, core: core, signals: make(map[<-chan *dbus.Signal]struct{})}
+	obj := &Notifier{Path: path, DestName: destName, core: core, signals: make(map[chan *dbus.Signal]struct{})}
 
 	dbusAddMatch("type='signal',path='" + string(obj.Path) + "',interface='org.freedesktop.Notifications',sender='" + obj.DestName + "',member='NotificationClosed'")
 

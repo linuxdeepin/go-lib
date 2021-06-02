@@ -19,10 +19,6 @@
 
 package initializer
 
-import (
-	"pkg.deepin.io/lib/dbus"
-)
-
 // TODO:
 // 1. a Promise like initializer might be better.
 // 2. using reflect to support different initializer.
@@ -38,14 +34,6 @@ type Initializer struct {
 // NewInitializer creates a new Initializer.
 func NewInitializer() *Initializer {
 	return new(Initializer)
-}
-
-func installOnSessionBus(v interface{}) (interface{}, error) {
-	return v, dbus.InstallOnSession(v.(dbus.DBusObject))
-}
-
-func installOnSystemBus(v interface{}) (interface{}, error) {
-	return v, dbus.InstallOnSystem(v.(dbus.DBusObject))
 }
 
 func noop(v interface{}) (interface{}, error) {
@@ -79,18 +67,6 @@ func (i *Initializer) initWithHandler(fn func(interface{}) (interface{}, error),
 // Init accepts a initializer function, and pass the successful return value to next initializer.
 func (i *Initializer) Init(fn func(interface{}) (interface{}, error)) *Initializer {
 	return i.initWithHandler(fn, noop)
-}
-
-// InitOnSessionBus accepts a initializer function which must return a dbus.DBusObject
-// as successful value, and then install this dbus.DBusObject on session bus.
-func (i *Initializer) InitOnSessionBus(fn func(interface{}) (interface{}, error)) *Initializer {
-	return i.initWithHandler(fn, installOnSessionBus)
-}
-
-// InitOnSystemBus accepts a initializer function which must return a dbus.DBusObject
-// as successful value, and then install this dbus.DBusObject on system bus.
-func (i *Initializer) InitOnSystemBus(fn func(interface{}) (interface{}, error)) *Initializer {
-	return i.initWithHandler(fn, installOnSystemBus)
 }
 
 // GetError returns the first error of initializers.

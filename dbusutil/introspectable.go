@@ -3,9 +3,9 @@ package dbusutil
 import (
 	"strings"
 
-	"pkg.deepin.io/lib/dbus1"
-	"pkg.deepin.io/lib/dbus1/introspect"
-	"pkg.deepin.io/lib/dbus1/prop"
+	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/introspect"
+	"github.com/godbus/dbus/prop"
 	"pkg.deepin.io/lib/strv"
 )
 

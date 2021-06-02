@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"pkg.deepin.io/gir/gio-2.0"
-	"pkg.deepin.io/lib/dbus1"
-	"pkg.deepin.io/lib/dbus1/introspect"
+	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/introspect"
 	"pkg.deepin.io/lib/dbusutil"
 	"pkg.deepin.io/lib/gsettings"
 )

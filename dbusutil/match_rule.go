@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"pkg.deepin.io/lib/dbus1"
+	"github.com/godbus/dbus"
 )
 
 type MatchRule struct {

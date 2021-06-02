@@ -204,7 +204,7 @@ func main() {
 			parts := strings.SplitN(imp, "=", 2)
 			pkg := parts[0]
 			alias := parts[1]
-			// pkg.deepin.io/lib/dbus1=dbus,bytes
+			// github.com/godbus/dbus=dbus,bytes
 			parsedExtraImports = append(parsedExtraImports, fmt.Sprintf("%s \"%s\"",
 				alias, pkg))
 		} else {

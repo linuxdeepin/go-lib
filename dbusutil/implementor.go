@@ -6,7 +6,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"pkg.deepin.io/lib/dbus1"
+	"github.com/godbus/dbus"
 )
 
 type Implementer interface {
