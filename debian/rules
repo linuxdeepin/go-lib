@@ -12,3 +12,4 @@ override_dh_auto_install:
 override_dh_fixperms:
 	dh_fixperms
 	find debian -name 'build_test_locale_data' -exec chmod 755 {} \;
+override_dh_auto_test:
