@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/godbus/dbus"
+	"pkg.deepin.io/lib/dbus1"
 )
 
 type impl1 struct {

@@ -19,7 +19,7 @@
 
 package lib
 
-import "github.com/godbus/dbus"
+import "pkg.deepin.io/lib/dbus"
 
 const (
 	SystemBus  = 1

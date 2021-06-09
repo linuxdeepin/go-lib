@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/godbus/dbus"
+	"pkg.deepin.io/lib/dbus1"
 	"pkg.deepin.io/lib/dbusutil"
 )
 

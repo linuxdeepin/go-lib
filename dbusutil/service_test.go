@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/godbus/dbus"
+	"pkg.deepin.io/lib/dbus1"
 )
 
 func TestService_GetNameOwner(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/godbus/dbus"
-	"github.com/godbus/dbus/introspect"
+	"pkg.deepin.io/lib/dbus1"
+	"pkg.deepin.io/lib/dbus1/introspect"
 )
 
 type Service struct {

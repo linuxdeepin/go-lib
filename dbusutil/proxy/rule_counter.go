@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/godbus/dbus"
+	"pkg.deepin.io/lib/dbus1"
 )
 
 var globalRuleCounter = &ruleCounter{
