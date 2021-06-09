@@ -20,14 +20,13 @@
 package utils
 
 import (
+	"pkg.deepin.io/lib/fsnotify"
 	"sync"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 type WatchProxy struct {
 	watcher      *fsnotify.Watcher
-	eventHandler func(fsnotify.Event)
+	eventHandler func(*fsnotify.FileEvent)
 	errorHandler func(error)
 	fileList     []string
 	end          chan bool
@@ -56,7 +55,7 @@ func (w *WatchProxy) setFileListWatch() {
 	}
 
 	for _, filename := range w.fileList {
-		_ = w.watcher.Add(filename)
+		_ = w.watcher.Watch(filename)
 	}
 }
 
@@ -66,7 +65,7 @@ func (w *WatchProxy) removeFileListWatch() {
 	}
 
 	for _, filename := range w.fileList {
-		_ = w.watcher.Remove(filename)
+		_ = w.watcher.RemoveWatch(filename)
 	}
 }
 
@@ -74,7 +73,7 @@ func (w *WatchProxy) SetFileList(fileList []string) {
 	w.fileList = fileList
 }
 
-func (w *WatchProxy) SetEventHandler(f func(fsnotify.Event)) {
+func (w *WatchProxy) SetEventHandler(f func(*fsnotify.FileEvent)) {
 	w.eventHandler = f
 }
 
@@ -102,7 +101,7 @@ func (w *WatchProxy) StartWatch() {
 
 	for {
 		select {
-		case ev, ok := <-w.watcher.Events:
+		case ev, ok := <-w.watcher.Event:
 			if !ok {
 				w.ResetFileListWatch()
 				break
@@ -111,7 +110,7 @@ func (w *WatchProxy) StartWatch() {
 				break
 			}
 			w.eventHandler(ev)
-		case err, ok := <-w.watcher.Errors:
+		case err, ok := <-w.watcher.Error:
 			if !ok {
 				w.ResetFileListWatch()
 				break
