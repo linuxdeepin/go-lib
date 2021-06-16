@@ -32,6 +32,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
+	"syscall"
 	"time"
 
 	"pkg.deepin.io/lib/asound"
@@ -295,9 +296,22 @@ func hwSpeakerEnable(s bool) error {
 	} else {
 		param = "-c"
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-	defer cancel()
-	cmdline := exec.CommandContext(ctx, "/usr/bin/hwaudioservice", param)
-	_, err := cmdline.CombinedOutput()
-	return err
+	//如果可执行文件执行失败，开关音效会失效联系华为解决
+	binPath := []string{
+		"/usr/share/hw-audio/hwaudioservice", //TODO 82239 华为为了规避内核版本不同，需要我们上层做出规避,执行不同目录下的hwaudioservice 文件
+		"/usr/bin/hwaudioservice",
+	}
+
+	for _, binFile := range binPath {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+		defer cancel()
+
+		err := syscall.Access(binFile, syscall.F_OK)
+		if !os.IsNotExist(err) {
+			cmd := exec.CommandContext(ctx, binFile, param)
+			cmd.CombinedOutput()
+		}
+	}
+
+	return nil
 }
