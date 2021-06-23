@@ -20,22 +20,84 @@
 package archive
 
 import (
-	C "gopkg.in/check.v1"
+	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
-type testWrapper struct{}
-
-func init() {
-	C.Suite(&testWrapper{})
+type UnitTestSuite struct {
+	suite.Suite
+	testDataPath string
 }
 
-func Test(t *testing.T) {
-	C.TestingT(t)
+func (s *UnitTestSuite) SetupSuite() {
+	s.testDataPath = "./testdata/tar-compress-datas"
+	data := []byte("UOS Deepin")
+	err := os.MkdirAll(s.testDataPath, 0777)
+	require.Nil(s.T(), err)
+
+	tmpfile, err := ioutil.TempFile(s.testDataPath, "data.dat")
+	require.Nil(s.T(), err)
+	defer tmpfile.Close()
+
+	err = ioutil.WriteFile(tmpfile.Name(), data, 0777)
+	require.Nil(s.T(), err)
 }
 
-func (*testWrapper) TestTarCompresssFiles(c *C.C) {
+func (s *UnitTestSuite) TearDownSuite() {
+	s.testDataPath = "./testdata"
+	err := os.RemoveAll(s.testDataPath)
+	require.Nil(s.T(), err)
+}
+
+func (s *UnitTestSuite) Test_CompressDir() {
+	var infos = []struct {
+		src      string
+		dest     string
+		errIsNil bool
+	}{
+		{
+			src:      "testdata/tar-compress-datas",
+			dest:     "testdata/tmp-compress.tar",
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tar-compress-datas",
+			dest:     "testdata/tmp-compress.tar.gz",
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tar-compress-datas",
+			dest:     "testdata/tmp-compress.tar.bz2",
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tar-compress-datas",
+			dest:     "testdata/tmp-compress.zip",
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/xxxxx",
+			dest:     "testdata/xxxxx",
+			errIsNil: false,
+		},
+	}
+
+	for _, info := range infos {
+		err := CompressDir(info.src, info.dest)
+		if !info.errIsNil {
+			assert.NotEqual(s.T(), nil, err)
+		} else {
+			assert.Equal(s.T(), nil, err)
+		}
+	}
+}
+
+func (s *UnitTestSuite) Test_CompresssFiles() {
 	var infos = []struct {
 		files    []string
 		dest     string
@@ -47,23 +109,37 @@ func (*testWrapper) TestTarCompresssFiles(c *C.C) {
 			errIsNil: true,
 		},
 		{
+			files:    []string{"testdata/tar-compress-datas"},
+			dest:     "testdata/tmp-compress.tar.gz",
+			errIsNil: true,
+		},
+		{
+			files:    []string{"testdata/tar-compress-datas"},
+			dest:     "testdata/tmp-compress.tar.bz2",
+			errIsNil: true,
+		},
+		{
+			files:    []string{"testdata/tar-compress-datas"},
+			dest:     "testdata/tmp-compress.zip",
+			errIsNil: true,
+		},
+		{
 			files:    []string{"testdata/xxxxx"},
 			dest:     "testdata/xxxxx",
 			errIsNil: false,
 		},
 	}
 	for _, info := range infos {
-		err := tarCompressFiles(info.files, info.dest)
+		err := CompressFiles(info.files, info.dest)
 		if !info.errIsNil {
-			c.Check(err, C.Not(C.Equals), nil)
+			assert.NotEqual(s.T(), nil, err)
 		} else {
-			c.Check(err, C.Equals, nil)
+			assert.Equal(s.T(), nil, err)
 		}
-		os.Remove(info.dest)
 	}
 }
 
-func (*testWrapper) TestTarExtracteFile(c *C.C) {
+func (s *UnitTestSuite) Test_ExtracteFile() {
 	var infos = []struct {
 		src      string
 		dest     string
@@ -71,9 +147,27 @@ func (*testWrapper) TestTarExtracteFile(c *C.C) {
 		errIsNil bool
 	}{
 		{
-			src:      "testdata/tar-extracte-data.tar",
+			src:      "testdata/tmp-compress.tar",
 			dest:     "testdata/tmp-extracte",
-			fileNum:  2,
+			fileNum:  1,
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tmp-compress.tar.gz",
+			dest:     "testdata/tmp-extracte",
+			fileNum:  1,
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tmp-compress.tar.bz2",
+			dest:     "testdata/tmp-extracte",
+			fileNum:  0,
+			errIsNil: true,
+		},
+		{
+			src:      "testdata/tmp-compress.zip",
+			dest:     "testdata/tmp-extracte",
+			fileNum:  0,
 			errIsNil: true,
 		},
 		{
@@ -84,14 +178,21 @@ func (*testWrapper) TestTarExtracteFile(c *C.C) {
 	}
 
 	for _, info := range infos {
-		files, err := tarExtracteFile(info.src, info.dest)
+		files, err := Extracte(info.src, info.dest)
+
 		if !info.errIsNil {
-			c.Check(err, C.Not(C.Equals), nil)
+			assert.NotEqual(s.T(), nil, err)
 			continue
 		}
 
-		c.Check(err, C.Equals, nil)
-		c.Check(info.fileNum, C.Equals, len(files))
-		os.RemoveAll(info.dest)
+		assert.Equal(s.T(), nil, err)
+		assert.Equal(s.T(), info.fileNum, len(files))
+
+		// 此处需要移除解压的目录, 否则在执行其它用例时会因为文件数不对而导致测试用例执行失败
+		os.Remove(info.dest)
 	}
+}
+
+func TestUnitTestSuite(t *testing.T) {
+	suite.Run(t, new(UnitTestSuite))
 }

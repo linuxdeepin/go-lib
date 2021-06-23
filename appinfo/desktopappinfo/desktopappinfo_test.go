@@ -74,13 +74,35 @@ func TestNewDesktopAppInfo(t *testing.T) {
 		xdgAppDirs = []string{filepath.Join(testDataDir, "applications")}
 
 		c.Convey("NewDesktopAppInfoFromFile", func(c C) {
-			ai, err := NewDesktopAppInfoFromFile("testdata/applications/deepin-screenshot.desktop")
+			var testDesktopTypes []string
+			testFileName := "testdata/applications/deepin-screenshot.desktop"
+			ai, err := NewDesktopAppInfoFromFile(testFileName)
 			c.So(err, ShouldBeNil)
 			c.So(ai, ShouldNotBeNil)
 
 			c.So(err, ShouldBeNil)
 			c.So(ai.GetIcon(), ShouldEqual, "deepin-screenshot")
 			c.So(ai.GetId(), ShouldEqual, "deepin-screenshot")
+			c.So(ai.GetIsHiden(), ShouldEqual, false)
+			c.So(ai.GetIsHidden(), ShouldEqual, false)
+			c.So(ai.GetNoDisplay(), ShouldEqual, false)
+			c.So(ai.ShouldShow(), ShouldEqual, true)
+			c.So(ai.GetGenericName(), ShouldEqual, "Screen capturing application")
+			c.So(ai.GetComment(), ShouldEqual, "Screen capturing application")
+			c.So(ai.GetDisplayName(), ShouldEqual, "Deepin Screenshot")
+			c.So(ai.GetMimeTypes(), ShouldResemble, testDesktopTypes)
+			c.So(ai.GetCategories(), ShouldResemble, []string{"Graphics", "GTK"})
+			c.So(ai.GetKeywords(), ShouldResemble, testDesktopTypes)
+			c.So(ai.GetStartupWMClass(), ShouldEqual, "")
+			c.So(ai.GetStartupNotify(), ShouldEqual, false)
+			c.So(ai.GetPath(), ShouldEqual, "")
+			c.So(ai.GetDBusActivatable(), ShouldEqual, false)
+			c.So(ai.GetTerminal(), ShouldEqual, false)
+			c.So(ai.IsDesktopOverrideExecSet(), ShouldEqual, false)
+			c.So(ai.GetDesktopOverrideExec(), ShouldEqual, "")
+
+			c.So(getId(testFileName), ShouldEqual, "testdata/applications/deepin-screenshot")
+			c.So(getCurrentDesktop(), ShouldResemble, []string{"Deepin", "GNOME"})
 		})
 
 		c.Convey("NewDesktopAppInfo By Id", func(c C) {

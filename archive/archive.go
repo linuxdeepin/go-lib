@@ -85,7 +85,7 @@ func getCompressType(file string) int32 {
 		return CompressTypeTar
 	case strings.HasSuffix(file, "tar.gz"):
 		return CompressTypeTarGz
-	case strings.HasSuffix(file, "tar.ba2"):
+	case strings.HasSuffix(file, "tar.bz2"):
 		return CompressTypeTarBz2
 	case strings.HasSuffix(file, "zip"):
 		return CompressTypeZip
