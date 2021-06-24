@@ -20,6 +20,7 @@
 package gettext
 
 import (
+	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"testing"
@@ -44,7 +45,7 @@ func init() {
 	//C.Suite(&gettext{})
 }
 
-func (*gettext) TestTr(c *C.C) {
+func Test_Tr(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	_ = os.Setenv("LANGUAGE", "ar")
 
@@ -52,26 +53,26 @@ func (*gettext) TestTr(c *C.C) {
 
 	Bindtextdomain("test", "testdata/locale")
 	Textdomain("test")
-	c.Check(Tr("Back"), C.Equals, "الخلف")
+	assert.Equal(t, Tr("Back"), "الخلف")
 }
 
-func (*gettext) TestDGettext(c *C.C) {
+func Test_DGettext(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
 	Bindtextdomain("test", "testdata/locale")
-	c.Check(DGettext("test", "Back"), C.Equals, "返回")
+	assert.Equal(t, DGettext("test", "Back"), "返回")
 }
 
-func (*gettext) TestFailed(c *C.C) {
+func Test_Failed(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	InitI18n()
 	Bindtextdomain("test", "testdata/locale")
-	c.Check(DGettext("test", "notfound"), C.Equals, "notfound")
-	c.Check(DGettext("test", "未找到"), C.Equals, "未找到")
+	assert.Equal(t, DGettext("test", "notfound"), "notfound")
+	assert.Equal(t, DGettext("test", "未找到"), "未找到")
 }
 
-func (*gettext) TestNTr(c *C.C) {
+func Test_NTr(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	Bindtextdomain("test", "testdata/plural/locale")
 	Textdomain("test")
@@ -79,44 +80,44 @@ func (*gettext) TestNTr(c *C.C) {
 	_ = os.Setenv("LANGUAGE", "es")
 	InitI18n()
 
-	c.Check(NTr("%d apple", "%d apples", 1), C.Equals, "%d manzana")
-	c.Check(NTr("%d apple", "%d apples", 2), C.Equals, "%d manzanas")
+	assert.Equal(t, NTr("%d apple", "%d apples", 1), "%d manzana")
+	assert.Equal(t, NTr("%d apple", "%d apples", 2), "%d manzanas")
 
 	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
 
-	c.Check(NTr("%d apple", "%d apples", 0), C.Equals, "%d苹果")
-	c.Check(NTr("%d apple", "%d apples", 1), C.Equals, "%d苹果")
-	c.Check(NTr("%d apple", "%d apples", 2), C.Equals, "%d苹果")
+	assert.Equal(t, NTr("%d apple", "%d apples", 0), "%d苹果")
+	assert.Equal(t, NTr("%d apple", "%d apples", 1), "%d苹果")
+	assert.Equal(t, NTr("%d apple", "%d apples", 2), "%d苹果")
 }
 
-func (*gettext) TestDNGettext(c *C.C) {
+func Test_DNGettext(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "en_US.UTF-8")
 	Bindtextdomain("test", "testdata/plural/locale")
 
 	_ = os.Setenv("LANGUAGE", "es")
 	InitI18n()
-	c.Check(DNGettext("test", "%d person", "%d persons", 1), C.Equals, "%d persona")
-	c.Check(DNGettext("test", "%d person", "%d persons", 2), C.Equals, "%d personas")
+	assert.Equal(t, DNGettext("test", "%d person", "%d persons", 1), "%d persona")
+	assert.Equal(t, DNGettext("test", "%d person", "%d persons", 2), "%d personas")
 
 	_ = os.Setenv("LANGUAGE", "zh_CN")
 	InitI18n()
-	c.Check(DNGettext("test", "%d person", "%d persons", 0), C.Equals, "%d人")
-	c.Check(DNGettext("test", "%d person", "%d persons", 1), C.Equals, "%d人")
-	c.Check(DNGettext("test", "%d person", "%d persons", 2), C.Equals, "%d人")
+	assert.Equal(t, DNGettext("test", "%d person", "%d persons", 0), "%d人")
+	assert.Equal(t, DNGettext("test", "%d person", "%d persons", 1), "%d人")
+	assert.Equal(t, DNGettext("test", "%d person", "%d persons", 2), "%d人")
 }
 
-func (*gettext) TestQueryLang(c *C.C) {
+func Test_QueryLang(t *testing.T) {
 	_ = os.Setenv("LC_ALL", "zh_CN.UTF-8")
 	_ = os.Setenv("LC_MESSAGE", "zh_TW.")
 	_ = os.Setenv("LANGUAGE", "en_US.12")
 	_ = os.Setenv("LANG", "it")
 
-	c.Check(QueryLang(), C.Equals, "en_US")
+	assert.Equal(t, QueryLang(), "en_US")
 
 	_ = os.Setenv("LANGUAGE", "")
-	c.Check(QueryLang(), C.Equals, "zh_CN")
+	assert.Equal(t, QueryLang(), "zh_CN")
 
 	_ = os.Setenv("LC_ALL", "")
-	c.Check(QueryLang(), C.Equals, "zh_TW")
+	assert.Equal(t, QueryLang(), "zh_TW")
 }
