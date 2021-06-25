@@ -20,17 +20,12 @@
 package gettext
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"testing"
 
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
-
-type gettext struct{} //nolint:golint,unused
-
-func Test(t *testing.T) { C.TestingT(t) }
 
 func init() {
 	// use ./build_test_locale_data to update locale def if need

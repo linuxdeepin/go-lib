@@ -20,8 +20,9 @@
 package keyboard
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestList(t *testing.T) {
@@ -39,21 +40,19 @@ func TestList(t *testing.T) {
 }
 
 func Test_list(t *testing.T) {
-	Convey("Test list", t, func(c C) {
-		controllers, err := list("./testdata")
-		c.So(err, ShouldBeNil)
-		c.So(controllers, ShouldHaveLength, 1)
+	controllers, err := list("./testdata")
+	assert.Nil(t, err)
+	if err != nil {
+		return
+	}
+	assert.Nil(t, err)
+	assert.Len(t, controllers, 1)
 
-		c.Convey("Test Controller", func(c C) {
-			controller := controllers[0]
-			c.So(controller.Name, ShouldEqual, "xxx::kbd_backlight")
-			c.So(controller.MaxBrightness, ShouldEqual, 3)
+	controller := controllers[0]
+	assert.Equal(t, controller.Name, "xxx::kbd_backlight")
+	assert.Equal(t, controller.MaxBrightness, 3)
 
-			br, err := controller.GetBrightness()
-			c.So(err, ShouldBeNil)
-			c.So(br, ShouldEqual, 1)
-
-		})
-	})
-
+	br, err := controller.GetBrightness()
+	assert.Nil(t, err)
+	assert.Equal(t, br, 1)
 }
