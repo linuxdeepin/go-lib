@@ -19,14 +19,18 @@
 
 package utils
 
-import C "gopkg.in/check.v1"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 type schemaTest struct {
 	schema string
 	exist  bool
 }
 
-func (*testWrapper) TestGSchemaIsExist(c *C.C) {
+func TestGSchemaIsExist(t *testing.T) {
 	schemas := []string{
 		"com.deepin.wacom",
 		"com.deepin.touchpad",
@@ -48,12 +52,12 @@ func (*testWrapper) TestGSchemaIsExist(c *C.C) {
 		schemaTest{"$fgg$", false},
 	}
 
-	for _, t := range list1 {
-		c.Check(isSchemaInList(t.schema, schemas), C.Equals, t.exist)
+	for _, l := range list1 {
+		assert.Equal(t, isSchemaInList(l.schema, schemas), l.exist)
 	}
 
-	for _, t := range list2 {
-		c.Check(IsGSchemaExist(t.schema), C.Equals, t.exist)
-		c.Check(isSchemaInList(t.schema, schemas), C.Equals, t.exist)
+	for _, l := range list2 {
+		assert.Equal(t, IsGSchemaExist(l.schema), l.exist)
+		assert.Equal(t, isSchemaInList(l.schema, schemas), l.exist)
 	}
 }

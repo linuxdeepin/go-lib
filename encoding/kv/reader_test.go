@@ -20,79 +20,70 @@
 package kv
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"io"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReader(t *testing.T) {
-	Convey("Test Reader", t, func(c C) {
-		f, err := os.Open("./testdata/a")
-		c.So(err, ShouldBeNil)
-		c.So(f, ShouldNotBeNil)
-		defer f.Close()
+	f, err := os.Open("./testdata/a")
+	require.Nil(t, err)
+	assert.NotNil(t, f)
+	defer f.Close()
 
-		r := NewReader(f)
-		r.Delim = ':'
-		r.TrimSpace = TrimDelimRightSpace | TrimTailingSpace
+	r := NewReader(f)
+	r.Delim = ':'
+	r.TrimSpace = TrimDelimRightSpace | TrimTailingSpace
 
-		c.Convey("Get Pid", func(c C) {
-			var resultPair *Pair
-			for {
-				pair, err := r.Read()
-				if err != nil {
-					break
-				}
-				if pair.Key == "Pid" {
-					resultPair = pair
-					break
-				}
-			}
-			c.So(resultPair, ShouldNotBeNil)
-			c.So(resultPair.Value, ShouldEqual, "21722")
-		})
-
-		c.Convey("ReadAll", func(c C) {
-			pairs, err := r.ReadAll()
-			c.So(err, ShouldBeNil)
-			c.So(len(pairs), ShouldEqual, 48)
-		})
-
-	})
-
-	Convey("Test ReadAll error", t, func(c C) {
-		f, err := os.Open("./testdata/b")
-		c.So(err, ShouldBeNil)
-		c.So(f, ShouldNotBeNil)
-		defer f.Close()
-
-		r := NewReader(f)
-		pairs, err := r.ReadAll()
-		c.So(err, ShouldEqual, ErrBadLine)
-		c.So(pairs, ShouldBeNil)
-	})
-
-	Convey("Test Read shell vars", t, func(c C) {
-		f, err := os.Open("./testdata/c")
-		c.So(err, ShouldBeNil)
-		c.So(f, ShouldNotBeNil)
-		defer f.Close()
-
-		r := NewReader(f)
-		r.TrimSpace = TrimLeadingTailingSpace
-		r.Comment = '#'
-
+	var resultPair *Pair
+	for {
 		pair, err := r.Read()
-		c.So(err, ShouldBeNil)
-		c.So(pair, ShouldResemble, &Pair{"LANG", "zh_CN.UTF-8"})
+		if err != nil {
+			break
+		}
+		if pair.Key == "Pid" {
+			resultPair = pair
+			break
+		}
+	}
+	assert.NotNil(t, resultPair)
+	assert.Equal(t, resultPair.Value, "21722")
 
-		pair, err = r.Read()
-		c.So(err, ShouldBeNil)
-		c.So(pair, ShouldResemble, &Pair{"LANGUAGE", "zh_CN"})
+	pairs, err := r.ReadAll()
+	require.Nil(t, err)
+	assert.Equal(t, len(pairs), 43)
 
-		pair, err = r.Read()
-		c.So(pair, ShouldBeNil)
-		c.So(err, ShouldEqual, io.EOF)
-	})
+	f, err = os.Open("./testdata/b")
+	require.Nil(t, err)
+	assert.NotNil(t, f)
+	defer f.Close()
+
+	r = NewReader(f)
+	pairs, err = r.ReadAll()
+	require.Nil(t, pairs)
+	assert.Equal(t, err, ErrBadLine)
+
+	f, err = os.Open("./testdata/c")
+	require.Nil(t, err)
+	assert.NotNil(t, f)
+	defer f.Close()
+
+	r = NewReader(f)
+	r.TrimSpace = TrimLeadingTailingSpace
+	r.Comment = '#'
+
+	pair, err := r.Read()
+	require.Nil(t, err)
+	assert.Equal(t, pair, &Pair{"LANG", "zh_CN.UTF-8"})
+
+	pair, err = r.Read()
+	require.Nil(t, err)
+	assert.Equal(t, pair, &Pair{"LANGUAGE", "zh_CN"})
+
+	pair, err = r.Read()
+	require.Nil(t, pair)
+	assert.Equal(t, err, io.EOF)
 }

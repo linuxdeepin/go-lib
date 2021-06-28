@@ -20,23 +20,14 @@
 package utils
 
 import (
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"testing"
 )
 
-type testWrapper struct{}
-
-// Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) { C.TestingT(t) }
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func (*testWrapper) TestIsURI(c *C.C) {
+func TestIsURI(t *testing.T) {
 	var data = []struct {
 		value  string
 		result bool
@@ -51,11 +42,11 @@ func (*testWrapper) TestIsURI(c *C.C) {
 		{"unknown:///usr/share", true},
 	}
 	for _, d := range data {
-		c.Check(IsURI(d.value), C.Equals, d.result)
+		assert.Equal(t, IsURI(d.value), d.result)
 	}
 }
 
-func (*testWrapper) TestGetURIScheme(c *C.C) {
+func TestGetURIScheme(t *testing.T) {
 	var data = []struct {
 		value, result string
 	}{
@@ -69,11 +60,11 @@ func (*testWrapper) TestGetURIScheme(c *C.C) {
 		{"unknown:///usr/share", "unknown"},
 	}
 	for _, d := range data {
-		c.Check(GetURIScheme(d.value), C.Equals, d.result)
+		assert.Equal(t, GetURIScheme(d.value), d.result)
 	}
 }
 
-func (*testWrapper) TestGetURIContent(c *C.C) {
+func TestGetURIContent(t *testing.T) {
 	var data = []struct {
 		value, result string
 	}{
@@ -87,11 +78,11 @@ func (*testWrapper) TestGetURIContent(c *C.C) {
 		{"unknown:///usr/share", "/usr/share"},
 	}
 	for _, d := range data {
-		c.Check(GetURIContent(d.value), C.Equals, d.result)
+		assert.Equal(t, GetURIContent(d.value), d.result)
 	}
 }
 
-func (*testWrapper) TestEncodeURI(c *C.C) {
+func TestEncodeURI(t *testing.T) {
 	var data = []struct {
 		value, scheme, result string
 	}{
@@ -112,11 +103,11 @@ func (*testWrapper) TestEncodeURI(c *C.C) {
 		{"file:///usr/lib/share/test", SCHEME_FILE, "file:///usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(EncodeURI(d.value, d.scheme), C.Equals, d.result)
+		assert.Equal(t, EncodeURI(d.value, d.scheme), d.result)
 	}
 }
 
-func (*testWrapper) TestDecodeURI(c *C.C) {
+func TestDecodeURI(t *testing.T) {
 	var data = []struct {
 		value, result string
 	}{
@@ -132,11 +123,11 @@ func (*testWrapper) TestDecodeURI(c *C.C) {
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(DecodeURI(d.value), C.Equals, d.result)
+		assert.Equal(t, DecodeURI(d.value), d.result)
 	}
 }
 
-func (*testWrapper) TestPathToURI(c *C.C) {
+func TestPathToURI(t *testing.T) {
 	var data = []struct {
 		value, scheme, result string
 	}{
@@ -149,11 +140,11 @@ func (*testWrapper) TestPathToURI(c *C.C) {
 		{"/usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203", SCHEME_FILE, "file:///usr/lib/share/%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84/1%202%203"},
 	}
 	for _, d := range data {
-		c.Check(PathToURI(d.value, d.scheme), C.Equals, d.result)
+		assert.Equal(t, PathToURI(d.value, d.scheme), d.result)
 	}
 }
 
-func (*testWrapper) TestURIToPath(c *C.C) {
+func TestURIToPath(t *testing.T) {
 	var data = []struct {
 		value, result string
 	}{
@@ -167,11 +158,11 @@ func (*testWrapper) TestURIToPath(c *C.C) {
 		{"/usr/lib/share/test", "/usr/lib/share/test"},
 	}
 	for _, d := range data {
-		c.Check(URIToPath(d.value), C.Equals, d.result)
+		assert.Equal(t, URIToPath(d.value), d.result)
 	}
 }
 
-func (*testWrapper) TestIsFileExist(c *C.C) {
+func TestIsFileExist(t *testing.T) {
 	var data = []struct {
 		path, uri string
 	}{
@@ -182,15 +173,15 @@ func (*testWrapper) TestIsFileExist(c *C.C) {
 	}
 	for _, d := range data {
 		os.Remove(d.path)
-		c.Check(IsFileExist(d.path), C.Equals, false)
+		assert.Equal(t, IsFileExist(d.path), false)
 		_ = ioutil.WriteFile(d.path, nil, 0644)
-		c.Check(IsFileExist(d.path), C.Equals, true)
-		c.Check(IsFileExist(d.uri), C.Equals, true)
+		assert.Equal(t, IsFileExist(d.path), true)
+		assert.Equal(t, IsFileExist(d.uri), true)
 		os.Remove(d.path)
 	}
 }
 
-func (*testWrapper) TestIsDir(c *C.C) {
+func TestIsDir(t *testing.T) {
 	var infos = []struct {
 		dir string
 		ok  bool
@@ -211,76 +202,76 @@ func (*testWrapper) TestIsDir(c *C.C) {
 	}
 
 	for _, info := range infos {
-		c.Check(IsDir(info.dir), C.Equals, info.ok)
+		assert.Equal(t, IsDir(info.dir), info.ok)
 	}
 }
 
-func (*testWrapper) TestIsSymlink(c *C.C) {
+func TestIsSymlink(t *testing.T) {
 	testFile := "/tmp/deepin_test_file"
 	testSymlink := "/tmp/deepin_test_symlink"
 	os.Remove(testSymlink)
-	c.Check(IsSymlink(testSymlink), C.Equals, false)
+	assert.Equal(t, IsSymlink(testSymlink), false)
 	_ = ioutil.WriteFile(testFile, nil, 0644)
 	_ = os.Symlink(testFile, testSymlink)
-	c.Check(IsSymlink(testSymlink), C.Equals, true)
+	assert.Equal(t, IsSymlink(testSymlink), true)
 	os.Remove(testSymlink)
 	os.Remove(testFile)
 }
 
-func (*testWrapper) TestIsEnvExists(c *C.C) {
+func TestIsEnvExists(t *testing.T) {
 	testEnvName := "test_is_env_exists"
 	testEnvValue := "test_env_value"
-	c.Check(false, C.Equals, IsEnvExists(testEnvName))
+	assert.Equal(t, false, IsEnvExists(testEnvName))
 	os.Setenv(testEnvName, testEnvValue)
-	c.Check(true, C.Equals, IsEnvExists(testEnvName))
+	assert.Equal(t, true, IsEnvExists(testEnvName))
 }
 
-func (*testWrapper) TestUnsetEnv(c *C.C) {
+func TestUnsetEnv(t *testing.T) {
 	testEnvName := "test_unset_env"
 	testEnvValue := "test_env_value"
-	c.Check(false, C.Equals, IsEnvExists(testEnvName))
+	assert.Equal(t, false, IsEnvExists(testEnvName))
 	os.Setenv(testEnvName, testEnvValue)
-	c.Check(true, C.Equals, IsEnvExists(testEnvName))
+	assert.Equal(t, true, IsEnvExists(testEnvName))
 	envCount := len(os.Environ())
 	_ = UnsetEnv(testEnvName)
-	c.Check(false, C.Equals, IsEnvExists(testEnvName))
-	c.Check(len(os.Environ()), C.Equals, envCount-1)
+	assert.Equal(t, false, IsEnvExists(testEnvName))
+	assert.Equal(t, len(os.Environ()), envCount-1)
 }
 
-func (*testWrapper) TestGenUuid(c *C.C) {
+func TestGenUuid(t *testing.T) {
 	validUuid := regexp.MustCompile(`^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$`)
 	var lastUuid string
 	for i := 0; i < 5; i++ {
 		currentUuid := GenUuid()
-		c.Check(currentUuid != lastUuid, C.Equals, true)
-		c.Check(validUuid.MatchString(currentUuid), C.Equals, true)
+		assert.Equal(t, currentUuid != lastUuid, true)
+		assert.Equal(t, validUuid.MatchString(currentUuid), true)
 		lastUuid = currentUuid
 	}
 }
 
-func (*testWrapper) TestRandString(c *C.C) {
+func TestRandString(t *testing.T) {
 	validStr := regexp.MustCompile(`^[0-za-f]{10}$`)
 	var lastStr string
 	for i := 0; i < 5; i++ {
 		currentStr := RandString(10)
-		c.Check(currentStr != lastStr, C.Equals, true)
-		c.Check(validStr.MatchString(currentStr), C.Equals, true)
+		assert.Equal(t, currentStr != lastStr, true)
+		assert.Equal(t, validStr.MatchString(currentStr), true)
 		lastStr = currentStr
 	}
 }
 
-func (*testWrapper) TestIsInterfaceNil(c *C.C) {
-	c.Check(IsInterfaceNil(nil), C.Equals, true)
-	c.Check(IsInterfaceNil(1), C.Equals, false)
-	c.Check(IsInterfaceNil(true), C.Equals, false)
-	c.Check(IsInterfaceNil(""), C.Equals, false)
-	c.Check(IsInterfaceNil("str"), C.Equals, false)
+func TestIsInterfaceNil(t *testing.T) {
+	assert.Equal(t, IsInterfaceNil(nil), true)
+	assert.Equal(t, IsInterfaceNil(1), false)
+	assert.Equal(t, IsInterfaceNil(true), false)
+	assert.Equal(t, IsInterfaceNil(""), false)
+	assert.Equal(t, IsInterfaceNil("str"), false)
 
 	var a1 []int = nil
-	c.Check(IsInterfaceNil(a1), C.Equals, true)
+	assert.Equal(t, IsInterfaceNil(a1), true)
 	var a2 []int = make([]int, 0)
-	c.Check(IsInterfaceNil(a2), C.Equals, false)
+	assert.Equal(t, IsInterfaceNil(a2), false)
 
 	var ifcWrapper interface{} = "str"
-	c.Check(IsInterfaceNil(ifcWrapper), C.Equals, false)
+	assert.Equal(t, IsInterfaceNil(ifcWrapper), false)
 }

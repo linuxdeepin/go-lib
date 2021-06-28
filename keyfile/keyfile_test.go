@@ -25,7 +25,8 @@ import (
 	"regexp"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const desktopFileContent0 = `#!/usr/bin/env xdg-open
@@ -65,107 +66,79 @@ abc/def=nokey
 
 func TestLoadFromData(t *testing.T) {
 
-	Convey("Test LoadFromData EntryNotInSectionError", t, func(c C) {
-		f := NewKeyFile()
-		err := f.LoadFromData([]byte(desktopFileContent1))
-		c.So(err, ShouldNotBeNil)
-		c.So(err, ShouldHaveSameTypeAs, EntryNotInSectionError{})
-		t.Log(err)
+	f := NewKeyFile()
+	err := f.LoadFromData([]byte(desktopFileContent1))
+	assert.NotNil(t, err)
+	assert.IsType(t, err, EntryNotInSectionError{})
+	t.Log(err)
+
+	f = NewKeyFile()
+	err = f.LoadFromData([]byte(desktopFileContent2))
+	assert.NotNil(t, err)
+	assert.IsType(t, err, ParseError{})
+	t.Log(err)
+
+	f = NewKeyFile()
+	err = f.LoadFromData([]byte(desktopFileContent3))
+	assert.NotNil(t, err)
+	t.Log(err)
+
+	f = NewKeyFile()
+	keyReg := regexp.MustCompile(`^[A-Za-z0-9\-]+$`)
+	f.SetKeyRegexp(keyReg)
+	err = f.LoadFromData([]byte(desktopFileContent4))
+	assert.NotNil(t, err)
+	t.Log(err)
+
+	ret := f.SetValue("Desktop Entry", "Abc+", "123")
+	assert.False(t, ret)
+
+	ret = f.SetValue("Desktop Entry", "Abc", "123")
+	assert.True(t, ret)
+
+	f = NewKeyFile()
+	err = f.LoadFromData([]byte(desktopFileContent0))
+	require.Nil(t, err)
+
+	assert.Equal(t, f.GetSections(), []string{"Desktop Entry"})
+
+	v, err := f.GetValue("Desktop Entry", "Type")
+	require.Nil(t, err)
+	assert.Equal(t, v, "Application")
+
+	_, err = f.GetValue("Desktop Entry", "x")
+	assert.NotNil(t, err)
+
+	_, err = f.GetValue("X", "X")
+	assert.NotNil(t, err)
+
+	assert.Equal(t, f.GetKeys("Desktop Entry"), []string{
+		"Encoding", "Type", "X-Created-By", "Categories",
+		"Icon", "Exec", "Name",
 	})
 
-	Convey("Test LoadFromData ParseError", t, func(c C) {
-		f := NewKeyFile()
-		err := f.LoadFromData([]byte(desktopFileContent2))
-		c.So(err, ShouldNotBeNil)
-		c.So(err, ShouldHaveSameTypeAs, ParseError{})
-		t.Log(err)
-	})
+	assert.Equal(t, f.GetSectionComments("Desktop Entry"), "#!/usr/bin/env xdg-open\n")
 
-	Convey("Test LoadFromData key is empty", t, func(c C) {
-		f := NewKeyFile()
-		err := f.LoadFromData([]byte(desktopFileContent3))
-		c.So(err, ShouldNotBeNil)
-		t.Log(err)
-	})
-
-	Convey("Test LoadFromData InvalidKeyError", t, func(c C) {
-		f := NewKeyFile()
-		keyReg := regexp.MustCompile(`^[A-Za-z0-9\-]+$`)
-		f.SetKeyRegexp(keyReg)
-		err := f.LoadFromData([]byte(desktopFileContent4))
-		c.So(err, ShouldNotBeNil)
-		t.Log(err)
-
-		ret := f.SetValue("Desktop Entry", "Abc+", "123")
-		c.So(ret, ShouldBeFalse)
-
-		ret = f.SetValue("Desktop Entry", "Abc", "123")
-		c.So(ret, ShouldBeTrue)
-	})
-
-	Convey("Test LoadFromData", t, func(c C) {
-		f := NewKeyFile()
-		err := f.LoadFromData([]byte(desktopFileContent0))
-		c.So(err, ShouldBeNil)
-
-		c.Convey("Test GetSections", func(c C) {
-			c.So(f.GetSections(), ShouldResemble, []string{"Desktop Entry"})
-		})
-
-		c.Convey("Get value that does exist", func(c C) {
-			v, err := f.GetValue("Desktop Entry", "Type")
-			c.So(err, ShouldBeNil)
-			c.So(v, ShouldEqual, "Application")
-		})
-
-		c.Convey("Get value the does not exist", func(c C) {
-			_, err := f.GetValue("Desktop Entry", "x")
-			c.So(err, ShouldNotBeNil)
-		})
-
-		c.Convey("Get value that section not exist", func(c C) {
-			_, err := f.GetValue("X", "X")
-			c.So(err, ShouldNotBeNil)
-		})
-
-		c.Convey("Test GetKeys", func(c C) {
-			c.So(f.GetKeys("Desktop Entry"), ShouldResemble, []string{
-				"Encoding", "Type", "X-Created-By", "Categories",
-				"Icon", "Exec", "Name",
-			})
-		})
-
-		c.Convey("Get section comments", func(c C) {
-			c.So(f.GetSectionComments("Desktop Entry"), ShouldEqual, "#!/usr/bin/env xdg-open\n")
-		})
-
-		c.Convey("Get key comments", func(c C) {
-			c.So(f.GetKeyComments("Desktop Entry", "Icon"), ShouldEqual, "# icon comments")
-			c.So(f.GetKeyComments("Desktop Entry", "Categories"), ShouldEqual, "")
-		})
-	})
+	assert.Equal(t, f.GetKeyComments("Desktop Entry", "Icon"), "# icon comments")
+	assert.Equal(t, f.GetKeyComments("Desktop Entry", "Categories"), "")
 }
 
 func TestLoadFromFile(t *testing.T) {
-	Convey("LoadFromFile ok", t, func(c C) {
+	f := NewKeyFile()
+	err := f.LoadFromFile("testdata/deepin-screenshot.desktop")
+	require.Nil(t, err)
+
+	localeName, err := f.GetLocaleString("Desktop Entry", "Name", "zh_CN")
+	assert.Equal(t, localeName, "深度截图")
+	require.Nil(t, err)
+
+	files, err := filepath.Glob("/usr/share/applications/*.desktop")
+	require.Nil(t, err)
+	for _, file := range files {
 		f := NewKeyFile()
-		err := f.LoadFromFile("testdata/deepin-screenshot.desktop")
-		c.So(err, ShouldBeNil)
-
-		localeName, err := f.GetLocaleString("Desktop Entry", "Name", "zh_CN")
-		c.So(localeName, ShouldEqual, "深度截图")
-		c.So(err, ShouldBeNil)
-	})
-
-	Convey("Load file in dir", t, func(c C) {
-		files, err := filepath.Glob("/usr/share/applications/*.desktop")
-		c.So(err, ShouldBeNil)
-		for _, file := range files {
-			f := NewKeyFile()
-			err := f.LoadFromFile(file)
-			c.So(err, ShouldBeNil)
-		}
-	})
+		err := f.LoadFromFile(file)
+		require.Nil(t, err)
+	}
 }
 
 const keyFileContent0 = `
@@ -180,48 +153,46 @@ strlist6=a\;bc;def
 strlist7=?`
 
 func TestGetStringList(t *testing.T) {
-	Convey("GetStringList", t, func(c C) {
-		f := NewKeyFile()
-		keyFileContent := keyFileContent0 + string([]byte{0xff, 0xfe, 0xfd})
-		err := f.LoadFromData([]byte(keyFileContent))
-		c.So(err, ShouldBeNil)
+	f := NewKeyFile()
+	keyFileContent := keyFileContent0 + string([]byte{0xff, 0xfe, 0xfd})
+	err := f.LoadFromData([]byte(keyFileContent))
+	require.Nil(t, err)
 
-		list, err := f.GetStringList("Test", "strlist0")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{"a", "b", "c", "d"})
+	list, err := f.GetStringList("Test", "strlist0")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{"a", "b", "c", "d"})
 
-		list, err = f.GetStringList("Test", "strlist1")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{"a", "b", "c"})
+	list, err = f.GetStringList("Test", "strlist1")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{"a", "b", "c"})
 
-		list, err = f.GetStringList("Test", "strlist2")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{""})
+	list, err = f.GetStringList("Test", "strlist2")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{""})
 
-		list, err = f.GetStringList("Test", "strlist3")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldBeNil)
+	list, err = f.GetStringList("Test", "strlist3")
+	require.Nil(t, err)
+	require.Nil(t, list)
 
-		list, err = f.GetStringList("Test", "strlist4")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{"abc"})
+	list, err = f.GetStringList("Test", "strlist4")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{"abc"})
 
-		t.Log(err)
+	t.Log(err)
 
-		list, err = f.GetStringList("Test", "strlist5")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{"abc\\befg"})
-		t.Log(err)
+	list, err = f.GetStringList("Test", "strlist5")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{"abc\\befg"})
+	t.Log(err)
 
-		list, err = f.GetStringList("Test", "strlist6")
-		c.So(err, ShouldBeNil)
-		c.So(list, ShouldResemble, []string{"a;bc", "def"})
+	list, err = f.GetStringList("Test", "strlist6")
+	require.Nil(t, err)
+	assert.Equal(t, list, []string{"a;bc", "def"})
 
-		_, err = f.GetStringList("Test", "strlist7")
-		c.So(err, ShouldNotBeNil)
-		c.So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})
-		t.Log(err)
-	})
+	_, err = f.GetStringList("Test", "strlist7")
+	assert.NotNil(t, err)
+	assert.IsType(t, err, ValueInvalidUTF8Error{})
+	t.Log(err)
 }
 
 const keyFileContent1 = `
@@ -234,95 +205,85 @@ str4=abc\;def
 str5=?`
 
 func TestGetString(t *testing.T) {
-	Convey("GetString", t, func(c C) {
-		f := NewKeyFile()
-		keyFileContent := keyFileContent1 + string([]byte{0xff, 0xfe, 0xfd})
-		err := f.LoadFromData([]byte(keyFileContent))
-		c.So(err, ShouldBeNil)
+	f := NewKeyFile()
+	keyFileContent := keyFileContent1 + string([]byte{0xff, 0xfe, 0xfd})
+	err := f.LoadFromData([]byte(keyFileContent))
+	require.Nil(t, err)
 
-		str, err := f.GetString("Test", "str0")
-		c.So(err, ShouldBeNil)
-		c.So(str, ShouldEqual, "abcdef")
+	str, err := f.GetString("Test", "str0")
+	require.Nil(t, err)
+	assert.Equal(t, str, "abcdef")
 
-		str, err = f.GetString("Test", "str1")
-		c.So(err, ShouldBeNil)
-		c.So(str, ShouldEqual, "line\n<-newline\r<-break\t<-table <-space")
+	str, err = f.GetString("Test", "str1")
+	require.Nil(t, err)
+	assert.Equal(t, str, "line\n<-newline\r<-break\t<-table <-space")
 
-		str, err = f.GetString("Test", "str2")
-		c.So(err, ShouldBeNil)
-		c.So(str, ShouldEqual, "abcdef")
+	str, err = f.GetString("Test", "str2")
+	require.Nil(t, err)
+	assert.Equal(t, str, "abcdef")
 
-		str, err = f.GetString("Test", "str3")
-		c.So(err, ShouldBeNil)
-		c.So(str, ShouldEqual, "abc\\bdef")
+	str, err = f.GetString("Test", "str3")
+	require.Nil(t, err)
+	assert.Equal(t, str, "abc\\bdef")
 
-		str, err = f.GetString("Test", "str4")
-		c.So(err, ShouldBeNil)
-		c.So(str, ShouldEqual, "abc\\;def")
+	str, err = f.GetString("Test", "str4")
+	require.Nil(t, err)
+	assert.Equal(t, str, "abc\\;def")
 
-		_, err = f.GetString("Test", "str5")
-		c.So(err, ShouldHaveSameTypeAs, ValueInvalidUTF8Error{})
-	})
+	_, err = f.GetString("Test", "str5")
+	assert.IsType(t, err, ValueInvalidUTF8Error{})
 }
 
 func TestSetString(t *testing.T) {
-	Convey("SetString", t, func(c C) {
-		f := NewKeyFile()
-		const s0 = "space newline\ncarriage-return\rtab\tbackslash\\"
-		f.SetString("Test", "str0", s0)
-		str0, err := f.GetString("Test", "str0")
-		c.So(err, ShouldBeNil)
-		c.So(str0, ShouldEqual, s0)
-		val0, err := f.GetValue("Test", "str0")
-		c.So(err, ShouldBeNil)
-		c.So(val0, ShouldEqual, `space newline\ncarriage-return\rtab\tbackslash\\`)
-	})
+	f := NewKeyFile()
+	const s0 = "space newline\ncarriage-return\rtab\tbackslash\\"
+	f.SetString("Test", "str0", s0)
+	str0, err := f.GetString("Test", "str0")
+	require.Nil(t, err)
+	assert.Equal(t, str0, s0)
+	val0, err := f.GetValue("Test", "str0")
+	require.Nil(t, err)
+	assert.Equal(t, val0, `space newline\ncarriage-return\rtab\tbackslash\\`)
 }
 
 func TestSetStringList(t *testing.T) {
-	Convey("SetStringList", t, func(c C) {
-		f := NewKeyFile()
-		strlist := []string{"space ", "newline\n", "carriage\rreturn", "tab\t", "backslash\\", "List;Separator;"}
-		f.SetStringList("Test", "strlist", strlist)
-		strlist1, err := f.GetStringList("Test", "strlist")
-		c.So(err, ShouldBeNil)
-		c.So(strlist1, ShouldResemble, strlist)
+	f := NewKeyFile()
+	strlist := []string{"space ", "newline\n", "carriage\rreturn", "tab\t", "backslash\\", "List;Separator;"}
+	f.SetStringList("Test", "strlist", strlist)
+	strlist1, err := f.GetStringList("Test", "strlist")
+	require.Nil(t, err)
+	assert.Equal(t, strlist1, strlist)
 
-		strlistValue, err := f.GetValue("Test", "strlist")
-		c.So(err, ShouldBeNil)
-		c.So(strlistValue, ShouldEqual, `space\s;newline\n;carriage\rreturn;tab\t;backslash\\;List\;Separator\;;`)
-	})
+	strlistValue, err := f.GetValue("Test", "strlist")
+	require.Nil(t, err)
+	assert.Equal(t, strlistValue, `space\s;newline\n;carriage\rreturn;tab\t;backslash\\;List\;Separator\;;`)
 }
 
 func TestSetBoolList(t *testing.T) {
-	Convey("SetBoolList", t, func(c C) {
-		f := NewKeyFile()
-		blist := []bool{true, true, false, false, true, false}
-		f.SetBoolList("Test", "blist", blist)
-		blist1, err := f.GetBoolList("Test", "blist")
-		c.So(err, ShouldBeNil)
-		c.So(blist1, ShouldResemble, blist)
+	f := NewKeyFile()
+	blist := []bool{true, true, false, false, true, false}
+	f.SetBoolList("Test", "blist", blist)
+	blist1, err := f.GetBoolList("Test", "blist")
+	require.Nil(t, err)
+	assert.Equal(t, blist1, blist)
 
-		blistStr, err := f.GetValue("Test", "blist")
-		c.So(err, ShouldBeNil)
-		c.So(blistStr, ShouldEqual, "true;true;false;false;true;false;")
-	})
+	blistStr, err := f.GetValue("Test", "blist")
+	require.Nil(t, err)
+	assert.Equal(t, blistStr, "true;true;false;false;true;false;")
 }
 
 func TestSetIntList(t *testing.T) {
-	Convey("SetIntList", t, func(c C) {
-		f := NewKeyFile()
-		ints := []int{-345, -1, 0, 1, 3, 5, 7, 9, 11989}
-		f.SetIntList("Test", "ints", ints)
-		ints1, err := f.GetIntList("Test", "ints")
-		c.So(err, ShouldBeNil)
-		c.So(ints1, ShouldResemble, ints)
+	f := NewKeyFile()
+	ints := []int{-345, -1, 0, 1, 3, 5, 7, 9, 11989}
+	f.SetIntList("Test", "ints", ints)
+	ints1, err := f.GetIntList("Test", "ints")
+	require.Nil(t, err)
+	assert.Equal(t, ints1, ints)
 
-		intsStr, err := f.GetValue("Test", "ints")
-		c.So(err, ShouldBeNil)
-		c.So(intsStr, ShouldResemble, "-345;-1;0;1;3;5;7;9;11989;")
+	intsStr, err := f.GetValue("Test", "ints")
+	require.Nil(t, err)
+	assert.Equal(t, intsStr, "-345;-1;0;1;3;5;7;9;11989;")
 
-	})
 }
 
 const keyFileContent2 = `[Test]
@@ -336,17 +297,15 @@ KeyD=keyfile
 `
 
 func TestSaveToWriter(t *testing.T) {
-	Convey("SaveToWriter", t, func(c C) {
-		f := NewKeyFile()
-		f.SetValue("Test", "KeyA", "aaaa")
-		f.SetValue("Test", "KeyB", "1234567890")
-		f.SetValue("Test", "KeyC", "true")
+	f := NewKeyFile()
+	f.SetValue("Test", "KeyA", "aaaa")
+	f.SetValue("Test", "KeyB", "1234567890")
+	f.SetValue("Test", "KeyC", "true")
 
-		f.SetValue("Main", "KeyD", "keyfile")
+	f.SetValue("Main", "KeyD", "keyfile")
 
-		var buf bytes.Buffer
-		err := f.SaveToWriter(&buf)
-		c.So(err, ShouldBeNil)
-		c.So(buf.String(), ShouldEqual, keyFileContent2)
-	})
+	var buf bytes.Buffer
+	err := f.SaveToWriter(&buf)
+	require.Nil(t, err)
+	assert.Equal(t, buf.String(), keyFileContent2)
 }

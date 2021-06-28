@@ -23,20 +23,11 @@ package proxy
 
 import (
 	"pkg.deepin.io/gir/glib-2.0"
-	C "gopkg.in/check.v1"
 	"pkg.deepin.io/lib/log"
 	"testing"
 )
 
-func Test(t *testing.T) { C.TestingT(t) }
-
-type testWrapper struct{}
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func (*testWrapper) TestMain(c *C.C) {
+func TestMain(t testing.T) {
 	logger.SetLogLevel(log.LevelDebug)
 	SetupProxy()
 	logger.Info("start loop...")

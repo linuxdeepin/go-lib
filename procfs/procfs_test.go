@@ -23,127 +23,110 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetFile(t *testing.T) {
-	Convey("getFile", t, func(c C) {
-		p := Process(1)
-		c.So(p.getFile("cwd"), ShouldEqual, "/proc/1/cwd")
-	})
+	p := Process(1)
+	assert.Equal(t, p.getFile("cwd"), "/proc/1/cwd")
 }
 
 func TestExist(t *testing.T) {
-	Convey("Exist", t, func(c C) {
-		p := Process(os.Getpid())
-		c.So(p.Exist(), ShouldBeTrue)
-	})
+	p := Process(os.Getpid())
+	assert.True(t, p.Exist())
 }
 
 func TestCmdline(t *testing.T) {
-	Convey("Cmdline", t, func(c C) {
-		p := Process(os.Getpid())
-		cmdline, err := p.Cmdline()
-		c.So(err, ShouldBeNil)
-		t.Log("cmdline:", cmdline)
-		c.So(len(cmdline) > 0, ShouldBeTrue)
-	})
+	p := Process(os.Getpid())
+	cmdline, err := p.Cmdline()
+	require.Nil(t, err)
+	t.Log("cmdline:", cmdline)
+	assert.True(t, len(cmdline) > 0)
 }
 
 func TestCwd(t *testing.T) {
-	Convey("Cwd", t, func(c C) {
-		p := Process(os.Getpid())
-		cwd, err := p.Cwd()
-		c.So(err, ShouldBeNil)
-		t.Log("cwd:", cwd)
+	p := Process(os.Getpid())
+	cwd, err := p.Cwd()
+	require.Nil(t, err)
+	t.Log("cwd:", cwd)
 
-		osWd, err1 := os.Getwd()
-		c.So(err1, ShouldBeNil)
-		c.So(cwd, ShouldEqual, osWd)
-	})
+	osWd, err1 := os.Getwd()
+	require.Nil(t, err1)
+	assert.Equal(t, cwd, osWd)
 }
 
 func TestExe(t *testing.T) {
-	Convey("Exe", t, func(c C) {
-		p := Process(os.Getpid())
-		exe, err := p.Exe()
-		c.So(err, ShouldBeNil)
-		t.Log("exe:", exe)
-		c.So(len(exe) > 0, ShouldBeTrue)
-	})
+	p := Process(os.Getpid())
+	exe, err := p.Exe()
+	require.Nil(t, err)
+	t.Log("exe:", exe)
+	assert.True(t, len(exe) > 0)
 }
 
 func TestEnvVars(t *testing.T) {
 	vars := EnvVars{
 		"PWD=/a/b/c",
 	}
-	Convey("EnvVars.Lookup", t, func(c C) {
-		pwd, ok := vars.Lookup("PWD")
-		c.So(pwd, ShouldEqual, "/a/b/c")
-		c.So(ok, ShouldBeTrue)
+	pwd, ok := vars.Lookup("PWD")
+	assert.Equal(t, pwd, "/a/b/c")
+	assert.True(t, ok)
 
-		abc, ok := vars.Lookup("abc")
-		c.So(abc, ShouldEqual, "")
-		c.So(ok, ShouldBeFalse)
-	})
+	abc, ok := vars.Lookup("abc")
+	assert.Equal(t, abc, "")
+	assert.False(t, ok)
 
-	Convey("EnvVars.Get", t, func(c C) {
-		pwd := vars.Get("PWD")
-		c.So(pwd, ShouldEqual, "/a/b/c")
+	pwd = vars.Get("PWD")
+	assert.Equal(t, pwd, "/a/b/c")
 
-		abc := vars.Get("abc")
-		c.So(abc, ShouldEqual, "")
-	})
+	abc = vars.Get("abc")
+	assert.Equal(t, abc, "")
 }
 
 func TestEnvion(t *testing.T) {
-	Convey("Envion", t, func(c C) {
-		p := Process(os.Getpid())
-		environ, err := p.Environ()
-		c.So(err, ShouldBeNil)
-		c.So(len(environ) > 0, ShouldBeTrue)
-		for _, aVar := range environ {
-			t.Log(string(aVar))
-		}
+	p := Process(os.Getpid())
+	environ, err := p.Environ()
+	require.Nil(t, err)
+	assert.True(t, len(environ) > 0)
+	for _, aVar := range environ {
+		t.Log(string(aVar))
+	}
 
-		path, ok := environ.Lookup("PATH")
-		c.So(ok, ShouldBeTrue)
-		c.So(path != "", ShouldBeTrue)
+	path, ok := environ.Lookup("PATH")
+	assert.True(t, ok)
+	assert.True(t, path != "")
 
-		home, ok := environ.Lookup("HOME")
-		c.So(ok, ShouldBeTrue)
-		c.So(home != "", ShouldBeTrue)
+	home, ok := environ.Lookup("HOME")
+	assert.True(t, ok)
+	assert.True(t, home != "")
 
-		xxx, ok := environ.Lookup("XXXXXXXXXXXXXXX")
-		c.So(ok, ShouldBeFalse)
-		c.So(xxx, ShouldEqual, "")
-	})
+	xxx, ok := environ.Lookup("XXXXXXXXXXXXXXX")
+	assert.False(t, ok)
+	assert.Equal(t, xxx, "")
 }
 
 func TestStatus(t *testing.T) {
-	Convey("Status", t, func(c C) {
-		p := Process(os.Getpid())
-		status, err := p.Status()
-		c.So(err, ShouldBeNil)
-		c.So(status, ShouldNotBeEmpty)
+	p := Process(os.Getpid())
+	status, err := p.Status()
+	require.Nil(t, err)
+	assert.NotEmpty(t, status)
 
-		// test lookup
-		val, err := status.lookup("XXX")
-		c.So(val, ShouldBeBlank)
-		c.So(err, ShouldResemble, StatusFieldNotFoundErr{"XXX"})
-		c.So(err.Error(), ShouldEqual, "field XXX is not found in proc status file")
+	// test lookup
+	val, err := status.lookup("XXX")
+	assert.Empty(t, val)
+	assert.Equal(t, err, StatusFieldNotFoundErr{"XXX"})
+	assert.Equal(t, err.Error(), "field XXX is not found in proc status file")
 
-		// test Uids
-		uids, err := status.Uids()
-		c.So(err, ShouldBeNil)
-		t.Log("uids:", uids)
-		c.So(uids[0], ShouldEqual, uint(os.Getuid()))
-		c.So(uids[1], ShouldEqual, uint(os.Geteuid()))
+	// test Uids
+	uids, err := status.Uids()
+	require.Nil(t, err)
+	t.Log("uids:", uids)
+	assert.Equal(t, uids[0], uint(os.Getuid()))
+	assert.Equal(t, uids[1], uint(os.Geteuid()))
 
-		// test PPid
-		ppid, err := status.PPid()
-		c.So(err, ShouldBeNil)
-		t.Log("ppid:", ppid)
-		c.So(ppid, ShouldBeGreaterThan, 0)
-	})
+	// test PPid
+	ppid, err := status.PPid()
+	require.Nil(t, err)
+	t.Log("ppid:", ppid)
+	assert.True(t, ppid > 0)
 }

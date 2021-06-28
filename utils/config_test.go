@@ -20,7 +20,9 @@
 package utils
 
 import (
-	C "gopkg.in/check.v1"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type testConfig struct {
@@ -40,16 +42,16 @@ func (c *testConfig) load() {
 	_ = c.core.Load(c)
 }
 
-func (*testWrapper) TestConfig(c *C.C) {
+func TestConfig(t *testing.T) {
 	conf := newTestConfig()
 	_ = conf.core.RemoveConfigFile()
 	conf.Data = "data"
 	err := conf.save()
 	if err != nil {
-		c.Skip("Save config failed:" + err.Error())
+		t.Skip("Save config failed:" + err.Error())
 		return
 	}
 	conf.Data = ""
 	conf.load()
-	c.Check(conf.Data, C.Equals, "data")
+	assert.Equal(t, conf.Data, "data")
 }

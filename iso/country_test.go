@@ -20,23 +20,26 @@
 package iso
 
 import (
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/require"
 	"os"
 	. "pkg.deepin.io/lib/gettext"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const envLanguage = "LANGUAGE"
 
-func (*testWrapper) TestGetCountryDatabase(c *C.C) {
+func TestGetCountryDatabase(t *testing.T) {
 	database, err := GetCountryDatabase()
-	c.Check(database, C.NotNil)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.NotNil(t, database)
 }
 
-func (*testWrapper) TestGetLocaleCountryInfo(c *C.C) {
+func TestGetLocaleCountryInfo(t *testing.T) {
 	cur := os.Getenv("LC_ALL")
 	if cur == "C" || cur == "POSIX" {
-		c.Skip("Unsupported locale")
+		t.Skip("Unsupported locale")
 		return
 	}
 	oldLanguage := os.Getenv(envLanguage)
@@ -54,13 +57,13 @@ func (*testWrapper) TestGetLocaleCountryInfo(c *C.C) {
 		InitI18n()
 		os.Setenv(envLanguage, d.language)
 		code, _ := GetLocaleCountryCode()
-		c.Check(code, C.Equals, d.code)
+		assert.Equal(t, code, d.code)
 		name, _ := GetLocaleCountryName()
-		c.Check(name, C.Equals, d.name)
+		assert.Equal(t, name, d.name)
 	}
 }
 
-func (*testWrapper) TestGetCountryCodeForLanguage(c *C.C) {
+func TestGetCountryCodeForLanguage(t *testing.T) {
 	testData := []struct {
 		language, code string
 	}{
@@ -71,22 +74,22 @@ func (*testWrapper) TestGetCountryCodeForLanguage(c *C.C) {
 	}
 	for _, d := range testData {
 		code, _ := GetCountryCodeForLanguage(d.language)
-		c.Check(code, C.Equals, d.code)
+		assert.Equal(t, code, d.code)
 	}
 
 	// check invalid format
 	_, err := GetCountryCodeForLanguage("")
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
 	_, err = GetCountryCodeForLanguage("en.US_UTF-8")
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
 	_, err = GetCountryCodeForLanguage("en_.US.UTF-8")
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetCountryInfoForCode(c *C.C) {
+func TestGetCountryInfoForCode(t *testing.T) {
 	cur := os.Getenv("LC_ALL")
 	if cur == "C" || cur == "POSIX" {
-		c.Skip("Unsupported locale")
+		t.Skip("Unsupported locale")
 		return
 	}
 	oldLanguage := os.Getenv(envLanguage)
@@ -108,6 +111,6 @@ func (*testWrapper) TestGetCountryInfoForCode(c *C.C) {
 		InitI18n()
 		os.Setenv(envLanguage, d.language)
 		name, _ := GetCountryNameForCode(d.code)
-		c.Check(name, C.Equals, d.name)
+		assert.Equal(t, name, d.name)
 	}
 }

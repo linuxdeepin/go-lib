@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGeneralize(t *testing.T) {
@@ -13,7 +14,7 @@ func TestGeneralize(t *testing.T) {
 
 func Test_strSliceUniq(t *testing.T) {
 	ret := strSliceUniq(nil)
-	assert.Nil(t, ret)
+	require.Nil(t, ret)
 
 	ret = strSliceUniq([]string{"a"})
 	assert.Equal(t, []string{"a"}, ret)
@@ -36,7 +37,7 @@ func Test_getPyList(t *testing.T) {
 	assert.Equal(t, []string{"z"}, ret)
 
 	ret = getPyList("")
-	assert.Nil(t, ret)
+	require.Nil(t, ret)
 }
 
 func Test_matchAux(t *testing.T) {
@@ -60,7 +61,7 @@ func Test_matchAux(t *testing.T) {
 
 func TestSplit(t *testing.T) {
 	ret := Split("")
-	assert.Nil(t, ret)
+	require.Nil(t, ret)
 
 	ret = Split("中文汉字")
 	assert.Equal(t, Blocks{

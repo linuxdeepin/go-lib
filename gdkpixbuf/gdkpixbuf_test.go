@@ -20,19 +20,11 @@
 package gdkpixbuf
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
-
-// Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) { C.TestingT(t) }
-
-type testWrapper struct{}
-
-var _ = C.Suite(&testWrapper{})
 
 const (
 	originImg               = "testdata/origin_1920x1080.jpg"
@@ -52,40 +44,40 @@ const (
 	originImgNotImage = "testdata/origin_not_image"
 )
 
-func (*testWrapper) TestGetImageSize(c *C.C) {
+func TestGetImageSize(t *testing.T) {
 	w, h, _ := GetImageSize(originImg)
-	c.Check(w, C.Equals, originImgWidth)
-	c.Check(h, C.Equals, originImgHeight)
+	assert.Equal(t, w, originImgWidth)
+	assert.Equal(t, h, originImgHeight)
 }
 
-func (*testWrapper) TestGetImageFormat(c *C.C) {
+func TestGetImageFormat(t *testing.T) {
 	var f Format
 	f, _ = GetImageFormat(originImgIconPng)
-	c.Check(f, C.Equals, FormatPng)
+	assert.Equal(t, f, FormatPng)
 	f, _ = GetImageFormat(originImgIconBmp)
-	c.Check(f, C.Equals, FormatBmp)
+	assert.Equal(t, f, FormatBmp)
 	_, err := GetImageFormat(originImgIconTxt)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestIsSupportedImage(c *C.C) {
-	c.Check(IsSupportedImage(originImgIconPng), C.Equals, true)
-	c.Check(IsSupportedImage(originImgIconBmp), C.Equals, true)
-	c.Check(IsSupportedImage(originImgIconGif), C.Equals, true)
-	c.Check(IsSupportedImage(originImgIconTxt), C.Equals, false)
-	c.Check(IsSupportedImage(originImgNotImage), C.Equals, false)
-	c.Check(IsSupportedImage("<file not exists>"), C.Equals, false)
+func TestIsSupportedImage(t *testing.T) {
+	assert.Equal(t, IsSupportedImage(originImgIconPng), true)
+	assert.Equal(t, IsSupportedImage(originImgIconBmp), true)
+	assert.Equal(t, IsSupportedImage(originImgIconGif), true)
+	assert.Equal(t, IsSupportedImage(originImgIconTxt), false)
+	assert.Equal(t, IsSupportedImage(originImgNotImage), false)
+	assert.Equal(t, IsSupportedImage("<file not exists>"), false)
 }
 
-func (*testWrapper) TestGetDominantColor(c *C.C) {
+func TestGetDominantColor(t *testing.T) {
 	h, s, v, err := GetDominantColorOfImage(originImg)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	if delta(h, originImgDominantColorH) > 1 ||
 		delta(s, originImgDominantColorS) > 0.1 ||
 		delta(v, originImgDominantColorV) > 0.1 {
-		c.Error("h, s, v = ", h, s, v)
+		t.Log(t, "h, s, v = ", h, s, v)
 	}
 }
 func delta(x, y float64) float64 {
@@ -95,253 +87,243 @@ func delta(x, y float64) float64 {
 	return y - x
 }
 
-func (*testWrapper) TestBlurImage(c *C.C) {
+func TestBlurImage(t *testing.T) {
 	resultFile := "testdata/test_blurimage.png"
 	err := BlurImage(originImg, resultFile, 50, 1, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	//c.Check(sumFileMd5(resultFile), C.Equals, "1b6781963a66148aed343325d08cfec0")
+	//assert.Equal(t, sumFileMd5(resultFile), "1b6781963a66148aed343325d08cfec0")
 }
 
-func (*testWrapper) TestBlurImageCache(c *C.C) {
+func TestBlurImageCache(t *testing.T) {
 	err := InitGdk()
 	if err != nil {
-		c.Skip(err.Error())
+		t.Skip(err.Error())
 		return
 	}
 	_, _, err = BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	resultFile, useCache, err := BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, true)
+	assert.Equal(t, useCache, true)
 	_ = os.Remove(resultFile)
 	_, useCache, err = BlurImageCache(originImg, 50, 1, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, false)
+	assert.Equal(t, useCache, false)
 }
 
-func (*testWrapper) BenchmarkBlurImage(c *C.C) {
-	for i := 0; i < c.N; i++ {
-		resultFile := fmt.Sprintf("testdata/test_blurimage_%d.png", i)
-		err := BlurImage(originImg, resultFile, 50, 1, FormatPng)
-		if err != nil {
-			c.Error(err)
-		}
-	}
-}
-
-func (*testWrapper) TestClipImage(c *C.C) {
+func TestClipImage(t *testing.T) {
 	resultFile := "testdata/test_clipimage_100x200.png"
 	err := ClipImage(originImg, resultFile, 0, 0, 100, 200, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	w, h, err := GetImageSize(resultFile)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(int(w), C.Equals, 100)
-	c.Check(int(h), C.Equals, 200)
-	// c.Check(sumFileMd5(resultFile), C.Equals, "0b31f921d5e9478e83eb98eda6b4252d")
+	assert.Equal(t, int(w), 100)
+	assert.Equal(t, int(h), 200)
+	// assert.Equal(t, sumFileMd5(resultFile), "0b31f921d5e9478e83eb98eda6b4252d")
 
 	resultFile = "testdata/test_clipimage_160x160.png"
 	err = ClipImage(originImg, resultFile, 40, 40, 160, 160, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	w, h, err = GetImageSize(resultFile)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(int(w), C.Equals, 160)
-	c.Check(int(h), C.Equals, 160)
-	// c.Check(sumFileMd5(resultFile), C.Equals, "ee9530add4ccf8cf77763fdb8e1d7394")
+	assert.Equal(t, int(w), 160)
+	assert.Equal(t, int(h), 160)
+	// assert.Equal(t, sumFileMd5(resultFile), "ee9530add4ccf8cf77763fdb8e1d7394")
 }
 
-func (*testWrapper) TestConvertImage(c *C.C) {
+func TestConvertImage(t *testing.T) {
 	var f Format
 	resultFilePng := "testdata/test_convertimage.png"
 	_ = ConvertImage(originImgPngSmall, resultFilePng, FormatPng)
 	f, _ = GetImageFormat(resultFilePng)
-	c.Check(f, C.Equals, FormatPng)
-	// c.Check(sumFileMd5(resultFilePng), C.Equals, "597e22ed7a9633950908d50e9309be21")
+	assert.Equal(t, f, FormatPng)
+	// assert.Equal(t, sumFileMd5(resultFilePng), "597e22ed7a9633950908d50e9309be21")
 
 	resultFileJpg := "testdata/test_convertimage.jpg"
 	_ = ConvertImage(originImgPngSmall, resultFileJpg, FormatJpeg)
 	f, _ = GetImageFormat(resultFileJpg)
-	c.Check(f, C.Equals, FormatJpeg)
-	// c.Check(sumFileMd5(resultFileJpg), C.Equals, "00c7c47613c39e0321cf4df6ab87fd45")
+	assert.Equal(t, f, FormatJpeg)
+	// assert.Equal(t, sumFileMd5(resultFileJpg), "00c7c47613c39e0321cf4df6ab87fd45")
 
 	resultFileBmp := "testdata/test_convertimage.bmp"
 	_ = ConvertImage(originImgPngSmall, resultFileBmp, FormatBmp)
 	f, _ = GetImageFormat(resultFileBmp)
-	c.Check(f, C.Equals, FormatBmp)
-	// c.Check(sumFileMd5(resultFileBmp), C.Equals, "aef8c2806dfa927f996b18785e58650c")
+	assert.Equal(t, f, FormatBmp)
+	// assert.Equal(t, sumFileMd5(resultFileBmp), "aef8c2806dfa927f996b18785e58650c")
 
 	resultFileIco := "testdata/test_convertimage.ico"
 	_ = ConvertImage(originImgPngSmall, resultFileIco, FormatIco)
 	f, _ = GetImageFormat(resultFileIco)
-	c.Check(f, C.Equals, FormatIco)
-	// c.Check(sumFileMd5(resultFileIco), C.Equals, "530442dfd38b9118e944d30d82a9cd37")
+	assert.Equal(t, f, FormatIco)
+	// assert.Equal(t, sumFileMd5(resultFileIco), "530442dfd38b9118e944d30d82a9cd37")
 
 	resultFileTiff := "testdata/test_convertimage.tiff"
 	_ = ConvertImage(originImgPngSmall, resultFileTiff, FormatTiff)
 	f, _ = GetImageFormat(resultFileTiff)
-	c.Check(f, C.Equals, FormatTiff)
+	assert.Equal(t, f, FormatTiff)
 	// FIXME: this hash won't be the same on different arch.
-	// c.Check(sumFileMd5(resultFileTiff), C.Equals, "2d28a01653464896e02c14de58e7487c")
+	// assert.Equal(t, sumFileMd5(resultFileTiff), "2d28a01653464896e02c14de58e7487c")
 }
 
-func (*testWrapper) TestFlipImageHorizontal(c *C.C) {
+func TestFlipImageHorizontal(t *testing.T) {
 	resultFileHorizontal := "testdata/test_flipimage_horizontal.png"
 	err := FlipImageHorizontal(originImg, resultFileHorizontal, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	//c.Check(sumFileMd5(resultFileHorizontal), C.Equals, "c6cb10065fea5865c2151b012ebe426c")
+	//assert.Equal(t, sumFileMd5(resultFileHorizontal), "c6cb10065fea5865c2151b012ebe426c")
 }
 
-func (*testWrapper) TestFlipImageVertical(c *C.C) {
+func TestFlipImageVertical(t *testing.T) {
 	resultFileVertical := "testdata/test_flipimage_vertical.png"
 	err := FlipImageVertical(originImg, resultFileVertical, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	// c.Check(sumFileMd5(resultFileVertical), C.Equals, "9683192bfd772e024e8f9ece58aa0035")
+	// assert.Equal(t, sumFileMd5(resultFileVertical), "9683192bfd772e024e8f9ece58aa0035")
 }
 
-func (*testWrapper) TestScaleImage(c *C.C) {
+func TestScaleImage(t *testing.T) {
 	resultFile := "testdata/test_scaleimage_500x600.png"
 	err := ScaleImage(originImg, resultFile, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	w, h, err := GetImageSize(resultFile)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(int(w), C.Equals, 500)
-	c.Check(int(h), C.Equals, 600)
-	// c.Check(sumFileMd5(resultFile), C.Equals, "14b8e27e743b6eb66e1c98745dbbd5cf")
+	assert.Equal(t, int(w), 500)
+	assert.Equal(t, int(h), 600)
+	// assert.Equal(t, sumFileMd5(resultFile), "14b8e27e743b6eb66e1c98745dbbd5cf")
 }
 
-func (*testWrapper) TestScaleImagePrefer(c *C.C) {
+func TestScaleImagePrefer(t *testing.T) {
 	resultFile := "testdata/test_scaleimageprefer_500x600.png"
 	err := ScaleImagePrefer(originImg, resultFile, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	w, h, err := GetImageSize(resultFile)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(int(w), C.Equals, 500)
-	c.Check(int(h), C.Equals, 600)
-	// c.Check(sumFileMd5(resultFile), C.Equals, "066950b89d6296e7860ae811d41f47e1")
+	assert.Equal(t, int(w), 500)
+	assert.Equal(t, int(h), 600)
+	// assert.Equal(t, sumFileMd5(resultFile), "066950b89d6296e7860ae811d41f47e1")
 }
 
-func (*testWrapper) TestThumbnailImage(c *C.C) {
+func TestThumbnailImage(t *testing.T) {
 	resultFile := "testdata/test_thumbnail.png"
 	maxWidth, maxHeight := 200, 200
 	err := ThumbnailImage(originImg, resultFile, maxWidth, maxHeight, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	w, h, _ := GetImageSize(resultFile)
-	c.Check(int(w) <= maxWidth, C.Equals, true)
-	c.Check(int(h) <= maxHeight, C.Equals, true)
-	// c.Check(sumFileMd5(resultFile), C.Equals, "ee26f7cafacecb95ae6fa4e4333a0ba1")
+	assert.Equal(t, int(w) <= maxWidth, true)
+	assert.Equal(t, int(h) <= maxHeight, true)
+	// assert.Equal(t, sumFileMd5(resultFile), "ee26f7cafacecb95ae6fa4e4333a0ba1")
 }
 
-func (*testWrapper) TestScaleImageCache(c *C.C) {
+func TestScaleImageCache(t *testing.T) {
 	err := InitGdk()
 	if err != nil {
-		c.Skip(err.Error())
+		t.Skip(err.Error())
 		return
 	}
 	_, _, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	resultFile, useCache, err := ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, true)
+	assert.Equal(t, useCache, true)
 	_ = os.Remove(resultFile)
 	_, useCache, err = ScaleImageCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, false)
+	assert.Equal(t, useCache, false)
 }
 
-func (*testWrapper) TestScaleImagePreferCache(c *C.C) {
+func TestScaleImagePreferCache(t *testing.T) {
 	err := InitGdk()
 	if err != nil {
-		c.Skip(err.Error())
+		t.Skip(err.Error())
 		return
 	}
 	_, _, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 	resultFile, useCache, err := ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, true)
+	assert.Equal(t, useCache, true)
 	_ = os.Remove(resultFile)
 	_, useCache, err = ScaleImagePreferCache(originImg, 500, 600, GDK_INTERP_HYPER, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	c.Check(useCache, C.Equals, false)
+	assert.Equal(t, useCache, false)
 }
 
-func (*testWrapper) TestRotateImageLeft(c *C.C) {
+func TestRotateImageLeft(t *testing.T) {
 	resultFile := "testdata/test_rotateimageleft.png"
 	err := RotateImageLeft(originImg, resultFile, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	// c.Check(sumFileMd5(resultFile), C.Equals, "e07d7c97138985843ffab23e26d4bc8d")
+	// assert.Equal(t, sumFileMd5(resultFile), "e07d7c97138985843ffab23e26d4bc8d")
 }
 
-func (*testWrapper) TestRotateImageRight(c *C.C) {
+func TestRotateImageRight(t *testing.T) {
 	resultFile := "testdata/test_rotateimageright.png"
 	err := RotateImageRight(originImg, resultFile, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	// c.Check(sumFileMd5(resultFile), C.Equals, "04032dac2648bdd03e07b2b8d38c5848")
+	// assert.Equal(t, sumFileMd5(resultFile), "04032dac2648bdd03e07b2b8d38c5848")
 }
 
-func (*testWrapper) TestRotateImageUpsizedown(c *C.C) {
+func TestRotateImageUpsizedown(t *testing.T) {
 	resultFile := "testdata/test_rotateimageupsidedown.png"
 	err := RotateImageUpsizedown(originImg, resultFile, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
-	// c.Check(sumFileMd5(resultFile), C.Equals, "6fb1ca20243db7769ba9bb9521e95012")
+	// assert.Equal(t, sumFileMd5(resultFile), "6fb1ca20243db7769ba9bb9521e95012")
 }
 
-func (*testWrapper) ManualTestScreenshotImage(c *C.C) {
+func ManualTestScreenshotImage(t *testing.T) {
 	err := InitGdk()
 	if err != nil {
-		c.Skip(err.Error())
+		t.Skip(err.Error())
 		return
 	}
 	resultFile := "testdata/test_screenshot.png"
 	err = ScreenshotImage(resultFile, FormatPng)
 	if err != nil {
-		c.Error(err)
+		assert.Error(t, err)
 	}
 }

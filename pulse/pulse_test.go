@@ -2,8 +2,11 @@ package pulse
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
+
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_pulse(t *testing.T) {
@@ -28,7 +31,7 @@ func Test_pulse(t *testing.T) {
 	ctx.SetDefaultSource(defaultSource.Name)
 
 	card, err := getCard(ctx, 0)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	if err != nil {
 		t.Log(err)
 		return

@@ -17,72 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package timer_test
+package timer
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	. "pkg.deepin.io/lib/timer"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 func TestTimer(t *testing.T) {
-	Convey("just stop", t, func(c C) {
-		timer := NewTimer()
-		timer.Stop()
-		c.So(timer.Elapsed(), ShouldEqual, 0)
-	})
+	timer := NewTimer()
+	timer.Stop()
+	assert.Equal(t, timer.Elapsed(), time.Duration(0))
 
-	Convey("get elapse without stop", t, func(c C) {
-		timer := NewTimer()
-		timer.Start()
+	timer = NewTimer()
+	timer.Start()
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*3+time.Millisecond*100)
-	})
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second*2-time.Millisecond*100, time.Second*3+time.Millisecond*100)
 
-	Convey("stop and elapse", t, func(c C) {
-		timer := NewTimer()
-		timer.Start()
+	timer = NewTimer()
+	timer.Start()
 
-		time.Sleep(time.Second)
-		timer.Stop()
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	time.Sleep(time.Second)
+	timer.Stop()
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
-	})
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-	Convey("stop and continue", t, func(c C) {
-		timer := NewTimer()
-		timer.Start()
+	timer = NewTimer()
+	timer.Start()
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		timer.Stop()
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	timer.Stop()
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		time.Sleep(time.Second)
-		timer.Continue()
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	time.Sleep(time.Second)
+	timer.Continue()
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
-	})
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second*2-time.Millisecond*100, time.Second*2+time.Millisecond*100)
 
-	Convey("reset", t, func(c C) {
-		timer := NewTimer()
-		timer.Start()
+	timer = NewTimer()
+	timer.Start()
 
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 
-		timer.Reset()
-		time.Sleep(time.Second)
-		c.So(timer.Elapsed(), ShouldBeBetweenOrEqual, time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
-	})
+	timer.Reset()
+	time.Sleep(time.Second)
+	assert.NotEqual(t, timer.Elapsed(), time.Second-time.Millisecond*100, time.Second+time.Millisecond*100)
 }

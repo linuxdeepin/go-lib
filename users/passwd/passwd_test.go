@@ -22,41 +22,32 @@ package passwd
 import (
 	"testing"
 
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type testWrapper struct{}
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func Test(t *testing.T) {
-	C.TestingT(t)
-}
-
-func (*testWrapper) TestGetPasswdByName(c *C.C) {
+func TestGetPasswdByName(t *testing.T) {
 	name := "root"
 	passwd, err := GetPasswdByName(name)
-	c.Check(passwd.Home, C.Equals, "/root")
-	c.Check(passwd.Uid, C.Equals, uint32(0))
-	c.Check(err, C.IsNil)
+	assert.Equal(t, passwd.Home, "/root")
+	assert.Equal(t, passwd.Uid, uint32(0))
+	require.Nil(t, err)
 
 	name = "root2"
 	passwd, err = GetPasswdByName(name)
-	c.Check(passwd, C.IsNil)
-	c.Check(err, C.DeepEquals, &UserNotFoundError{Name: name})
+	require.Nil(t, passwd)
+	assert.Equal(t, err, &UserNotFoundError{Name: name})
 }
 
-func (*testWrapper) TestGetPasswdByUid(c *C.C) {
+func TestGetPasswdByUid(t *testing.T) {
 	uid := uint32(0)
 	passwd, err := GetPasswdByUid(uid)
-	c.Check(err, C.IsNil)
-	c.Check(passwd.Name, C.Equals, "root")
+	require.Nil(t, err)
+	assert.Equal(t, passwd.Name, "root")
 }
 
-func (*testWrapper) TestGetPasswdEntry(c *C.C) {
+func TestGetPasswdEntry(t *testing.T) {
 	passwds := GetPasswdEntry()
-	c.Check(len(passwds), C.Not(C.Equals), 0)
-	c.Check(passwds[0].Name, C.Equals, "root")
+	assert.NotEqual(t, len(passwds), 0)
+	assert.Equal(t, passwds[0].Name, "root")
 }

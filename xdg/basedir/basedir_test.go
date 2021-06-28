@@ -21,126 +21,112 @@ package basedir
 
 import (
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetUserHomeDir(t *testing.T) {
-	Convey("GetUserHomeDir", t, func(c C) {
-		os.Setenv("HOME", "/home/test")
-		dir := GetUserHomeDir()
-		c.So(dir, ShouldEqual, "/home/test")
-	})
+	os.Setenv("HOME", "/home/test")
+	dir := GetUserHomeDir()
+	assert.Equal(t, dir, "/home/test")
 }
 
 func TestGetUserDataDir(t *testing.T) {
-	Convey("GetUserDataDir", t, func(c C) {
-		os.Setenv("HOME", "/home/test")
-		os.Setenv("XDG_DATA_HOME", "")
-		dir := GetUserDataDir()
-		c.So(dir, ShouldEqual, "/home/test/.local/share")
+	os.Setenv("HOME", "/home/test")
+	os.Setenv("XDG_DATA_HOME", "")
+	dir := GetUserDataDir()
+	assert.Equal(t, dir, "/home/test/.local/share")
 
-		os.Setenv("XDG_DATA_HOME", "a invalid path")
-		dir = GetUserDataDir()
-		c.So(dir, ShouldEqual, "/home/test/.local/share")
+	os.Setenv("XDG_DATA_HOME", "a invalid path")
+	dir = GetUserDataDir()
+	assert.Equal(t, dir, "/home/test/.local/share")
 
-		os.Setenv("XDG_DATA_HOME", "/home/test/xdg")
-		dir = GetUserDataDir()
-		c.So(dir, ShouldEqual, "/home/test/xdg")
-	})
+	os.Setenv("XDG_DATA_HOME", "/home/test/xdg")
+	dir = GetUserDataDir()
+	assert.Equal(t, dir, "/home/test/xdg")
 }
 
 func TestFilterNotAbs(t *testing.T) {
-	Convey("filterNotAbs", t, func(c C) {
-		result := filterNotAbs([]string{
-			"a/is/invald", "b/is invalid", "c is invald", "/d/is/ok", "/e/is/ok/"})
-		c.So(result, ShouldResemble, []string{"/d/is/ok", "/e/is/ok"})
-	})
+	result := filterNotAbs([]string{
+		"a/is/invald", "b/is invalid", "c is invald", "/d/is/ok", "/e/is/ok/"})
+	assert.Equal(t, result, []string{"/d/is/ok", "/e/is/ok"})
 }
 
 func TestGetSystemDataDirs(t *testing.T) {
-	Convey("GetSystemDataDirs", t, func(c C) {
-		os.Setenv("XDG_DATA_DIRS", "/a:/b:/c")
-		dirs := GetSystemDataDirs()
-		c.So(dirs, ShouldResemble, []string{"/a", "/b", "/c"})
+	os.Setenv("XDG_DATA_DIRS", "/a:/b:/c")
+	dirs := GetSystemDataDirs()
+	assert.Equal(t, dirs, []string{"/a", "/b", "/c"})
 
-		os.Setenv("XDG_DATA_DIRS", "/a:/b/:/c/")
-		dirs = GetSystemDataDirs()
-		c.So(dirs, ShouldResemble, []string{"/a", "/b", "/c"})
+	os.Setenv("XDG_DATA_DIRS", "/a:/b/:/c/")
+	dirs = GetSystemDataDirs()
+	assert.Equal(t, dirs, []string{"/a", "/b", "/c"})
 
-		os.Setenv("XDG_DATA_DIRS", "/a:/b/:c is invald")
-		dirs = GetSystemDataDirs()
-		c.So(dirs, ShouldResemble, []string{"/a", "/b"})
+	os.Setenv("XDG_DATA_DIRS", "/a:/b/:c is invald")
+	dirs = GetSystemDataDirs()
+	assert.Equal(t, dirs, []string{"/a", "/b"})
 
-		os.Setenv("XDG_DATA_DIRS", "a/is/invald:b/is invalid :c is invald")
-		dirs = GetSystemDataDirs()
-		c.So(dirs, ShouldResemble, []string{"/usr/local/share", "/usr/share"})
+	os.Setenv("XDG_DATA_DIRS", "a/is/invald:b/is invalid :c is invald")
+	dirs = GetSystemDataDirs()
+	assert.Equal(t, dirs, []string{"/usr/local/share", "/usr/share"})
 
-		os.Setenv("XDG_DATA_DIRS", "")
-		dirs = GetSystemDataDirs()
-		c.So(dirs, ShouldResemble, []string{"/usr/local/share", "/usr/share"})
-	})
+	os.Setenv("XDG_DATA_DIRS", "")
+	dirs = GetSystemDataDirs()
+	assert.Equal(t, dirs, []string{"/usr/local/share", "/usr/share"})
 }
 
 func TestGetUserConfigDir(t *testing.T) {
-	Convey("GetUserConfigDir", t, func(c C) {
-		os.Setenv("XDG_CONFIG_HOME", "")
-		os.Setenv("HOME", "/home/test")
-		dir := GetUserConfigDir()
-		c.So(dir, ShouldEqual, "/home/test/.config")
+	os.Setenv("XDG_CONFIG_HOME", "")
+	os.Setenv("HOME", "/home/test")
+	dir := GetUserConfigDir()
+	assert.Equal(t, dir, "/home/test/.config")
 
-		os.Setenv("XDG_CONFIG_HOME", "/home/test/myconfig")
-		dir = GetUserConfigDir()
-		c.So(dir, ShouldEqual, "/home/test/myconfig")
-	})
+	os.Setenv("XDG_CONFIG_HOME", "/home/test/myconfig")
+	dir = GetUserConfigDir()
+	assert.Equal(t, dir, "/home/test/myconfig")
 }
 
 func TestGetSystemConfigDirs(t *testing.T) {
-	Convey("GetSystemDirs", t, func(c C) {
-		os.Setenv("XDG_CONFIG_DIRS", "/a:/b:/c")
-		dirs := GetSystemConfigDirs()
-		c.So(dirs, ShouldResemble, []string{"/a", "/b", "/c"})
+	os.Setenv("XDG_CONFIG_DIRS", "/a:/b:/c")
+	dirs := GetSystemConfigDirs()
+	assert.Equal(t, dirs, []string{"/a", "/b", "/c"})
 
-		os.Setenv("XDG_CONFIG_DIRS", "")
-		dirs = GetSystemConfigDirs()
-		c.So(dirs, ShouldResemble, []string{"/etc/xdg"})
-	})
+	os.Setenv("XDG_CONFIG_DIRS", "")
+	dirs = GetSystemConfigDirs()
+	assert.Equal(t, dirs, []string{"/etc/xdg"})
 }
 
 func TestGetUserCacheDir(t *testing.T) {
-	Convey("GetUserCacheDir", t, func(c C) {
-		os.Setenv("XDG_CACHE_HOME", "/cache/user/a")
-		dir := GetUserCacheDir()
-		c.So(dir, ShouldEqual, "/cache/user/a")
+	os.Setenv("XDG_CACHE_HOME", "/cache/user/a")
+	dir := GetUserCacheDir()
+	assert.Equal(t, dir, "/cache/user/a")
 
-		os.Setenv("XDG_CACHE_HOME", "")
-		os.Setenv("HOME", "/home/test")
-		dir = GetUserCacheDir()
-		c.So(dir, ShouldEqual, "/home/test/.cache")
-	})
+	os.Setenv("XDG_CACHE_HOME", "")
+	os.Setenv("HOME", "/home/test")
+	dir = GetUserCacheDir()
+	assert.Equal(t, dir, "/home/test/.cache")
 }
 
 func TestGetUserRuntimeDir(t *testing.T) {
-	Convey("GetUserRuntimeDir", t, func(c C) {
-		os.Setenv("XDG_RUNTIME_DIR", "/runtime/user/test")
-		dir, err := GetUserRuntimeDir(true)
-		c.So(err, ShouldBeNil)
-		c.So(dir, ShouldEqual, "/runtime/user/test")
+	os.Setenv("XDG_RUNTIME_DIR", "/runtime/user/test")
+	dir, err := GetUserRuntimeDir(true)
+	require.Nil(t, err)
+	assert.Equal(t, dir, "/runtime/user/test")
 
-		os.Setenv("XDG_RUNTIME_DIR", "")
-		dir, err = GetUserRuntimeDir(true)
-		c.So(err, ShouldNotBeNil)
-		c.So(dir, ShouldEqual, "")
+	os.Setenv("XDG_RUNTIME_DIR", "")
+	dir, err = GetUserRuntimeDir(true)
+	assert.NotNil(t, err)
+	assert.Equal(t, dir, "")
 
-		os.Setenv("XDG_RUNTIME_DIR", "a invalid path")
-		dir, err = GetUserRuntimeDir(true)
-		c.So(err, ShouldNotBeNil)
-		c.So(dir, ShouldEqual, "")
+	os.Setenv("XDG_RUNTIME_DIR", "a invalid path")
+	dir, err = GetUserRuntimeDir(true)
+	assert.NotNil(t, err)
+	assert.Equal(t, dir, "")
 
-		os.Setenv("XDG_RUNTIME_DIR", "")
-		dir, err = GetUserRuntimeDir(false)
-		c.So(err, ShouldBeNil)
-		c.So(dir, ShouldEqual, fmt.Sprintf("/tmp/goxdg-runtime-dir-fallback-%d", os.Getuid()))
-	})
+	os.Setenv("XDG_RUNTIME_DIR", "")
+	dir, err = GetUserRuntimeDir(false)
+	require.Nil(t, err)
+	assert.Equal(t, dir, fmt.Sprintf("/tmp/goxdg-runtime-dir-fallback-%d", os.Getuid()))
 }

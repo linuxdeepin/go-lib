@@ -22,39 +22,30 @@ package group
 import (
 	"testing"
 
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type testWrapper struct{}
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func Test(t *testing.T) {
-	C.TestingT(t)
-}
-
-func (*testWrapper) TestGetGroupByName(c *C.C) {
+func TestGetGroupByName(t *testing.T) {
 	name := "root"
 	group, err := GetGroupByName(name)
-	c.Check(err, C.IsNil)
-	c.Check(group.Gid, C.Equals, uint32(0))
+	require.Nil(t, err)
+	assert.Equal(t, group.Gid, uint32(0))
 
 	name = "root2"
 	group, err = GetGroupByName(name)
-	c.Check(group, C.IsNil)
-	c.Check(err, C.DeepEquals, &GroupNotFoundError{Name: name})
+	require.Nil(t, group)
+	assert.Equal(t, err, &GroupNotFoundError{Name: name})
 }
 
-func (*testWrapper) TestGetGroupByGid(c *C.C) {
+func TestGetGroupByGid(t *testing.T) {
 	uid := uint32(0)
 	group, err := GetGroupByGid(uid)
-	c.Check(err, C.IsNil)
-	c.Check(group.Name, C.Equals, "root")
+	require.Nil(t, err)
+	assert.Equal(t, group.Name, "root")
 }
 
-func (*testWrapper) TestGetGroupEntry(c *C.C) {
+func TestGetGroupEntry(t *testing.T) {
 	groups := GetGroupEntry()
-	c.Check(len(groups), C.Not(C.Equals), 0)
+	assert.NotEqual(t, len(groups), 0)
 }

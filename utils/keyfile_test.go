@@ -20,21 +20,22 @@
 package utils
 
 import (
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 	"os"
+	"testing"
 )
 
-func (*testWrapper) TestKeyFile(c *C.C) {
+func TestKeyFile(t *testing.T) {
 	file := "testdata/test_keyfile.ini"
 	group := "Test"
 	key := "id"
 	value := "1234"
 
-	c.Check(WriteKeyToKeyFile(file, group, key, value), C.Equals, true)
+	assert.Equal(t, WriteKeyToKeyFile(file, group, key, value), true)
 	ifc, ok := ReadKeyFromKeyFile(file, group, key, "")
-	c.Check(ok, C.Equals, true)
+	assert.Equal(t, ok, true)
 
-	c.Check(value, C.Equals, ifc.(string))
+	assert.Equal(t, value, ifc.(string))
 
 	os.Remove(file)
 }

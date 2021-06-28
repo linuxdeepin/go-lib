@@ -20,81 +20,67 @@
 package strv
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestContains(t *testing.T) {
-	Convey("Contains", t, func(c C) {
-		vector := Strv([]string{"a", "b", "c"})
-		c.So(vector.Contains("b"), ShouldBeTrue)
-		c.So(vector.Contains("d"), ShouldBeFalse)
-	})
+	vector := Strv([]string{"a", "b", "c"})
+	assert.True(t, vector.Contains("b"))
+	assert.False(t, vector.Contains("d"))
 }
 
 func TestEqual(t *testing.T) {
-	Convey("Equal", t, func(c C) {
-		v1 := Strv([]string{"a", "b", "c"})
-		v2 := Strv([]string{"a", "b", "c", "d"})
-		v3 := Strv(v1[:])
-		c.So(v1.Equal(v2), ShouldBeFalse)
-		c.So(v1.Equal(v3), ShouldBeTrue)
-	})
+	v1 := Strv([]string{"a", "b", "c"})
+	v2 := Strv([]string{"a", "b", "c", "d"})
+	v3 := Strv(v1[:])
+	assert.False(t, v1.Equal(v2))
+	assert.True(t, v1.Equal(v3))
 }
 
 func TestUniq(t *testing.T) {
-	Convey("Uniq", t, func(c C) {
-		vector := Strv([]string{"a", "b", "c", "c", "b", "a", "c"})
-		vector = vector.Uniq()
-		c.So(vector, ShouldResemble, Strv([]string{"a", "b", "c"}))
-	})
+	vector := Strv([]string{"a", "b", "c", "c", "b", "a", "c"})
+	vector = vector.Uniq()
+	assert.Equal(t, vector, Strv([]string{"a", "b", "c"}))
 }
 
 func TestFilterFunc(t *testing.T) {
-	Convey("FilterFunc", t, func(c C) {
-		vector := Strv([]string{"hello", "", "world", "", "!"})
-		vector = vector.FilterFunc(func(str string) bool {
-			return len(str) == 0
-		})
-		c.So(vector, ShouldResemble, Strv([]string{"hello", "world", "!"}))
+	vector := Strv([]string{"hello", "", "world", "", "!"})
+	vector = vector.FilterFunc(func(str string) bool {
+		return len(str) == 0
 	})
+	assert.Equal(t, vector, Strv([]string{"hello", "world", "!"}))
 }
 
 func TestFilterEmpty(t *testing.T) {
-	Convey("FilterEmpty", t, func(c C) {
-		vector := Strv([]string{"hello", "", "world", "", "!"})
-		vector = vector.FilterEmpty()
-		c.So(vector, ShouldResemble, Strv([]string{"hello", "world", "!"}))
-	})
+	vector := Strv([]string{"hello", "", "world", "", "!"})
+	vector = vector.FilterEmpty()
+	assert.Equal(t, vector, Strv([]string{"hello", "world", "!"}))
 }
 
 func TestAdd(t *testing.T) {
-	Convey("Add", t, func(c C) {
-		vector := Strv([]string{"a", "b", "c"})
+	vector := Strv([]string{"a", "b", "c"})
 
-		vector0, b0 := vector.Add("d")
-		c.So(vector, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(vector0, ShouldResemble, Strv([]string{"a", "b", "c", "d"}))
-		c.So(b0, ShouldBeTrue)
+	vector0, b0 := vector.Add("d")
+	assert.Equal(t, vector, Strv([]string{"a", "b", "c"}))
+	assert.Equal(t, vector0, Strv([]string{"a", "b", "c", "d"}))
+	assert.True(t, b0)
 
-		vector1, b1 := vector.Add("c")
-		c.So(vector, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(vector1, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(b1, ShouldBeFalse)
-	})
+	vector1, b1 := vector.Add("c")
+	assert.Equal(t, vector, Strv([]string{"a", "b", "c"}))
+	assert.Equal(t, vector1, Strv([]string{"a", "b", "c"}))
+	assert.False(t, b1)
 }
 
 func TestDelete(t *testing.T) {
-	Convey("Delete", t, func(c C) {
-		vector := Strv([]string{"a", "b", "c"})
-		vector0, b0 := vector.Delete("d")
-		c.So(vector, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(vector0, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(b0, ShouldBeFalse)
+	vector := Strv([]string{"a", "b", "c"})
+	vector0, b0 := vector.Delete("d")
+	assert.Equal(t, vector, Strv([]string{"a", "b", "c"}))
+	assert.Equal(t, vector0, Strv([]string{"a", "b", "c"}))
+	assert.False(t, b0)
 
-		vector1, b1 := vector.Delete("c")
-		c.So(vector, ShouldResemble, Strv([]string{"a", "b", "c"}))
-		c.So(vector1, ShouldResemble, Strv([]string{"a", "b"}))
-		c.So(b1, ShouldBeTrue)
-	})
+	vector1, b1 := vector.Delete("c")
+	assert.Equal(t, vector, Strv([]string{"a", "b", "c"}))
+	assert.Equal(t, vector1, Strv([]string{"a", "b"}))
+	assert.True(t, b1)
 }

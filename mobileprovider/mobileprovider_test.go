@@ -20,147 +20,142 @@
 package mobileprovider
 
 import (
-	C "gopkg.in/check.v1"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type testWrapper struct{}
-
-func Test(t *testing.T) { C.TestingT(t) }
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func (*testWrapper) TestMobileProvider(c *C.C) {
+func TestMobileProvider(t *testing.T) {
 	database, err := GetMobileProviderDatabase()
-	c.Check(database, C.NotNil)
-	c.Check(err, C.Equals, nil)
+	assert.NotNil(t, database)
+	assert.Equal(t, err, nil)
 }
 
-func (*testWrapper) TestGetProviders(c *C.C) {
+func TestGetProviders(t *testing.T) {
 	providers, err := GetProviders("cn")
-	c.Check(len(providers), C.Equals, 3)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(providers), 3)
 
 	providers, err = GetProviders("<invalid>")
-	c.Check(providers == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
+	assert.Equal(t, providers == nil, true)
 }
 
-func (*testWrapper) TestGetProvider(c *C.C) {
+func TestGetProvider(t *testing.T) {
 	provider, err := GetProvider("cn", "China Mobile")
-	c.Check(len(provider.GSM.APN), C.Equals, 3)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(provider.GSM.APN), 3)
 
 	provider, err = GetProvider("cn", "<invalid>")
-	c.Check(provider == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
+	assert.Equal(t, provider == nil, true)
 }
 
-func (*testWrapper) TestGetGSM(c *C.C) {
+func TestGetGSM(t *testing.T) {
 	gsm, err := GetGSM("cn", "China Mobile")
-	c.Check(len(gsm.APN), C.Equals, 3)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(gsm.APN), 3)
 
 	gsm, err = GetGSM("cn", "<invalid>")
-	c.Check(gsm == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.Equal(t, gsm == nil, true)
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetCDMA(c *C.C) {
+func TestGetCDMA(t *testing.T) {
 	cdma, err := GetCDMA("cn", "China Telecom")
-	c.Check(cdma.Username, C.Equals, "ctnet@mycdma.cn")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, cdma.Username, "ctnet@mycdma.cn")
 
 	cdma, err = GetCDMA("cn", "<invalid>")
-	c.Check(cdma == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
+	assert.Equal(t, cdma == nil, true)
 
 	cdma, err = GetCDMA("cn", "China Mobile")
-	c.Check(cdma == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
+	assert.Equal(t, cdma == nil, true)
 }
 
-func (*testWrapper) TestGetAPN(c *C.C) {
+func TestGetAPN(t *testing.T) {
 	apn, err := GetAPN("cn", "China Mobile", "cmnet", "internet")
-	c.Check(GetAPNName(apn), C.Equals, "Internet")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, GetAPNName(apn), "Internet")
 
 	apn, err = GetAPN("cn", "China Mobile", "cmnet", "<invalid>")
-	c.Check(apn == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.Equal(t, apn == nil, true)
+	assert.NotNil(t, err)
 
 	apn, err = GetAPN("au", "Amaysim", "internet", "")
-	c.Check(GetAPNName(apn), C.Equals, "")
-	c.Check(GetAPNUsageType(apn), C.Equals, "")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, GetAPNName(apn), "")
+	assert.Equal(t, GetAPNUsageType(apn), "")
 }
 
-func (*testWrapper) TestGetGSMForNetworkID(c *C.C) {
+func TestGetGSMForNetworkID(t *testing.T) {
 	gsm, err := GetGSMForNetworkID("460", "00")
-	c.Check(len(gsm.APN), C.Equals, 3)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(gsm.APN), 3)
 
 	gsm, err = GetGSMForNetworkID("460", "<invalid>")
-	c.Check(gsm == nil, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.Equal(t, gsm == nil, true)
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetProviderNames(c *C.C) {
+func TestGetProviderNames(t *testing.T) {
 	names, err := GetProviderNames("cn")
-	c.Check(names[0], C.Equals, "China Mobile")
-	c.Check(names[1], C.Equals, "China Unicom")
-	c.Check(names[2], C.Equals, "China Telecom")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, names[0], "China Mobile")
+	assert.Equal(t, names[1], "China Unicom")
+	assert.Equal(t, names[2], "China Telecom")
 
 	names, err = GetProviderNames("<invalid>")
-	c.Check(len(names) == 0, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.NotNil(t, err)
+	assert.Equal(t, len(names) == 0, true)
 }
 
-func (*testWrapper) TestGetPlans(c *C.C) {
+func TestGetPlans(t *testing.T) {
 	plans, err := GetPlans("cn", "China Mobile")
-	c.Check(len(plans), C.Equals, 3)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(plans), 3)
+	assert.Equal(t, err, nil)
 
 	plans, err = GetPlans("ca", "Bell Mobility")
-	c.Check(len(plans), C.Equals, 5)
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, len(plans), 5)
 
 	plans, err = GetPlans("cn", "<invalid>")
-	c.Check(len(plans) == 0, C.Equals, true)
-	c.Check(err, C.NotNil)
+	assert.Equal(t, len(plans) == 0, true)
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetDefaultPlan(c *C.C) {
+func TestGetDefaultPlan(t *testing.T) {
 	plan, err := GetDefaultPlan("cn", "China Mobile")
-	c.Check(plan.Name, C.Equals, "WAP")
-	c.Check(plan.ProviderName, C.Equals, "China Mobile")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, plan.Name, "WAP")
+	assert.Equal(t, plan.ProviderName, "China Mobile")
 
 	plan, err = GetDefaultPlan("cn", "<invalid>")
-	c.Check(plan.Name, C.Equals, "")
-	c.Check(err, C.NotNil)
+	assert.Equal(t, plan.Name, "")
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetDefaultGSMPlanForCountry(c *C.C) {
+func TestGetDefaultGSMPlanForCountry(t *testing.T) {
 	plan, err := GetDefaultGSMPlanForCountry("cn")
-	c.Check(plan.Name, C.Equals, "Internet")
-	c.Check(plan.ProviderName, C.Equals, "China Mobile")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, plan.Name, "Internet")
+	assert.Equal(t, plan.ProviderName, "China Mobile")
 
 	plan, err = GetDefaultGSMPlanForCountry("<invalid>")
-	c.Check(plan.Name, C.Equals, "")
-	c.Check(err, C.NotNil)
+	assert.Equal(t, plan.Name, "")
+	assert.NotNil(t, err)
 }
 
-func (*testWrapper) TestGetDefaultCDMAPlanForCountry(c *C.C) {
+func TestGetDefaultCDMAPlanForCountry(t *testing.T) {
 	plan, err := GetDefaultCDMAPlanForCountry("cn")
-	c.Check(plan.Name, C.Equals, "China Telecom")
-	c.Check(err, C.Equals, nil)
+	require.Nil(t, err)
+	assert.Equal(t, plan.Name, "China Telecom")
 
 	plan, err = GetDefaultCDMAPlanForCountry("<invalid>")
-	c.Check(plan.Name, C.Equals, "")
-	c.Check(err, C.NotNil)
+	assert.Equal(t, plan.Name, "")
+	assert.NotNil(t, err)
 }

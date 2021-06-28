@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestList(t *testing.T) {
@@ -41,11 +42,7 @@ func TestList(t *testing.T) {
 
 func Test_list(t *testing.T) {
 	controllers, err := list("./testdata")
-	assert.Nil(t, err)
-	if err != nil {
-		return
-	}
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, controllers, 1)
 
 	controller := controllers[0]
@@ -53,6 +50,6 @@ func Test_list(t *testing.T) {
 	assert.Equal(t, controller.MaxBrightness, 3)
 
 	br, err := controller.GetBrightness()
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, br, 1)
 }

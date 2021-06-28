@@ -20,30 +20,26 @@
 package mime
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIsGtkTheme(t *testing.T) {
-	Convey("Deepin is gtk theme", t, func(c C) {
-		ok, err := isGtkTheme("testdata/Deepin/index.theme")
-		c.So(ok, ShouldEqual, true)
-		c.So(err, ShouldBeNil)
-	})
+	ok, err := isGtkTheme("testdata/Deepin/index.theme")
+	require.Nil(t, err)
+	assert.Equal(t, ok, true)
 }
 
 func TestIsIconTheme(t *testing.T) {
-	Convey("Deepin is icon theme", t, func(c C) {
-		ok, err := isIconTheme("testdata/Deepin/index.theme")
-		c.So(ok, ShouldEqual, true)
-		c.So(err, ShouldBeNil)
-	})
+	ok, err := isIconTheme("testdata/Deepin/index.theme")
+	require.Nil(t, err)
+	assert.Equal(t, ok, true)
 }
 
 func TestIsCursorTheme(t *testing.T) {
-	Convey("Deepin is cursor theme", t, func(c C) {
-		ok, err := isCursorTheme("testdata/Deepin/index.theme")
-		c.So(ok, ShouldEqual, true)
-		c.So(err, ShouldBeNil)
-	})
+	ok, err := isCursorTheme("testdata/Deepin/index.theme")
+	require.Nil(t, err)
+	assert.Equal(t, ok, true)
 }

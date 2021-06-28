@@ -20,91 +20,83 @@
 package locale
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExplodeLocale(t *testing.T) {
-	Convey("ExplodeLocale", t, func(c C) {
-		cs := ExplodeLocale("zh_CN.UTF-8@hubei")
-		c.So(cs, ShouldResemble, &Components{
-			Language:  "zh",
-			Territory: "CN",
-			Codeset:   "UTF-8",
-			Modifier:  "hubei",
-			Mask:      ComponentTerritory | ComponentCodeset | ComponentModifier,
-		})
+	cs := ExplodeLocale("zh_CN.UTF-8@hubei")
+	assert.Equal(t, cs, &Components{
+		Language:  "zh",
+		Territory: "CN",
+		Codeset:   "UTF-8",
+		Modifier:  "hubei",
+		Mask:      ComponentTerritory | ComponentCodeset | ComponentModifier,
+	})
 
-		cs = ExplodeLocale("zh_CN.UTF-8")
-		c.So(cs, ShouldResemble, &Components{
-			Language:  "zh",
-			Territory: "CN",
-			Codeset:   "UTF-8",
-			Mask:      ComponentTerritory | ComponentCodeset,
-		})
+	cs = ExplodeLocale("zh_CN.UTF-8")
+	assert.Equal(t, cs, &Components{
+		Language:  "zh",
+		Territory: "CN",
+		Codeset:   "UTF-8",
+		Mask:      ComponentTerritory | ComponentCodeset,
+	})
 
-		cs = ExplodeLocale("zh_CN")
-		c.So(cs, ShouldResemble, &Components{
-			Language:  "zh",
-			Territory: "CN",
-			Mask:      ComponentTerritory,
-		})
+	cs = ExplodeLocale("zh_CN")
+	assert.Equal(t, cs, &Components{
+		Language:  "zh",
+		Territory: "CN",
+		Mask:      ComponentTerritory,
+	})
 
-		cs = ExplodeLocale("zh")
-		c.So(cs, ShouldResemble, &Components{
-			Language: "zh",
-		})
+	cs = ExplodeLocale("zh")
+	assert.Equal(t, cs, &Components{
+		Language: "zh",
+	})
 
-		cs = ExplodeLocale("")
-		c.So(cs, ShouldResemble, &Components{})
+	cs = ExplodeLocale("")
+	assert.Equal(t, cs, &Components{})
 
-		cs = ExplodeLocale("_.@")
-		c.So(cs, ShouldResemble, &Components{
-			Mask: ComponentTerritory | ComponentCodeset | ComponentModifier,
-		})
+	cs = ExplodeLocale("_.@")
+	assert.Equal(t, cs, &Components{
+		Mask: ComponentTerritory | ComponentCodeset | ComponentModifier,
 	})
 }
 
 func TestGetLocaleVariants(t *testing.T) {
-	Convey("GetLocaleVariants", t, func(c C) {
-		variants := GetLocaleVariants("zh_CN")
-		c.So(variants, ShouldResemble, []string{"zh_CN", "zh"})
+	variants := GetLocaleVariants("zh_CN")
+	assert.Equal(t, variants, []string{"zh_CN", "zh"})
 
-		variants = GetLocaleVariants("zh_CN.UTF-8")
-		c.So(variants, ShouldResemble, []string{"zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
+	variants = GetLocaleVariants("zh_CN.UTF-8")
+	assert.Equal(t, variants, []string{"zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
 
-		variants = GetLocaleVariants("zh_CN.UTF-8@hubei")
-		c.So(variants, ShouldResemble, []string{"zh_CN.UTF-8@hubei", "zh_CN@hubei", "zh.UTF-8@hubei", "zh@hubei", "zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
-	})
+	variants = GetLocaleVariants("zh_CN.UTF-8@hubei")
+	assert.Equal(t, variants, []string{"zh_CN.UTF-8@hubei", "zh_CN@hubei", "zh.UTF-8@hubei", "zh@hubei", "zh_CN.UTF-8", "zh_CN", "zh.UTF-8", "zh"})
 }
 
 func Test_readAliases(t *testing.T) {
-	Convey("readAliases", t, func(c C) {
-		aliases := readAliases("testdata/locale.alias")
-		c.So(aliases, ShouldResemble, map[string]string{"bokmal": "nb_NO.ISO-8859-1", "catalan": "ca_ES.ISO-8859-1", "croatian": "hr_HR.ISO-8859-2"})
+	aliases := readAliases("testdata/locale.alias")
+	assert.Equal(t, aliases, map[string]string{"bokmal": "nb_NO.ISO-8859-1", "catalan": "ca_ES.ISO-8859-1", "croatian": "hr_HR.ISO-8859-2"})
 
-		aliases = readAliases("testdata/x")
-		c.So(aliases, ShouldBeNil)
-		c.So(aliases["nil"], ShouldEqual, "")
-	})
+	aliases = readAliases("testdata/x")
+	require.Nil(t, aliases)
+	assert.Equal(t, aliases["nil"], "")
 }
 
 func Test_unaliasLang(t *testing.T) {
-	Convey("unaliasLang", t, func(c C) {
-		aliasFile = "testdata/locale.alias"
-		c.So(unaliasLang("zh_CN"), ShouldEqual, "zh_CN")
-		c.So(unaliasLang(""), ShouldEqual, "")
-		c.So(unaliasLang("bokmal"), ShouldEqual, "nb_NO.ISO-8859-1")
-	})
+	aliasFile = "testdata/locale.alias"
+	assert.Equal(t, unaliasLang("zh_CN"), "zh_CN")
+	assert.Equal(t, unaliasLang(""), "")
+	assert.Equal(t, unaliasLang("bokmal"), "nb_NO.ISO-8859-1")
 }
 
 func TestGetLanguageNames(t *testing.T) {
-	Convey("GetLanguageNames", t, func(c C) {
-		os.Setenv("LANGUAGE", "zh_CN")
-		c.So(GetLanguageNames(), ShouldResemble, []string{"zh_CN", "zh", "C"})
+	os.Setenv("LANGUAGE", "zh_CN")
+	assert.Equal(t, GetLanguageNames(), []string{"zh_CN", "zh", "C"})
 
-		os.Setenv("LANGUAGE", "en_US")
-		c.So(GetLanguageNames(), ShouldResemble, []string{"en_US", "en", "C"})
-	})
+	os.Setenv("LANGUAGE", "en_US")
+	assert.Equal(t, GetLanguageNames(), []string{"en_US", "en", "C"})
 }

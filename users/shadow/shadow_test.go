@@ -23,35 +23,26 @@ import (
 	"syscall"
 	"testing"
 
-	C "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type testWrapper struct{}
-
-func init() {
-	C.Suite(&testWrapper{})
-}
-
-func Test(t *testing.T) {
-	C.TestingT(t)
-}
-
-func (*testWrapper) TestGetShadowByName(c *C.C) {
+func TestGetShadowByName(t *testing.T) {
 	name := "root"
 	shadow, err := GetShadowByName(name)
 
 	if err != nil {
 		// Permission denied, current user has no access to shadow file
-		c.Check(shadow, C.IsNil)
-		c.Check(err, C.Equals, syscall.EACCES)
+		require.Nil(t, shadow)
+		assert.Equal(t, err, syscall.EACCES)
 	} else {
-		c.Check(shadow.Name, C.Equals, "root")
+		assert.Equal(t, shadow.Name, "root")
 	}
 }
 
-func (*testWrapper) TestGetShadowEntry(c *C.C) {
+func TestGetShadowEntry(t *testing.T) {
 	shadows := GetShadowEntry()
 	if len(shadows) > 0 {
-		c.Check(shadows[0].Name, C.Equals, "root")
+		assert.Equal(t, shadows[0].Name, "root")
 	}
 }

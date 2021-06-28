@@ -1,10 +1,11 @@
 package gsettings
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_StartMonitor(t *testing.T) {
-	assert.Nil(t, StartMonitor())
+	require.Nil(t, StartMonitor())
 }

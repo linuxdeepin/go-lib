@@ -20,23 +20,25 @@
 package utils
 
 import (
-	C "gopkg.in/check.v1"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func (*testWrapper) TestMD5Sum(c *C.C) {
+func TestMD5Sum(t *testing.T) {
 	testStr := "hello world"
 	if ret, ok := SumStrMd5(testStr); !ok {
-		c.Errorf("SumStrMd5 '%s' Faild", testStr)
+		t.Errorf("SumStrMd5 '%s' Faild", testStr)
 		return
 	} else {
-		c.Check(ret, C.Equals, "5eb63bbbe01eeed093cb22bb8f5acdc3")
+		assert.Equal(t, ret, "5eb63bbbe01eeed093cb22bb8f5acdc3")
 	}
 
 	testFile := "testdata/testfile"
 	if ret, ok := SumFileMd5(testFile); !ok {
-		c.Errorf("SumFileMd5 '%s' Failed", testFile)
+		t.Errorf("SumFileMd5 '%s' Failed", testFile)
 		return
 	} else {
-		c.Check(ret, C.Equals, "0a75266cc21da8c88a940b00d4d535b7")
+		assert.Equal(t, ret, "0a75266cc21da8c88a940b00d4d535b7")
 	}
 }

@@ -1,8 +1,10 @@
 package cgroup
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var mountTableTest = []*MountTableItem{
@@ -65,7 +67,7 @@ var mountTableTest = []*MountTableItem{
 
 func Test_MountTableItem(t *testing.T) {
 	err := Init()
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	for _, mountTableItem := range mountTable {
 		for _, mountTest := range mountTableTest {
 			if mountTableItem.Name() == mountTest.name {

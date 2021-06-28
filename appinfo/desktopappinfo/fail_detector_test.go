@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // 测试简单的情况
@@ -11,12 +12,12 @@ func TestFailDetectorSimple(t *testing.T) {
 	ch := make(chan struct{}, 2)
 	fd := newFailDetector(ch)
 	_, err := fd.Write([]byte("Failed to invoke: Booster: abcdef"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.True(t, fd.done)
 
 	fd = newFailDetector(ch)
 	_, err = fd.Write([]byte("deepin-turbo-invoker: error: xxxx not a file\n"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.True(t, fd.done)
 }
 
@@ -25,22 +26,22 @@ func TestFailDetectorWrite(t *testing.T) {
 	ch := make(chan struct{}, 2)
 	fd := newFailDetector(ch)
 	_, err := fd.Write([]byte("line1\n"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.False(t, fd.done)
 	assert.Len(t, fd.buf.Bytes(), 0)
 
 	_, err = fd.Write([]byte("line2\nabc"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.False(t, fd.done)
 	assert.Equal(t, []byte("abc"), fd.buf.Bytes())
 
 	_, err = fd.Write(nil)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.False(t, fd.done)
 	assert.Equal(t, []byte("abc"), fd.buf.Bytes())
 
 	_, err = fd.Write([]byte("abc-abc\nFailed to invoke: Booster: abcdef\nline 3"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.True(t, fd.done)
 	assert.Zero(t, fd.buf.Bytes())
 }

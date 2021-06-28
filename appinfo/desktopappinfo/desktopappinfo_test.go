@@ -24,112 +24,98 @@ import (
 	"path/filepath"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"pkg.deepin.io/lib/keyfile"
 )
 
 func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {
-	Convey("NewDesktopAppInfoFromKeyFile failed, empty keyfile", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldNotBeNil)
-		c.So(err, ShouldEqual, ErrInvalidFirstSection)
-		c.So(ai, ShouldBeNil)
-		t.Log(err)
-	})
+	kfile := keyfile.NewKeyFile()
+	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, ErrInvalidFirstSection)
+	require.Nil(t, ai)
+	t.Log(err)
 
-	Convey("NewDesktopAppInfoFromKeyFile failed, invalid type", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		kfile.SetValue(MainSection, KeyType, "xxxx")
-		kfile.SetValue(MainSection, KeyName, "Deepin Screenshot")
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldNotBeNil)
-		c.So(err, ShouldEqual, ErrInvalidType)
-		c.So(ai, ShouldBeNil)
-		t.Log(err)
+	kfile = keyfile.NewKeyFile()
+	kfile.SetValue(MainSection, KeyType, "xxxx")
+	kfile.SetValue(MainSection, KeyName, "Deepin Screenshot")
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, ErrInvalidType)
+	require.Nil(t, ai)
+	t.Log(err)
 
-	})
+	kfile = keyfile.NewKeyFile()
+	kfile.SetValue(MainSection, KeyType, TypeApplication)
+	kfile.SetValue(MainSection, KeyName, "Deepin Screenshot")
+	kfile.SetValue(MainSection, KeyExec, "deepin-screenshot --icon")
+	kfile.SetValue(MainSection, KeyIcon, "deepin-screenshot.png")
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
 
-	Convey("NewDesktopAppInfoFromKeyFile sucess", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		kfile.SetValue(MainSection, KeyType, TypeApplication)
-		kfile.SetValue(MainSection, KeyName, "Deepin Screenshot")
-		kfile.SetValue(MainSection, KeyExec, "deepin-screenshot --icon")
-		kfile.SetValue(MainSection, KeyIcon, "deepin-screenshot.png")
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-
-		c.So(ai.GetCommandline(), ShouldEqual, "deepin-screenshot --icon")
-		c.So(ai.GetName(), ShouldEqual, "Deepin Screenshot")
-		c.So(ai.GetIcon(), ShouldEqual, "deepin-screenshot")
-	})
+	assert.Equal(t, ai.GetCommandline(), "deepin-screenshot --icon")
+	assert.Equal(t, ai.GetName(), "Deepin Screenshot")
+	assert.Equal(t, ai.GetIcon(), "deepin-screenshot")
 }
 
 func TestNewDesktopAppInfo(t *testing.T) {
-	Convey("NewDesktopAppInfo", t, func(c C) {
-		testDataDir, err := filepath.Abs("testdata")
-		c.So(err, ShouldBeNil)
-		xdgDataDirs = []string{testDataDir}
-		xdgAppDirs = []string{filepath.Join(testDataDir, "applications")}
+	testDataDir, err := filepath.Abs("testdata")
+	require.Nil(t, err)
+	xdgDataDirs = []string{testDataDir}
+	xdgAppDirs = []string{filepath.Join(testDataDir, "applications")}
 
-		c.Convey("NewDesktopAppInfoFromFile", func(c C) {
-			var testDesktopTypes []string
-			testFileName := "testdata/applications/deepin-screenshot.desktop"
-			ai, err := NewDesktopAppInfoFromFile(testFileName)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
+	var testDesktopTypes []string
+	testFileName := "testdata/applications/deepin-screenshot.desktop"
+	ai, err := NewDesktopAppInfoFromFile(testFileName)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
 
-			c.So(err, ShouldBeNil)
-			c.So(ai.GetIcon(), ShouldEqual, "deepin-screenshot")
-			c.So(ai.GetId(), ShouldEqual, "deepin-screenshot")
-			c.So(ai.GetIsHiden(), ShouldEqual, false)
-			c.So(ai.GetIsHidden(), ShouldEqual, false)
-			c.So(ai.GetNoDisplay(), ShouldEqual, false)
-			c.So(ai.ShouldShow(), ShouldEqual, true)
-			c.So(ai.GetGenericName(), ShouldEqual, "Screen capturing application")
-			c.So(ai.GetComment(), ShouldEqual, "Screen capturing application")
-			c.So(ai.GetDisplayName(), ShouldEqual, "Deepin Screenshot")
-			c.So(ai.GetMimeTypes(), ShouldResemble, testDesktopTypes)
-			c.So(ai.GetCategories(), ShouldResemble, []string{"Graphics", "GTK"})
-			c.So(ai.GetKeywords(), ShouldResemble, testDesktopTypes)
-			c.So(ai.GetStartupWMClass(), ShouldEqual, "")
-			c.So(ai.GetStartupNotify(), ShouldEqual, false)
-			c.So(ai.GetPath(), ShouldEqual, "")
-			c.So(ai.GetDBusActivatable(), ShouldEqual, false)
-			c.So(ai.GetTerminal(), ShouldEqual, false)
-			c.So(ai.IsDesktopOverrideExecSet(), ShouldEqual, false)
-			c.So(ai.GetDesktopOverrideExec(), ShouldEqual, "")
+	require.Nil(t, err)
+	assert.Equal(t, ai.GetIcon(), "deepin-screenshot")
+	assert.Equal(t, ai.GetId(), "deepin-screenshot")
+	assert.Equal(t, ai.GetIsHiden(), false)
+	assert.Equal(t, ai.GetIsHidden(), false)
+	assert.Equal(t, ai.GetNoDisplay(), false)
+	assert.Equal(t, ai.ShouldShow(), true)
+	assert.Equal(t, ai.GetGenericName(), "Screen capturing application")
+	assert.Equal(t, ai.GetComment(), "Screen capturing application")
+	assert.Equal(t, ai.GetDisplayName(), "Deepin Screenshot")
+	assert.Equal(t, ai.GetMimeTypes(), testDesktopTypes)
+	assert.Equal(t, ai.GetCategories(), []string{"Graphics", "GTK"})
+	assert.Equal(t, ai.GetKeywords(), testDesktopTypes)
+	assert.Equal(t, ai.GetStartupWMClass(), "")
+	assert.Equal(t, ai.GetStartupNotify(), false)
+	assert.Equal(t, ai.GetPath(), "")
+	assert.Equal(t, ai.GetDBusActivatable(), false)
+	assert.Equal(t, ai.GetTerminal(), false)
+	assert.Equal(t, ai.IsDesktopOverrideExecSet(), false)
+	assert.Equal(t, ai.GetDesktopOverrideExec(), "")
 
-			c.So(getId(testFileName), ShouldEqual, "testdata/applications/deepin-screenshot")
-			c.So(getCurrentDesktop(), ShouldResemble, []string{"Deepin", "GNOME"})
-		})
+	assert.Equal(t, getId(testFileName), "testdata/applications/deepin-screenshot")
+	assert.Equal(t, getCurrentDesktop(), []string{"Deepin", "GNOME"})
 
-		c.Convey("NewDesktopAppInfo By Id", func(c C) {
-			ai := NewDesktopAppInfo("deepin-screenshot")
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetId(), ShouldEqual, "deepin-screenshot")
+	ai = NewDesktopAppInfo("deepin-screenshot")
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetId(), "deepin-screenshot")
 
-			ai = NewDesktopAppInfo("deepin-screenshot.desktop")
-			c.So(ai, ShouldNotBeNil)
+	ai = NewDesktopAppInfo("deepin-screenshot.desktop")
+	assert.NotNil(t, ai)
 
-			ai = NewDesktopAppInfo("not-exist")
-			c.So(ai, ShouldBeNil)
-		})
+	ai = NewDesktopAppInfo("not-exist")
+	require.Nil(t, ai)
 
-	})
 }
 
 func TestGetActions(t *testing.T) {
-	Convey("DesktopAppInfo.GetActions", t, func(c C) {
-		ai, err := NewDesktopAppInfoFromFile("testdata/applications/deepin-screenshot.desktop")
-		c.So(err, ShouldBeNil)
-		actions := ai.GetActions()
-		t.Log("actions:", actions)
-		c.So(actions, ShouldHaveLength, 2)
-		c.So(actions[0].Exec, ShouldEqual, "deepin-screenshot -f")
-		c.So(actions[1].Exec, ShouldEqual, "deepin-screenshot -d 5")
-	})
+	ai, err := NewDesktopAppInfoFromFile("testdata/applications/deepin-screenshot.desktop")
+	require.Nil(t, err)
+	actions := ai.GetActions()
+	t.Log("actions:", actions)
+	assert.Len(t, actions, 2)
+	assert.Equal(t, actions[0].Exec, "deepin-screenshot -f")
+	assert.Equal(t, actions[1].Exec, "deepin-screenshot -d 5")
 }
 
 func init() {
@@ -137,9 +123,7 @@ func init() {
 }
 
 func TestGetCurrentDestkops(t *testing.T) {
-	Convey("getCurrentDesktop", t, func(c C) {
-		c.So(getCurrentDesktop(), ShouldResemble, []string{"Deepin", "GNOME"})
-	})
+	assert.Equal(t, getCurrentDesktop(), []string{"Deepin", "GNOME"})
 }
 
 const desktopFileContent0 = `
@@ -191,79 +175,63 @@ NotShowIn=KDE;GNOME;
 `
 
 func TestGetShowIn(t *testing.T) {
-	Convey("GetShowIn destkop env: Deepin", t, func(c C) {
-		currentDesktops = []string{"Deepin"}
+	currentDesktops = []string{"Deepin"}
 
-		c.Convey("GetShowIn OnlyShowIn=Deepin", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent0))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeTrue)
-		})
+	kfile := keyfile.NewKeyFile()
+	err := kfile.LoadFromData([]byte(desktopFileContent0))
+	require.Nil(t, err)
+	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.True(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn OnlyShowIn=GNOME", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent1))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeFalse)
-		})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent1))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.False(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn OnlyShowIn undefined and NotShowIn undefined", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent2))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeTrue)
-		})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent2))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.True(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn OnlyShowIn=GNOME;Deepin", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent3))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeTrue)
-		})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent3))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.True(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn OnlyShowIn=Xfce;KDE", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent4))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeFalse)
-		})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent4))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.False(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn NotShowIn=Deepin", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent5))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeFalse)
-		})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent5))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.False(t, ai.GetShowIn(nil))
 
-		c.Convey("GetShowIn NotShowIn=KDE;GNOME;", func(c C) {
-			kfile := keyfile.NewKeyFile()
-			err := kfile.LoadFromData([]byte(desktopFileContent6))
-			c.So(err, ShouldBeNil)
-			ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-			c.So(err, ShouldBeNil)
-			c.So(ai, ShouldNotBeNil)
-			c.So(ai.GetShowIn(nil), ShouldBeTrue)
-		})
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent6))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.True(t, ai.GetShowIn(nil))
 }
 
 const desktopFileContent7 = `
@@ -302,220 +270,204 @@ Exec=notexist
 `
 
 func TestGetExecutable(t *testing.T) {
-	Convey("GetExecutable Exec undefined", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent6))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "")
-		c.So(ai.IsExecutableOk(), ShouldBeFalse)
-	})
+	kfile := keyfile.NewKeyFile()
+	err := kfile.LoadFromData([]byte(desktopFileContent6))
+	require.Nil(t, err)
+	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "")
+	assert.False(t, ai.IsExecutableOk())
 
-	Convey("GetExecutable Exec=sh", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent7))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "sh")
-		c.So(ai.IsExecutableOk(), ShouldBeTrue)
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent7))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "sh")
+	assert.True(t, ai.IsExecutableOk())
 
-	Convey("GetExecutable Exec=sh $", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent8))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "")
-		c.So(ai.IsExecutableOk(), ShouldBeFalse)
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent8))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "")
+	assert.False(t, ai.IsExecutableOk())
 
-	Convey("GetExecutable Exec=/bin/sh", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent9))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "/bin/sh")
-		c.So(ai.IsExecutableOk(), ShouldBeTrue)
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent9))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "/bin/sh")
+	assert.True(t, ai.IsExecutableOk())
 
-	Convey("GetExecutable Exec=/bin/sh/notexist", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent10))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "/bin/sh/notexist")
-		c.So(ai.IsExecutableOk(), ShouldBeFalse)
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent10))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "/bin/sh/notexist")
+	assert.False(t, ai.IsExecutableOk())
 
-	Convey("GetExecutable Exec=notexist", t, func(c C) {
-		kfile := keyfile.NewKeyFile()
-		err := kfile.LoadFromData([]byte(desktopFileContent11))
-		c.So(err, ShouldBeNil)
-		ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-		c.So(err, ShouldBeNil)
-		c.So(ai, ShouldNotBeNil)
-		c.So(ai.GetExecutable(), ShouldEqual, "notexist")
-		c.So(ai.IsExecutableOk(), ShouldBeFalse)
-	})
+	kfile = keyfile.NewKeyFile()
+	err = kfile.LoadFromData([]byte(desktopFileContent11))
+	require.Nil(t, err)
+	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
+	require.Nil(t, err)
+	assert.NotNil(t, ai)
+	assert.Equal(t, ai.GetExecutable(), "notexist")
+	assert.False(t, ai.IsExecutableOk())
 }
 
 func Test_splitExec(t *testing.T) {
-	Convey("splitExec", t, func(c C) {
-		parts, err := splitExec(`abc def ghi`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc", "def", "ghi"})
+	parts, err := splitExec(`abc def ghi`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
-		parts, err = splitExec(`"abc" def "ghi"`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc", "def", "ghi"})
+	parts, err = splitExec(`"abc" def "ghi"`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
-		parts, err = splitExec(`"abc 123" def "ghi"`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc 123", "def", "ghi"})
+	parts, err = splitExec(`"abc 123" def "ghi"`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc 123", "def", "ghi"})
 
-		parts, err = splitExec(`abc def "" ghi`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc", "def", "", "ghi"})
+	parts, err = splitExec(`abc def "" ghi`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc", "def", "", "ghi"})
 
-		parts, err = splitExec(`"abc's" def`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc's", "def"})
+	parts, err = splitExec(`"abc's" def`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc's", "def"})
 
-		parts, err = splitExec(`"abc\\s" def`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc\\s", "def"})
+	parts, err = splitExec(`"abc\\s" def`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc\\s", "def"})
 
-		parts, err = splitExec(`abc   def ghi`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc", "def", "ghi"})
+	parts, err = splitExec(`abc   def ghi`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
-		parts, err = splitExec(`"abc"`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"abc"})
+	parts, err = splitExec(`"abc"`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"abc"})
 
-		parts, err = splitExec(`"$abcdef"`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"$abcdef"})
+	parts, err = splitExec(`"$abcdef"`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"$abcdef"})
 
-		parts, err = splitExec("\"`abcdef\" def")
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"`abcdef", "def"})
+	parts, err = splitExec("\"`abcdef\" def")
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"`abcdef", "def"})
 
-		parts, err = splitExec(`sh -c 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"sh", "-c", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
+	parts, err = splitExec(`sh -c 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"sh", "-c", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
 
-		_, err = splitExec(`"abcdef`)
-		c.So(err, ShouldEqual, ErrQuotingNotClosed)
+	_, err = splitExec(`"abcdef`)
+	assert.Equal(t, err, ErrQuotingNotClosed)
 
-		_, err = splitExec(`"abcdef\"`)
-		c.So(err, ShouldEqual, ErrQuotingNotClosed)
+	_, err = splitExec(`"abcdef\"`)
+	assert.Equal(t, err, ErrQuotingNotClosed)
 
-		_, err = splitExec(`"abc\def"`)
-		c.So(err, ShouldResemble, ErrInvalidEscapeSequence{'d'})
+	_, err = splitExec(`"abc\def"`)
+	assert.Equal(t, err, ErrInvalidEscapeSequence{'d'})
 
-		_, err = splitExec(`#echo hello world`)
-		c.So(err, ShouldResemble, ErrReservedCharNotQuoted{'#'})
+	_, err = splitExec(`#echo hello world`)
+	assert.Equal(t, err, ErrReservedCharNotQuoted{'#'})
 
-		_, err = splitExec(`(1)`)
-		c.So(err, ShouldResemble, ErrReservedCharNotQuoted{'('})
+	_, err = splitExec(`(1)`)
+	assert.Equal(t, err, ErrReservedCharNotQuoted{'('})
 
-		_, err = splitExec(`"abc"def`)
-		c.So(err, ShouldEqual, ErrNoSpaceAfterQuoting)
+	_, err = splitExec(`"abc"def`)
+	assert.Equal(t, err, ErrNoSpaceAfterQuoting)
 
-		parts, err = splitExec(`env WINEPREFIX="/home/tp/.wine" wine-stable C:\\windows\\command\\start.exe /Unix /home/tp/.wine/dosdevices/c:/users/tp/Start\ Menu/Programs/sc1.08/sc1.08.lnk`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"env", "WINEPREFIX=/home/tp/.wine",
-			"wine-stable", "C:\\\\windows\\\\command\\\\start.exe",
-			"/Unix", "/home/tp/.wine/dosdevices/c:/users/tp/Start Menu/Programs/sc1.08/sc1.08.lnk"})
+	parts, err = splitExec(`env WINEPREFIX="/home/tp/.wine" wine-stable C:\\windows\\command\\start.exe /Unix /home/tp/.wine/dosdevices/c:/users/tp/Start\ Menu/Programs/sc1.08/sc1.08.lnk`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"env", "WINEPREFIX=/home/tp/.wine",
+		"wine-stable", "C:\\\\windows\\\\command\\\\start.exe",
+		"/Unix", "/home/tp/.wine/dosdevices/c:/users/tp/Start Menu/Programs/sc1.08/sc1.08.lnk"})
 
-		parts, err = splitExec(`echo hello\ world`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"echo", "hello world"})
+	parts, err = splitExec(`echo hello\ world`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"echo", "hello world"})
 
-		parts, err = splitExec(`echo hello\world`)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"echo", "helloworld"})
+	parts, err = splitExec(`echo hello\world`)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"echo", "helloworld"})
 
-		_, err = splitExec(`echo hello\`)
-		c.So(err, ShouldEqual, ErrEscapeCharAtEnd)
-	})
+	_, err = splitExec(`echo hello\`)
+	assert.Equal(t, err, ErrEscapeCharAtEnd)
 }
 
 func Test_expandFieldCode(t *testing.T) {
-	Convey("expandFieldCode", t, func(c C) {
-		icon := "test_icon"
-		desktopFile := "test.desktop"
-		files := []string{"/dir1/dir2/a", "/dir1/dir2/b"}
-		translatedName := "translatedName"
-		cmdline := []string{"start", "%f", "%i", "%c", "%k", "end"}
-		parts, err := expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", files[0], "--icon", icon, translatedName, desktopFile, "end"})
+	icon := "test_icon"
+	desktopFile := "test.desktop"
+	files := []string{"/dir1/dir2/a", "/dir1/dir2/b"}
+	translatedName := "translatedName"
+	cmdline := []string{"start", "%f", "%i", "%c", "%k", "end"}
+	parts, err := expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", files[0], "--icon", icon, translatedName, desktopFile, "end"})
 
-		cmdline = []string{"start", "%G", "end"}
-		_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldEqual, ErrBadFieldCode)
+	cmdline = []string{"start", "%G", "end"}
+	_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	assert.Equal(t, err, ErrBadFieldCode)
 
-		cmdline = []string{"start", "%d", "%d", "%v", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "end"})
+	cmdline = []string{"start", "%d", "%d", "%v", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "end"})
 
-		cmdline = []string{"start", "%F", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
+	cmdline = []string{"start", "%F", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
 
-		cmdline = []string{"start", "%u", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "/dir1/dir2/a", "end"})
+	cmdline = []string{"start", "%u", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "end"})
 
-		cmdline = []string{"start", "%U", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
+	cmdline = []string{"start", "%U", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
 
-		cmdline = []string{"start", "%%", "%abc", "end"}
-		_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldEqual, ErrBadFieldCode)
+	cmdline = []string{"start", "%%", "%abc", "end"}
+	_, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	assert.Equal(t, err, ErrBadFieldCode)
 
-		cmdline = []string{"start", "1%%", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "1%", "end"})
+	cmdline = []string{"start", "1%%", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "1%", "end"})
 
-		files = []string{"file:///home/tp/2017%E5%B9%B403%E6%9C%88-%E6%B7%B1%E5%BA%A6%E9%9B%86%E7%BB%93-%E7%94%B5%E5%AD%90%E7%89%88.pdf"}
-		cmdline = []string{"/opt/Foxitreader/FoxitReader.sh", "%F"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"/opt/Foxitreader/FoxitReader.sh", "/home/tp/2017年03月-深度集结-电子版.pdf"})
+	files = []string{"file:///home/tp/2017%E5%B9%B403%E6%9C%88-%E6%B7%B1%E5%BA%A6%E9%9B%86%E7%BB%93-%E7%94%B5%E5%AD%90%E7%89%88.pdf"}
+	cmdline = []string{"/opt/Foxitreader/FoxitReader.sh", "%F"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"/opt/Foxitreader/FoxitReader.sh", "/home/tp/2017年03月-深度集结-电子版.pdf"})
 
-		files = []string{"/a/b/log"}
-		cmdline = []string{"start", "file=%u", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file=/a/b/log", "end"})
+	files = []string{"/a/b/log"}
+	cmdline = []string{"start", "file=%u", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "file=/a/b/log", "end"})
 
-		cmdline = []string{"start", "file=%u+++", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "file=/a/b/log+++", "end"})
+	cmdline = []string{"start", "file=%u+++", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "file=/a/b/log+++", "end"})
 
-		cmdline = []string{"start", "icon:%i", "end"}
-		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"start", "icon:--icon", "test_icon", "end"})
-	})
+	cmdline = []string{"start", "icon:%i", "end"}
+	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
+	require.Nil(t, err)
+	assert.Equal(t, parts, []string{"start", "icon:--icon", "test_icon", "end"})
 }
