@@ -537,7 +537,7 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 	turboInvokerPath, _ := exec.LookPath("deepin-turbo-invoker")
 
 	if shouldUseTurboInvoker(ai, isAction, turboInvokerPath, launchContext) {
-		args := []string{"--desktop-file"}
+		args := []string{"--no-wait", "--desktop-file"}
 		args = append(args, ai.GetFileName())
 
 		if ai.IsDesktopOverrideExecSet() {
