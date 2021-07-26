@@ -43,7 +43,7 @@ func TestQueryURI(t *testing.T) {
 
 	for _, info := range infos {
 		m, err := Query(info.uri)
-		require.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, m, info.mime)
 	}
 }

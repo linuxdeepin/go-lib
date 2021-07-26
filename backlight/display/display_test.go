@@ -41,18 +41,18 @@ func getControllerByName(cs []*Controller, name string) *Controller {
 
 func Test_list(t *testing.T) {
 	controllers, err := list("./testdata")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Len(t, controllers, 2)
 	controller := getControllerByName(controllers, "intel_backlight")
 	assert.Equal(t, controller.MaxBrightness, 937)
 	assert.Len(t, controller.DeviceEDID, 128)
 
 	br, err := controller.GetBrightness()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, br, 100)
 
 	abr, err := controller.GetActualBrightness()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, abr, 100)
 
 	controller = getControllerByName(controllers, "acpi_video0")
@@ -61,11 +61,11 @@ func Test_list(t *testing.T) {
 	require.Nil(t, controller.DeviceEDID)
 
 	br, err = controller.GetBrightness()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, br, 1)
 
 	abr, err = controller.GetActualBrightness()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, abr, 1)
 
 	controller = controllers.GetByEDID(edid0)
@@ -77,7 +77,7 @@ func Test_list(t *testing.T) {
 
 func TestList(t *testing.T) {
 	controllers, err := List()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log(err)
 	for _, c := range controllers {
 		t.Logf("%+v\n", c)

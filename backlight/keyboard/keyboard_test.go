@@ -42,7 +42,7 @@ func TestList(t *testing.T) {
 
 func Test_list(t *testing.T) {
 	controllers, err := list("./testdata")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Len(t, controllers, 1)
 
 	controller := controllers[0]
@@ -50,6 +50,6 @@ func Test_list(t *testing.T) {
 	assert.Equal(t, controller.MaxBrightness, 3)
 
 	br, err := controller.GetBrightness()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, br, 1)
 }

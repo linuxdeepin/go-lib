@@ -31,7 +31,7 @@ func TestGetPasswdByName(t *testing.T) {
 	passwd, err := GetPasswdByName(name)
 	assert.Equal(t, passwd.Home, "/root")
 	assert.Equal(t, passwd.Uid, uint32(0))
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	name = "root2"
 	passwd, err = GetPasswdByName(name)
@@ -42,7 +42,7 @@ func TestGetPasswdByName(t *testing.T) {
 func TestGetPasswdByUid(t *testing.T) {
 	uid := uint32(0)
 	passwd, err := GetPasswdByUid(uid)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, passwd.Name, "root")
 }
 

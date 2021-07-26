@@ -29,7 +29,7 @@ import (
 func TestGetGroupByName(t *testing.T) {
 	name := "root"
 	group, err := GetGroupByName(name)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, group.Gid, uint32(0))
 
 	name = "root2"
@@ -41,7 +41,7 @@ func TestGetGroupByName(t *testing.T) {
 func TestGetGroupByGid(t *testing.T) {
 	uid := uint32(0)
 	group, err := GetGroupByGid(uid)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, group.Name, "root")
 }
 

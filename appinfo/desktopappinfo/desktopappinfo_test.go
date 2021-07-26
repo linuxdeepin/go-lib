@@ -32,7 +32,7 @@ import (
 func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {
 	kfile := keyfile.NewKeyFile()
 	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, err, ErrInvalidFirstSection)
 	require.Nil(t, ai)
 	t.Log(err)
@@ -41,7 +41,7 @@ func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {
 	kfile.SetValue(MainSection, KeyType, "xxxx")
 	kfile.SetValue(MainSection, KeyName, "Deepin Screenshot")
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, err, ErrInvalidType)
 	require.Nil(t, ai)
 	t.Log(err)
@@ -52,7 +52,7 @@ func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {
 	kfile.SetValue(MainSection, KeyExec, "deepin-screenshot --icon")
 	kfile.SetValue(MainSection, KeyIcon, "deepin-screenshot.png")
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 
 	assert.Equal(t, ai.GetCommandline(), "deepin-screenshot --icon")
@@ -62,17 +62,17 @@ func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {
 
 func TestNewDesktopAppInfo(t *testing.T) {
 	testDataDir, err := filepath.Abs("testdata")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	xdgDataDirs = []string{testDataDir}
 	xdgAppDirs = []string{filepath.Join(testDataDir, "applications")}
 
 	var testDesktopTypes []string
 	testFileName := "testdata/applications/deepin-screenshot.desktop"
 	ai, err := NewDesktopAppInfoFromFile(testFileName)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ai.GetIcon(), "deepin-screenshot")
 	assert.Equal(t, ai.GetId(), "deepin-screenshot")
 	assert.Equal(t, ai.GetIsHiden(), false)
@@ -110,7 +110,7 @@ func TestNewDesktopAppInfo(t *testing.T) {
 
 func TestGetActions(t *testing.T) {
 	ai, err := NewDesktopAppInfoFromFile("testdata/applications/deepin-screenshot.desktop")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	actions := ai.GetActions()
 	t.Log("actions:", actions)
 	assert.Len(t, actions, 2)
@@ -179,57 +179,57 @@ func TestGetShowIn(t *testing.T) {
 
 	kfile := keyfile.NewKeyFile()
 	err := kfile.LoadFromData([]byte(desktopFileContent0))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.True(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent1))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.False(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent2))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.True(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent3))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.True(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent4))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.False(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent5))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.False(t, ai.GetShowIn(nil))
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent6))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.True(t, ai.GetShowIn(nil))
 }
@@ -272,54 +272,54 @@ Exec=notexist
 func TestGetExecutable(t *testing.T) {
 	kfile := keyfile.NewKeyFile()
 	err := kfile.LoadFromData([]byte(desktopFileContent6))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err := NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "")
 	assert.False(t, ai.IsExecutableOk())
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent7))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "sh")
 	assert.True(t, ai.IsExecutableOk())
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent8))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "")
 	assert.False(t, ai.IsExecutableOk())
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent9))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "/bin/sh")
 	assert.True(t, ai.IsExecutableOk())
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent10))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "/bin/sh/notexist")
 	assert.False(t, ai.IsExecutableOk())
 
 	kfile = keyfile.NewKeyFile()
 	err = kfile.LoadFromData([]byte(desktopFileContent11))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	ai, err = NewDesktopAppInfoFromKeyFile(kfile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, ai)
 	assert.Equal(t, ai.GetExecutable(), "notexist")
 	assert.False(t, ai.IsExecutableOk())
@@ -327,47 +327,47 @@ func TestGetExecutable(t *testing.T) {
 
 func Test_splitExec(t *testing.T) {
 	parts, err := splitExec(`abc def ghi`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
 	parts, err = splitExec(`"abc" def "ghi"`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
 	parts, err = splitExec(`"abc 123" def "ghi"`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc 123", "def", "ghi"})
 
 	parts, err = splitExec(`abc def "" ghi`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc", "def", "", "ghi"})
 
 	parts, err = splitExec(`"abc's" def`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc's", "def"})
 
 	parts, err = splitExec(`"abc\\s" def`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc\\s", "def"})
 
 	parts, err = splitExec(`abc   def ghi`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc", "def", "ghi"})
 
 	parts, err = splitExec(`"abc"`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"abc"})
 
 	parts, err = splitExec(`"$abcdef"`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"$abcdef"})
 
 	parts, err = splitExec("\"`abcdef\" def")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"`abcdef", "def"})
 
 	parts, err = splitExec(`sh -c 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"sh", "-c", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
 
 	_, err = splitExec(`"abcdef`)
@@ -389,17 +389,17 @@ func Test_splitExec(t *testing.T) {
 	assert.Equal(t, err, ErrNoSpaceAfterQuoting)
 
 	parts, err = splitExec(`env WINEPREFIX="/home/tp/.wine" wine-stable C:\\windows\\command\\start.exe /Unix /home/tp/.wine/dosdevices/c:/users/tp/Start\ Menu/Programs/sc1.08/sc1.08.lnk`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"env", "WINEPREFIX=/home/tp/.wine",
 		"wine-stable", "C:\\\\windows\\\\command\\\\start.exe",
 		"/Unix", "/home/tp/.wine/dosdevices/c:/users/tp/Start Menu/Programs/sc1.08/sc1.08.lnk"})
 
 	parts, err = splitExec(`echo hello\ world`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"echo", "hello world"})
 
 	parts, err = splitExec(`echo hello\world`)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"echo", "helloworld"})
 
 	_, err = splitExec(`echo hello\`)
@@ -413,7 +413,7 @@ func Test_expandFieldCode(t *testing.T) {
 	translatedName := "translatedName"
 	cmdline := []string{"start", "%f", "%i", "%c", "%k", "end"}
 	parts, err := expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", files[0], "--icon", icon, translatedName, desktopFile, "end"})
 
 	cmdline = []string{"start", "%G", "end"}
@@ -422,22 +422,22 @@ func Test_expandFieldCode(t *testing.T) {
 
 	cmdline = []string{"start", "%d", "%d", "%v", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "end"})
 
 	cmdline = []string{"start", "%F", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
 
 	cmdline = []string{"start", "%u", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "end"})
 
 	cmdline = []string{"start", "%U", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "/dir1/dir2/a", "/dir1/dir2/b", "end"})
 
 	cmdline = []string{"start", "%%", "%abc", "end"}
@@ -446,28 +446,28 @@ func Test_expandFieldCode(t *testing.T) {
 
 	cmdline = []string{"start", "1%%", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "1%", "end"})
 
 	files = []string{"file:///home/tp/2017%E5%B9%B403%E6%9C%88-%E6%B7%B1%E5%BA%A6%E9%9B%86%E7%BB%93-%E7%94%B5%E5%AD%90%E7%89%88.pdf"}
 	cmdline = []string{"/opt/Foxitreader/FoxitReader.sh", "%F"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"/opt/Foxitreader/FoxitReader.sh", "/home/tp/2017年03月-深度集结-电子版.pdf"})
 
 	files = []string{"/a/b/log"}
 	cmdline = []string{"start", "file=%u", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "file=/a/b/log", "end"})
 
 	cmdline = []string{"start", "file=%u+++", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "file=/a/b/log+++", "end"})
 
 	cmdline = []string{"start", "icon:%i", "end"}
 	parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"start", "icon:--icon", "test_icon", "end"})
 }

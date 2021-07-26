@@ -32,7 +32,7 @@ const envLanguage = "LANGUAGE"
 
 func TestGetCountryDatabase(t *testing.T) {
 	database, err := GetCountryDatabase()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, database)
 }
 
@@ -79,11 +79,11 @@ func TestGetCountryCodeForLanguage(t *testing.T) {
 
 	// check invalid format
 	_, err := GetCountryCodeForLanguage("")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = GetCountryCodeForLanguage("en.US_UTF-8")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, err = GetCountryCodeForLanguage("en_.US.UTF-8")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetCountryInfoForCode(t *testing.T) {

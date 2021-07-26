@@ -68,26 +68,26 @@ func TestLoadFromData(t *testing.T) {
 
 	f := NewKeyFile()
 	err := f.LoadFromData([]byte(desktopFileContent1))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.IsType(t, err, EntryNotInSectionError{})
 	t.Log(err)
 
 	f = NewKeyFile()
 	err = f.LoadFromData([]byte(desktopFileContent2))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.IsType(t, err, ParseError{})
 	t.Log(err)
 
 	f = NewKeyFile()
 	err = f.LoadFromData([]byte(desktopFileContent3))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	t.Log(err)
 
 	f = NewKeyFile()
 	keyReg := regexp.MustCompile(`^[A-Za-z0-9\-]+$`)
 	f.SetKeyRegexp(keyReg)
 	err = f.LoadFromData([]byte(desktopFileContent4))
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	t.Log(err)
 
 	ret := f.SetValue("Desktop Entry", "Abc+", "123")
@@ -98,19 +98,19 @@ func TestLoadFromData(t *testing.T) {
 
 	f = NewKeyFile()
 	err = f.LoadFromData([]byte(desktopFileContent0))
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, f.GetSections(), []string{"Desktop Entry"})
 
 	v, err := f.GetValue("Desktop Entry", "Type")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, v, "Application")
 
 	_, err = f.GetValue("Desktop Entry", "x")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	_, err = f.GetValue("X", "X")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	assert.Equal(t, f.GetKeys("Desktop Entry"), []string{
 		"Encoding", "Type", "X-Created-By", "Categories",
@@ -126,18 +126,18 @@ func TestLoadFromData(t *testing.T) {
 func TestLoadFromFile(t *testing.T) {
 	f := NewKeyFile()
 	err := f.LoadFromFile("testdata/deepin-screenshot.desktop")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	localeName, err := f.GetLocaleString("Desktop Entry", "Name", "zh_CN")
 	assert.Equal(t, localeName, "深度截图")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	files, err := filepath.Glob("/usr/share/applications/*.desktop")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	for _, file := range files {
 		f := NewKeyFile()
 		err := f.LoadFromFile(file)
-		require.Nil(t, err)
+		require.NoError(t, err)
 	}
 }
 
@@ -156,41 +156,41 @@ func TestGetStringList(t *testing.T) {
 	f := NewKeyFile()
 	keyFileContent := keyFileContent0 + string([]byte{0xff, 0xfe, 0xfd})
 	err := f.LoadFromData([]byte(keyFileContent))
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	list, err := f.GetStringList("Test", "strlist0")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{"a", "b", "c", "d"})
 
 	list, err = f.GetStringList("Test", "strlist1")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{"a", "b", "c"})
 
 	list, err = f.GetStringList("Test", "strlist2")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{""})
 
 	list, err = f.GetStringList("Test", "strlist3")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Nil(t, list)
 
 	list, err = f.GetStringList("Test", "strlist4")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{"abc"})
 
 	t.Log(err)
 
 	list, err = f.GetStringList("Test", "strlist5")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{"abc\\befg"})
 	t.Log(err)
 
 	list, err = f.GetStringList("Test", "strlist6")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, list, []string{"a;bc", "def"})
 
 	_, err = f.GetStringList("Test", "strlist7")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.IsType(t, err, ValueInvalidUTF8Error{})
 	t.Log(err)
 }
@@ -208,26 +208,26 @@ func TestGetString(t *testing.T) {
 	f := NewKeyFile()
 	keyFileContent := keyFileContent1 + string([]byte{0xff, 0xfe, 0xfd})
 	err := f.LoadFromData([]byte(keyFileContent))
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	str, err := f.GetString("Test", "str0")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str, "abcdef")
 
 	str, err = f.GetString("Test", "str1")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str, "line\n<-newline\r<-break\t<-table <-space")
 
 	str, err = f.GetString("Test", "str2")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str, "abcdef")
 
 	str, err = f.GetString("Test", "str3")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str, "abc\\bdef")
 
 	str, err = f.GetString("Test", "str4")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str, "abc\\;def")
 
 	_, err = f.GetString("Test", "str5")
@@ -239,10 +239,10 @@ func TestSetString(t *testing.T) {
 	const s0 = "space newline\ncarriage-return\rtab\tbackslash\\"
 	f.SetString("Test", "str0", s0)
 	str0, err := f.GetString("Test", "str0")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, str0, s0)
 	val0, err := f.GetValue("Test", "str0")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, val0, `space newline\ncarriage-return\rtab\tbackslash\\`)
 }
 
@@ -251,11 +251,11 @@ func TestSetStringList(t *testing.T) {
 	strlist := []string{"space ", "newline\n", "carriage\rreturn", "tab\t", "backslash\\", "List;Separator;"}
 	f.SetStringList("Test", "strlist", strlist)
 	strlist1, err := f.GetStringList("Test", "strlist")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, strlist1, strlist)
 
 	strlistValue, err := f.GetValue("Test", "strlist")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, strlistValue, `space\s;newline\n;carriage\rreturn;tab\t;backslash\\;List\;Separator\;;`)
 }
 
@@ -264,11 +264,11 @@ func TestSetBoolList(t *testing.T) {
 	blist := []bool{true, true, false, false, true, false}
 	f.SetBoolList("Test", "blist", blist)
 	blist1, err := f.GetBoolList("Test", "blist")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, blist1, blist)
 
 	blistStr, err := f.GetValue("Test", "blist")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, blistStr, "true;true;false;false;true;false;")
 }
 
@@ -277,11 +277,11 @@ func TestSetIntList(t *testing.T) {
 	ints := []int{-345, -1, 0, 1, 3, 5, 7, 9, 11989}
 	f.SetIntList("Test", "ints", ints)
 	ints1, err := f.GetIntList("Test", "ints")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ints1, ints)
 
 	intsStr, err := f.GetValue("Test", "ints")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, intsStr, "-345;-1;0;1;3;5;7;9;11989;")
 
 }
@@ -306,6 +306,6 @@ func TestSaveToWriter(t *testing.T) {
 
 	var buf bytes.Buffer
 	err := f.SaveToWriter(&buf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, buf.String(), keyFileContent2)
 }

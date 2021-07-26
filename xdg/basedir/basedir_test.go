@@ -112,21 +112,21 @@ func TestGetUserCacheDir(t *testing.T) {
 func TestGetUserRuntimeDir(t *testing.T) {
 	os.Setenv("XDG_RUNTIME_DIR", "/runtime/user/test")
 	dir, err := GetUserRuntimeDir(true)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, dir, "/runtime/user/test")
 
 	os.Setenv("XDG_RUNTIME_DIR", "")
 	dir, err = GetUserRuntimeDir(true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, dir, "")
 
 	os.Setenv("XDG_RUNTIME_DIR", "a invalid path")
 	dir, err = GetUserRuntimeDir(true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, dir, "")
 
 	os.Setenv("XDG_RUNTIME_DIR", "")
 	dir, err = GetUserRuntimeDir(false)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, dir, fmt.Sprintf("/tmp/goxdg-runtime-dir-fallback-%d", os.Getuid()))
 }

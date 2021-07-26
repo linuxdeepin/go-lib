@@ -30,7 +30,7 @@ import (
 
 func TestReader(t *testing.T) {
 	f, err := os.Open("./testdata/a")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, f)
 	defer f.Close()
 
@@ -53,11 +53,11 @@ func TestReader(t *testing.T) {
 	assert.Equal(t, resultPair.Value, "21722")
 
 	pairs, err := r.ReadAll()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(pairs), 43)
 
 	f, err = os.Open("./testdata/b")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, f)
 	defer f.Close()
 
@@ -67,7 +67,7 @@ func TestReader(t *testing.T) {
 	assert.Equal(t, err, ErrBadLine)
 
 	f, err = os.Open("./testdata/c")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, f)
 	defer f.Close()
 
@@ -76,11 +76,11 @@ func TestReader(t *testing.T) {
 	r.Comment = '#'
 
 	pair, err := r.Read()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, pair, &Pair{"LANG", "zh_CN.UTF-8"})
 
 	pair, err = r.Read()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, pair, &Pair{"LANGUAGE", "zh_CN"})
 
 	pair, err = r.Read()

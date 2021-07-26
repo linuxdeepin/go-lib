@@ -57,7 +57,7 @@ func TestGetImageFormat(t *testing.T) {
 	f, _ = GetImageFormat(originImgIconBmp)
 	assert.Equal(t, f, FormatBmp)
 	_, err := GetImageFormat(originImgIconTxt)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestIsSupportedImage(t *testing.T) {

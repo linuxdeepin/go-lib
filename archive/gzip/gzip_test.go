@@ -38,20 +38,20 @@ func (s *UnitTestSuite) SetupSuite() {
 	s.testDataPath = "./testdata/tar-compress-datas"
 	data := []byte("UOS Deepin")
 	err := os.MkdirAll(s.testDataPath, 0777)
-	require.Nil(s.T(), err)
+	require.NoError(s.T(), err)
 
 	tmpfile, err := ioutil.TempFile(s.testDataPath, "data.dat")
-	require.Nil(s.T(), err)
+	require.NoError(s.T(), err)
 	defer tmpfile.Close()
 
 	err = ioutil.WriteFile(tmpfile.Name(), data, 0777)
-	require.Nil(s.T(), err)
+	require.NoError(s.T(), err)
 }
 
 func (s *UnitTestSuite) TearDownSuite() {
 	s.testDataPath = "./testdata"
 	err := os.RemoveAll(s.testDataPath)
-	require.Nil(s.T(), err)
+	require.NoError(s.T(), err)
 }
 
 func (s *UnitTestSuite) Test_CompressDir() {

@@ -31,7 +31,7 @@ func Test_pulse(t *testing.T) {
 	ctx.SetDefaultSource(defaultSource.Name)
 
 	card, err := getCard(ctx, 0)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	if err != nil {
 		t.Log(err)
 		return

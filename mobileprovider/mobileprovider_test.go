@@ -34,128 +34,128 @@ func TestMobileProvider(t *testing.T) {
 
 func TestGetProviders(t *testing.T) {
 	providers, err := GetProviders("cn")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(providers), 3)
 
 	providers, err = GetProviders("<invalid>")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, providers == nil, true)
 }
 
 func TestGetProvider(t *testing.T) {
 	provider, err := GetProvider("cn", "China Mobile")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(provider.GSM.APN), 3)
 
 	provider, err = GetProvider("cn", "<invalid>")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, provider == nil, true)
 }
 
 func TestGetGSM(t *testing.T) {
 	gsm, err := GetGSM("cn", "China Mobile")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(gsm.APN), 3)
 
 	gsm, err = GetGSM("cn", "<invalid>")
 	assert.Equal(t, gsm == nil, true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetCDMA(t *testing.T) {
 	cdma, err := GetCDMA("cn", "China Telecom")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, cdma.Username, "ctnet@mycdma.cn")
 
 	cdma, err = GetCDMA("cn", "<invalid>")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, cdma == nil, true)
 
 	cdma, err = GetCDMA("cn", "China Mobile")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, cdma == nil, true)
 }
 
 func TestGetAPN(t *testing.T) {
 	apn, err := GetAPN("cn", "China Mobile", "cmnet", "internet")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, GetAPNName(apn), "Internet")
 
 	apn, err = GetAPN("cn", "China Mobile", "cmnet", "<invalid>")
 	assert.Equal(t, apn == nil, true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	apn, err = GetAPN("au", "Amaysim", "internet", "")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, GetAPNName(apn), "")
 	assert.Equal(t, GetAPNUsageType(apn), "")
 }
 
 func TestGetGSMForNetworkID(t *testing.T) {
 	gsm, err := GetGSMForNetworkID("460", "00")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(gsm.APN), 3)
 
 	gsm, err = GetGSMForNetworkID("460", "<invalid>")
 	assert.Equal(t, gsm == nil, true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetProviderNames(t *testing.T) {
 	names, err := GetProviderNames("cn")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, names[0], "China Mobile")
 	assert.Equal(t, names[1], "China Unicom")
 	assert.Equal(t, names[2], "China Telecom")
 
 	names, err = GetProviderNames("<invalid>")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, len(names) == 0, true)
 }
 
 func TestGetPlans(t *testing.T) {
 	plans, err := GetPlans("cn", "China Mobile")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(plans), 3)
 	assert.Equal(t, err, nil)
 
 	plans, err = GetPlans("ca", "Bell Mobility")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, len(plans), 5)
 
 	plans, err = GetPlans("cn", "<invalid>")
 	assert.Equal(t, len(plans) == 0, true)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetDefaultPlan(t *testing.T) {
 	plan, err := GetDefaultPlan("cn", "China Mobile")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, plan.Name, "WAP")
 	assert.Equal(t, plan.ProviderName, "China Mobile")
 
 	plan, err = GetDefaultPlan("cn", "<invalid>")
 	assert.Equal(t, plan.Name, "")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetDefaultGSMPlanForCountry(t *testing.T) {
 	plan, err := GetDefaultGSMPlanForCountry("cn")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, plan.Name, "Internet")
 	assert.Equal(t, plan.ProviderName, "China Mobile")
 
 	plan, err = GetDefaultGSMPlanForCountry("<invalid>")
 	assert.Equal(t, plan.Name, "")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestGetDefaultCDMAPlanForCountry(t *testing.T) {
 	plan, err := GetDefaultCDMAPlanForCountry("cn")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, plan.Name, "China Telecom")
 
 	plan, err = GetDefaultCDMAPlanForCountry("<invalid>")
 	assert.Equal(t, plan.Name, "")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }

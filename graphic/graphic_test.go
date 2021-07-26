@@ -381,13 +381,13 @@ func TestGetPreferScaleClipRect(t *testing.T) {
 	// check exceptions
 	var err error
 	_, _, _, _, err = GetPreferScaleClipRect(0, 0, 100, 100)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 512, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 0, 384)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	_, _, _, _, err = GetPreferScaleClipRect(1024, 768, 0, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestNewImageWithColor(t *testing.T) {
@@ -434,7 +434,7 @@ func TestGetIcons(t *testing.T) {
 				assert.Equal(t, v, data.images[v])
 			}
 		} else {
-			assert.NotNil(t, err, nil)
+			assert.Error(t, err)
 			assert.Equal(t, len(icons), 0)
 		}
 	}
@@ -473,8 +473,8 @@ func TestSniffImageFormat(t *testing.T) {
 
 	for _, data := range datas {
 		formatName, err := SniffImageFormat(data.file)
-		require.Nil(t, err)
-		assert.Equal(t, err, nil)
+		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, formatName, data.formatName)
 	}
 }

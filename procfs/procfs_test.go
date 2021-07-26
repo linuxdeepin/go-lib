@@ -40,7 +40,7 @@ func TestExist(t *testing.T) {
 func TestCmdline(t *testing.T) {
 	p := Process(os.Getpid())
 	cmdline, err := p.Cmdline()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log("cmdline:", cmdline)
 	assert.True(t, len(cmdline) > 0)
 }
@@ -48,7 +48,7 @@ func TestCmdline(t *testing.T) {
 func TestCwd(t *testing.T) {
 	p := Process(os.Getpid())
 	cwd, err := p.Cwd()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log("cwd:", cwd)
 
 	osWd, err1 := os.Getwd()
@@ -59,7 +59,7 @@ func TestCwd(t *testing.T) {
 func TestExe(t *testing.T) {
 	p := Process(os.Getpid())
 	exe, err := p.Exe()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log("exe:", exe)
 	assert.True(t, len(exe) > 0)
 }
@@ -86,7 +86,7 @@ func TestEnvVars(t *testing.T) {
 func TestEnvion(t *testing.T) {
 	p := Process(os.Getpid())
 	environ, err := p.Environ()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.True(t, len(environ) > 0)
 	for _, aVar := range environ {
 		t.Log(string(aVar))
@@ -108,7 +108,7 @@ func TestEnvion(t *testing.T) {
 func TestStatus(t *testing.T) {
 	p := Process(os.Getpid())
 	status, err := p.Status()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, status)
 
 	// test lookup
@@ -119,14 +119,14 @@ func TestStatus(t *testing.T) {
 
 	// test Uids
 	uids, err := status.Uids()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log("uids:", uids)
 	assert.Equal(t, uids[0], uint(os.Getuid()))
 	assert.Equal(t, uids[1], uint(os.Geteuid()))
 
 	// test PPid
 	ppid, err := status.PPid()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	t.Log("ppid:", ppid)
 	assert.True(t, ppid > 0)
 }

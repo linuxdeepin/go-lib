@@ -67,7 +67,7 @@ var mountTableTest = []*MountTableItem{
 
 func Test_MountTableItem(t *testing.T) {
 	err := Init()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	for _, mountTableItem := range mountTable {
 		for _, mountTest := range mountTableTest {
 			if mountTableItem.Name() == mountTest.name {

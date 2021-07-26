@@ -28,18 +28,18 @@ import (
 
 func TestIsGtkTheme(t *testing.T) {
 	ok, err := isGtkTheme("testdata/Deepin/index.theme")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ok, true)
 }
 
 func TestIsIconTheme(t *testing.T) {
 	ok, err := isIconTheme("testdata/Deepin/index.theme")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ok, true)
 }
 
 func TestIsCursorTheme(t *testing.T) {
 	ok, err := isCursorTheme("testdata/Deepin/index.theme")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ok, true)
 }

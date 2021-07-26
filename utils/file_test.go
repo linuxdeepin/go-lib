@@ -64,16 +64,16 @@ func TestCopyDir(t *testing.T) {
 
 func TestCreateFile(t *testing.T) {
 	err := CreateFile("")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	file := "testdata/create-testfile"
 	err = CreateFile(file)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	os.Remove(file)
 
 	file = "testdata/xxx/create-testfile"
 	err = CreateFile(file)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestSymlinkFile(t *testing.T) {
