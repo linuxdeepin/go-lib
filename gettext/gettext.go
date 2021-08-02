@@ -97,6 +97,14 @@ func Bindtextdomain(domain, dirname string) string {
 	return C.GoString(C.bindtextdomain(_domain, _dirname))
 }
 
+func BindTextdomainCodeset(domain, codeset string) string {
+	_domain := C.CString(domain)
+	_codeset := C.CString(codeset)
+	defer C.free(unsafe.Pointer(_domain))
+	defer C.free(unsafe.Pointer(_codeset))
+	return C.GoString(C.bind_textdomain_codeset(_domain, _codeset))
+}
+
 func NTr(msgid, plural string, n int) string {
 	cMsgid := C.CString(msgid)
 	defer C.free(unsafe.Pointer(cMsgid))
