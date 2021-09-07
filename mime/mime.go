@@ -21,7 +21,10 @@ package mime
 
 import (
 	"fmt"
-	"pkg.deepin.io/gir/gio-2.0"
+	"os"
+	"path/filepath"
+
+	gio "pkg.deepin.io/gir/gio-2.0"
 	dutils "pkg.deepin.io/lib/utils"
 )
 
@@ -29,6 +32,8 @@ const (
 	MimeTypeGtk    = "application/x-gtk-theme"
 	MimeTypeIcon   = "application/x-icon-theme"
 	MimeTypeCursor = "application/x-cursor-theme"
+
+	MimeUserConfig = ".config/mimeapps.list"
 )
 
 // Query query file mime type
@@ -48,7 +53,8 @@ func Query(uri string) (string, error) {
 //
 // desktopId: the basename of the desktop file
 func SetDefaultApp(mime, desktopId string) error {
-	cur, _ := GetDefaultApp(mime, false)
+	// If the default app is in /usr/share/applications/, still go to set
+	cur := GetUserDefaultApp(mime)
 	if cur == desktopId {
 		return nil
 	}
@@ -63,8 +69,24 @@ func SetDefaultApp(mime, desktopId string) error {
 	return err
 }
 
+// get default from ~/.config/mimeapps.list
+func GetUserDefaultApp(ty string) string {
+	v, exist := dutils.ReadKeyFromKeyFile(filepath.Join(os.Getenv("HOME"), MimeUserConfig),
+		"Default Applications", ty, "")
+	if !exist {
+		return ""
+	}
+
+	ret, ok := v.(string)
+	if !ok {
+		return ""
+	}
+
+	return ret
+}
+
 // Get default app for 'mime'
-//
+// gio.AppInfoGetDefaultForType can get default from ~/.config/mimeapps.list ， /usr/share/applications/mimeinfo.cache , /usr/share/applications/mimeapps.list
 // ret0: desktopId
 func GetDefaultApp(mime string, mustSupportURIs bool) (string, error) {
 	app := gio.AppInfoGetDefaultForType(mime, false)
