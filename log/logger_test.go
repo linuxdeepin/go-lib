@@ -29,7 +29,7 @@ import (
 
 	C "gopkg.in/check.v1"
 )
-
+// test
 var originStdout = os.Stdout
 var redirectStdoutFile = "testdata/stdout"
 var redirectStdout, _ = os.OpenFile(redirectStdoutFile, os.O_CREATE|os.O_RDWR, 0644)
