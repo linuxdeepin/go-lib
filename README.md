@@ -4,7 +4,6 @@ Deepin GoLang Library is a library containing many useful go routines for things
 
 ## Dependencies
 
-
 ### Build dependencies
 
 * gio-2.0
