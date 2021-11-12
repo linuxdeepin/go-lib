@@ -2,7 +2,6 @@ package dbusutil
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"reflect"
 	"strings"
@@ -13,22 +12,7 @@ import (
 	"github.com/godbus/dbus"
 )
 
-func isSessionBusExists() bool {
-	address := fmt.Sprintf("/run/user/%d/bus", os.Getuid())
-	_, err := os.Stat(address)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
 func TestService_GetNameOwner(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -48,11 +32,6 @@ func TestService_GetNameOwner(t *testing.T) {
 }
 
 func TestService_NameHasOwner(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -75,11 +54,6 @@ func TestService_NameHasOwner(t *testing.T) {
 }
 
 func TestService_RequestName(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -143,11 +117,6 @@ func (srvString) GetInterfaceName() string {
 }
 
 func TestService_Export(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -231,11 +200,6 @@ func processSignal(conn *dbus.Conn, fn func(signal *dbus.Signal) bool) {
 }
 
 func TestService_Emit(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -380,11 +344,6 @@ var serviceEmitPropertyChangedTests = []struct {
 }
 
 func TestService_EmitPropertyChanged(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -531,11 +490,6 @@ var serviceEmitPropertiesChangedTest = []struct {
 }
 
 func TestService_EmitPropertiesChanged(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -584,11 +538,6 @@ func (obj *srvObject5) Method1() *dbus.Error {
 }
 
 func TestService_AutoQuit(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	ch := make(chan struct{})
 
 	bus, err := dbus.SessionBusPrivate()
@@ -652,11 +601,6 @@ func TestService_AutoQuit(t *testing.T) {
 }
 
 func TestService_GetConnPIDAndUID(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -697,11 +641,6 @@ func (*srvObject6) GetInterfaceName() string {
 }
 
 func TestService_SetReadCallback(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -788,11 +727,6 @@ func (*srvObject7) GetInterfaceName() string {
 }
 
 func TestService_SetWriteCallback(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -884,11 +818,6 @@ func (*srvObject8) GetInterfaceName() string {
 }
 
 func TestService_ConnectChanged(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -986,11 +915,6 @@ func (*srvObject9) GetInterfaceName() string {
 }
 
 func TestService_PropTag(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -1244,11 +1168,6 @@ func (*srvObject10) GetInterfaceName() string {
 }
 
 func TestService_StructProp(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -1420,11 +1339,6 @@ func (cp *customProperty) GetType() reflect.Type {
 }
 
 func TestService_DumpProperties(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)
@@ -1471,11 +1385,6 @@ func (*srvObject13) GetInterfaceName() string {
 }
 
 func TestService_IntUintProp(t *testing.T) {
-	if !isSessionBusExists() {
-		t.Skip()
-		return
-	}
-
 	service, err := NewSessionService()
 	if err != nil {
 		t.Error("Unexpected error:", err)

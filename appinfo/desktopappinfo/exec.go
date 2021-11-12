@@ -263,27 +263,25 @@ func expandFieldCode(cmdline, files []string, translatedName, icon, desktopFile 
 				}
 				switch fieldCode {
 				case 'f':
-					// a single filepath
+					// a single file name
 					if len(files) > 0 {
 						buf.WriteString(toLocalPath(files[0]))
 					}
 				case 'F':
-					// a list of filepaths
+					// a list of files
 					for _, file := range files {
 						buf.WriteString(toLocalPath(file))
 						submitBuf()
 					}
 				case 'u':
-					// a single filepath or URL
-					// file URI 转为 filepath 传入，避免应用不兼容 file URI 的情况
+					// a single URL
 					if len(files) > 0 {
-						buf.WriteString(toLocalPath(files[0]))
+						buf.WriteString(toURL(files[0]))
 					}
 				case 'U':
-					// a list of filepaths or URLs
-					// file URI 转为 filepath 传入，避免应用不兼容 file URI 的情况
+					// a list of URLs
 					for _, file := range files {
-						buf.WriteString(toLocalPath(file))
+						buf.WriteString(toURL(file))
 						submitBuf()
 					}
 				case 'i':
