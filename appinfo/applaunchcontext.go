@@ -48,12 +48,17 @@ type AppLaunchContext struct {
 	timestamp   uint32
 	cmdPrefixes []string
 	cmdSuffixes []string
+	env         []string
 }
 
 func NewAppLaunchContext(conn *x.Conn) *AppLaunchContext {
 	return &AppLaunchContext{
 		conn: conn,
 	}
+}
+
+func (ctx *AppLaunchContext) SetEnv(env []string) {
+	ctx.env = env
 }
 
 func (ctx *AppLaunchContext) SetTimestamp(timestamp uint32) {
@@ -74,6 +79,10 @@ func (ctx *AppLaunchContext) GetCmdPrefixes() []string {
 
 func (ctx *AppLaunchContext) SetCmdSuffixes(v []string) {
 	ctx.cmdSuffixes = v
+}
+
+func (ctx *AppLaunchContext) GetEnv() []string {
+	return ctx.env
 }
 
 func (ctx *AppLaunchContext) GetCmdSuffixes() []string {
