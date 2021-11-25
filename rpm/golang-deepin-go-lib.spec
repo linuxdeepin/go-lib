@@ -1,9 +1,9 @@
 # Run tests in check section
 # disable for bootstrapping
 %bcond_with check
-%global import_path pkg.deepin.io/lib
+%global import_path github.com/linuxdeepin/go-lib
 
-%global goipath  pkg.deepin.io/lib
+%global goipath  github.com/linuxdeepin/go-lib
 %global forgeurl https://github.com/linuxdeepin/go-lib
 
 %global with_debug 1
@@ -48,7 +48,7 @@ BuildRequires:  pkgconfig(libpulse)
 %description devel
 %{summary}.
 
-Provides: golang(pkg.deepin.io/lib)
+Provides: golang(github.com/linuxdeepin/go-lib)
 
 This package contains library source intended for
 building other packages which use import path with

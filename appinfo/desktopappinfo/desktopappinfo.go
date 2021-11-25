@@ -29,11 +29,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/linuxdeepin/go-lib/appinfo"
+	"github.com/linuxdeepin/go-lib/keyfile"
+	"github.com/linuxdeepin/go-lib/shell"
+	"github.com/linuxdeepin/go-lib/xdg/basedir"
 	gio "pkg.deepin.io/gir/gio-2.0"
-	"pkg.deepin.io/lib/appinfo"
-	"pkg.deepin.io/lib/keyfile"
-	"pkg.deepin.io/lib/shell"
-	"pkg.deepin.io/lib/xdg/basedir"
 )
 
 const (

@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	. "pkg.deepin.io/lib/initializer"
+	. "github.com/linuxdeepin/go-lib/initializer"
 )
 
 func TestInitializer(t *testing.T) {

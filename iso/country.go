@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	. "pkg.deepin.io/lib/gettext"
+	. "github.com/linuxdeepin/go-lib/gettext"
 	"strings"
 	"sync"
 )

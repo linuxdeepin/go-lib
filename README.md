@@ -28,8 +28,8 @@ $ go get github.com/linuxdeepin/go-x11-client
 Install
 
 ```
-mkdir -p $GOPATH/src/pkg.deepin.io
-cp -r go-lib $GOPATH/src/pkg.deepin.io/lib
+mkdir -p $GOPATH/src/github.com/linuxdeepin/
+cp -r go-lib $GOPATH/src/github.com/linuxdeepin/go-lib
 ```
 
 ## Getting help

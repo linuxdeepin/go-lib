@@ -20,8 +20,8 @@
 package gdkpixbuf
 
 import (
-	"pkg.deepin.io/lib/graphic"
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/graphic"
+	"github.com/linuxdeepin/go-lib/utils"
 )
 
 // function links to lib/graphic

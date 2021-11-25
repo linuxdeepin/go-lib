@@ -20,7 +20,7 @@
 package notify
 
 import (
-	"pkg.deepin.io/lib/notify/dbusnotify"
+	"github.com/linuxdeepin/go-lib/notify/dbusnotify"
 )
 
 var (

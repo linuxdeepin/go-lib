@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"pkg.deepin.io/lib/initializer/v2"
+	"github.com/linuxdeepin/go-lib/initializer/v2"
 )
 
 func e1() error {

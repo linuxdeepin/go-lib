@@ -212,7 +212,7 @@ Prop4 使用 gsprop.String 内部的锁，在 dbusutil 代码里就是不加锁�
 
 先安装 dbusutil-gen 到 $GOPATH/bin 中，执行命令：
 ```
-go install pkg.deepin.io/lib/dbusutil/_tool/dbusutil-gen
+go install github.com/linuxdeepin/go-lib/dbusutil/_tool/dbusutil-gen
 ```
 
 在代码里写上特殊注释
@@ -242,4 +242,3 @@ file1.go file2.go 是要扫描的 go 源代码文件， 其中就定义了 Type1
   * nil 不进行比较
   * 任意，如 bytes.Equal，作为函数，比较是使用 bytes.Equal(old, new)
   * 以method: 开头，如 method:equal, 作为方法，比较时使用 old.equal(new)
-

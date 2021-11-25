@@ -22,7 +22,7 @@ package graphic
 import (
 	"image"
 	"os"
-	dutils "pkg.deepin.io/lib/utils"
+	dutils "github.com/linuxdeepin/go-lib/utils"
 )
 
 // GetImageSize return image's width and height.

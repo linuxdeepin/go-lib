@@ -21,6 +21,7 @@ package utils
 
 import (
 	"fmt"
+
 	"pkg.deepin.io/gir/gio-2.0"
 )
 

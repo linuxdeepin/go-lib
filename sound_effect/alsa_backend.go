@@ -3,7 +3,7 @@ package sound_effect
 import (
 	"unsafe"
 
-	"pkg.deepin.io/lib/asound"
+	"github.com/linuxdeepin/go-lib/asound"
 )
 
 type ALSAPlayBackend struct {

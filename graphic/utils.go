@@ -23,7 +23,7 @@ import (
 	"image"
 	"image/draw"
 	"os"
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/utils"
 )
 
 func generateCacheFilePath(keyword string) (dstfile string) {

@@ -24,8 +24,8 @@ import (
 	"os"
 	"path/filepath"
 
+	dutils "github.com/linuxdeepin/go-lib/utils"
 	gio "pkg.deepin.io/gir/gio-2.0"
-	dutils "pkg.deepin.io/lib/utils"
 )
 
 const (

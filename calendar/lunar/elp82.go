@@ -21,7 +21,7 @@ package lunar
 
 import (
 	"math"
-	"pkg.deepin.io/lib/calendar/util"
+	"github.com/linuxdeepin/go-lib/calendar/util"
 )
 
 // 参数 T 儒略世纪数

@@ -4,9 +4,9 @@ import (
 	"io"
 	"time"
 
-	"pkg.deepin.io/lib/asound"
-	paSimple "pkg.deepin.io/lib/pulse/simple"
-	"pkg.deepin.io/lib/stb_vorbis"
+	"github.com/linuxdeepin/go-lib/asound"
+	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
+	"github.com/linuxdeepin/go-lib/stb_vorbis"
 )
 
 func newOggDecoder(file string) (Decoder, error) {

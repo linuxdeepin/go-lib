@@ -21,7 +21,7 @@ package keyboard
 
 import (
 	"path/filepath"
-	. "pkg.deepin.io/lib/backlight/common"
+	. "github.com/linuxdeepin/go-lib/backlight/common"
 	"strings"
 )
 

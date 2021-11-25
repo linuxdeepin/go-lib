@@ -27,7 +27,7 @@ import (
 	_ "image/png"
 	"log"
 	"os"
-	"pkg.deepin.io/lib/notify"
+	"github.com/linuxdeepin/go-lib/notify"
 )
 
 func init() {

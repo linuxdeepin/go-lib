@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"pkg.deepin.io/lib/archive/gzip"
+	"github.com/linuxdeepin/go-lib/archive/gzip"
 )
 
 const (

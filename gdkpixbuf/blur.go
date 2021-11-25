@@ -27,7 +27,7 @@ import "C"
 
 import (
 	"fmt"
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/utils"
 )
 
 // BlurImage generate blur effect to an image file.

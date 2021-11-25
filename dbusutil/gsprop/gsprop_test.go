@@ -10,8 +10,8 @@ import (
 	"github.com/godbus/dbus"
 	"github.com/godbus/dbus/introspect"
 	"pkg.deepin.io/gir/gio-2.0"
-	"pkg.deepin.io/lib/dbusutil"
-	"pkg.deepin.io/lib/gsettings"
+	"github.com/linuxdeepin/go-lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/gsettings"
 )
 
 const demoSchemaId = "ca.desrt.dconf-editor.Demo"

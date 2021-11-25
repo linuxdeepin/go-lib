@@ -25,7 +25,7 @@ import (
 	"sync"
 
 	"github.com/godbus/dbus"
-	"pkg.deepin.io/lib/event"
+	"github.com/linuxdeepin/go-lib/event"
 )
 
 type ActionCallback func(n *Notification, action string)

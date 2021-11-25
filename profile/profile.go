@@ -28,7 +28,7 @@ import (
 	"runtime/pprof"
 	"sync"
 
-	"pkg.deepin.io/lib/initializer/v2"
+	"github.com/linuxdeepin/go-lib/initializer/v2"
 )
 
 type _Profile struct {

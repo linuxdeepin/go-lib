@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"pkg.deepin.io/lib/keyfile"
-	"pkg.deepin.io/lib/strv"
-	"pkg.deepin.io/lib/xdg/basedir"
+	"github.com/linuxdeepin/go-lib/keyfile"
+	"github.com/linuxdeepin/go-lib/strv"
+	"github.com/linuxdeepin/go-lib/xdg/basedir"
 	"strings"
 	"sync"
 )

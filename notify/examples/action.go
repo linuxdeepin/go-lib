@@ -23,7 +23,7 @@ package main
 
 import (
 	"log"
-	"pkg.deepin.io/lib/notify"
+	"github.com/linuxdeepin/go-lib/notify"
 	"time"
 )
 

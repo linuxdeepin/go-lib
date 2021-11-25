@@ -3,7 +3,7 @@ package sound_effect
 import (
 	"unsafe"
 
-	paSimple "pkg.deepin.io/lib/pulse/simple"
+	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
 )
 
 type PulseAudioPlayBackend struct {

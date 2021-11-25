@@ -15,7 +15,7 @@ import (
 	"strings"
 	"unicode"
 
-	"pkg.deepin.io/lib/strv"
+	"github.com/linuxdeepin/go-lib/strv"
 )
 
 func astNodeToStr(fSet *token.FileSet, node interface{}) (string, error) {
@@ -246,7 +246,7 @@ func main() {
 		if _outputFile == "" {
 			_outputFile = "exported_methods_auto.go"
 		}
-		g.pkg.extraImports = append(g.pkg.extraImports, `"pkg.deepin.io/lib/dbusutil"`)
+		g.pkg.extraImports = append(g.pkg.extraImports, `"github.com/linuxdeepin/go-lib/dbusutil"`)
 		g.genHeader()
 		g.genExportedMethods(types)
 	} else {

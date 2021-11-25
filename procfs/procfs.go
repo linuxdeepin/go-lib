@@ -24,7 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"pkg.deepin.io/lib/encoding/kv"
+	"github.com/linuxdeepin/go-lib/encoding/kv"
 	"strconv"
 	"strings"
 )

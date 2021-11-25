@@ -20,7 +20,7 @@
 package lunar
 
 import (
-	"pkg.deepin.io/lib/calendar/util"
+	"github.com/linuxdeepin/go-lib/calendar/util"
 	"testing"
 )
 

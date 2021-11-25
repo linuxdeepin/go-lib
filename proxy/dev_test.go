@@ -23,7 +23,7 @@ package proxy
 
 import (
 	"pkg.deepin.io/gir/glib-2.0"
-	"pkg.deepin.io/lib/log"
+	"github.com/linuxdeepin/go-lib/log"
 	"testing"
 )
 

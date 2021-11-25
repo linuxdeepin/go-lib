@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"pkg.deepin.io/lib/keyfile"
+	"github.com/linuxdeepin/go-lib/keyfile"
 )
 
 func TestNewDesktopAppInfoFromKeyFile(t *testing.T) {

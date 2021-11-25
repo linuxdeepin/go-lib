@@ -22,7 +22,7 @@ package iso
 import (
 	"github.com/stretchr/testify/require"
 	"os"
-	. "pkg.deepin.io/lib/gettext"
+	. "github.com/linuxdeepin/go-lib/gettext"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

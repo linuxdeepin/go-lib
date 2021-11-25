@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"pkg.deepin.io/lib/calendar/util"
+	"github.com/linuxdeepin/go-lib/calendar/util"
 )
 
 func TestSolarTerms(t *testing.T) {

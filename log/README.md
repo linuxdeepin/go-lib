@@ -56,7 +56,7 @@ env DDE_DEBUG_MATCH="network" DDE_DEBUG_LEVEL="warning" dde-session-daemon
 ## 示例代码
 
 ```go
-import "pkg.deepin.io/lib/log"
+import "github.com/linuxdeepin/go-lib/log"
 import "flag"
 
 var (

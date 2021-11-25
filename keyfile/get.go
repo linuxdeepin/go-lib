@@ -26,7 +26,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	libLocale "pkg.deepin.io/lib/locale"
+	libLocale "github.com/linuxdeepin/go-lib/locale"
 )
 
 func parseValueAsBool(value string) (bool, error) {

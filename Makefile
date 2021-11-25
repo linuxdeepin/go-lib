@@ -1,5 +1,5 @@
 GOPATH_DIR = gopath
-GOPKG_PREFIX = pkg.deepin.io/lib
+GOPKG_PREFIX = github.com/linuxdeepin/go-lib
 
 prepare:
 	@mkdir -p ${GOPATH_DIR}/src/$(dir ${GOPKG_PREFIX});

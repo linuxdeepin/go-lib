@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"time"
 
-	"pkg.deepin.io/lib/calendar/util"
+	"github.com/linuxdeepin/go-lib/calendar/util"
 )
 
 // Calendar 保存公历年内计算农历所需的信息

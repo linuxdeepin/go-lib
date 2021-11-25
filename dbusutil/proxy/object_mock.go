@@ -5,7 +5,7 @@ import (
 
 	"github.com/godbus/dbus"
 	"github.com/stretchr/testify/mock"
-	"pkg.deepin.io/lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/dbusutil"
 )
 
 type MockObject struct {

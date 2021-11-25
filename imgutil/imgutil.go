@@ -10,8 +10,8 @@ import (
 
 	_ "golang.org/x/image/bmp"
 	_ "golang.org/x/image/tiff"
-	"pkg.deepin.io/lib/gdkpixbuf"
-	"pkg.deepin.io/lib/strv"
+	"github.com/linuxdeepin/go-lib/gdkpixbuf"
+	"github.com/linuxdeepin/go-lib/strv"
 )
 
 const (

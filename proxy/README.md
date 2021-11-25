@@ -18,7 +18,7 @@ no_proxy="localhost,127.0.0.0/8,::1"
 ```go
 import (
 	"pkg.deepin.io/gir/glib-2.0"
-	"pkg.deepin.io/lib/proxy"
+	"github.com/linuxdeepin/go-lib/proxy"
 )
 
 func main() {

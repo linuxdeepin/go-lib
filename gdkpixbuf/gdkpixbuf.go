@@ -32,7 +32,7 @@ import (
 	"unsafe"
 
 	x "github.com/linuxdeepin/go-x11-client"
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/utils"
 )
 
 // Format defines the type of image format.

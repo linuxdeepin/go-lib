@@ -22,7 +22,7 @@
 package main
 
 import (
-	"pkg.deepin.io/lib/notify"
+	"github.com/linuxdeepin/go-lib/notify"
 )
 
 func init() {

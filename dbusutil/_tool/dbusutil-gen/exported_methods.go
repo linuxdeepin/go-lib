@@ -11,9 +11,9 @@ import (
 	"sort"
 	"unicode"
 
-	"pkg.deepin.io/lib/strv"
+	"github.com/linuxdeepin/go-lib/strv"
 
-	"pkg.deepin.io/lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/dbusutil"
 )
 
 func (g *Generator) genExportedMethods(types strv.Strv) {

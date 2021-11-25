@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/cryptix/wav"
-	"pkg.deepin.io/lib/asound"
-	paSimple "pkg.deepin.io/lib/pulse/simple"
+	"github.com/linuxdeepin/go-lib/asound"
+	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
 )
 
 type WavDecoder struct {

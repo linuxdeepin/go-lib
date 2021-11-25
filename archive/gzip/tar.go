@@ -23,7 +23,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"os"
-	"pkg.deepin.io/lib/archive/utils"
+	"github.com/linuxdeepin/go-lib/archive/utils"
 )
 
 func tarCompressFiles(files []string, dest string) error {

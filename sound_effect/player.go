@@ -28,9 +28,9 @@ import (
 	"sync"
 	"time"
 
-	"pkg.deepin.io/lib/asound"
-	paSimple "pkg.deepin.io/lib/pulse/simple"
-	"pkg.deepin.io/lib/sound_effect/theme"
+	"github.com/linuxdeepin/go-lib/asound"
+	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
+	"github.com/linuxdeepin/go-lib/sound_effect/theme"
 )
 
 type Player struct {

@@ -22,7 +22,7 @@ package log
 import (
 	"fmt"
 	"os"
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/utils"
 	"time"
 )
 

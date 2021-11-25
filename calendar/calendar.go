@@ -20,7 +20,7 @@
 package calendar
 
 import (
-	"pkg.deepin.io/lib/calendar/lunar"
+	"github.com/linuxdeepin/go-lib/calendar/lunar"
 )
 
 /*

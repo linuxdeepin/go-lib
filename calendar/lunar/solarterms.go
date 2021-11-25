@@ -21,7 +21,7 @@ package lunar
 
 import (
 	"math"
-	"pkg.deepin.io/lib/calendar/util"
+	"github.com/linuxdeepin/go-lib/calendar/util"
 )
 
 var SolarTermNames = []string{

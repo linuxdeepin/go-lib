@@ -16,7 +16,7 @@ Build-Depends: debhelper (>= 9), dh-golang, golang-go,
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
-Package: golang-dlib-dev
+Package: golang-github-linuxdeepin-go-lib-dev
 Architecture: all
 Depends: ${misc:Depends},
  golang-github-linuxdeepin-go-x11-client-dev,
@@ -27,6 +27,10 @@ Depends: ${misc:Depends},
  golang-gir-glib-2.0-dev (>> 1.2.0+),
  golang-dbus-dev,
  libpulse-dev, libgtk-3-dev, libasound2-dev, libpam0g-dev, golang-golang-x-net-dev
+Replaces:
+ golang-dlib-dev
+Conflicts:
+ golang-dlib-dev
 Built-Using: ${misc:Built-Using}
 Provides: go-dlib
 Description: Go bindings for Deepin Desktop Environment development

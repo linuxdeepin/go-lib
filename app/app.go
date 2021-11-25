@@ -23,8 +23,8 @@ package app
 import (
 	"fmt"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"pkg.deepin.io/lib/log"
-	"pkg.deepin.io/lib/profile"
+	"github.com/linuxdeepin/go-lib/log"
+	"github.com/linuxdeepin/go-lib/profile"
 	"strings"
 )
 

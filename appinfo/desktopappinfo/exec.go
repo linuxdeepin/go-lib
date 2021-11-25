@@ -26,7 +26,7 @@ import (
 	"net/url"
 	"strings"
 
-	"pkg.deepin.io/lib/utils"
+	"github.com/linuxdeepin/go-lib/utils"
 )
 
 func getDefaultTerminal() (exec string, execArg string) {
