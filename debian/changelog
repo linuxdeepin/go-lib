@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (0.5.0-1) unstable; urgency=medium
+
+  * change package name to golang-github-linuxdeepin-go-lib
+
+ -- weizhixiang <weizhixiang@uniontech.com>  Tue, 30 Nov 2021 19:39:58 +0800
+
 go-dlib (0.4.11-1) unstable; urgency=low
 
   * Autobuild Tag 0.4.11 
