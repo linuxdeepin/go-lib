@@ -12,7 +12,7 @@
 
 [1.9.2] 2019-03-01
 *   chore(dbusutil): RemoveHandler check signal ext
-*   chore: use pkg.deepin.io/gir
+*   chore: use github.com/linuxdeepin/go-gir
 
 [1.9.1] 2019-02-25
 *   fix(proxy): abnormally clear env vars when modifying config

@@ -33,7 +33,7 @@ import (
 	"github.com/linuxdeepin/go-lib/keyfile"
 	"github.com/linuxdeepin/go-lib/shell"
 	"github.com/linuxdeepin/go-lib/xdg/basedir"
-	gio "pkg.deepin.io/gir/gio-2.0"
+	gio "github.com/linuxdeepin/go-gir/gio-2.0"
 )
 
 const (
