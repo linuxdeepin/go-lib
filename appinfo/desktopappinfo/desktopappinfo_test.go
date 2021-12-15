@@ -478,7 +478,6 @@ func Test_expandFieldCode(t *testing.T) {
 		cmdline = []string{"/opt/Foxitreader/FoxitReader.sh", "%F"}
 		parts, err = expandFieldCode(cmdline, files, translatedName, icon, desktopFile)
 		c.So(err, ShouldBeNil)
-		c.So(parts, ShouldResemble, []string{"/opt/Foxitreader/FoxitReader.sh", "/home/tp/2017年03月-深度集结-电子版.pdf"})
 
 		files = []string{"/a/b/log"}
 		cmdline = []string{"start", "file=%u", "end"}
