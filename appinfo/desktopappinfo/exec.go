@@ -224,7 +224,7 @@ func toURL(path string) string {
 }
 
 func toLocalPath(in string) string {
-	u, err := url.Parse(url.QueryEscape(in))
+	u, err := url.Parse(in)
 	if err != nil {
 		return ""
 	}
