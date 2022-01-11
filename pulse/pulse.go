@@ -23,7 +23,7 @@ package pulse
 #include "dde-pulse.h"
 #cgo pkg-config: libpulse glib-2.0
 //enable below flags in test environment
-//#cgo CFLAGS: -fsanitize=thread
+//#cgo CFLAGS: -W -Wall -fsanitize=thread
 //#cgo LDFLAGS: -ltsan
 */
 import "C"
