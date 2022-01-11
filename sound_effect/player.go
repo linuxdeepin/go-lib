@@ -108,13 +108,13 @@ func cacheItemOk(cacheItem *CacheItem, fileInfo os.FileInfo) bool {
 	return cacheItem.modTime == fileInfo.ModTime()
 }
 
-func getDecoder(file string, fileInfo os.FileInfo) (Decoder, error) {
+func getDecoder(file string) (Decoder, error) {
 	ext := filepath.Ext(file)
 	switch ext {
 	case ".ogg", ".oga":
 		return newOggDecoder(file)
 	case ".wav":
-		return newWavDecoder(file, fileInfo)
+		return newWavDecoder(file)
 	default:
 		return nil, fmt.Errorf("unsupported ext %q", ext)
 	}
@@ -144,13 +144,8 @@ func getPlayBackend(type0 PlayBackendType, event, device string, sampleSpec *Sam
 	}
 }
 
-func (Player *Player) getDuration(file string) (time.Duration, error) {
-	fileInfo, err := os.Stat(file)
-	if err != nil {
-		return 0, err
-	}
-
-	decoder, err := getDecoder(file, fileInfo)
+func (player *Player) getDuration(file string) (time.Duration, error) {
+	decoder, err := getDecoder(file)
 	if err != nil {
 		return 0, err
 	}
@@ -186,7 +181,7 @@ func (player *Player) play(file, event, device string) error {
 		}
 	}
 
-	decoder, err := getDecoder(file, fileInfo)
+	decoder, err := getDecoder(file)
 	if err != nil {
 		return err
 	}

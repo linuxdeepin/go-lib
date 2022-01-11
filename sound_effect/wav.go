@@ -2,12 +2,13 @@ package sound_effect
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
-	"github.com/cryptix/wav"
 	"github.com/linuxdeepin/go-lib/asound"
 	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
+	wav "github.com/youpy/go-wav"
 )
 
 type WavDecoder struct {
@@ -19,18 +20,18 @@ type WavDecoder struct {
 	duration      time.Duration
 }
 
-func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
+func newWavDecoder(filename string) (Decoder, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	wavReader, err := wav.NewReader(f, fileInfo.Size())
+	wavReader := wav.NewReader(f)
+	format, err := wavReader.Format()
 	if err != nil {
 		return nil, err
 	}
-	wavFile := wavReader.GetFile()
-	paFormat, pcmFormat, err := getWavFormat(wavFile)
+	paFormat, pcmFormat, err := getWavFormat(format)
 	if err != nil {
 		return nil, err
 	}
@@ -38,17 +39,16 @@ func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
 	sampleSpec := &SampleSpec{
 		paFormat:  paFormat,
 		pcmFormat: pcmFormat,
-		rate:      int(wavFile.SampleRate),
-		channels:  int(wavFile.Channels),
+		rate:      int(format.SampleRate),
+		channels:  int(format.NumChannels),
 	}
 
-	bytesPerFrame := int(wavFile.Channels) * int(wavFile.SignificantBits/8)
-	bufSize := int(wavFile.SampleRate/8) * bytesPerFrame
-	// NOTE: do not use wavFile.Duration
-	duration := time.Duration(
-		float64(wavReader.GetSampleCount()/uint32(wavFile.Channels)) / float64(wavFile.SampleRate) *
-			float64(time.Second),
-	)
+	bytesPerFrame := int(format.BlockAlign)
+	bufSize := int(format.SampleRate/8) * bytesPerFrame
+	duration, err := wavReader.Duration()
+	if err != nil {
+		return nil, err
+	}
 
 	return &WavDecoder{
 		f:             f,
@@ -60,8 +60,12 @@ func newWavDecoder(filename string, fileInfo os.FileInfo) (Decoder, error) {
 	}, nil
 }
 
-func getWavFormat(wavFile wav.File) (paSimple.SampleFormat, asound.PCMFormat, error) {
-	switch wavFile.SignificantBits {
+func getWavFormat(wavFormat *wav.WavFormat) (paSimple.SampleFormat, asound.PCMFormat, error) {
+	if wavFormat.AudioFormat != wav.AudioFormatPCM {
+		// 非 PCM 格式，暂时不支持
+		return 0, 0, fmt.Errorf("wav audio format %v unsupported", wavFormat.AudioFormat)
+	}
+	switch wavFormat.BitsPerSample {
 	case 8:
 		return paSimple.SampleFormatU8, asound.PCMFormatU8, nil
 	case 16:
@@ -88,15 +92,7 @@ func (d *WavDecoder) GetDuration() time.Duration {
 }
 
 func (d *WavDecoder) read(buf []byte) (int, error) {
-	var n int
-	for n < len(buf) {
-		sample, err := d.reader.ReadRawSample()
-		if err != nil {
-			return n - (n % d.bytesPerFrame), err
-		}
-		n += copy(buf[n:], sample)
-	}
-	return n, nil
+	return d.reader.Read(buf)
 }
 
 func (d *WavDecoder) Close() error {
