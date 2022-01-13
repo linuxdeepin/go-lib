@@ -1,8 +1,10 @@
 package sound_effect
 
 import (
+	"fmt"
 	"unsafe"
 
+	"github.com/linuxdeepin/go-lib/pulse"
 	paSimple "github.com/linuxdeepin/go-lib/pulse/simple"
 )
 
@@ -10,7 +12,21 @@ type PulseAudioPlayBackend struct {
 	conn paSimple.Conn
 }
 
+func getPulseDefaultSink() string {
+	ctx := pulse.GetContextForced()
+	if ctx == nil {
+		return ""
+	}
+	device := ctx.GetDefaultSink()
+	fmt.Printf("use '%s' instead of empty device\n", device)
+	return device
+}
+
 func newPulseAudioPlayBackend(event, device string, sampleSpec *SampleSpec) (PlayBackend, error) {
+	if device == "" {
+		device = getPulseDefaultSink()
+	}
+
 	paConn, err := paSimple.NewConn("", "com.deepin.SoundEffect",
 		paSimple.StreamDirectionPlayback, device, event, sampleSpec.GetPaSampleSpec())
 
