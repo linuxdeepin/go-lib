@@ -13,7 +13,7 @@ type PulseAudioPlayBackend struct {
 }
 
 func getPulseDefaultSink() string {
-	ctx := pulse.GetContextForced()
+	ctx := pulse.GetContext()
 	if ctx == nil {
 		return ""
 	}
