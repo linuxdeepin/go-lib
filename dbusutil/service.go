@@ -266,12 +266,18 @@ func (s *Service) EmitPropertiesChanged(v Implementer, propValMap map[string]int
 }
 
 func (s *Service) Quit() {
-	s.conn.Close()
-	close(s.quit)
+	s.mu.Lock()
+	if s.quit != nil {
+		close(s.quit)
+		s.quit = nil
+	}
+	s.mu.Unlock()
 }
 
 func (s *Service) Wait() {
+	s.mu.Lock()
 	s.quit = make(chan struct{})
+	s.mu.Unlock()
 	if s.quitCheckInterval > 0 {
 		go func() {
 			ticker := time.NewTicker(s.quitCheckInterval)
