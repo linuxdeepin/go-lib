@@ -152,6 +152,11 @@ pa_context* new_pa_context(pa_threaded_mainloop* m)
     pa_context* ctx = pa_context_new(mlapi, "go-pulseaudio");
     pa_threaded_mainloop_unlock(m);
 
+    if (!ctx) {
+	fprintf(stderr, "pa_context_new() failed.\n");
+	return NULL;
+    }
+
     connect_timeout = 0;
 
     pa_threaded_mainloop_lock(m);
