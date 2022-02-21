@@ -108,7 +108,7 @@ func readDirNames(dirname string) ([]string, error) {
 }
 
 func Walk(root string, walkFn WalkFunc) {
-	info, err := os.Lstat(root)
+	info, err := os.Stat(root)
 	if err != nil {
 		return
 	}
