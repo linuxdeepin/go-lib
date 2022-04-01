@@ -6,18 +6,18 @@ import (
 	"sync"
 
 	"github.com/godbus/dbus"
-	"github.com/linuxdeepin/go-lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/dbusutilv1"
 )
 
 type Object interface {
 	Path_() dbus.ObjectPath
 	ServiceName_() string
-	InitSignalExt(sigLoop *dbusutil.SignalLoop, ruleAuto bool)
+	InitSignalExt(sigLoop *dbusutilv1.SignalLoop, ruleAuto bool)
 	RemoveAllHandlers()
-	RemoveHandler(handlerId dbusutil.SignalHandlerId)
+	RemoveHandler(handlerId dbusutilv1.SignalHandlerId)
 	ConnectPropertiesChanged(
 		cb func(interfaceName string, changedProperties map[string]dbus.Variant,
-			invalidatedProperties []string)) (dbusutil.SignalHandlerId, error)
+			invalidatedProperties []string)) (dbusutilv1.SignalHandlerId, error)
 }
 
 type ImplObject struct {
@@ -47,17 +47,17 @@ func (o *ImplObject) GetExtra(key string) (interface{}, bool) {
 }
 
 type objectSignalExt struct {
-	sigLoop  *dbusutil.SignalLoop
+	sigLoop  *dbusutilv1.SignalLoop
 	ruleAuto bool
 
 	// used when ruleAuto is true
-	ruleHandlersMap map[string][]dbusutil.SignalHandlerId //nolint
+	ruleHandlersMap map[string][]dbusutilv1.SignalHandlerId //nolint
 	//                  ^rule  ^handler ids
 
 	// used when ruleAuto is false
-	handleIds []dbusutil.SignalHandlerId //nolint:
+	handleIds []dbusutilv1.SignalHandlerId //nolint:
 
-	propChangedHandlerId dbusutil.SignalHandlerId                 //nolint:
+	propChangedHandlerId dbusutilv1.SignalHandlerId               //nolint:
 	propChangedCallbacks map[propChangedKey][]PropChangedCallback //nolint:
 }
 
@@ -107,9 +107,9 @@ func (o *ImplObject) SetProperty_(flags dbus.Flags, interfaceName, propName stri
 		propName, dbus.MakeVariant(value)).Err
 }
 
-func (o *ImplObject) addRuleHandlerId(rule string, handlerId dbusutil.SignalHandlerId) {
+func (o *ImplObject) addRuleHandlerId(rule string, handlerId dbusutilv1.SignalHandlerId) {
 	if o.ruleHandlersMap == nil {
-		o.ruleHandlersMap = make(map[string][]dbusutil.SignalHandlerId)
+		o.ruleHandlersMap = make(map[string][]dbusutilv1.SignalHandlerId)
 	}
 	o.ruleHandlersMap[rule] = append(o.ruleHandlersMap[rule], handlerId)
 }
@@ -156,8 +156,8 @@ func (o *ImplObject) initPropertiesChangedHandler() error {
 	if o.propChangedHandlerId != 0 {
 		return nil
 	}
-	var handlerId dbusutil.SignalHandlerId
-	sigRule := &dbusutil.SignalRule{
+	var handlerId dbusutilv1.SignalHandlerId
+	sigRule := &dbusutilv1.SignalRule{
 		Path: o.obj.Path(),
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
 	}
@@ -208,12 +208,12 @@ func (o *ImplObject) addMatch(rule string) error {
 	return nil
 }
 
-func handlerIdSliceDelete(slice []dbusutil.SignalHandlerId,
-	index int) []dbusutil.SignalHandlerId {
+func handlerIdSliceDelete(slice []dbusutilv1.SignalHandlerId,
+	index int) []dbusutilv1.SignalHandlerId {
 	return append(slice[:index], slice[index+1:]...)
 }
 
-func handlerIdSliceIndex(slice []dbusutil.SignalHandlerId, hId dbusutil.SignalHandlerId) int {
+func handlerIdSliceIndex(slice []dbusutilv1.SignalHandlerId, hId dbusutilv1.SignalHandlerId) int {
 	for idx, value := range slice {
 		if value == hId {
 			return idx
@@ -222,7 +222,7 @@ func handlerIdSliceIndex(slice []dbusutil.SignalHandlerId, hId dbusutil.SignalHa
 	return -1
 }
 
-func (o *ImplObject) removeHandler(handlerId dbusutil.SignalHandlerId) {
+func (o *ImplObject) removeHandler(handlerId dbusutilv1.SignalHandlerId) {
 	o.sigLoop.RemoveHandler(handlerId)
 	if o.ruleAuto {
 		for rule, handlerIds := range o.ruleHandlersMap {
@@ -268,7 +268,7 @@ func (o *ImplObject) removeAllHandlers() {
 	o.removePropertiesChangedHandler()
 }
 
-func (o *ImplObject) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, cb dbusutil.SignalHandlerFunc) (dbusutil.SignalHandlerId, error) {
+func (o *ImplObject) ConnectSignal_(rule string, sigRule *dbusutilv1.SignalRule, cb dbusutilv1.SignalHandlerFunc) (dbusutilv1.SignalHandlerId, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
@@ -276,7 +276,7 @@ func (o *ImplObject) ConnectSignal_(rule string, sigRule *dbusutil.SignalRule, c
 	return o.connectSignal(rule, sigRule, cb)
 }
 
-func (o *ImplObject) connectSignal(rule string, sigRule *dbusutil.SignalRule, cb dbusutil.SignalHandlerFunc) (dbusutil.SignalHandlerId, error) {
+func (o *ImplObject) connectSignal(rule string, sigRule *dbusutilv1.SignalRule, cb dbusutilv1.SignalHandlerFunc) (dbusutilv1.SignalHandlerId, error) {
 	if o.ruleAuto {
 		err := o.addMatch(rule)
 		if err != nil {
@@ -296,7 +296,7 @@ func (o *ImplObject) connectSignal(rule string, sigRule *dbusutil.SignalRule, cb
 
 // Object public methods:
 
-func (o *ImplObject) InitSignalExt(sigLoop *dbusutil.SignalLoop, ruleAuto bool) {
+func (o *ImplObject) InitSignalExt(sigLoop *dbusutilv1.SignalLoop, ruleAuto bool) {
 	if o.conn != sigLoop.Conn() {
 		panic("dbus conn not same")
 	}
@@ -319,7 +319,7 @@ func (o *ImplObject) RemoveAllHandlers() {
 	o.removeAllHandlers()
 }
 
-func (o *ImplObject) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
+func (o *ImplObject) RemoveHandler(handlerId dbusutilv1.SignalHandlerId) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
@@ -337,7 +337,7 @@ func (o *ImplObject) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
 
 func (o *ImplObject) ConnectPropertiesChanged(
 	cb func(interfaceName string, changedProperties map[string]dbus.Variant,
-		invalidatedProperties []string)) (dbusutil.SignalHandlerId, error) {
+		invalidatedProperties []string)) (dbusutilv1.SignalHandlerId, error) {
 
 	if cb == nil {
 		return 0, errors.New("nil callback")
@@ -352,7 +352,7 @@ func (o *ImplObject) ConnectPropertiesChanged(
 		rule = o.getMatchRulePropertiesChanged()
 	}
 
-	return o.connectSignal(rule, &dbusutil.SignalRule{
+	return o.connectSignal(rule, &dbusutilv1.SignalRule{
 		Path: o.obj.Path(),
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
 	}, func(sig *dbus.Signal) {

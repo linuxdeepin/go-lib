@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/godbus/dbus"
+	"github.com/linuxdeepin/go-lib/dbusutilv1"
 	"github.com/stretchr/testify/mock"
-	"github.com/linuxdeepin/go-lib/dbusutil"
 )
 
 type MockObject struct {
@@ -29,7 +29,7 @@ func (o *MockObject) ServiceName_() string {
 	return mockArgs.String(0)
 }
 
-func (o *MockObject) InitSignalExt(sigLoop *dbusutil.SignalLoop, ruleAuto bool) {
+func (o *MockObject) InitSignalExt(sigLoop *dbusutilv1.SignalLoop, ruleAuto bool) {
 	o.Called(sigLoop, ruleAuto)
 }
 
@@ -37,16 +37,16 @@ func (o *MockObject) RemoveAllHandlers() {
 	o.Called()
 }
 
-func (o *MockObject) RemoveHandler(handlerId dbusutil.SignalHandlerId) {
+func (o *MockObject) RemoveHandler(handlerId dbusutilv1.SignalHandlerId) {
 	o.Called(handlerId)
 }
 
 func (o *MockObject) ConnectPropertiesChanged(
 	cb func(interfaceName string, changedProperties map[string]dbus.Variant,
-		invalidatedProperties []string)) (dbusutil.SignalHandlerId, error) {
+		invalidatedProperties []string)) (dbusutilv1.SignalHandlerId, error) {
 	mockArgs := o.Called(cb)
 
-	ret0, ok := mockArgs.Get(0).(dbusutil.SignalHandlerId)
+	ret0, ok := mockArgs.Get(0).(dbusutilv1.SignalHandlerId)
 	if !ok {
 		panic(fmt.Sprintf("assert: arguments: 0 failed because object wasn't correct type: %v", mockArgs.Get(0)))
 	}

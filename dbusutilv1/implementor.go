@@ -1,4 +1,4 @@
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"
@@ -9,10 +9,11 @@ import (
 	"github.com/godbus/dbus"
 )
 
+// Implementer 对象实例
 type Implementer interface {
-	GetInterfaceName() string
 }
 
+// ImplementerExt 对象实例拓展
 type ImplementerExt interface {
 	Implementer
 	GetExportedMethods() ExportedMethods
@@ -53,22 +54,24 @@ func getImplementerPointer(impl Implementer) unsafe.Pointer {
 }
 
 type implementer struct {
-	core        Implementer
-	props       map[string]*fieldProp
-	propChanges propChanges
+	core          Implementer
+	props         map[string]*fieldProp
+	propChanges   propChanges
+	interfaceName string
 }
 
 func (impl *implementer) getStatic(s *Service) *implementerStatic {
-	return s.getImplementerStatic(impl.core)
+	return s.getImplementerStatic(impl.getInterfaceName())
 }
 
 func (impl *implementer) getInterfaceName() string {
-	return impl.core.GetInterfaceName()
+	return impl.interfaceName
 }
 
-func newImplementer(core Implementer, service *Service, path dbus.ObjectPath) (*implementer, error) {
+func newImplementer(core Implementer, ifcName string, service *Service, path dbus.ObjectPath) (*implementer, error) {
 	impl := &implementer{
-		core: core,
+		core:          core,
+		interfaceName: ifcName,
 	}
 
 	structValue, ok := getStructValue(core)
@@ -76,12 +79,10 @@ func newImplementer(core Implementer, service *Service, path dbus.ObjectPath) (*
 		return nil, errors.New("v is not a struct pointer")
 	}
 
-	ifcName := core.GetInterfaceName()
-
 	service.mu.Lock()
 	implStatic, ok := service.implStaticMap[ifcName]
 	if !ok {
-		implStatic = newImplementerStatic(core, structValue)
+		implStatic = newImplementerStatic(core, ifcName, structValue)
 		service.implStaticMap[ifcName] = implStatic
 	}
 	service.mu.Unlock()
@@ -133,7 +134,7 @@ func (impl *implementer) connectChanged(propertyName string, cb PropertyChangedC
 func (impl *implementer) notifyChanged(s *Service, path dbus.ObjectPath,
 	p *fieldProp, propStatic *fieldPropStatic, value interface{}) {
 
-	interfaceName := impl.core.GetInterfaceName()
+	interfaceName := impl.getInterfaceName()
 	propChanged := newPropertyChanged(path, interfaceName, propStatic.name, value)
 	p.notifyChanged(propChanged)
 	_ = emitPropertiesChanged(s.conn, path, interfaceName,
@@ -209,7 +210,7 @@ func (impl *implementer) stopDelayEmitPropChanged(s *Service, path dbus.ObjectPa
 
 	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
 	if len(changedProps)+len(invalidatedProps) > 0 {
-		err = s.conn.Emit(path, signalName, impl.core.GetInterfaceName(),
+		err = s.conn.Emit(path, signalName, impl.getInterfaceName(),
 			changedProps, invalidatedProps)
 	}
 

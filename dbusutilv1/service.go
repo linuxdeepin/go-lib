@@ -1,10 +1,8 @@
-package dbusutil
+package dbusutilv1
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"sort"
 	"sync"
 	"time"
 	"unsafe"
@@ -26,7 +24,7 @@ type Service struct {
 	objMap        map[dbus.ObjectPath]*ServerObject
 	implStaticMap map[string]*implementerStatic
 	//                ^interface name
-	implObjMap map[unsafe.Pointer]*ServerObject
+	implObjMap map[unsafe.Pointer][]*ServerObject
 }
 
 func NewService(conn *dbus.Conn) *Service {
@@ -34,7 +32,7 @@ func NewService(conn *dbus.Conn) *Service {
 		conn:          conn,
 		objMap:        make(map[dbus.ObjectPath]*ServerObject),
 		implStaticMap: make(map[string]*implementerStatic),
-		implObjMap:    make(map[unsafe.Pointer]*ServerObject),
+		implObjMap:    make(map[unsafe.Pointer][]*ServerObject),
 	}
 }
 
@@ -74,45 +72,34 @@ func (s *Service) ReleaseName(name string) error {
 	return err
 }
 
-func (s *Service) NewServerObject(path dbus.ObjectPath,
-	implementers ...Implementer) (*ServerObject, error) {
-
-	if !path.IsValid() {
-		return nil, errors.New("path invalid")
-	}
-
-	if len(implementers) == 0 {
-		return nil, errors.New("no implementer")
-	}
-
-	implMap := make(map[string]Implementer)
-	implSlice := make([]*implementer, 0, len(implementers))
-
-	for _, implCore := range implementers {
-		ifcName := implCore.GetInterfaceName()
-		_, ok := implMap[ifcName]
-		if ok {
-			return nil, errors.New("interface duplicated")
-		}
-
-		impl, err := newImplementer(implCore, s, path)
-		if err != nil {
-			return nil, err
-		}
-		implSlice = append(implSlice, impl)
-		implMap[ifcName] = implCore
-	}
-
+func (s *Service) NewServerObject(path dbus.ObjectPath) (*ServerObject, error) {
 	obj := &ServerObject{
-		service:      s,
-		path:         path,
-		implementers: implSlice,
+		service: s,
+		path:    path,
 	}
-
 	return obj, nil
 }
 
-func (s *Service) GetServerObject(impl Implementer) *ServerObject {
+func (s *Service) ServerObjectAddImpl(so *ServerObject, interfaceName string, implCore Implementer) error {
+	isFind := false
+	for _, impl := range so.implementers {
+		if impl.getInterfaceName() == interfaceName {
+			isFind = true
+		}
+	}
+	if isFind {
+		return errors.New("interface duplicated")
+	}
+	impl, err := newImplementer(implCore, interfaceName, s, so.path)
+	if err != nil {
+		return err
+	}
+	so.implementers = append(so.implementers, impl)
+
+	return nil
+}
+
+func (s *Service) GetServerObject(impl Implementer) []*ServerObject {
 	ptr := getImplementerPointer(impl)
 	s.mu.RLock()
 	so := s.implObjMap[ptr]
@@ -127,8 +114,19 @@ func (s *Service) GetServerObjectByPath(path dbus.ObjectPath) *ServerObject {
 	return so
 }
 
-func (s *Service) Export(path dbus.ObjectPath, implements ...Implementer) error {
-	so, err := s.NewServerObject(path, implements...)
+func (s *Service) Export(path dbus.ObjectPath, interfaceName string, impl Implementer) error {
+	if !path.IsValid() {
+		return errors.New("path invalid")
+	}
+	so := s.GetServerObjectByPath(path)
+	if so == nil {
+		var err error
+		so, err = s.NewServerObject(path)
+		if err != nil {
+			return err
+		}
+	}
+	err := s.ServerObjectAddImpl(so, interfaceName, impl)
 	if err != nil {
 		return err
 	}
@@ -136,11 +134,17 @@ func (s *Service) Export(path dbus.ObjectPath, implements ...Implementer) error 
 }
 
 func (s *Service) StopExport(impl Implementer) error {
-	so := s.GetServerObject(impl)
-	if so == nil {
+	sos := s.GetServerObject(impl)
+	if sos == nil {
 		return errors.New("server object not found")
 	}
-	return so.StopExport()
+	for _, so := range sos {
+		err := so.StopExport()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *Service) StopExportByPath(path dbus.ObjectPath) error {
@@ -156,8 +160,7 @@ func (s *Service) IsExported(impl Implementer) bool {
 	return so != nil
 }
 
-func (s *Service) getImplementerStatic(impl Implementer) *implementerStatic {
-	ifcName := impl.GetInterfaceName()
+func (s *Service) getImplementerStatic(ifcName string) *implementerStatic {
 	s.mu.RLock()
 	implStatic := s.implStaticMap[ifcName]
 	s.mu.RUnlock()
@@ -165,104 +168,153 @@ func (s *Service) getImplementerStatic(impl Implementer) *implementerStatic {
 }
 
 func (s *Service) Emit(v Implementer, signalName string, values ...interface{}) error {
-	so := s.GetServerObject(v)
-	if so == nil {
+	sos := s.GetServerObject(v)
+	if sos == nil {
 		return errors.New("v is not exported")
 	}
-	implStatic := s.getImplementerStatic(v)
 
-	var signal introspect.Signal
-	for _, sig := range implStatic.introspectInterface.Signals {
-		if sig.Name == signalName {
-			signal = sig
-			break
+	for _, so := range sos {
+		impl := so.getImplementer(v)
+		if impl == nil {
+			return errors.New("impl not exist")
+		}
+
+		implStatic := s.getImplementerStatic(impl.getInterfaceName())
+
+		var signal introspect.Signal
+		for _, sig := range implStatic.introspectInterface.Signals {
+			if sig.Name == signalName {
+				signal = sig
+				break
+			}
+		}
+
+		if signal.Name == "" {
+			return errors.New("not found signal")
+		}
+		if len(values) != len(signal.Args) {
+			return errors.New("signal args length not equal")
+		}
+		for idx, arg := range signal.Args {
+			valueType := dbus.SignatureOf(values[idx]).String()
+			if valueType != arg.Type {
+				return fmt.Errorf("signal arg[%d] type not match", idx)
+			}
+		}
+
+		err := s.conn.Emit(so.path, impl.getInterfaceName()+"."+signalName, values...)
+		if err != nil {
+			return err
 		}
 	}
 
-	if signal.Name == "" {
-		return errors.New("not found signal")
-	}
-	if len(values) != len(signal.Args) {
-		return errors.New("signal args length not equal")
-	}
-	for idx, arg := range signal.Args {
-		valueType := dbus.SignatureOf(values[idx]).String()
-		if valueType != arg.Type {
-			return fmt.Errorf("signal arg[%d] type not match", idx)
-		}
-	}
-
-	return s.conn.Emit(so.path,
-		v.GetInterfaceName()+"."+signalName, values...)
+	return nil
 }
 
 func (s *Service) EmitPropertyChanged(v Implementer, propertyName string, value interface{}) error {
-	so := s.GetServerObject(v)
-	if so == nil {
+	sos := s.GetServerObject(v)
+	if sos == nil {
 		return errors.New("v is not exported")
 	}
 
-	impl := so.getImplementer(v.GetInterfaceName())
+	for _, so := range sos {
+		impl := so.getImplementer(v)
+		if impl == nil {
+			return errors.New("impl not exist")
+		}
 
-	implStatic := s.getImplementerStatic(v)
+		implStatic := s.getImplementerStatic(impl.getInterfaceName())
 
-	err := implStatic.checkPropertyValue(propertyName, value)
-	if err != nil {
-		return err
+		err := implStatic.checkPropertyValue(propertyName, value)
+		if err != nil {
+			return err
+		}
+		err = impl.emitPropChanged(s, so.path, propertyName, value)
+		if err != nil {
+			return err
+		}
 	}
 
-	return impl.emitPropChanged(s, so.path, propertyName, value)
+	return nil
 }
 
 func (s *Service) DelayEmitPropertyChanged(v Implementer) func() error {
-	so := s.GetServerObject(v)
-	if so == nil {
+	sos := s.GetServerObject(v)
+	if sos == nil {
 		return nil
 	}
 
-	impl := so.getImplementer(v.GetInterfaceName())
-	if impl == nil {
+	for _, so := range sos {
+		impl := so.getImplementer(v)
+		if impl == nil {
+			return nil
+		}
+
+		impl.delayEmitPropChanged()
+	}
+
+	cb := func() error {
+		for _, so := range sos {
+			impl := so.getImplementer(v)
+			if impl == nil {
+				return errors.New("impl not exist")
+			}
+			err := impl.stopDelayEmitPropChanged(s, so.path)
+			if err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 
-	impl.delayEmitPropChanged()
-	return func() error {
-		return impl.stopDelayEmitPropChanged(s, so.path)
-	}
+	return cb
 }
 
 func (s *Service) EmitPropertiesChanged(v Implementer, propValMap map[string]interface{},
 	invalidatedProps ...string) error {
-	so := s.GetServerObject(v)
-	if so == nil {
+	sos := s.GetServerObject(v)
+	if sos == nil {
 		return errors.New("v is not exported")
 	}
 
-	implStatic := s.getImplementerStatic(v)
+	for _, so := range sos {
+		impl := so.getImplementer(v)
+		if impl == nil {
+			return errors.New("impl not exist")
+		}
 
-	const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
-	var changedProps map[string]dbus.Variant
-	if len(propValMap) > 0 {
-		changedProps = make(map[string]dbus.Variant)
-	}
-	for propName, val := range propValMap {
-		err := implStatic.checkPropertyValue(propName, val)
+		implStatic := s.getImplementerStatic(impl.getInterfaceName())
+
+		const signalName = orgFreedesktopDBus + ".Properties.PropertiesChanged"
+		var changedProps map[string]dbus.Variant
+		if len(propValMap) > 0 {
+			changedProps = make(map[string]dbus.Variant)
+		}
+		for propName, val := range propValMap {
+			err := implStatic.checkPropertyValue(propName, val)
+			if err != nil {
+				return err
+			}
+			changedProps[propName] = dbus.MakeVariant(val)
+		}
+		for _, propName := range invalidatedProps {
+			if _, ok := propValMap[propName]; ok {
+				return errors.New("property appears in both propValMap and invalidateProps")
+			}
+
+			err := implStatic.checkProperty(propName)
+			if err != nil {
+				return err
+			}
+		}
+
+		err := s.conn.Emit(so.path, signalName, impl.getInterfaceName(), changedProps, invalidatedProps)
 		if err != nil {
 			return err
 		}
-		changedProps[propName] = dbus.MakeVariant(val)
 	}
-	for _, propName := range invalidatedProps {
-		if _, ok := propValMap[propName]; ok {
-			return errors.New("property appears in both propValMap and invalidateProps")
-		}
 
-		err := implStatic.checkProperty(propName)
-		if err != nil {
-			return err
-		}
-	}
-	return s.conn.Emit(so.path, signalName, v.GetInterfaceName(), changedProps, invalidatedProps)
+	return nil
 }
 
 func (s *Service) Quit() {
@@ -344,34 +396,5 @@ func (s *Service) NameHasOwner(name string) (hasOwner bool, err error) {
 }
 
 func (s *Service) DumpProperties(v Implementer) (string, error) {
-	so := s.GetServerObject(v)
-	if so == nil {
-		return "", errors.New("not exported")
-	}
-
-	impl := so.getImplementer(v.GetInterfaceName())
-	implStatic := impl.getStatic(s)
-
-	var buf bytes.Buffer
-
-	var propNames []string
-	for name := range impl.props {
-		propNames = append(propNames, name)
-	}
-	sort.Strings(propNames)
-
-	for _, name := range propNames {
-		p := impl.props[name]
-		fmt.Fprintln(&buf, "property name:", name)
-		fmt.Fprintf(&buf, "valueMu: %p\n", p.valueMu)
-
-		propStatic := implStatic.props[name]
-		fmt.Fprintln(&buf, "signature:", propStatic.signature)
-		fmt.Fprintln(&buf, "access:", propStatic.access)
-		fmt.Fprintln(&buf, "emit:", propStatic.emit)
-
-		buf.WriteString("\n")
-	}
-
-	return buf.String(), nil
+	return "", nil
 }

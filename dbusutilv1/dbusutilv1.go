@@ -1,4 +1,4 @@
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"

@@ -1,4 +1,4 @@
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ func (so *ServerObject) propertiesGet(sender dbus.Sender,
 	interfaceName, propertyName string) (dbus.Variant, *dbus.Error) {
 	so.service.DelayAutoQuit()
 
-	impl := so.getImplementer(interfaceName)
+	impl := so.getImplementerByInterface(interfaceName)
 	if impl == nil {
 		return dbus.Variant{}, prop.ErrIfaceNotFound
 	}
@@ -39,7 +39,7 @@ func (so *ServerObject) propertiesGet(sender dbus.Sender,
 func (so *ServerObject) propertiesGetAll(sender dbus.Sender, interfaceName string) (map[string]dbus.Variant, *dbus.Error) {
 	so.service.DelayAutoQuit()
 
-	impl := so.getImplementer(interfaceName)
+	impl := so.getImplementerByInterface(interfaceName)
 	if impl == nil {
 		return nil, prop.ErrIfaceNotFound
 	}
@@ -67,7 +67,7 @@ func (so *ServerObject) propertiesSet(sender dbus.Sender, interfaceName, propert
 	newVar dbus.Variant) *dbus.Error {
 	so.service.DelayAutoQuit()
 
-	impl := so.getImplementer(interfaceName)
+	impl := so.getImplementerByInterface(interfaceName)
 	if impl == nil {
 		return prop.ErrIfaceNotFound
 	}
