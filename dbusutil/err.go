@@ -8,7 +8,11 @@ import (
 )
 
 func MakeError(v Implementer, name string, args ...interface{}) *dbus.Error {
-	errName := v.GetInterfaceName() + ".Error." + name
+	interfaceName := ""
+	if implV20, ok := v.(ImplementerV20); ok {
+		interfaceName = implV20.GetInterfaceName() + "."
+	}
+	errName := interfaceName + "Error." + name
 	msg := fmt.Sprint(args...)
 	return &dbus.Error{
 		Name: errName,
@@ -17,7 +21,11 @@ func MakeError(v Implementer, name string, args ...interface{}) *dbus.Error {
 }
 
 func MakeErrorf(v Implementer, name, format string, args ...interface{}) *dbus.Error {
-	errName := v.GetInterfaceName() + ".Error." + name
+	interfaceName := ""
+	if implV20, ok := v.(ImplementerV20); ok {
+		interfaceName = implV20.GetInterfaceName() + "."
+	}
+	errName := interfaceName + "Error." + name
 	msg := fmt.Sprintf(format, args...)
 	return &dbus.Error{
 		Name: errName,
@@ -27,7 +35,11 @@ func MakeErrorf(v Implementer, name, format string, args ...interface{}) *dbus.E
 
 func MakeErrorJSON(v Implementer, name string, detail interface{}) *dbus.Error {
 	var msg string
-	errName := v.GetInterfaceName() + ".Error." + name
+	interfaceName := ""
+	if implV20, ok := v.(ImplementerV20); ok {
+		interfaceName = implV20.GetInterfaceName() + "."
+	}
+	errName := interfaceName + "Error." + name
 	data, err := json.Marshal(detail)
 	if err != nil {
 		msg = "failed to marshal json"

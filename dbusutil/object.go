@@ -6,6 +6,7 @@ import (
 	"github.com/godbus/dbus"
 )
 
+// ServerObject 一个path对应一个obj
 type ServerObject struct {
 	service      *Service
 	path         dbus.ObjectPath
@@ -24,33 +25,52 @@ func (so *ServerObject) Export() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	_, ok := s.objMap[path]
-	if ok {
-		return errors.New("server object is exported")
-	}
-
 	for _, impl := range so.implementers {
 		core := impl.core
 		corePtr := getImplementerPointer(core)
-		_, ok := s.implObjMap[corePtr]
-		if ok {
-			return errors.New("implementer is exported")
+		objs, _ := s.implObjMap[corePtr]
+		isFindObj := false
+		for _, obj := range objs {
+			if obj == so {
+				isFindObj = true
+				break
+			}
+		}
+		if isFindObj {
+			continue
 		}
 
 		// 对旧代码实现兼容
 		if coreExt, ok := core.(ImplementerExt); ok {
-			err := conn.ExportMethodTable(coreExt.GetExportedMethods().toMethodTable(), so.path, core.GetInterfaceName())
+			err := conn.ExportMethodTable(coreExt.GetExportedMethods().toMethodTable(), so.path, impl.getInterfaceName())
 			if err != nil {
 				return err
 			}
 		} else {
-			err := conn.Export(core, so.path, core.GetInterfaceName())
+			err := conn.Export(core, so.path, impl.getInterfaceName())
 			if err != nil {
 				return err
 			}
 		}
 
-		s.implObjMap[corePtr] = so
+		s.implObjMap[corePtr] = append(s.implObjMap[corePtr], so)
+	}
+
+	_, ok := s.objMap[path]
+	if ok {
+		// clear
+		err := conn.ExportMethodTable(nil, so.path,
+			orgFreedesktopDBus+".Introspectable")
+		if err != nil {
+			return err
+		}
+		err = conn.ExportMethodTable(nil, so.path,
+			orgFreedesktopDBus+".Properties")
+		if err != nil {
+			return err
+		}
+	} else {
+		s.objMap[so.path] = so
 	}
 
 	methodTable := make(map[string]interface{}, 3)
@@ -73,7 +93,6 @@ func (so *ServerObject) Export() error {
 		return err
 	}
 
-	s.objMap[so.path] = so
 	return nil
 }
 
@@ -104,30 +123,48 @@ func (so *ServerObject) StopExport() error {
 
 	for _, impl := range so.implementers {
 		core := impl.core
-		err := conn.Export(nil, so.path, core.GetInterfaceName())
+		err := conn.Export(nil, so.path, impl.getInterfaceName())
 		if err != nil {
 			return err
 		}
 		corePtr := getImplementerPointer(core)
-		delete(s.implObjMap, corePtr)
+		objs, _ := s.implObjMap[corePtr]
+		var objsNew []*ServerObject
+		for _, obj := range objs {
+			if obj == so {
+				continue
+			}
+			objsNew = append(objsNew, obj)
+		}
+		s.implObjMap[corePtr] = objsNew
 	}
 
 	delete(s.objMap, path)
 	return nil
 }
 
-func (so *ServerObject) getImplementer(interfaceName string) *implementer {
+func (so *ServerObject) getImplementerByInterface(interfaceName string) *implementer {
 	for _, impl := range so.implementers {
-		if impl.core.GetInterfaceName() == interfaceName {
+		if impl.getInterfaceName() == interfaceName {
 			return impl
 		}
 	}
 	return nil
 }
 
+func (so *ServerObject) getImplementer(v Implementer) *implementer {
+	for _, impl := range so.implementers {
+		if getImplementerPointer(impl.core) == getImplementerPointer(v) {
+			return impl
+		}
+	}
+	return nil
+}
+
+// SetWriteCallback V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) SetWriteCallback(v Implementer, propertyName string,
 	cb PropertyWriteCallback) error {
-	impl := so.getImplementer(v.GetInterfaceName())
+	impl := so.getImplementer(v)
 	if impl == nil {
 		return errors.New("not exported")
 	}
@@ -135,9 +172,10 @@ func (so *ServerObject) SetWriteCallback(v Implementer, propertyName string,
 	return impl.setWriteCallback(propertyName, cb)
 }
 
+// SetReadCallback V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) SetReadCallback(v Implementer, propertyName string,
 	cb PropertyReadCallback) error {
-	impl := so.getImplementer(v.GetInterfaceName())
+	impl := so.getImplementer(v)
 	if impl == nil {
 		return errors.New("not exported")
 	}
@@ -145,10 +183,11 @@ func (so *ServerObject) SetReadCallback(v Implementer, propertyName string,
 	return impl.setReadCallback(propertyName, cb)
 }
 
+// ConnectChanged V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) ConnectChanged(v Implementer, propertyName string,
 	cb PropertyChangedCallback) error {
 
-	impl := so.getImplementer(v.GetInterfaceName())
+	impl := so.getImplementer(v)
 	if impl == nil {
 		return errors.New("not exported")
 	}

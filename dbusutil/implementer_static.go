@@ -8,7 +8,7 @@ import (
 	"github.com/godbus/dbus/introspect"
 )
 
-func newImplementerStatic(impl Implementer, structValue reflect.Value) *implementerStatic {
+func newImplementerStatic(impl Implementer, interfaceName string, structValue reflect.Value) *implementerStatic {
 	s := &implementerStatic{}
 	structType := structValue.Type()
 	s.props = getFieldPropStaticMap(structType, structValue)
@@ -22,7 +22,7 @@ func newImplementerStatic(impl Implementer, structValue reflect.Value) *implemen
 	}
 
 	s.introspectInterface = introspect.Interface{
-		Name:       impl.GetInterfaceName(),
+		Name:       interfaceName,
 		Signals:    getSignals(structType),
 		Properties: getPropsIntrospection(s.props),
 		Methods:    methods,
