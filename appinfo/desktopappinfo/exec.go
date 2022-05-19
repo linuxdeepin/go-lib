@@ -224,9 +224,11 @@ func toURL(path string) string {
 }
 
 func toLocalPath(in string) string {
-	u, err := url.Parse(in)
-	if err == nil && u.Scheme == "file" {
-		return u.Path
+	if strings.HasPrefix(in, "file://") {
+		u, err := url.Parse(in)
+		if err == nil {
+			return u.Path
+		}
 	}
 	return in
 }
