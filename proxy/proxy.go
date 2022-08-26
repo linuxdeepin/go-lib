@@ -21,14 +21,15 @@ package proxy
 
 import (
 	"fmt"
+	"github.com/godbus/dbus"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/linuxdeepin/go-gir/gio-2.0"
 	"github.com/linuxdeepin/go-lib/gsettings"
 	"github.com/linuxdeepin/go-lib/log"
 	"github.com/linuxdeepin/go-lib/utils"
-	"github.com/linuxdeepin/go-gir/gio-2.0"
 )
 
 // Synchronize proxy gsettings to environment variables.
@@ -137,6 +138,13 @@ func updateProxyEnvs() {
 	os.Unsetenv(envAutoProxy)
 	os.Unsetenv(envAllProxy)
 	os.Unsetenv(envNoProxy)
+	systemdAndDbusUnSetEnv(envHttpProxy)
+	systemdAndDbusUnSetEnv(envHttpsProxy)
+	systemdAndDbusUnSetEnv(envFtpProxy)
+	systemdAndDbusUnSetEnv(envSocksProxy)
+	systemdAndDbusUnSetEnv(envAutoProxy)
+	systemdAndDbusUnSetEnv(envAllProxy)
+	systemdAndDbusUnSetEnv(envNoProxy)
 	proxyMode := proxySettings.GetString(gkeyProxyMode)
 	switch proxyMode {
 	case proxyModeNone:
@@ -164,6 +172,52 @@ func doSetEnv(env, value string) {
 	if len(value) > 0 {
 		os.Setenv(env, value)
 	}
+	systemdAndDbusSetEnv(env, value)
+}
+
+func systemdAndDbusSetEnv(env, value string) {
+	if len(value) > 0 {
+		bus, err := dbus.SessionBus()
+		if err != nil {
+			logger.Warning(err)
+			return
+		}
+
+		systemdObj := bus.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
+		err = systemdObj.Call("org.freedesktop.systemd1.Manager.SetEnvironment", 0, []string{fmt.Sprintf("%s=%s", env, value)}).Err
+		if err != nil {
+			logger.Warning(err)
+		}
+		dbusObj := bus.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+		envMap := make(map[string]string)
+		envMap[env] = value
+		err = dbusObj.Call("org.freedesktop.DBus.UpdateActivationEnvironment", 0, envMap).Err
+		if err != nil {
+			logger.Warning(err)
+		}
+		logger.Debug("update dbus and systemd env")
+	}
+}
+
+func systemdAndDbusUnSetEnv(env string) {
+	bus, err := dbus.SessionBus()
+	if err != nil {
+		logger.Warning(err)
+		return
+	}
+	systemdObj := bus.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
+	err = systemdObj.Call("org.freedesktop.systemd1.Manager.UnsetEnvironment", 0, []string{env}).Err
+	if err != nil {
+		logger.Warning(err)
+	}
+	dbusObj := bus.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+	envMap := make(map[string]string)
+	envMap[env] = ""
+	err = dbusObj.Call("org.freedesktop.DBus.UpdateActivationEnvironment", 0, envMap).Err
+	if err != nil {
+		logger.Warning(err)
+	}
+	logger.Debug("unset dbus and systemd env")
 }
 
 func getProxyValue(proxyType string, protocol string) (proxyValue string) {
