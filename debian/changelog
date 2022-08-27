@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (0.5.1) unstable; urgency=medium
+
+  * update changlog
+
+ -- lichangze <lichangze@uniontech.com>  Sat, 27 Aug 2022 19:39:58 +0800
+
 golang-github-linuxdeepin-go-lib (0.5.0-1) unstable; urgency=medium
 
   * change package name to golang-github-linuxdeepin-go-lib
