@@ -252,14 +252,17 @@ int wav_convert(char *file_name,char *dest_name,float precent){
         return -1;
     }
 
-    //int db = -4;
-    int db = wav_getdb(precent);
-    printf("db: %d.\n",db);
+    double factor = 0.0;
+    if (precent > 0.00){
+        //int db = -4;
+        int db = wav_getdb(precent);
+        printf("db: %d.\n",db);
 
-    //注意：pow里必须强转为double类型，因为两个int类型做除法，结果还是int类型，会损失精度，此处把db强转为
-    //double，double/int最后的结果是个double，保证了精度
-    double factor = pow(10, (double)db / 20);
-
+        //注意：pow里必须强转为double类型，因为两个int类型做除法，结果还是int类型，会损失精度，此处把db强转为
+        //double，double/int最后的结果是个double，保证了精度
+        factor= pow(10, (double)db / 20);
+    }
+   
     wav = (wav_t *)malloc(sizeof(wav_t));
     if(NULL == wav){
         printf("malloc wav failedly\n");
