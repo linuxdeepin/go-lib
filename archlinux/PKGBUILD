@@ -43,6 +43,7 @@ check() {
   go get -v github.com/godbus/dbus/introspect
   go get -v github.com/godbus/dbus/prop
   go get -v github.com/youpy/go-wav
+  go get -v github.com/stretchr/testify
   go test -v $(go list ./... | grep -v -e lib/pulse -e lib/users/passwd -e lib/users/group -e lib/timer -e lib/log -e lib/dbus -e lib/shell)
 }
 
