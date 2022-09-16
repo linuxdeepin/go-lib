@@ -37,7 +37,7 @@ func (s *SM2Helper) Encrypt(p []byte) ([]byte, error) {
 	if len(p) == 0 {
 		return nil, fmt.Errorf("plaintext size is zero")
 	}
-	size := C.get_ciphertext_size(s.context, C.size_t(len(p)))
+	size := C.get_ciphertext_size(s.context, (*C.uint8_t)(unsafe.Pointer(&p[0])), C.size_t(len(p)))
 	if size <= 0 {
 		return nil, fmt.Errorf("get ciphertext size failed")
 	}
@@ -56,7 +56,7 @@ func (s *SM2Helper) Decrypt(c []byte) ([]byte, error) {
 	if len(c) == 0 {
 		return nil, fmt.Errorf("ciphertext size is zero")
 	}
-	size := C.get_plaintext_size((*C.uint8_t)(unsafe.Pointer(&c[0])), C.size_t(len(c)))
+	size := C.get_plaintext_size(s.context, (*C.uint8_t)(unsafe.Pointer(&c[0])), C.size_t(len(c)))
 	if size <= 0 {
 		return nil, fmt.Errorf("get plaintext size failed")
 	}

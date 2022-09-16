@@ -4,8 +4,33 @@
 
 package sm4
 
-// #include <openssl/sm4.h>
-// #cgo pkg-config: openssl
+/*
+#cgo pkg-config: openssl
+#include <openssl/evp.h>
+
+static void openssl_evp_sm4_cipher(const unsigned char *key,
+                                   unsigned char *out,
+                                   unsigned char *in, int inl,
+                                   int enc) {
+    int ret = 0;
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (ctx == NULL) {
+        return;
+    }
+    ret = EVP_CipherInit(ctx, EVP_sm4_ecb(), key, NULL, enc);
+    if (1 != ret) {
+        printf("EVP_CipherInit fail... ret = %d \n", ret);
+        EVP_CIPHER_CTX_free(ctx);
+        return;
+    }
+    ret = EVP_Cipher(ctx, out, in, inl);
+    if (1 != ret) {
+        printf("EVP_Cipher fail.. ret = %d \n", ret);
+    }
+
+    EVP_CIPHER_CTX_free(ctx);
+}
+*/
 import "C"
 import (
 	"crypto/cipher"
@@ -21,7 +46,7 @@ const (
 
 // A cipher is an instance of SM4 encryption using a particular key.
 type sm4Cipher struct {
-	key C.SM4_KEY
+	key []byte
 }
 
 // NewCipher creates and returns a new cipher.Block.
@@ -35,16 +60,24 @@ func NewCipher(key []byte) (cipher.Block, error) {
 		break
 	}
 	ret := &sm4Cipher{}
-	C.SM4_set_key((*C.uint8_t)(unsafe.Pointer(&key[0])), &ret.key)
+
+	ret.key = make([]byte, k)
+	copy(ret.key, key)
 	return ret, nil
 }
 
 func (c *sm4Cipher) BlockSize() int { return BlockSize }
 
 func (c *sm4Cipher) Encrypt(dst, src []byte) {
-	C.SM4_encrypt((*C.uint8_t)(unsafe.Pointer(&src[0])), (*C.uint8_t)(unsafe.Pointer(&dst[0])), &c.key)
+	C.openssl_evp_sm4_cipher((*C.uint8_t)(unsafe.Pointer(&c.key[0])),
+		(*C.uint8_t)(unsafe.Pointer(&dst[0])),
+		(*C.uint8_t)(unsafe.Pointer(&src[0])), C.int(len(src)),
+		1)
 }
 
 func (c *sm4Cipher) Decrypt(dst, src []byte) {
-	C.SM4_decrypt((*C.uint8_t)(unsafe.Pointer(&src[0])), (*C.uint8_t)(unsafe.Pointer(&dst[0])), &c.key)
+	C.openssl_evp_sm4_cipher((*C.uint8_t)(unsafe.Pointer(&c.key[0])),
+		(*C.uint8_t)(unsafe.Pointer(&dst[0])),
+		(*C.uint8_t)(unsafe.Pointer(&src[0])), C.int(len(src)),
+		0)
 }
