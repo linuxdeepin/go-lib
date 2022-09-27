@@ -40,13 +40,13 @@ License: CC0-1.0
 
 # sh
 Files: gen.sh gen_test_report.sh
-Copyright: None
-License: CC0-1.0
+Copyright: UnionTech Software Technology Co., Ltd.
+License: GPL-3.0-or-later
 
 # translation or configuration files
 Files: misc/*
-Copyright: UnionTech Software Technology Co., Ltd.
-License: GPL-3.0-or-later
+Copyright: None
+License: CC0-1.0
 
 # png svg
 Files: *.png *.svg *.jpg
@@ -69,7 +69,12 @@ Copyright: UnionTech Software Technology Co., Ltd.
 License: GPL-3.0-or-later
 
 # Project config file
-Files: *TODO* gettext/build_test_locale_data stb_vorbis/stb_vorbis.c
+Files: *TODO* gettext/build_test_locale_data
 Copyright: UnionTech Software Technology Co., Ltd.
 License: GPL-3.0-or-later
+
+# Project config file
+Files: stb_vorbis/stb_vorbis.c
+Copyright: 2017 Sean Barrett
+License: MIT
 

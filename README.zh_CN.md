@@ -50,4 +50,4 @@ cp -r go-lib $GOPATH/src/github.com/linuxdeepin/go-lib
 
 ## 开源协议
 
-go-lib项目在LGPL-3.0-or-later开源协议下发布。
+go-lib项目在 [GPL-3.0-or-later](LICENSE)开源协议下发布。
