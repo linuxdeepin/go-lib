@@ -26,7 +26,7 @@ func startHandleSafeDo() {
 	// Move all safeDo fn to here to avoid creating too many OS Thread.
 	// Because GOMAXPROC only apply to go-runtime.
 	for c := range pendingSafeDo {
-		if c.fn != nil {
+		if c.fn != nil && c.loop != nil {
 			runtime.LockOSThread()
 			C.pa_threaded_mainloop_lock(c.loop)
 			c.fn()
