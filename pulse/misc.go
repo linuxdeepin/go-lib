@@ -72,18 +72,12 @@ func (infos ProfileInfos2) SelectProfile() string {
 		return ""
 	}
 
-	profile := infos.selectByAvailable(AvailableTypeYes)
+	profile := infos.selectByAvailable()
 	if len(profile.Name) != 0 {
 		return profile.Name
 	}
 
-	profile = infos.selectByAvailable(AvailableTypeUnknow)
-	if len(profile.Name) != 0 {
-		return profile.Name
-	}
-
-	profile = infos.selectByAvailable(AvailableTypeNo)
-	return profile.Name
+	return infos[0].Name
 }
 
 func (infos ProfileInfos2) Len() int {
@@ -98,10 +92,10 @@ func (infos ProfileInfos2) Swap(i, j int) {
 	infos[i], infos[j] = infos[j], infos[i]
 }
 
-func (infos ProfileInfos2) selectByAvailable(available int) ProfileInfo2 {
+func (infos ProfileInfos2) selectByAvailable() ProfileInfo2 {
 	var profile ProfileInfo2
 	for _, info := range infos {
-		if info.Available != available {
+		if info.Available == 0 {
 			continue
 		}
 
