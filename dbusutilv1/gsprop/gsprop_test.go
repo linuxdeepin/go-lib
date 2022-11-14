@@ -26,7 +26,7 @@ type srvObject1 struct {
 	Strv   Strv   `prop:"access:rw"`
 }
 
-const srvObj1Interface = "com.deepin.lib.gsprop.Object1"
+const srvObj1Interface = "org.deepin.dde.lib.gsprop.Object1"
 
 func (o *srvObject1) GetExportedMethods() dbusutilv1.ExportedMethods {
 	return nil
@@ -70,7 +70,7 @@ gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c
 		t.Error("Unexpected error:", err)
 	}
 
-	const srvObj1Path = "/com/deepin/lib/gsprop/Object1"
+	const srvObj1Path = "/org/deepin/dde/lib/gsprop/Object1"
 	err = service.Export(srvObj1Path, srvObj1Interface, srvObj1)
 	if err != nil {
 		t.Error("Unexpected error export srvObj1:", err)

@@ -55,7 +55,7 @@ func ToError(err error) *dbus.Error {
 		name = err0.Name()
 		msg = err0.Error()
 	} else {
-		name = "com.deepin.DBus.Error.Unnamed"
+		name = "org.deepin.dde.DBus.Error.Unnamed"
 		msg = err.Error()
 	}
 	return &dbus.Error{

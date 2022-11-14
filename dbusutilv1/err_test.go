@@ -15,7 +15,7 @@ func (*impl1) GetExportedMethods() ExportedMethods {
 }
 
 func (*impl1) GetInterfaceName() string {
-	return "com.deepin.lib.Exportable1"
+	return "org.deepin.dde.lib.Exportable1"
 }
 
 func TestMakeError(t *testing.T) {
@@ -87,7 +87,7 @@ func (err namedError) Name() string {
 func TestToError(t *testing.T) {
 	err := ToError(unnamedError{})
 	expectedErr := &dbus.Error{
-		Name: "com.deepin.DBus.Error.Unnamed",
+		Name: "org.deepin.dde.DBus.Error.Unnamed",
 		Body: []interface{}{"xxx err msg"},
 	}
 

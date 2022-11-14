@@ -9,7 +9,7 @@ import (
 
 	"github.com/godbus/dbus"
 	"github.com/godbus/dbus/introspect"
-	"github.com/linuxdeepin/go-gir/gio-2.0"
+	gio "github.com/linuxdeepin/go-gir/gio-2.0"
 	"github.com/linuxdeepin/go-lib/dbusutil"
 	"github.com/linuxdeepin/go-lib/gsettings"
 )
@@ -26,7 +26,7 @@ type srvObject1 struct {
 	Strv   Strv   `prop:"access:rw"`
 }
 
-const srvObj1Interface = "com.deepin.lib.gsprop.Object1"
+const srvObj1Interface = "org.deepin.dde.lib.gsprop.Object1"
 
 func (*srvObject1) GetInterfaceName() string {
 	return srvObj1Interface
@@ -74,7 +74,7 @@ gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c
 		t.Error("Unexpected error:", err)
 	}
 
-	const srvObj1Path = "/com/deepin/lib/gsprop/Object1"
+	const srvObj1Path = "/org/deepin/dde/lib/gsprop/Object1"
 	err = service.Export(srvObj1Path, srvObj1)
 	if err != nil {
 		t.Error("Unexpected error export srvObj1:", err)
