@@ -6,10 +6,11 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/godbus/dbus"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/godbus/dbus"
 
 	"github.com/linuxdeepin/go-gir/gio-2.0"
 	"github.com/linuxdeepin/go-lib/gsettings"
@@ -51,10 +52,13 @@ const (
 	proxyModeManual = "manual"
 	proxyModeAuto   = "auto"
 
-	gkeyProxyAuto        = "autoconfig-url"
-	gkeyProxyIgnoreHosts = "ignore-hosts"
-	gkeyProxyHost        = "host"
-	gkeyProxyPort        = "port"
+	gkeyProxyAuto                   = "autoconfig-url"
+	gkeyProxyIgnoreHosts            = "ignore-hosts"
+	gkeyProxyHost                   = "host"
+	gkeyProxyPort                   = "port"
+	gkeyProxyUseAuthentication      = "use-authentication"
+	gkeyProxyAuthenticationUser     = "authentication-user"
+	gkeyProxyAuthenticationPassword = "authentication-password"
 
 	gchildProxyHttp  = "http"
 	gchildProxyHttps = "https"
@@ -139,6 +143,7 @@ func updateProxyEnvs() {
 		doSetEnv(envHttpProxy, getProxyValue(proxyTypeHttp, proxyTypeHttp))
 		doSetEnv(envHttpsProxy, getProxyValue(proxyTypeHttps, proxyTypeHttp))
 		doSetEnv(envFtpProxy, getProxyValue(proxyTypeFtp, proxyTypeHttp))
+		doSetEnv(envAllProxy, getProxyValue(proxyTypeSocks, proxyTypeSocks))
 		doSetEnv(envSocksProxy, getProxyValue(proxyTypeSocks, proxyTypeSocks))
 
 		arrayIgnoreHosts := proxySettings.GetStrv(gkeyProxyIgnoreHosts)
@@ -215,7 +220,18 @@ func getProxyValue(proxyType string, protocol string) (proxyValue string) {
 		return
 	}
 	port := strconv.Itoa(int(childSettings.GetInt(gkeyProxyPort)))
-	proxyValue = fmt.Sprintf("%s://%s:%s", protocol, host, port)
+
+	useAuthentication := false
+	if childSettings.GetSchema().HasKey(gkeyProxyUseAuthentication) {
+		useAuthentication = childSettings.GetBoolean(gkeyProxyUseAuthentication)
+	}
+	if useAuthentication {
+		user := childSettings.GetString(gkeyProxyAuthenticationUser)
+		password := childSettings.GetString(gkeyProxyAuthenticationPassword)
+		proxyValue = fmt.Sprintf("%s://%s:%s@%s:%s", protocol, user, password, host, port)
+	} else {
+		proxyValue = fmt.Sprintf("%s://%s:%s", protocol, host, port)
+	}
 	return
 }
 
