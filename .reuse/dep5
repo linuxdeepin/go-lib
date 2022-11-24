@@ -78,3 +78,8 @@ Files: stb_vorbis/stb_vorbis.c
 Copyright: 2017 Sean Barrett
 License: MIT
 
+# gomod files
+Files: go.mod go.sum
+Copyright: None
+License: CC0-1.0
+
