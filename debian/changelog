@@ -1,3 +1,10 @@
+golang-github-linuxdeepin-go-lib (6.0.2) unstable; urgency=medium
+
+  [ TagBuilder ]
+  * feat: 接口更变，增加V23接口(Task: 207483)(Influence: 接口更变)
+
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Tue, 13 Dec 2022 19:32:33 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.1) unstable; urgency=medium
 
   [ TagBuilder ]
