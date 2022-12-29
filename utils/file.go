@@ -77,9 +77,6 @@ func IsFileExist(path string) bool {
 func IsDir(path string) bool {
 	// if is uri path, ensure it decoded
 	path = DecodeURI(path)
-	if IsSymlink(path) {
-		return symlinkIsDir(path)
-	}
 
 	f, err := os.Stat(path)
 	if err != nil {
@@ -211,16 +208,3 @@ func iterCopyDir(src, dest string, mode os.FileMode) error {
 	return nil
 }
 
-// If 'link' is relative symlink, we need to cd it's parent dir.
-func symlinkIsDir(link string) bool {
-	target, err := os.Readlink(link)
-	if err != nil {
-		return false
-	}
-
-	dir := path.Dir(link)
-	if len(dir) == 0 {
-		return IsDir(target)
-	}
-	return IsDir(path.Join(dir, target))
-}
