@@ -6,11 +6,29 @@ pkgdesc='A library containing many useful go routines for things such as glib, g
 arch=('any')
 url="https://github.com/linuxdeepin/go-lib"
 license=('GPL3')
-depends=('dbus' 'libpulse' 'gdk-pixbuf2' 'gdk-pixbuf-xlib' 'mobile-broadband-provider-info' 'libx11' 'libcanberra'
-         'golang-gopkg-alecthomas-kingpin.v2' 'golang-deepin-gir-git'
-         'golang-github-linuxdeepin-go-x11-client-git' 'golang-golang-x-net' 'golang-golang-x-image')
-         # 'golang-github-cryptix-wav' not packaged yet, paused until our go packaging standards formed
-makedepends=('iso-codes' 'golang-gopkg-check.v1' 'git' 'go') # git needed only for go get
+depends=(
+    'dbus'
+    'libpulse'
+    'gdk-pixbuf2'
+    'gdk-pixbuf-xlib'
+    'mobile-broadband-provider-info'
+    'libx11'
+    'libcanberra'
+    'golang-gopkg-alecthomas-kingpin.v2'
+    'golang-deepin-gir-git'
+    'golang-github-linuxdeepin-go-x11-client-git'
+    'golang-golang-x-net'
+    'golang-golang-x-image'
+)
+checkdepends=(
+    'iso-codes'
+    'golang-gopkg-check.v1'
+    'golang-gopkg-yaml.v3'
+    'golang-github-fsnotify-fsnotify'
+    'golang-github-stretchr-testify'
+    'git'
+    'dash'
+) # git needed only for go get
 conflicts=('golang-deepin-lib')
 provides=('golang-deepin-lib')
 groups=('deepin-git')
@@ -18,33 +36,25 @@ source=('source.tar.gz')
 sha512sums=('SKIP')
 
 prepare() {
- export GO111MODULE=off
   cd $deepin_source_name
-
-  sed -i 's/int connect_timeout;/extern int connect_timeout;/' pulse/dde-pulse.h
+  sed -i 's|"sh"|"dash"|' shell/shell_test.go
 }
 
 check() {
-  export GOPATH="$srcdir/build:/usr/share/gocode"
   export GO111MODULE=off
+  export GOPATH="$srcdir/build:/usr/share/gocode"
   mkdir -p "$srcdir"/build/src/github.com/linuxdeepin
-  cp -a "$srcdir/$deepin_source_name" "$srcdir"/build/src/github.com/linuxdeepin/go-lib
+  cp -a "$srcdir"/$deepin_source_name "$srcdir"/build/src/github.com/linuxdeepin/go-lib
   cd "$srcdir"/build/src/github.com/linuxdeepin/go-lib
   # TODO: make packages for them
-  go get -v github.com/smartystreets/goconvey/convey
-  go get -v github.com/mozillazg/go-pinyin
-  go get -v gopkg.in/yaml.v3
-  # TODO: figure out why pulse tests hang
+  go get github.com/cryptix/wav \
+         github.com/smartystreets/goconvey/convey \
+         github.com/mozillazg/go-pinyin \
+         github.com/godbus/dbus \
+         github.com/youpy/go-wav
   # passwd: test needs to access /etc/passwd
-  # group & timer & log & dbus: build failed
-  # shell: TestEncode failed
-  go get -v github.com/fsnotify/fsnotify
-  go get -v github.com/godbus/dbus
-  go get -v github.com/godbus/dbus/introspect
-  go get -v github.com/godbus/dbus/prop
-  go get -v github.com/youpy/go-wav
-  go get -v github.com/stretchr/testify
-  go test -v $(go list ./... | grep -v -e lib/pulse -e lib/users/passwd -e lib/users/group -e lib/timer -e lib/log -e lib/dbus -e lib/shell)
+  # gm: needs gmssl
+  go test -v $(go list ./... | grep -v -e lib/users/passwd -e lib/gm)
 }
 
 package() {
