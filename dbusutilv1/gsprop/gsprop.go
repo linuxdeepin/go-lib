@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 package gsprop
 
 import (
@@ -11,15 +7,15 @@ import (
 
 	"github.com/godbus/dbus"
 	gio "github.com/linuxdeepin/go-gir/gio-2.0"
-	"github.com/linuxdeepin/go-lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/dbusutilv1"
 	"github.com/linuxdeepin/go-lib/gsettings"
 )
 
 type base struct {
-	mu                sync.Mutex
-	gs                *gio.Settings
-	key               string
-	notifyChangedList []func(val interface{})
+	mu            sync.Mutex
+	gs            *gio.Settings
+	key           string
+	notifyChanged func(val interface{})
 }
 
 func (b *base) bind(gs *gio.Settings, keyName string,
@@ -32,22 +28,19 @@ func (b *base) bind(gs *gio.Settings, keyName string,
 	gs.GetProperty("path", &propPath)
 	gsettings.ConnectChanged(propPath, keyName, func(_ string) {
 		b.mu.Lock()
-		notifyChangedList := b.notifyChangedList
+		notifyChanged := b.notifyChanged
 		b.mu.Unlock()
-		if notifyChangedList != nil {
+
+		if notifyChanged != nil {
 			val, _ := getFn()
-			for _, notifyChanged := range notifyChangedList {
-				if notifyChanged != nil {
-					notifyChanged(val)
-				}
-			}
+			notifyChanged(val)
 		}
 	})
 }
 
 func (b *base) SetNotifyChangedFunc(fn func(val interface{})) {
 	b.mu.Lock()
-	b.notifyChangedList = append(b.notifyChangedList, fn)
+	b.notifyChanged = fn
 	b.mu.Unlock()
 }
 
@@ -55,7 +48,7 @@ func checkSet(setOk bool) *dbus.Error {
 	if setOk {
 		return nil
 	}
-	return dbusutil.ToError(errors.New("write failed"))
+	return dbusutilv1.ToError(errors.New("write failed"))
 }
 
 type Bool struct {

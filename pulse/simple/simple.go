@@ -42,6 +42,8 @@ const (
 	SampleFormatS16NE     = C.PA_SAMPLE_S16NE
 	SampleFormatS16LE     = C.PA_SAMPLE_S16LE
 	SampleFormatS16BE     = C.PA_SAMPLE_S16BE
+	SampleFormatS24LE     = C.PA_SAMPLE_S24LE
+	SampleFormatS24BE     = C.PA_SAMPLE_S24BE
 	SampleFormatFloat32LE = C.PA_SAMPLE_FLOAT32LE
 	SampleFormatFloat32BE = C.PA_SAMPLE_FLOAT32BE
 	SampleFormatS32LE     = C.PA_SAMPLE_S32LE

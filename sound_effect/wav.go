@@ -74,6 +74,8 @@ func getWavFormat(wavFormat *wav.WavFormat) (paSimple.SampleFormat, asound.PCMFo
 		return paSimple.SampleFormatU8, asound.PCMFormatU8, nil
 	case 16:
 		return paSimple.SampleFormatS16LE, asound.PCMFormatS16LE, nil
+	case 24:
+		return paSimple.SampleFormatS24LE, asound.PCMFormatS24_3LE, nil
 	case 32:
 		return paSimple.SampleFormatS32LE, asound.PCMFormatS32LE, nil
 	default:

@@ -1,8 +1,4 @@
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"
@@ -157,7 +153,7 @@ func TestService_Export(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj1 := &srvObject1{}
-	err = service.Export("/org/deepin/dde/lib/Object1", srvObj1)
+	err = service.Export("/org/deepin/dde/lib/Object1", srvObj1.GetInterfaceName(), srvObj1)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj1:", err)
 	}
@@ -189,13 +185,13 @@ func TestService_Export(t *testing.T) {
 	}
 
 	srvObj12 := srvObject12{}
-	err = service.Export("/org/deepin/dde/lib/Object12", srvObj12)
+	err = service.Export("/org/deepin/dde/lib/Object12", srvObj12.GetInterfaceName(), srvObj12)
 	if err == nil {
 		t.Error("Expected error due to srvObj12 is not a struct pointer")
 	}
 
 	srvStr := srvString("hello")
-	err = service.Export("/org/deepin/dde/lib/String", srvStr)
+	err = service.Export("/org/deepin/dde/lib/String", srvStr.GetInterfaceName(), srvStr)
 	if err == nil {
 		t.Error("Expected error due to srvStr is not a struct pointer")
 	}
@@ -246,7 +242,7 @@ func TestService_Emit(t *testing.T) {
 	}
 	srvObj2 := &srvObject2{}
 	const srvObj2Path = "/org/deepin/dde/lib/Object2"
-	err = service.Export(srvObj2Path, srvObj2)
+	err = service.Export(srvObj2Path, srvObj2.GetInterfaceName(), srvObj2)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj2:", err)
 	}
@@ -395,7 +391,7 @@ func TestService_EmitPropertyChanged(t *testing.T) {
 	}
 	srvObj3 := &srvObject3{}
 	const srvObj3Path = "/org/deepin/dde/lib/Object3"
-	err = service.Export(srvObj3Path, srvObj3)
+	err = service.Export(srvObj3Path, srvObj3.GetInterfaceName(), srvObj3)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj3:", err)
 	}
@@ -545,7 +541,7 @@ func TestService_EmitPropertiesChanged(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 	srvObj4 := &srvObject4{}
-	err = service.Export("/org/deepin/dde/lib/Object4", srvObj4)
+	err = service.Export("/org/deepin/dde/lib/Object4", srvObj4.GetInterfaceName(), srvObj4)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj4:", err)
 	}
@@ -613,7 +609,7 @@ func TestService_AutoQuit(t *testing.T) {
 	srvObj5 := &srvObject5{
 		s: service,
 	}
-	err = service.Export("/org/deepin/dde/lib/Object5", srvObj5)
+	err = service.Export("/org/deepin/dde/lib/Object5", srvObj5.GetInterfaceName(), srvObj5)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj5:", err)
 	}
@@ -715,7 +711,11 @@ func TestService_SetReadCallback(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	serverObject6, err := service.NewServerObject("/org/deepin/dde/lib/Object6", srvObj6)
+	serverObject6, err := service.NewServerObject("/org/deepin/dde/lib/Object6")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	err = service.ServerObjectAddImpl(serverObject6, srvObj6.GetInterfaceName(), srvObj6)
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
@@ -806,7 +806,11 @@ func TestService_SetWriteCallback(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	serverObject7, err := service.NewServerObject("/org/deepin/dde/lib/Object7", srvObj7)
+	serverObject7, err := service.NewServerObject("/org/deepin/dde/lib/Object7")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	err = service.ServerObjectAddImpl(serverObject7, srvObj7.GetInterfaceName(), srvObj7)
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
@@ -902,7 +906,11 @@ func TestService_ConnectChanged(t *testing.T) {
 		Prop1: "apple",
 	}
 
-	serverObject8, err := service.NewServerObject("/org/deepin/dde/lib/Object8", srvObj8)
+	serverObject8, err := service.NewServerObject("/org/deepin/dde/lib/Object8")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	err = service.ServerObjectAddImpl(serverObject8, srvObj8.GetInterfaceName(), srvObj8)
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
@@ -1008,7 +1016,7 @@ func TestService_PropTag(t *testing.T) {
 	}
 	const srvObj9Path = "/org/deepin/dde/lib/Object9"
 
-	err = service.Export(srvObj9Path, srvObj9)
+	err = service.Export(srvObj9Path, srvObj9.GetInterfaceName(), srvObj9)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj9:", err)
 	}
@@ -1262,7 +1270,15 @@ func TestService_StructProp(t *testing.T) {
 		Prop1: rect{1, 2, 3, 4},
 	}
 
-	serverObject10, err := service.NewServerObject("/org/deepin/dde/lib/Object10", srvObj10)
+	serverObject10, err := service.NewServerObject("/org/deepin/dde/lib/Object10")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+
+	err = service.ServerObjectAddImpl(serverObject10, srvObj10.GetInterfaceName(), srvObj10)
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
 
 	_ = serverObject10.ConnectChanged(srvObj10, "Prop1", func(change *PropertyChanged) {
 		srvObj10.prop1ChangedCount++
@@ -1437,7 +1453,7 @@ func TestService_DumpProperties(t *testing.T) {
 	srvObj11 := &srvObject11{
 		Prop5: &customProperty{5},
 	}
-	err = service.Export("/org/deepin/dde/lib/Object11", srvObj11)
+	err = service.Export("/org/deepin/dde/lib/Object11", srvObj11.GetInterfaceName(), srvObj11)
 	if err != nil {
 		t.Error("Unexpected error exporting srvObj11:", err)
 	}
@@ -1491,7 +1507,11 @@ func TestService_IntUintProp(t *testing.T) {
 		Prop3: integers{3, 4},
 	}
 
-	serverObject13, err := service.NewServerObject("/org/deepin/dde/lib/Object13", srvObj13)
+	serverObject13, err := service.NewServerObject("/org/deepin/dde/lib/Object13")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+	err = service.ServerObjectAddImpl(serverObject13, srvObj13.GetInterfaceName(), srvObj13)
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}

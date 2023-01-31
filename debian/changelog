@@ -1,8 +1,22 @@
-golang-github-linuxdeepin-go-lib (0.5.1) unstable; urgency=medium
+golang-github-linuxdeepin-go-lib (6.0.2) unstable; urgency=medium
 
-  * update changlog
+  [ TagBuilder ]
+  * feat: 接口更变，增加V23接口(Task: 207483)(Influence: 接口更变)
 
- -- lichangze <lichangze@uniontech.com>  Sat, 27 Aug 2022 19:39:58 +0800
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Tue, 13 Dec 2022 19:32:33 +0800
+
+golang-github-linuxdeepin-go-lib (6.0.1) unstable; urgency=medium
+
+  [ TagBuilder ]
+  * fix: 关机音效文件更新后采用24bit导致无法播放(Bug: 144437)(Influence: 关机音效)
+
+ -- caixiangrong <caixiangrong@uniontech.com>  Mon, 25 Jul 2022 13:18:52 +0800
+
+golang-github-linuxdeepin-go-lib (6.0.0.0) unstable; urgency=medium
+
+  * snipe version
+
+ -- Tan Feng <tanfeng@uniontech.com>  Fri, 10 Jun 2022 22:01:25 +0800
 
 golang-github-linuxdeepin-go-lib (0.5.0-1) unstable; urgency=medium
 

@@ -1,8 +1,4 @@
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"
@@ -165,7 +161,6 @@ func (so *ServerObject) getImplementer(v Implementer) *implementer {
 	return nil
 }
 
-// SetWriteCallback V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) SetWriteCallback(v Implementer, propertyName string,
 	cb PropertyWriteCallback) error {
 	impl := so.getImplementer(v)
@@ -176,7 +171,6 @@ func (so *ServerObject) SetWriteCallback(v Implementer, propertyName string,
 	return impl.setWriteCallback(propertyName, cb)
 }
 
-// SetReadCallback V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) SetReadCallback(v Implementer, propertyName string,
 	cb PropertyReadCallback) error {
 	impl := so.getImplementer(v)
@@ -187,7 +181,6 @@ func (so *ServerObject) SetReadCallback(v Implementer, propertyName string,
 	return impl.setReadCallback(propertyName, cb)
 }
 
-// ConnectChanged V23兼容该接口。V23正常流程外部不再需要该接口
 func (so *ServerObject) ConnectChanged(v Implementer, propertyName string,
 	cb PropertyChangedCallback) error {
 

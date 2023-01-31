@@ -1,8 +1,4 @@
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-package dbusutil
+package dbusutilv1
 
 import (
 	"errors"
@@ -21,11 +17,6 @@ type Implementer interface {
 type ImplementerExt interface {
 	Implementer
 	GetExportedMethods() ExportedMethods
-}
-
-// ImplementerV20 兼容v20之前的方式
-type ImplementerV20 interface {
-	GetInterfaceName() string
 }
 
 type ExportedMethods []ExportedMethod
