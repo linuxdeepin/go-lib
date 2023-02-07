@@ -7,8 +7,8 @@ package dbusutil
 import (
 	"errors"
 
-	"github.com/godbus/dbus"
-	"github.com/godbus/dbus/prop"
+	"github.com/godbus/dbus/v5"
+	"github.com/godbus/dbus/v5/prop"
 )
 
 func (so *ServerObject) propertiesGet(sender dbus.Sender,

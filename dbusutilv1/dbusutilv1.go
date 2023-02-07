@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/godbus/dbus"
-	"github.com/godbus/dbus/introspect"
+	"github.com/godbus/dbus/v5"
+	"github.com/godbus/dbus/v5/introspect"
 )
 
 var logger *log.Logger

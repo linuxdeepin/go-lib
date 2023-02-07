@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 	"github.com/linuxdeepin/go-lib/dbusutilv1"
 )
 
