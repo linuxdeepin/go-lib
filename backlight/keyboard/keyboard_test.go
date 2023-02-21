@@ -31,7 +31,7 @@ func Test_list(t *testing.T) {
 	assert.Len(t, controllers, 1)
 
 	controller := controllers[0]
-	assert.Equal(t, controller.Name, "xxx::kbd_backlight")
+	assert.Equal(t, controller.Name, "xxx__kbd_backlight")
 	assert.Equal(t, controller.MaxBrightness, 3)
 
 	br, err := controller.GetBrightness()
