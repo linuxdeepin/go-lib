@@ -9,7 +9,7 @@ require (
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/stretchr/testify v1.8.0
 	github.com/youpy/go-wav v0.3.2
-	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69
+	golang.org/x/image v0.5.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 )
