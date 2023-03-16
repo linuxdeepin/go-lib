@@ -4,8 +4,6 @@ go 1.15
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4
-	github.com/godbus/dbus v4.1.0+incompatible
-	github.com/linuxdeepin/go-gir v0.0.0-20211207134948-479a42104c80
 	github.com/linuxdeepin/go-x11-client v0.0.0-20220830090948-78fe92b727bb
 	github.com/mozillazg/go-pinyin v0.19.0
 	github.com/smartystreets/goconvey v1.7.2
@@ -19,4 +17,6 @@ require (
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
+	github.com/godbus/dbus/v5 v5.1.0
+	github.com/linuxdeepin/go-gir v0.0.0-20230331033513-a8d7a9e89f9b
 )

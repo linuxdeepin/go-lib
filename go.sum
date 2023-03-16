@@ -7,8 +7,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.5.4 h1:jRbGcIw6P2Meqdwuo0H1p6JVLbL5DHKAKlYndzMwVZI=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
-github.com/godbus/dbus v4.1.0+incompatible h1:WqqLRTsQic3apZUK9qC5sGNfXthmPXzUZ7nQPrNITa4=
-github.com/godbus/dbus v4.1.0+incompatible/go.mod h1:/YcGZj5zSblfDWMMoOzV4fas9FZnQYTkDnsGvmh2Grw=
+github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
+github.com/godbus/dbus/v5 v5.1.0/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=
@@ -20,8 +20,8 @@ github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfn
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/linuxdeepin/go-gir v0.0.0-20211207134948-479a42104c80 h1:oU8VGDmjswR8lpa6Pin85ulO1ZRxSs2l6nbjomXfKCI=
-github.com/linuxdeepin/go-gir v0.0.0-20211207134948-479a42104c80/go.mod h1:abG3BzoOj3V3vTs3VhhJ9EsLL0JmfzCNpWmBzVDyJPk=
+github.com/linuxdeepin/go-gir v0.0.0-20230331033513-a8d7a9e89f9b h1:jQpiMVcWkn3iS1u5JGiUrEMgRe6fa+OwdAA5mW1AZtI=
+github.com/linuxdeepin/go-gir v0.0.0-20230331033513-a8d7a9e89f9b/go.mod h1:a0tox5vepTQu5iO6rdKc4diGT+fkyXZlRROM8ULEvaI=
 github.com/linuxdeepin/go-x11-client v0.0.0-20220830090948-78fe92b727bb h1:kgPssZCtCS0XCBVowxOUV9o7Z80Tb4huS2hM1qyraz4=
 github.com/linuxdeepin/go-x11-client v0.0.0-20220830090948-78fe92b727bb/go.mod h1:KwpmRZ47A/0a2l9V0V6aTlkuNaqy5j1fOqMFJONuIMY=
 github.com/mozillazg/go-pinyin v0.19.0 h1:p+J8/kjJ558KPvVGYLvqBhxf8jbZA2exSLCs2uUVN8c=

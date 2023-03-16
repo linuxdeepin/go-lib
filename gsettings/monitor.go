@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 func addMatch(bus *dbus.Conn, rule string) error {

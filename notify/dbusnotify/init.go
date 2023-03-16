@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 var __conn *dbus.Conn = nil

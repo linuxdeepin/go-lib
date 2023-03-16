@@ -6,7 +6,7 @@ package dbusutilv1
 import (
 	"errors"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 // ServerObject 一个path对应一个obj
@@ -112,7 +112,7 @@ func (so *ServerObject) StopExport() error {
 		return errors.New("server object is not exported")
 	}
 
-	// TODO: 等 github.com/godbus/dbus 升级之后，需要把所有 conn.Export 都换成 conn.ExportMethodTable。
+	// TODO: 等 github.com/godbus/dbus/v5 升级之后，需要把所有 conn.Export 都换成 conn.ExportMethodTable。
 	// 目前是由于 conn.ExportMethodTable 方法在 methods 参数为 nil 时有 bug，才用了 conn.Export 方法。
 	err := conn.Export(nil, path, orgFreedesktopDBus+".Properties")
 	if err != nil {
