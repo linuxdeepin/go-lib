@@ -111,7 +111,7 @@ func (g *Generator) genGetExportedMethodsFn(result map[string]dbusutilv1.Exporte
 
 func getDBusIdent(imports []*ast.ImportSpec) string {
 	for _, spec := range imports {
-		if spec.Path.Value == `"github.com/godbus/dbus"` {
+		if spec.Path.Value == `"github.com/godbus/dbus/v5"` {
 			if spec.Name != nil {
 				return spec.Name.Name
 			}

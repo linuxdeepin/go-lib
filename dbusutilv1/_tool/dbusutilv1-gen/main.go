@@ -225,7 +225,7 @@ func main() {
 			parts := strings.SplitN(imp, "=", 2)
 			pkg := parts[0]
 			alias := parts[1]
-			// github.com/godbus/dbus=dbus,bytes
+			// github.com/godbus/dbus/v5=dbus,bytes
 			parsedExtraImports = append(parsedExtraImports, fmt.Sprintf("%s \"%s\"",
 				alias, pkg))
 		} else {

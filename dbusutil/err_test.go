@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 type impl1 struct {
