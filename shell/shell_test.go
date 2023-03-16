@@ -10,9 +10,9 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	_, err := exec.LookPath("sh")
+	_, err := exec.LookPath("dash")
 	if err != nil {
-		t.Skip("not found sh")
+		t.Skip("not found dash")
 	}
 
 	for _, s := range []string{
@@ -25,7 +25,7 @@ func TestEncode(t *testing.T) {
 		r := Encode(s)
 		t.Log(r)
 
-		cmd := exec.Command("sh", "-c", "echo -n "+r)
+		cmd := exec.Command("dash", "-c", "echo -n "+r)
 		output, err := cmd.Output()
 		if err != nil {
 			t.Fatal(err)

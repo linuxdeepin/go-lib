@@ -8,8 +8,8 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/godbus/dbus"
-	"github.com/godbus/dbus/introspect"
+	"github.com/godbus/dbus/v5"
+	"github.com/godbus/dbus/v5/introspect"
 )
 
 func newImplementerStatic(impl Implementer, interfaceName string, structValue reflect.Value) *implementerStatic {
