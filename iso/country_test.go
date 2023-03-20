@@ -90,7 +90,8 @@ func TestGetCountryInfoForCode(t *testing.T) {
 		{"en_US.UTF-8", "Cn", "China"},
 		{"en_US.UTF-8", "cn", "China"},
 	}
-	for _, d := range testData {
+	for index, d := range testData {
+		t.Log("index", index);
 		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
 		os.Setenv("LC_CTYPE", "en_US.UTF-8")
 		InitI18n()
