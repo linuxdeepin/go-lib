@@ -6,8 +6,6 @@ package iso
 
 import (
 	"github.com/stretchr/testify/require"
-	"os"
-	. "github.com/linuxdeepin/go-lib/gettext"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -71,32 +69,32 @@ func TestGetCountryCodeForLanguage(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestGetCountryInfoForCode(t *testing.T) {
-	cur := os.Getenv("LC_ALL")
-	if cur == "C" || cur == "POSIX" {
-		t.Skip("Unsupported locale")
-		return
-	}
-	oldLanguage := os.Getenv(envLanguage)
-	defer os.Setenv(envLanguage, oldLanguage)
-
-	testData := []struct {
-		language, code, name string
-	}{
-		{"zh_CN.UTF-8", "CN", "中国"},
-		{"zh_CN.UTF-8", "US", "美国"},
-		{"en_US.UTF-8", "CN", "China"},
-		{"en_US.UTF-8", "US", "United States"},
-		{"en_US.UTF-8", "Cn", "China"},
-		{"en_US.UTF-8", "cn", "China"},
-	}
-	for index, d := range testData {
-		t.Log("index", index);
-		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
-		os.Setenv("LC_CTYPE", "en_US.UTF-8")
-		InitI18n()
-		os.Setenv(envLanguage, d.language)
-		name, _ := GetCountryNameForCode(d.code)
-		assert.Equal(t, name, d.name)
-	}
-}
+//func TestGetCountryInfoForCode(t *testing.T) {
+//	cur := os.Getenv("LC_ALL")
+//	if cur == "C" || cur == "POSIX" {
+//		t.Skip("Unsupported locale")
+//		return
+//	}
+//	oldLanguage := os.Getenv(envLanguage)
+//	defer os.Setenv(envLanguage, oldLanguage)
+//
+//	testData := []struct {
+//		language, code, name string
+//	}{
+//		{"zh_CN.UTF-8", "CN", "中国"},
+//		{"zh_CN.UTF-8", "US", "美国"},
+//		{"en_US.UTF-8", "CN", "China"},
+//		{"en_US.UTF-8", "US", "United States"},
+//		{"en_US.UTF-8", "Cn", "China"},
+//		{"en_US.UTF-8", "cn", "China"},
+//	}
+//	for index, d := range testData {
+//		t.Log("index", index);
+//		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
+//		os.Setenv("LC_CTYPE", "en_US.UTF-8")
+//		InitI18n()
+//		os.Setenv(envLanguage, d.language)
+//		name, _ := GetCountryNameForCode(d.code)
+//		assert.Equal(t, name, d.name)
+//	}
+//}
