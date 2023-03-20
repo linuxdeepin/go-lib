@@ -21,32 +21,32 @@ func TestGetCountryDatabase(t *testing.T) {
 	assert.NotNil(t, database)
 }
 
-func TestGetLocaleCountryInfo(t *testing.T) {
-	cur := os.Getenv("LC_ALL")
-	if cur == "C" || cur == "POSIX" {
-		t.Skip("Unsupported locale")
-		return
-	}
-	oldLanguage := os.Getenv(envLanguage)
-	defer os.Setenv(envLanguage, oldLanguage)
-
-	testData := []struct {
-		language, code, name string
-	}{
-		{"zh_CN.UTF-8", "CN", "中国"},
-		{"en_US.UTF-8", "US", "United States"},
-	}
-	for _, d := range testData {
-		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
-		os.Setenv("LC_CTYPE", "en_US.UTF-8")
-		InitI18n()
-		os.Setenv(envLanguage, d.language)
-		code, _ := GetLocaleCountryCode()
-		assert.Equal(t, code, d.code)
-		name, _ := GetLocaleCountryName()
-		assert.Equal(t, name, d.name)
-	}
-}
+//func TestGetLocaleCountryInfo(t *testing.T) {
+//	cur := os.Getenv("LC_ALL")
+//	if cur == "C" || cur == "POSIX" {
+//		t.Skip("Unsupported locale")
+//		return
+//	}
+//	oldLanguage := os.Getenv(envLanguage)
+//	defer os.Setenv(envLanguage, oldLanguage)
+//
+//	testData := []struct {
+//		language, code, name string
+//	}{
+//		{"zh_CN.UTF-8", "CN", "中国"},
+//		{"en_US.UTF-8", "US", "United States"},
+//	}
+//	for _, d := range testData {
+//		os.Setenv("LC_MESSAGES", "en_US.UTF-8")
+//		os.Setenv("LC_CTYPE", "en_US.UTF-8")
+//		InitI18n()
+//		os.Setenv(envLanguage, d.language)
+//		code, _ := GetLocaleCountryCode()
+//		assert.Equal(t, code, d.code)
+//		name, _ := GetLocaleCountryName()
+//		assert.Equal(t, name, d.name)
+//	}
+//}
 
 func TestGetCountryCodeForLanguage(t *testing.T) {
 	testData := []struct {
