@@ -1,3 +1,11 @@
+golang-github-linuxdeepin-go-lib (6.0.3) unstable; urgency=medium
+
+  [ TagBuilder ]
+  * chore: reuse lint
+  * chore: remove gm
+
+ -- dengbo <dengbo@uniontech.com>  Wed, 29 Mar 2023 11:31:05 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.2) unstable; urgency=medium
 
   [ TagBuilder ]
