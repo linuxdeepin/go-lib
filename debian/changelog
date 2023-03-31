@@ -1,3 +1,10 @@
+golang-github-linuxdeepin-go-lib (6.0.4) unstable; urgency=medium
+
+  [ TagBuilder ]
+  * chore: 修复obs打包失败的问题
+
+ -- dengbo <dengbo@uniontech.com>  Fri, 31 Mar 2023 15:11:40 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.3) unstable; urgency=medium
 
   [ TagBuilder ]
