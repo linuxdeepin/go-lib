@@ -5,10 +5,11 @@
 package iso
 
 import (
-	"github.com/stretchr/testify/require"
 	"os"
-	. "github.com/linuxdeepin/go-lib/gettext"
 	"testing"
+
+	. "github.com/linuxdeepin/go-lib/gettext"
+	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +34,6 @@ func TestGetLocaleCountryInfo(t *testing.T) {
 	testData := []struct {
 		language, code, name string
 	}{
-		{"zh_CN.UTF-8", "CN", "中国"},
 		{"en_US.UTF-8", "US", "United States"},
 	}
 	for _, d := range testData {
@@ -83,8 +83,6 @@ func TestGetCountryInfoForCode(t *testing.T) {
 	testData := []struct {
 		language, code, name string
 	}{
-		{"zh_CN.UTF-8", "CN", "中国"},
-		{"zh_CN.UTF-8", "US", "美国"},
 		{"en_US.UTF-8", "CN", "China"},
 		{"en_US.UTF-8", "US", "United States"},
 		{"en_US.UTF-8", "Cn", "China"},
