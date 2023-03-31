@@ -4,12 +4,12 @@ Upstream-Contact: UnionTech Software Technology Co., Ltd.  <>
 Source: https://github.com/linuxdeepin/go-lib
 
 # gitignore clang-format gitreview .tx
-Files: .gitignore .clang-format .gitreview .mailmap .tx/config
+Files: .gitignore .clang-format .gitreview .mailmap .tx/*
 Copyright: None
 License: CC0-1.0
 
 # ci
-Files: .github/* .gitlab-ci.yml
+Files: .github/* .obs/* .gitlab-ci.yml
 Copyright: None
 License: CC0-1.0
 
