@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.5) unstable; urgency=medium
+
+  * chore: add go mod support
+
+ -- dengbo <dengbo@uniontech.com>  Sat, 6 May 2023 10:26:55 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.4) unstable; urgency=medium
 
   [ TagBuilder ]
