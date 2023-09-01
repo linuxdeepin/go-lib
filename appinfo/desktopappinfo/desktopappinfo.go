@@ -6,7 +6,9 @@ package desktopappinfo
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -612,6 +614,37 @@ func startCommand(ai *DesktopAppInfo, cmdline string, files []string, launchCont
 
 	var snId string
 	startupNotify := ai.GetStartupNotify()
+	// 名单中的应用强制startupNotify,
+	forceStartupNotifyList := []string{
+		"com.alibabainc.dingtalk.desktop",
+		"com.qq.im.deepin.desktop",
+		"com.qq.weixin.deepin.desktop",
+		"com.qq.weixin.work.deepin.desktop",
+		"wemeetapp.desktop",
+		"wps-office-prometheus.desktop",
+		"cn.codemao.kitten3.desktop",
+		"cn.codemao.wood.desktop",
+		"cn.scratch.scratch.desktop",
+		"com.51dzt.deepin.desktop",
+		"com.macromediaflash8.deepin.desktop",
+		"com.meitu.mtxx.deepin.desktop",
+		"com.mspaint.deepin.desktop",
+		"com.qq.tenvideo.desktop",
+		"com.youku.deepin.desktop",
+		"com.youkuido.deepin.desktop",
+		"gimp.desktop",
+		"mu.codewith.mu-editor.desktop",
+	}
+	const startupNotifyListPath = "/var/lib/apps/startupNotifyList.json"
+	c, err := ioutil.ReadFile(startupNotifyListPath)
+	if err == nil {
+		_ = json.Unmarshal(c, &forceStartupNotifyList)
+	}
+	for _, d := range forceStartupNotifyList {
+		if strings.Contains(ai.GetFileName(), d) {
+			startupNotify = true
+		}
+	}
 	if startupNotify && launchContext != nil &&
 		launchContext.GetTimestamp() != 0 {
 		snId, _ = launchContext.GetStartupNotifyId(ai, files)
