@@ -7,6 +7,7 @@ package desktopappinfo
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/godbus/dbus/v5"
 	gio "github.com/linuxdeepin/go-gir/gio-2.0"
 	"github.com/linuxdeepin/go-lib/appinfo"
 	"github.com/linuxdeepin/go-lib/keyfile"
@@ -56,6 +58,14 @@ const (
 	enableInvoker         = "ENABLE_TURBO_INVOKER"
 	turboInvokerFailedMsg = "Failed to invoke: Booster:"
 	turboInvokerErrMsg    = "deepin-turbo-invoker: error"
+)
+
+// NOTE: these consts is copied from systemd-go
+// https://github.com/coreos/go-systemd/blob/d843340ab4bd3815fda02e648f9b09ae2dc722a7/dbus/dbus.go#L30-L35
+const (
+	alpha    = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	num      = `0123456789`
+	alphaNum = alpha + num
 )
 
 var xdgDataDirs []string
@@ -671,4 +681,49 @@ func (action *DesktopAction) Launch(files []string, launchContext *appinfo.AppLa
 func (action *DesktopAction) StartCommand(files []string, launchContext *appinfo.AppLaunchContext) (*exec.Cmd, error) {
 	ai := action.parent
 	return startCommand(ai, action.Exec, files, launchContext, true)
+}
+
+// PathBusEscape sanitizes a constituent string of a dbus ObjectPath using the
+// rules that systemd uses for serializing special characters.
+// NOTE: this function is copied from systemd-go
+// https://github.com/coreos/go-systemd/blob/d843340ab4bd3815fda02e648f9b09ae2dc722a7/dbus/dbus.go#L47
+func pathBusEscape(path string) string {
+	// Special case the empty string
+	if len(path) == 0 {
+		return "_"
+	}
+	n := []byte{}
+	for i := 0; i < len(path); i++ {
+		c := path[i]
+		if needsEscape(i, c) {
+			e := fmt.Sprintf("_%x", c)
+			n = append(n, []byte(e)...)
+		} else {
+			n = append(n, c)
+		}
+	}
+	return string(n)
+}
+
+// needsEscape checks whether a byte in a potential dbus ObjectPath needs to be escaped
+// NOTE: this function is copied from systemd-go
+// https://github.com/coreos/go-systemd/blob/d843340ab4bd3815fda02e648f9b09ae2dc722a7/dbus/dbus.go#L38
+func needsEscape(i int, b byte) bool {
+	// Escape everything that is not a-z-A-Z-0-9
+	// Also escape 0-9 if it's the first character
+	return strings.IndexByte(alphaNum, b) == -1 ||
+		(i == 0 && strings.IndexByte(num, b) != -1)
+}
+
+func GetDBusObjectFromAppDesktop(desktop string, service string, path string) (dbus.ObjectPath, error) {
+	sessionBus, err := dbus.SessionBus()
+	if err != nil {
+		return "", err
+	}
+
+	escapeId := pathBusEscape(strings.TrimSuffix(desktop, ".desktop"))
+	return sessionBus.Object(
+		service,
+		dbus.ObjectPath(path+"/"+escapeId),
+	).Path(), nil
 }
