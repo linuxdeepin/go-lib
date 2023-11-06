@@ -1,3 +1,10 @@
+golang-github-linuxdeepin-go-lib (6.0.6) unstable; urgency=medium
+
+  * fix: 系统关机音效异常
+  * feat: add interface to adapt new am
+
+ -- dengbo <dengbo@uniontech.com>  Mon, 06 Nov 2023 15:50:50 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.5) unstable; urgency=medium
 
   * chore: add go mod support
