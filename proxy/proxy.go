@@ -195,11 +195,7 @@ func systemdAndDbusUnSetEnv(env string) {
 		logger.Warning(err)
 		return
 	}
-	systemdObj := bus.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
-	err = systemdObj.Call("org.freedesktop.systemd1.Manager.UnsetEnvironment", 0, []string{env}).Err
-	if err != nil {
-		logger.Warning(err)
-	}
+
 	dbusObj := bus.Object("org.freedesktop.DBus", "/org/freedesktop/DBus")
 	envMap := make(map[string]string)
 	envMap[env] = ""
@@ -207,6 +203,14 @@ func systemdAndDbusUnSetEnv(env string) {
 	if err != nil {
 		logger.Warning(err)
 	}
+
+	// dbus will register with systemd when cleaning environment variables, so systemd needs to be cleaned up at the end
+	systemdObj := bus.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
+	err = systemdObj.Call("org.freedesktop.systemd1.Manager.UnsetEnvironment", 0, []string{env}).Err
+	if err != nil {
+		logger.Warning(err)
+	}
+
 	logger.Debug("unset dbus and systemd env")
 }
 
