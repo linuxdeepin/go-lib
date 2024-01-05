@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.7) unstable; urgency=medium
+
+  * fix: proxy env error
+
+ -- chenhongtao <chenhongtao@deepin.org>  Fri, 05 Jan 2024 13:37:55 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.6) unstable; urgency=medium
 
   * fix: 系统关机音效异常
