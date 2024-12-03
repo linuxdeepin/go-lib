@@ -174,3 +174,15 @@ func (cm ChannelMap) CanFade() bool {
 		return true
 	}
 }
+
+// 音频支持单声道设置，仅在pipewire下有效果
+func (cv CVolume) SetMono(volume float64, enable bool) CVolume {
+	var v Volume
+	v.paVolume = C.pa_volume_t(volume * C.PA_VOLUME_NORM)
+	var channels uint32 = 1
+	if !enable {
+		channels = 32
+	}
+	C.pa_cvolume_set(&cv.core, C.unsigned(channels), v.paVolume)
+	return cv
+}
