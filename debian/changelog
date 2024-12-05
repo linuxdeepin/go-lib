@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.8) unstable; urgency=medium
+
+  * feat: pipewire下支持单声道设置
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 05 Dec 2024 14:01:55 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.7) unstable; urgency=medium
 
   * fix: proxy env error
