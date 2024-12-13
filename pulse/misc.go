@@ -179,7 +179,7 @@ func (cm ChannelMap) CanFade() bool {
 func (cv CVolume) SetMono(volume float64, enable bool) CVolume {
 	var v Volume
 	v.paVolume = C.pa_volume_t(volume * C.PA_VOLUME_NORM)
-	var channels uint32 = 1
+	var channels uint32 = 31
 	if !enable {
 		channels = 32
 	}
