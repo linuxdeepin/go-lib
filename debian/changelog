@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.9) unstable; urgency=medium
+
+  * feat: 修改单声道pa设置的值 (#105)
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 19 Dec 2024 11:08:13 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.8) unstable; urgency=medium
 
   * feat: pipewire下支持单声道设置
