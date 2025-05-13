@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 9), dh-golang, golang-go,
  iso-codes, dbus-x11, libasound2-dev, libpam0g-dev, golang-golang-x-net-dev, golang-github-stretchr-testify-dev,
  golang-golang-x-crypto-dev, libssl-dev
 Standards-Version: 3.9.8
-Homepage: http://www.deepin.org
+Homepage: https://github.com/linuxdeepin/go-lib
 
 Package: golang-github-linuxdeepin-go-lib-dev
 Architecture: all
