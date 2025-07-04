@@ -5,13 +5,16 @@
 package procfs
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"github.com/linuxdeepin/go-lib/encoding/kv"
 	"strconv"
 	"strings"
+	"sync"
+
+	"github.com/linuxdeepin/go-lib/encoding/kv"
 )
 
 type Process uint
@@ -51,6 +54,20 @@ func (p Process) Exe() (string, error) {
 	exeFile := p.getFile("exe")
 	exe, err := filepath.EvalSymlinks(exeFile)
 	return exe, err
+}
+
+func (p Process) TrustedExe() (string, error) {
+	exeFile := p.getFile("exe")
+	exe, err := filepath.EvalSymlinks(exeFile)
+	if err != nil {
+		return "", err
+	}
+	if os.Getuid() == 0 {
+		if !checkSenderNsMntValid(uint32(p)) {
+			return "", errors.New("due to the difference between the current process's ns mnt and the init process's ns mnt, the exe field is not reliable")
+		}
+	}
+	return exe, nil
 }
 
 type EnvVars []string
@@ -144,4 +161,28 @@ func (st Status) PPid() (uint, error) {
 		return 0, err
 	}
 	return uint(v), nil
+}
+
+var _initProcNsMnt string
+var _once sync.Once
+
+// 通过判断/proc/pid/ns/mnt 和 /proc/1/ns/mnt是否相同，如果不相同，则进程exe字段不可信
+func checkSenderNsMntValid(pid uint32) bool {
+	_once.Do(func() {
+		out, err := os.Readlink("/proc/1/ns/mnt")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		_initProcNsMnt = strings.TrimSpace(out)
+	})
+	c, err := os.Readlink(fmt.Sprintf("/proc/%v/ns/mnt", pid))
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	defer func() {
+		fmt.Printf("pid 1 mnt ns is %v,pid %v mnt ns is %v\n", _initProcNsMnt, pid, strings.TrimSpace(c))
+	}()
+	return strings.TrimSpace(c) == _initProcNsMnt
 }

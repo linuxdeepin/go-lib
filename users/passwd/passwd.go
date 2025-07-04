@@ -10,8 +10,11 @@ import "C"
 
 import (
 	"fmt"
+	"sync"
 	"unsafe"
 )
+
+var mutex sync.Mutex
 
 // Passwd wraps up `passwd` struct used in kernel
 type Passwd struct {
@@ -53,6 +56,8 @@ func (err *UserNotFoundError) Error() string {
 // GetPasswdByName wraps up `getpwnam` system call.
 // It retrieves records from the password file based on username.
 func GetPasswdByName(name string) (*Passwd, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	nameC := C.CString(name)
 	defer C.free(unsafe.Pointer(nameC))
 	passwdC, err := C.getpwnam(nameC)
@@ -70,6 +75,8 @@ func GetPasswdByName(name string) (*Passwd, error) {
 // GetPasswdByUid wraps up `getpwuid` system call.
 // It retrieves records from the password file based on uid.
 func GetPasswdByUid(uid uint32) (*Passwd, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	uidC := C.__uid_t(uid)
 	passwdC, err := C.getpwuid(uidC)
 	if passwdC == nil {
@@ -86,6 +93,8 @@ func GetPasswdByUid(uid uint32) (*Passwd, error) {
 // GetPasswdEntry wraps up `getpwent` system call
 // It performs sequential scans of the records in the password file.
 func GetPasswdEntry() []*Passwd {
+	mutex.Lock()
+	defer mutex.Unlock()
 	var passwds []*Passwd
 
 	// Restart scanning from the begging of the password file.
