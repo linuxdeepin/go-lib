@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.11) unstable; urgency=medium
+
+  * feat: add GetModuleList method (#111)
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 15 Jul 2025 20:49:33 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.10) unstable; urgency=medium
 
   * feat: procfs增加TrustedExe方法 (#109)
