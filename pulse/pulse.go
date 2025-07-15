@@ -341,6 +341,24 @@ func (c *Context) MoveSourceOutputsByIndex(sourceOutputs []uint32, sourceIdx uin
 	})
 }
 
+// GetModuleList retrieves the list of loaded modules
+func (c *Context) GetModuleList() (r []*Module) {
+	ck := newCookie()
+
+	c.safeDo(func() {
+		C._get_module_info_list(c.loop, c.ctx, C.int64_t(ck.id))
+	})
+
+	for _, info := range ck.ReplyList() {
+		module := info.data.(*Module)
+		if module == nil {
+			continue
+		}
+		r = append(r, module)
+	}
+	return
+}
+
 var (
 	__context   *Context
 	__ctxLocker sync.Mutex

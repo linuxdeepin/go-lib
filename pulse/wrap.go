@@ -154,3 +154,26 @@ type SampleSpec struct {
 	Rate     uint32
 	Channels uint8
 }
+
+type Module struct {
+	Index      uint32
+	Name       string
+	Argument   string
+	NUsed      uint32
+	AutoUnload int // deprecated, but keep for completeness
+	PropList   map[string]string
+}
+
+func toModuleInfo(info *C.pa_module_info) *Module {
+	if info == nil {
+		return nil
+	}
+	return &Module{
+		Index:      uint32(info.index),
+		Name:       C.GoString(info.name),
+		Argument:   C.GoString(info.argument),
+		NUsed:      uint32(info.n_used),
+		AutoUnload: int(info.auto_unload),
+		PropList:   toProplist(info.proplist),
+	}
+}

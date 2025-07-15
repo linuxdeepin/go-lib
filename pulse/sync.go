@@ -38,6 +38,8 @@ func NewPaInfo(data unsafe.Pointer, Type int) *paInfo {
 		info.data = toServerInfo((*C.pa_server_info)(data))
 	case C.PA_SUBSCRIPTION_EVENT_CARD:
 		info.data = toCardInfo((*C.pa_card_info)(data))
+	case C.PA_SUBSCRIPTION_EVENT_MODULE:
+		info.data = toModuleInfo((*C.pa_module_info)(data))
 	default:
 		// current didn't support this type
 		return nil
