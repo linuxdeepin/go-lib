@@ -18,5 +18,5 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/godbus/dbus/v5 v5.1.0
-	github.com/linuxdeepin/go-gir v0.0.0-20230331033513-a8d7a9e89f9b
+	github.com/linuxdeepin/go-gir v0.0.0-20250812023606-b28aaee32ac9
 )
