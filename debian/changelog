@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.12) unstable; urgency=medium
+
+  * chore: bump go-gir revision in go.mod
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 14 Aug 2025 20:55:31 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.11) unstable; urgency=medium
 
   * feat: add GetModuleList method (#111)
