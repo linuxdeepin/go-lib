@@ -510,3 +510,22 @@ func (c *Context) LoadModule(name, argument string) {
 		C.pa_operation_unref(op)
 	})
 }
+
+// UnloadModule unloads a module by its index
+func (c *Context) UnloadModule(index uint32) {
+	c.safeDo(func() {
+		op := C.pa_context_unload_module(c.ctx, C.uint32_t(index), C.get_success_cb(), nil)
+		C.pa_operation_unref(op)
+	})
+}
+
+// UnloadModuleByName unloads the first module matching the given name
+func (c *Context) UnloadModuleByName(name string) {
+	modules := c.GetModuleList()
+	for _, module := range modules {
+		if module.Name == name {
+			c.UnloadModule(module.Index)
+			return
+		}
+	}
+}
