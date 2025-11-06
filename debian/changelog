@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.13) unstable; urgency=medium
+
+  * feat: add module unloading functionality (#115)
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 06 Nov 2025 14:47:39 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.12) unstable; urgency=medium
 
   * chore: bump go-gir revision in go.mod
