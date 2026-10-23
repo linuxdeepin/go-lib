@@ -37,7 +37,6 @@ sha512sums=('SKIP')
 
 prepare() {
   cd $deepin_source_name
-  sed -i 's|"sh"|"dash"|' shell/shell_test.go
 }
 
 check() {
