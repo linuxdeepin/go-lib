@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2018 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2018 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -351,9 +351,9 @@ func Test_splitExec(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, parts, []string{"`abcdef", "def"})
 
-	parts, err = splitExec(`sh -c 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
+	parts, err = splitExec(`app --flag 'if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then run env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi'`)
 	require.NoError(t, err)
-	assert.Equal(t, parts, []string{"sh", "-c", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then exec env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
+	assert.Equal(t, parts, []string{"app", "--flag", `if ! [ -e "/usr/bin/ibus-daemon" ] && [ "x$XDG_SESSION_TYPE" = "xwayland" ] ; then run env IM_CONFIG_CHECK_ENV=1 deepin-terminal true; fi`})
 
 	_, err = splitExec(`"abcdef`)
 	assert.Equal(t, err, ErrQuotingNotClosed)

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2018 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2018 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,21 +10,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-
-	"github.com/linuxdeepin/go-lib/utils"
 )
-
-func getDefaultTerminal() (exec string, execArg string) {
-	gs, err := utils.CheckAndNewGSettings("com.deepin.desktop.default-applications.terminal")
-	if err == nil {
-		exec = gs.GetString("exec")
-		execArg = gs.GetString("exec-arg")
-	} else {
-		exec = "xterm"
-		execArg = "-e"
-	}
-	return
-}
 
 // The characters that must be escaped
 var escapeChars = []byte{'`', '$', '\\', '"'}

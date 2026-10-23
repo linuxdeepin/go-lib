@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2018 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2018 - 2026 UnionTech Software Technology Co., Ltd.
 // 
 // SPDX-License-Identifier: GPL-3.0-or-later
 package gsprop
@@ -6,7 +6,6 @@ package gsprop
 import (
 	"encoding/xml"
 	"os/exec"
-	"strings"
 	"testing"
 	"time"
 
@@ -41,20 +40,20 @@ func TestAll(t *testing.T) {
 		t.Skip("failed to exec gsettings list-recursively")
 	}
 
-	script := `
-gsettings set ca.desrt.dconf-editor.Demo boolean true
-gsettings set ca.desrt.dconf-editor.Demo enumeration Blue
-gsettings set ca.desrt.dconf-editor.Demo integer-32-signed -32
-gsettings set ca.desrt.dconf-editor.Demo integer-32-unsigned 132
-gsettings set ca.desrt.dconf-editor.Demo double 1.5
-gsettings set ca.desrt.dconf-editor.Demo string 'hello world'
-gsettings set ca.desrt.dconf-editor.Demo string-array '["go","perl","python", "c#"]'
-`
-	sh := exec.Command("sh")
-	sh.Stdin = strings.NewReader(script)
-	err = sh.Run()
-	if err != nil {
-		t.Error("Unexpected error executing script:", err)
+	sets := [][]string{
+		{"set", demoSchemaId, "boolean", "true"},
+		{"set", demoSchemaId, "enumeration", "Blue"},
+		{"set", demoSchemaId, "integer-32-signed", "-32"},
+		{"set", demoSchemaId, "integer-32-unsigned", "132"},
+		{"set", demoSchemaId, "double", "1.5"},
+		{"set", demoSchemaId, "string", "hello world"},
+		{"set", demoSchemaId, "string-array", `["go","perl","python", "c#"]`},
+	}
+	for _, args := range sets {
+		err = exec.Command("gsettings", args...).Run()
+		if err != nil {
+			t.Error("Unexpected error executing gsettings:", err)
+		}
 	}
 
 	gs := gio.NewSettings(demoSchemaId)
