@@ -25,7 +25,10 @@ static void read_callback(pa_stream *s, size_t length, void *userdata) {
     }
 
     if (!data) {
-	pa_stream_drop(s);
+        /* NULL data means either a hole or empty buffer.
+         * Only drop the stream when there is a hole (length > 0) */
+        if (length)
+            pa_stream_drop(s);
 	return;
     }
 
