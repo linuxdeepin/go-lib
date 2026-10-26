@@ -1,3 +1,9 @@
+golang-github-linuxdeepin-go-lib (6.0.15) unstable; urgency=medium
+
+  * refactor(desktopappinfo): remove unused launch code
+
+ -- zhangkun <zhangkun2@uniontech.com>  Mon, 26 Oct 2026 11:15:54 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.14) unstable; urgency=medium
 
   * fix: add null check for pa_context operations (#117)
