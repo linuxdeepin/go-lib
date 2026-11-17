@@ -1,3 +1,11 @@
+golang-github-linuxdeepin-go-lib (6.2.0) unstable; urgency=medium
+
+  * chore: Sync by
+    https://github.com/linuxdeepin/.github/commit/4ea94168bb695accf2fa86
+    ecb697e490f89398eb
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 17 Nov 2026 22:05:04 +0800
+
 golang-github-linuxdeepin-go-lib (6.0.15) unstable; urgency=medium
 
   * refactor(desktopappinfo): remove unused launch code
